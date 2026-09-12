@@ -20,6 +20,8 @@
   --color-sidebar-primary: var(--sidebar-primary);
   --color-sidebar-foreground: var(--sidebar-foreground);
   --color-sidebar: var(--sidebar);
+  --color-sidebar-sub-foreground: var(--sidebar-sub-foreground);
+  --color-sidebar-chevron: var(--sidebar-chevron);
   --color-chart-5: var(--chart-5);
   --color-chart-4: var(--chart-4);
   --color-chart-3: var(--chart-3);
@@ -110,6 +112,10 @@
   --sidebar-accent-foreground: #8a3b12;
   --sidebar-border: #eae7e7;
   --sidebar-ring: #ff6b35;
+  /* Sub-items sit a step quieter than a top-level row, and the disclosure
+     chevron quieter still — both measured from the prototype. */
+  --sidebar-sub-foreground: #444141;
+  --sidebar-chevron: #9b9797;
 
   /* Muted body copy and the "Do this" links on the setup checklist. */
   --muted-strong: #605d5d;
@@ -165,6 +171,8 @@
   --sidebar-accent-foreground: oklch(0.985 0 0);
   --sidebar-border: oklch(1 0 0 / 10%);
   --sidebar-ring: #ff6b35;
+  --sidebar-sub-foreground: oklch(0.708 0 0);
+  --sidebar-chevron: oklch(0.708 0 0);
 }
 
 @layer base {

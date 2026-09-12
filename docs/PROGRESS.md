@@ -226,6 +226,54 @@ arrived as a `GET`. Worth recording because the symptom pointed squarely at
 the application and cost a long detour through store and fiber inspection
 before the harness was suspected.
 
+## Step 5 · Sidebar — done
+
+Rebuilt against the prototype's own rendered styles rather than a
+screenshot: a white 236px panel closed by a 2px `rgb(32 30 29 / 40%)` rule,
+a 30px mark over `FOUNDHINT / LOCAL SEO`, rows uppercase 12.5px/800 on
+`#eae7e7` hairlines, and an active row set larger (13.5px) in `#fff1eb` on
+`#8a3b12` behind a 3px `#ff6b35` bar — indented 6px further than an
+inactive row, which is what makes the bar read as pushing the label aside
+rather than sitting on it. The footer carries the permanent plan strip.
+Two tokens were added for values the design system did not yet name:
+`--sidebar-sub-foreground` (#444141) and `--sidebar-chevron` (#9b9797).
+Verified by reading computed styles back out of the running bundle and
+diffing them against the prototype's: zero differences.
+
+**The prototype's expandable groups are reproduced only where the children
+are real destinations.** There, most sub-links do not navigate. Here a
+group survives for Business and Settings, whose children jump to actual
+sections of those screens — `SectionCard` now takes an `id`, and the seven
+sections carry one. Dashboard, Setup, Locations and Services stay plain
+rows because each is a single destination. Schema, Landing Pages, SEO
+Audit, Google Business Profile, Ranking Grid, Performance and
+Recommendations remain absent: no engine, and a row opening an empty screen
+reads as broken rather than unbuilt. The prototype's "See what Pro unlocks"
+button is likewise left out until there is something for it to open.
+
+A group opens by itself when its screen is the current one and closes when
+you leave, so the sections of the page you are on are always listed.
+Jumping to a section moves focus to its heading, not just the scroll
+position — otherwise only sighted users actually arrive.
+
+**Two races, both found by testing rather than by reading.** A jump from
+another screen first did nothing at all: the lookup ran before the
+destination had mounted and loaded. Waiting on frames fixed that case but
+was the wrong instrument — `requestAnimationFrame` is throttled to a stop
+in a background tab, which is also why the first test of the fix appeared
+to hang. A `MutationObserver` waits on the DOM change itself. Then the
+opposite case surfaced: when the destination's data was already cached the
+section existed immediately, the reveal ran inline, and the screen's own
+`PageHeader` — whose mount effect runs *after* the sidebar's, since the
+sidebar is higher in the tree — took the focus straight back. Revealing
+from a task instead of inline settles both, because a task runs after every
+effect in the commit.
+
+Verified across four cases in a browser with a deliberately slowed mock:
+cross-screen into a still-loading screen, same-screen, and cross-screen
+twice more with the data already cached. All four land on the requested
+section with focus on its heading.
+
 ## Pending
 
 1. **Database round-trip verification** (above) — the gate on everything

@@ -143,6 +143,7 @@ export default function BusinessPage() {
         <RequestError error={error} />
 
         <SectionCard
+          id="business-details"
           title={__("Business details", "found-hint")}
           description={__("How your business is identified.", "found-hint")}
         >
@@ -276,6 +277,7 @@ export default function BusinessPage() {
         </SectionCard>
 
         <SectionCard
+          id="business-contact"
           title={__("Contact", "found-hint")}
           description={__(
             "Locations can override these; leave a location's field empty to use the business value.",
@@ -330,7 +332,10 @@ export default function BusinessPage() {
           </FieldGroup>
         </SectionCard>
 
-        <SectionCard title={__("Presentation", "found-hint")}>
+        <SectionCard
+          id="business-presentation"
+          title={__("Presentation", "found-hint")}
+        >
           <FieldGroup className="fhint:grid fhint:grid-cols-1 fhint:gap-4 fhint:md:grid-cols-3">
             <Field data-invalid={errors.logo_url ? true : undefined}>
               <FieldLabel htmlFor="fhint-logo">
@@ -384,6 +389,7 @@ export default function BusinessPage() {
         </SectionCard>
 
         <SectionCard
+          id="business-social"
           title={__("Social profiles", "found-hint")}
           description={__(
             "Published as the profiles that belong to this business.",

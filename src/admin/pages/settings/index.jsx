@@ -104,6 +104,7 @@ export default function SettingsPage() {
         <RequestError error={error} />
 
         <SectionCard
+          id="settings-data"
           title={__("Your data", "found-hint")}
           description={__(
             "Nothing is deleted when you remove the plugin unless you ask for it here.",
@@ -140,6 +141,7 @@ export default function SettingsPage() {
         </SectionCard>
 
         <SectionCard
+          id="settings-log"
           title={__("Activity log", "found-hint")}
           description={__(
             "FoundHint records what it does, so a problem can be traced later.",
@@ -222,6 +224,7 @@ export default function SettingsPage() {
       </form>
 
       <SectionCard
+        id="settings-system"
         title={__("System", "found-hint")}
         description={__(
           "Read-only. Safe to copy into a support request.",
