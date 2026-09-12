@@ -23,6 +23,8 @@
     "composer.lock",
     "package-lock.json",
     "docs",
+    "tests",
+    "phpcs.xml.dist",
     ".claude",
     ".agents"
   ],

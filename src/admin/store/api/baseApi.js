@@ -6,7 +6,7 @@ const { rest_url, rest_nonce } = window.FHINT ?? {};
  * Shared RTK Query base. Resource-specific endpoints are injected via
  * baseApi.injectEndpoints() from one file per REST resource under
  * store/api/*Api.js (e.g. businessApi.js, locationsApi.js) — see
- * includes/Presentation/REST/ for the PHP side of each resource, once it
+ * includes/API/ for the PHP side of each resource, once it
  * exists.
  */
 export const baseApi = createApi({

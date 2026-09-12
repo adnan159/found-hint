@@ -8,20 +8,21 @@
 defined( 'ABSPATH' ) || exit;
 
 /**
- * Only non-class utilities belong here (template helpers, shorthand
- * wrappers) — see local-seo's CLAUDE.md rule this repo carries over.
+ * Only non-class utilities belong here — things that need to be callable
+ * without instantiation (shorthand wrappers, template helpers). Anything
+ * with real logic belongs in a class under includes/App/.
  */
 
-if ( ! function_exists( 'fhint_plugin' ) ) {
+if ( ! function_exists( 'fhint_setting' ) ) {
 	/**
-	 * The booted plugin instance.
+	 * Get a single plugin setting by dot notation, with optional fallback.
 	 *
-	 * The entry point for everything: fhint_plugin()->get( SomeService::class ).
-	 *
-	 * @return \FHINT\Plugin
+	 * @param string $key      Dot-notation key, e.g. 'general.timezone'.
+	 * @param mixed  $fallback Returned when the key isn't found.
+	 * @return mixed
 	 */
-	function fhint_plugin() {
-		return \FHINT\Plugin::instance();
+	function fhint_setting( $key, $fallback = null ) {
+		return \FHINT\App\Core\Settings::get( $key, $fallback );
 	}
 }
 
@@ -33,7 +34,9 @@ if ( ! function_exists( 'fhint_rest_url' ) ) {
 	 * @return string
 	 */
 	function fhint_rest_url( $path = '' ) {
-		return rest_url( 'fhint/v1' . ( $path ? '/' . ltrim( $path, '/' ) : '' ) );
+		$base = \FHINT\API::NAMESPACE_NAME . '/' . \FHINT\API::VERSION;
+
+		return rest_url( $base . ( $path ? '/' . ltrim( $path, '/' ) : '' ) );
 	}
 }
 
@@ -41,15 +44,15 @@ if ( ! function_exists( 'fhint_table' ) ) {
 	/**
 	 * Full, prefixed name of one of this plugin's custom tables.
 	 *
-	 * Never hardcode a table name — always resolve it through this helper
-	 * (or FHINT\Infrastructure\Database\Tables once it exists) so the
-	 * `{$wpdb->prefix}fhint_` prefix lives in exactly one place.
+	 * Never hardcode a table name — always resolve it through this helper so
+	 * the `{$wpdb->prefix}fhint_` prefix lives in exactly one place.
 	 *
-	 * @param string $table Unprefixed table name, e.g. 'businesses'.
+	 * @param string $table Unprefixed table name, e.g. 'business'.
 	 * @return string
 	 */
 	function fhint_table( $table ) {
 		global $wpdb;
+
 		return $wpdb->prefix . 'fhint_' . $table;
 	}
 }

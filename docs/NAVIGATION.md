@@ -12,7 +12,7 @@ thing being built rather than a proposal:
    for what was extracted from it: brand tokens, the dashboard card
    composition, the Free/Pro gating pattern, copy tone.
 
-## Collapsed sidebar (what `includes/Presentation/Admin/Menu.php` registers today)
+## Collapsed sidebar (what `includes/Admin/Menu.php` registers today)
 
 ```
 FoundHint

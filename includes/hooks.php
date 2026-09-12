@@ -8,8 +8,32 @@
 defined( 'ABSPATH' ) || exit;
 
 /**
- * Nothing yet — this file exists so the structure and the include in
- * found-hint.php are in place before any global (non-class) hook needs one.
- * Prefer wiring hooks inside a service provider's boot() over adding here;
- * this file is only for truly plugin-wide wiring with no natural owner.
+ * Only truly plugin-wide wiring with no natural owner belongs here.
+ * Anything that belongs to a module goes in that module's own class.
  */
+
+/**
+ * Daily log trim.
+ *
+ * Scheduled on activation and cleared on deactivation (see found-hint.php).
+ * Reconciled here on every load so a site whose cron entry was lost — a
+ * restored backup, a migrated host — quietly gets it back rather than
+ * growing its log table without bound.
+ */
+add_action(
+	'init',
+	static function () {
+		if ( ! wp_next_scheduled( 'fhint_purge_logs' ) ) {
+			wp_schedule_event( time() + HOUR_IN_SECONDS, 'daily', 'fhint_purge_logs' );
+		}
+	}
+);
+
+add_action(
+	'fhint_purge_logs',
+	static function () {
+		$days = (int) \FHINT\App\Core\Settings::get( 'logs.retention_days', 30 );
+
+		\FHINT\App\Core\Logger::purge_expired( $days );
+	}
+);

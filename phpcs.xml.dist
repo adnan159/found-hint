@@ -10,6 +10,10 @@
 	<exclude-pattern>*/assets/build/*</exclude-pattern>
 	<exclude-pattern>*/src/*</exclude-pattern>
 	<exclude-pattern>*/libs/*</exclude-pattern>
+	<!-- The smoke harness deliberately defines WordPress globals (ABSPATH,
+	     dbDelta, WP_Error…) so domain logic can run without WordPress. The
+	     prefix and global-naming rules do not apply to it. -->
+	<exclude-pattern>*/tests/*</exclude-pattern>
 	<exclude-pattern>*.js</exclude-pattern>
 	<exclude-pattern>*.css</exclude-pattern>
 

@@ -12,7 +12,7 @@ import Settings from "./pages/settings";
 
 /**
  * Client-side hash routing under one WP admin page (see
- * includes/Presentation/Admin/Menu.php). Keep this list in sync with the
+ * includes/Admin/Menu.php). Keep this list in sync with the
  * submenu entries registered there and with docs/NAVIGATION.md.
  */
 export const router = createHashRouter([
