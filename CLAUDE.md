@@ -12,9 +12,9 @@ The PHP side is a flat set of top-level **modules**, each a thin dispatcher
 class with a static `init()` owning one subdirectory of classes. The admin
 is a Vite-built React SPA mounted on a single WordPress admin page.
 
-The data layer (business, locations, opening hours, services) and its REST
-API are built. The audit engine, schema output and the admin screens are
-not — see `docs/PROGRESS.md` for exactly what is done and what is next.
+The data layer (business, locations, opening hours, services), its REST API
+and the admin screens for all of it are built. The audit engine and schema
+output are not — see `docs/PROGRESS.md` for exactly what is done and next.
 
 The sibling `local-seo` plugin in this same directory is the reference for
 the *product*: its `docs/DATABASE.md`, `API.md` and `FEATURES.md` describe
@@ -262,10 +262,19 @@ into `#fhint-app`; every sub-page is a hash route. Submenu entries point at
   peer range still tops out at ESLint 9 while this project is on 10. Without
   it the shadcn CLI cannot install anything — it shells out to `npm install`
   and dies on the conflict.
-- A clean `npm run build` does **not** prove a new component works: nothing
-  imports these yet, so Vite tree-shakes them out entirely. To check them,
-  import them somewhere and render — building an SSR entry and running it in
-  Node catches both compile and runtime errors without a browser.
+- A clean `npm run build` does **not** prove a component works: Vite
+  tree-shakes anything unimported, and a build never executes a component.
+  Build an SSR entry and run it in Node to catch compile *and* runtime
+  errors without a browser — and load the real bundle in a browser against
+  a mocked API before calling a screen done. The select bug below survived
+  a clean build, a clean lint and a passing SSR render.
+- **Never pass `undefined` as a controlled component's value.** Base UI
+  treats `undefined` as "uncontrolled" on first render and then ignores the
+  real value when it arrives, so a saved value shows as the placeholder
+  forever. Use `null` for "nothing selected": `value={x || null}`.
+- **Base UI selects need `items`** (`[{ value, label }]`) on the root for
+  the trigger to show a label without the popup being opened, since the
+  options live in a portal that is not mounted until then.
 
 ## Brand
 

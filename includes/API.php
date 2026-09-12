@@ -9,6 +9,7 @@ namespace FHINT;
 
 use FHINT\API\Business;
 use FHINT\API\Locations;
+use FHINT\API\Onboarding;
 use FHINT\API\Services;
 use FHINT\API\Settings;
 
@@ -38,6 +39,7 @@ class API {
 	public static function init() {
 		Business::init();
 		Locations::init();
+		Onboarding::init();
 		Services::init();
 		Settings::init();
 	}

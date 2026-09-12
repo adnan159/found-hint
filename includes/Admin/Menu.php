@@ -72,6 +72,15 @@ class Menu {
 
 		add_submenu_page(
 			self::SLUG,
+			__( 'Setup', 'found-hint' ),
+			__( 'Setup', 'found-hint' ),
+			$capability,
+			self::SLUG . '#/setup',
+			array( __CLASS__, 'render_page' )
+		);
+
+		add_submenu_page(
+			self::SLUG,
 			__( 'Business', 'found-hint' ),
 			__( 'Business', 'found-hint' ),
 			$capability,
@@ -94,33 +103,6 @@ class Menu {
 			__( 'Services', 'found-hint' ),
 			$capability,
 			self::SLUG . '#/services',
-			array( __CLASS__, 'render_page' )
-		);
-
-		add_submenu_page(
-			self::SLUG,
-			__( 'Schema', 'found-hint' ),
-			__( 'Schema', 'found-hint' ),
-			$capability,
-			self::SLUG . '#/schema',
-			array( __CLASS__, 'render_page' )
-		);
-
-		add_submenu_page(
-			self::SLUG,
-			__( 'SEO Audit', 'found-hint' ),
-			__( 'SEO Audit', 'found-hint' ),
-			$capability,
-			self::SLUG . '#/audit',
-			array( __CLASS__, 'render_page' )
-		);
-
-		add_submenu_page(
-			self::SLUG,
-			__( 'Google Business Profile', 'found-hint' ),
-			__( 'Google Business Profile', 'found-hint' ),
-			$capability,
-			self::SLUG . '#/gbp',
 			array( __CLASS__, 'render_page' )
 		);
 

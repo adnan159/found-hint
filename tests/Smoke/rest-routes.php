@@ -54,6 +54,7 @@ $expected = array(
 	'fhint/v1/services/(?P<id>\d+)',
 	'fhint/v1/settings',
 	'fhint/v1/logs',
+	'fhint/v1/onboarding',
 );
 
 foreach ( $expected as $route ) {

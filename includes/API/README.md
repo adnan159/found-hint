@@ -386,6 +386,78 @@ the fact that it was emptied.
 
 ---
 
+# Guided setup
+
+### `GET /onboarding` · `POST|PUT|PATCH /onboarding`
+
+**This route moves a position and nothing else.** The wizard saves a business
+name by calling `PUT /business`, exactly as the Business screen does. There is
+deliberately no write path for content here: a second one would mean a second
+set of validation rules to keep in step, and it is what would let "start over"
+destroy real work. `tests/Smoke/onboarding.php` asserts that the stored option
+holds exactly `status, current, completed, skipped, started_at, ended_at` and
+no field of business data.
+
+`GET` returns the position plus per-step status, recomputed on every read:
+
+```json
+{
+  "data": {
+    "status": "in_progress",
+    "current": "location",
+    "completed": ["welcome", "business"],
+    "skipped": [],
+    "started_at": 1789242719,
+    "ended_at": 0,
+    "steps": [
+      { "id": "welcome",  "position": 1, "is_data_step": false, "has_data": false, "completed": true,  "skipped": false, "done": true },
+      { "id": "business", "position": 2, "is_data_step": true,  "has_data": true,  "completed": true,  "skipped": false, "done": true },
+      { "id": "location", "position": 3, "is_data_step": true,  "has_data": false, "completed": false, "skipped": false, "done": false }
+    ],
+    "total_steps": 4,
+    "done_steps": 1,
+    "is_open": true,
+    "next_step": "hours",
+    "previous_step": "business"
+  }
+}
+```
+
+`has_data` is read from the live repositories, not from a stored flag, so a
+value entered on the ordinary Business or Locations screen counts the step as
+done without the wizard ever being opened. `done` is `has_data` **or** the
+user walked the step — walking `hours` without setting a day is a legitimate
+answer, because unset is not the same as closed (see *Opening hours*).
+
+`total_steps` and `done_steps` count only the four data steps; `welcome` and
+`done` are navigation.
+
+The write method takes one `action`, and `step` where the action needs a
+target (it defaults to `current`):
+
+| `action` | Effect |
+|---|---|
+| `go` | Move to `step`. No step is marked. |
+| `complete` | Mark `step` completed, move to the next step. |
+| `skip` | Mark `step` skipped, move to the next step. |
+| `finish` | `status` → `done`, `ended_at` set. |
+| `dismiss` | `status` → `dismissed`, `ended_at` set. |
+| `restart` | Position back to `welcome`, `completed`/`skipped` emptied. |
+
+`action` is required and both fields are validated against their enums —
+`step` against `FHINT\App\Onboarding\Onboarding::steps()`
+(`welcome, business, location, hours, services, done`). An unknown value is a
+`400` with `rest_invalid_param`.
+
+**`restart` only rewinds the position.** It deletes no business, no location,
+no hours and no services; the next `GET` will report those steps `done` again
+through `has_data`, because the data is still there.
+
+Both methods return the same state object, so a client needs no follow-up
+read after a move.
+
+---
+
 # Plan limits
 
 `meta.limits` entries all share one shape, from

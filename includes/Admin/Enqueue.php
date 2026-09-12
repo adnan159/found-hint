@@ -7,6 +7,9 @@
 
 namespace FHINT\Admin;
 
+use FHINT\App\Business\Business;
+use FHINT\App\Location\Location;
+use FHINT\App\Service\Service;
 use FHINT\Libs\Assets;
 
 defined( 'ABSPATH' ) || exit;
@@ -95,8 +98,15 @@ class Enqueue {
 	/**
 	 * First-paint bootstrap data for the React app.
 	 *
-	 * Never put secrets here — it lands in page source. Extend this array as
-	 * new pages need bootstrap data (business/location ids, limits, etc.).
+	 * Never put secrets here — it lands in page source.
+	 *
+	 * `reference` carries the option lists the forms need to render their
+	 * selects. They live here rather than in a REST response because they
+	 * are static for the request and the same on every screen, so shipping
+	 * them with the page avoids a round trip before a form can paint. They
+	 * must come from the server rather than being duplicated in JavaScript:
+	 * the business type list is filterable (`fhint_business_types`), and a
+	 * hardcoded copy would let the form offer a type the server rejects.
 	 *
 	 * @return array
 	 */
@@ -106,6 +116,29 @@ class Enqueue {
 			'rest_nonce' => wp_create_nonce( 'wp_rest' ),
 			'plugin_url' => FHINT_URL,
 			'version'    => FHINT_VERSION,
+			'reference'  => array(
+				'business_types'    => Business::types(),
+				'location_statuses' => Location::statuses(),
+				'service_statuses'  => Service::statuses(),
+				'timezones'         => timezone_identifiers_list(),
+				'currency'          => self::default_currency(),
+			),
 		);
+	}
+
+	/**
+	 * A sensible default currency for new services.
+	 *
+	 * WordPress has no currency setting of its own, so this only offers a
+	 * starting point the operator can change; the value is never forced.
+	 *
+	 * @return string
+	 */
+	private static function default_currency() {
+		if ( function_exists( 'get_woocommerce_currency' ) ) {
+			return (string) get_woocommerce_currency();
+		}
+
+		return '';
 	}
 }

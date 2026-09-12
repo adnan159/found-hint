@@ -4,8 +4,8 @@
 step finishes: what shipped, and how it was verified — the evidence, not the
 intent. Name any bug the verification caught.
 
-Last updated: step 2. The data layer and its REST API exist; the audit
-engine, schema output and admin screens do not.
+Last updated: step 3. The data layer, its REST API and the admin screens
+for everything it covers exist. The audit engine and schema output do not.
 
 ## Step 0 · Scaffold — done
 
@@ -118,14 +118,123 @@ Do that first, before building anything on top: start Local, activate the
 plugin, confirm the seven tables appear, run `dbDelta` a second time and
 assert it reports no changes, then drive the routes with real payloads.
 
+## Step 3 · Admin screens — done
+
+The screens for every feature the API actually backs, built from the
+prototype's design language with shadcn/ui on Tailwind v4.
+
+**Shipped:**
+- RTK Query slices, one per resource (`store/api/{business,locations,services,settings}Api.js`),
+  unwrapping the `{ data, meta }` envelope.
+- `lib/errors.js` — all 38 domain codes mapped to sentences, plus handling
+  for both documented error shapes (`data.fields` machine codes and
+  WordPress's `data.params`).
+- Screens: Dashboard, Business, Locations (list + detail), Services,
+  Settings. Shared pieces: `PageHeader` (moves focus to the heading on
+  route change), `SectionCard`, `NoticeBar`, `RequestError`.
+- `OpeningHoursEditor` — the full week, preserving the three-state model
+  (not set / closed / open) and split shifts, and omitting unset days from
+  the payload so "never said" is never published as "closed".
+- Design tokens retuned from the prototype's own stylesheet: square corners
+  (`--radius: 0`), warm neutrals, Archivo, `#ff6b35`. Applied through the
+  theme so shadcn primitives inherit them rather than being overridden
+  per call site.
+- `Admin\Enqueue` now localizes a `reference` block (business types,
+  statuses, timezones) so selects read their options from the server
+  instead of duplicating a filterable PHP list in JavaScript.
+
+**Deliberately not built,** because the feature behind them does not exist:
+the health score, Google Business Profile, ranking grid, performance and
+"fix first" cards from the prototype, and the Schema and SEO Audit screens.
+A card showing an invented number is worse than an absent one — it is
+indistinguishable from a real reading. `schema_mode` is likewise stored by
+the API but has no control, because nothing reads it yet.
+
+**Removed:** the `Schema`, `SEO Audit` and `Google Business Profile` pages,
+routes and menu entries; five unused shadcn components (checkbox,
+dropdown-menu, radio-group, tabs, tooltip).
+
+**Verified in a browser, not just built.** The production bundle was loaded
+in a harness with the REST API mocked, and every screen driven: business
+and location forms populated from the API, the services table with its
+ordering controls correctly disabled at both ends, the add-service dialog,
+settings with live system figures, and the hours editor round-tripping a
+week containing a split shift, an explicitly closed day and two unset days.
+An SSR pass also renders all eight routes, so a runtime error cannot hide
+behind a passing build (Vite tree-shakes anything unimported).
+
+**Bug caught:** the business type select showed its placeholder instead of
+the saved value. The cause was `value={x || undefined}` — `undefined` makes
+Base UI's select uncontrolled on first render, so the real value arriving
+with the profile was ignored. Isolated by comparing against the location
+and hours selects, which always pass a string and worked; fixed by passing
+`null`. Only visible by looking at the running UI: it builds, lints and
+renders without complaint.
+
+## Step 4 · Guided setup — done
+
+A six-step wizard at `#/setup`: welcome, business, address, hours, services,
+finish.
+
+**The wizard stores a position and nothing else.** Every value it collects
+goes through the ordinary resource endpoints — the business step calls
+`PUT /business`, exactly as the Business screen does. `/onboarding` has no
+write path for content, because a second one would mean a second set of
+validation rules to keep in step, and it is what would let "start over"
+destroy real work.
+
+**Shipped:**
+- `App\Onboarding\Onboarding` — the position store. One option
+  (`fhint_onboarding`) holding `status, current, completed, skipped,
+  started_at, ended_at`, and six actions: `go`, `complete`, `skip`,
+  `finish`, `dismiss`, `restart`.
+- `API\Onboarding` — `GET|POST|PUT|PATCH /onboarding`, both methods
+  returning the same state object so no client needs a follow-up read.
+  `action` and `step` are validated against their enums.
+- Per-step status is computed from the **live repositories** on every read,
+  not from a stored flag, so a value entered on the ordinary Business or
+  Locations screen counts the step as done without the wizard being opened.
+  A step is done when the data exists **or** the user walked it — walking
+  `hours` without setting a day is a legitimate answer, because unset is not
+  closed.
+- `pages/setup/` — `WizardShell` (sticky header, step strip, focus moved to
+  the *step* heading on every change: the page has not changed, the step
+  has), and one component per step.
+- `store/api/onboardingApi.js`, routed at `#/setup` and listed in the
+  sidebar and the WordPress submenu.
+
+**Verified:** `tests/Smoke/onboarding.php` — 42 assertions, and
+**mutation-tested** rather than assumed: adding a business name to the
+position produced 2 failures, and making `restart` delete settings produced
+1. It asserts the stored keys are exactly those six, that no `name`,
+`address`, `phone`, `email`, `website` or `city` field appears, and that a
+restart leaves every other stored option byte-for-byte identical.
+
+The whole flow was then **driven in a browser** against a stateful mock,
+welcome through finish, and the request log checked rather than the screen
+alone: eleven writes, of which `/onboarding` carried six position moves and
+every value went to `PUT /business`, `POST /locations`, `PUT /locations/12`
+and `POST /services` — the architectural rule holds in the running app, not
+just in the source.
+
+**Bug caught — in the test harness, not the plugin.** Every mutation looked
+like it was being swallowed. The cause was the mock: RTK Query's
+`fetchBaseQuery` calls `fetch(request)` with a `Request` object, so the
+method and body live on *it*, while the mock read `opt.method` and
+`opt.body` from an always-empty second argument. Every mutation therefore
+arrived as a `GET`. Worth recording because the symptom pointed squarely at
+the application and cost a long detour through store and fiber inspection
+before the harness was suspected.
+
 ## Pending
 
-1. **Database round-trip verification** (above) — the gate on everything else.
+1. **Database round-trip verification** (above) — the gate on everything
+   else. The screens have only ever talked to a mocked API.
 2. **Schema engine** — JSON-LD graph from `Nap`, output on `wp_head`,
    SEO-plugin detection and the four ownership modes, cached and
    invalidated on write. Needs `Frontend/`.
 3. **Audit engine** — rule contract, runner, scoring, the Free rule set,
    and the safe automatic fixes. Tables already exist.
 4. **Dashboard API** — reads stored audit figures, never measures.
-5. **Admin screens** — replace the placeholder pages in `src/admin/pages/`,
-   one RTK Query slice per resource.
+5. **Screens for the rest** — the audit, schema and dashboard score cards,
+   once their engines exist.

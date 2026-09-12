@@ -1,19 +1,22 @@
 import { createHashRouter } from "react-router";
 import RootLayout from "./layouts/root";
-import Audit from "./pages/audit";
 import Business from "./pages/business";
 import Dashboard from "./pages/dashboard";
-import Gbp from "./pages/gbp";
+import LocationDetail from "./pages/locations/detail";
 import Locations from "./pages/locations";
 import NotFound from "./pages/not-found";
-import Schema from "./pages/schema";
 import Services from "./pages/services";
+import Setup from "./pages/setup";
 import Settings from "./pages/settings";
 
 /**
- * Client-side hash routing under one WP admin page (see
- * includes/Admin/Menu.php). Keep this list in sync with the
- * submenu entries registered there and with docs/NAVIGATION.md.
+ * Client-side hash routing under one WordPress admin page (see
+ * includes/Admin/Menu.php). Keep this list in sync with the submenu entries
+ * registered there.
+ *
+ * Only screens with a working endpoint behind them are routed. Schema, the
+ * SEO audit and Google Business Profile appear in the prototype but have no
+ * engine yet, so they are absent rather than empty.
  */
 export const router = createHashRouter([
   {
@@ -24,11 +27,11 @@ export const router = createHashRouter([
       { index: true, element: <Dashboard /> },
       { path: "business", element: <Business /> },
       { path: "locations", element: <Locations /> },
+      { path: "locations/:id", element: <LocationDetail /> },
       { path: "services", element: <Services /> },
-      { path: "schema", element: <Schema /> },
-      { path: "audit", element: <Audit /> },
-      { path: "gbp", element: <Gbp /> },
       { path: "settings", element: <Settings /> },
+      { path: "setup", element: <Setup /> },
+      { path: "*", element: <NotFound /> },
     ],
   },
 ]);

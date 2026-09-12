@@ -52,6 +52,7 @@ $fhint_options = array(
 	'fhint_version',
 	'fhint_first_install_time',
 	'fhint_data_changed_at',
+	'fhint_onboarding',
 	'fhint_required_rewrite_flush',
 );
 

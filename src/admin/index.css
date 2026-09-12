@@ -4,14 +4,14 @@
 @import "tailwindcss/utilities.css";
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
-@import "@fontsource-variable/inter";
+@import "@fontsource-variable/archivo";
 
 @custom-variant dark (&:is(.dark *));
 @source "./**/*.{js,jsx,ts,tsx}";
 
 @theme inline {
   --font-heading: var(--font-sans);
-  --font-sans: "Inter Variable", sans-serif;
+  --font-sans: "Archivo Variable", system-ui, sans-serif;
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
@@ -43,6 +43,14 @@
   --color-card: var(--card);
   --color-foreground: var(--foreground);
   --color-background: var(--background);
+  --color-notice: var(--notice);
+  --color-notice-border: var(--notice-border);
+  --color-notice-foreground: var(--notice-foreground);
+  --color-divider: var(--divider);
+  --color-muted-strong: var(--muted-strong);
+  --color-link-accent: var(--link-accent);
+  --color-success: var(--success);
+  --color-success-foreground: var(--success-foreground);
   --radius-sm: calc(var(--radius) * 0.6);
   --radius-md: calc(var(--radius) * 0.8);
   --radius-lg: var(--radius);
@@ -53,43 +61,76 @@
 }
 
 /*
- * Brand tokens: orange primary (#FF6B35) + near-black sidebar — carried
- * over from the FoundHint prototype (see project memory / docs/NAVIGATION.md).
- * Everything else starts from shadcn's neutral base and can be retuned.
+ * Design tokens, taken from the FoundHint prototype's own stylesheet rather
+ * than eyeballed from a screenshot. Three of them define the look and should
+ * not drift:
+ *
+ * - `--radius: 0` — the design is square-cornered throughout. shadcn ships
+ *   rounded by default, so this is what makes the primitives look like the
+ *   prototype instead of like stock shadcn.
+ * - `--primary: #ff6b35` — the accent actually rendered on every screen. The
+ *   prototype's token file also carries an unused `#ec3013`; ignore it.
+ * - Warm neutrals. The greys are warm (#201e1d, #7d7979, #d7d3d3), not the
+ *   blue-grey shadcn defaults, which is most of why the design reads as it
+ *   does.
  */
 :root {
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
+  --background: #f3f2f2;
+  --foreground: #201e1d;
+  --card: #ffffff;
+  --card-foreground: #201e1d;
+  --popover: #ffffff;
+  --popover-foreground: #201e1d;
   --primary: #ff6b35;
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.967 0.001 286.375);
-  --secondary-foreground: oklch(0.21 0.006 285.885);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.205 0 0);
-  --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
+  --primary-foreground: #ffffff;
+  --secondary: #f8f4f4;
+  --secondary-foreground: #201e1d;
+  --muted: #f8f4f4;
+  --muted-foreground: #7d7979;
+  --accent: #f8f4f4;
+  --accent-foreground: #201e1d;
+  --destructive: #ae1800;
+  --border: #d7d3d3;
+  --input: #bab6b6;
   --ring: #ff6b35;
-  --chart-1: oklch(0.87 0 0);
-  --chart-2: oklch(0.556 0 0);
-  --chart-3: oklch(0.439 0 0);
-  --chart-4: oklch(0.371 0 0);
-  --chart-5: oklch(0.269 0 0);
-  --radius: 0.625rem;
-  --sidebar: oklch(0.145 0 0);
-  --sidebar-foreground: oklch(0.985 0 0);
+  --chart-1: #ff6b35;
+  --chart-2: #7d7979;
+  --chart-3: #605d5d;
+  --chart-4: #444141;
+  --chart-5: #2d2b2b;
+  --radius: 0px;
+  /* The sidebar is white, not dark. Its active row is the same peach/rust
+     pair used for notices, measured from the prototype: #fff1eb behind
+     #8a3b12, with a 3px accent bar on the leading edge. */
+  --sidebar: #ffffff;
+  --sidebar-foreground: #201e1d;
   --sidebar-primary: #ff6b35;
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.269 0 0);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(1 0 0 / 10%);
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #fff1eb;
+  --sidebar-accent-foreground: #8a3b12;
+  --sidebar-border: #eae7e7;
   --sidebar-ring: #ff6b35;
+
+  /* Muted body copy and the "Do this" links on the setup checklist. */
+  --muted-strong: #605d5d;
+  --link-accent: #d8521f;
+
+  /* Completed work is green, not the brand orange — orange is for things
+     that still want attention, so using it for a tick would make a finished
+     checklist look like an unfinished one. */
+  --success: #157f4b;
+  --success-foreground: #ffffff;
+
+  /* Plan-limit and "heads up" notices — an accent-tinted band, not an
+     error. Defined as tokens so components use `bg-notice` rather than
+     hardcoding the hex in three places. */
+  --notice: #fff1eb;
+  --notice-border: #ffc9af;
+  --notice-foreground: #8a3b12;
+
+  /* The prototype's section-header rule: heavier than a normal border, and
+     the single most recognisable detail of the card style. */
+  --divider: rgb(32 30 29 / 40%);
 }
 
 .dark {
@@ -136,6 +177,57 @@
 }
 
 /* width */
+/*
+ * Prototype surface treatment, applied centrally.
+ *
+ * shadcn's Card ships a soft ring and a shadow; this design uses a flat
+ * 1px border and no shadow. Targeting `data-slot` rather than editing
+ * components/ui/** means the rule survives `shadcn add --overwrite`, and it
+ * keeps the decision in one place instead of as a className override
+ * repeated at every call site.
+ */
+@layer components {
+  [data-slot="card"] {
+    box-shadow: none;
+    --tw-ring-color: var(--border);
+  }
+
+  /* Progress hardcodes `rounded-full` and a 1.5 height, and its className
+     lands on the root rather than the track — so the bar is squared and
+     sized here instead of at each call site. 8px on #eae7e7, measured
+     from the prototype. */
+  [data-slot="progress-track"] {
+    height: 8px;
+    border-radius: 0;
+    background-color: #eae7e7;
+  }
+
+  [data-slot="progress-indicator"] {
+    border-radius: 0;
+  }
+}
+
+/*
+ * WordPress's admin stylesheet styles bare inputs, tables and buttons, and
+ * it loads after ours. These re-assert the few properties it overrides
+ * inside our own screen only.
+ */
+#fhint-app input:not([type="checkbox"]):not([type="radio"]),
+#fhint-app textarea,
+#fhint-app select {
+  box-shadow: none;
+  border-radius: 0;
+  min-height: 0;
+  line-height: inherit;
+}
+
+#fhint-app input:focus,
+#fhint-app textarea:focus,
+#fhint-app select:focus {
+  box-shadow: none;
+  outline-offset: 1px;
+}
+
 .modern-scroll::-webkit-scrollbar {
   width: 8px;
   height: 8px;
