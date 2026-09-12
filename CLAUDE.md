@@ -149,6 +149,10 @@ Rules that apply to every table:
 
 ### REST API
 
+**Full endpoint reference: [`includes/API/README.md`](includes/API/README.md)**
+— routes, payloads, every error and validation code, and the partial-update
+and opening-hours rules. Update it in the same commit as a route change.
+
 `includes/API.php` is the dispatcher; every sub-controller under
 `includes/API/` extends `WP_REST_Controller`, exposes a static `init()`, and
 registers its own routes on `rest_api_init`. Namespace and version constants
@@ -232,9 +236,36 @@ into `#fhint-app`; every sub-page is a hash route. Submenu entries point at
 - **Accessibility is a requirement.** Labels on every control, visible focus
   states, `aria-live` for save/error notices, focus moved to the heading on
   route change, never status by colour alone.
-- Add shadcn/ui primitives with the shadcn CLI (`components.json` is already
-  configured, `prefix: "fhint"`, `style: "base-vega"`) rather than
-  hand-rolling a component the library already has.
+- Add shadcn/ui primitives with the CLI rather than hand-rolling a component
+  the library already has:
+
+  ```bash
+  npx shadcn@latest add <component>
+  ```
+
+  `components.json` is configured (`style: base-vega`, `prefix: fhint`,
+  `baseColor: neutral`, Lucide icons, JSX not TSX). Twenty primitives are
+  already in `src/admin/components/ui/`.
+
+### Working with generated components
+
+- **Class merging comes from the `cn` package**, not a local helper —
+  generated components `import { cn } from "cn"`. There is deliberately no
+  `src/admin/lib/utils.js`: keeping a second implementation would put two
+  mergers in one bundle and mean hand-editing every component the CLI
+  generates.
+- **Don't reformat or hand-edit `components/ui/**`.** Regenerating a
+  component silently reverts the edit. ESLint exempts that directory from
+  `no-unused-vars` for the same reason. If a primitive needs different
+  behaviour, wrap it in your own component outside `ui/`.
+- **`.npmrc` sets `legacy-peer-deps=true`**, because `eslint-plugin-react`'s
+  peer range still tops out at ESLint 9 while this project is on 10. Without
+  it the shadcn CLI cannot install anything — it shells out to `npm install`
+  and dies on the conflict.
+- A clean `npm run build` does **not** prove a new component works: nothing
+  imports these yet, so Vite tree-shakes them out entirely. To check them,
+  import them somewhere and render — building an SSR entry and running it in
+  Node catches both compile and runtime errors without a browser.
 
 ## Brand
 
