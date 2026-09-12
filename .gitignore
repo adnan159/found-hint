@@ -1,0 +1,15 @@
+node_modules/
+vendor/
+*.log
+*.cache
+*.tmp
+.DS_Store
+.idea/
+.vscode/
+*.zip
+*.tar.gz
+*.bak
+assets/build/
+package-lock.json
+composer.lock
+build/
