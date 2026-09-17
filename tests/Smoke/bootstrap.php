@@ -10,6 +10,11 @@ define( 'FHINT_VERSION', '0.1.0' );
 define( 'FHINT_DB_VERSION', '0.1.0' );
 define( 'FHINT_SETTINGS_NAME', 'fhint_settings' );
 
+// WordPress defines these; code under test uses them for retention windows.
+define( 'MINUTE_IN_SECONDS', 60 );
+define( 'HOUR_IN_SECONDS', 60 * MINUTE_IN_SECONDS );
+define( 'DAY_IN_SECONDS', 24 * HOUR_IN_SECONDS );
+
 $GLOBALS['__options'] = array();
 $GLOBALS['__filters'] = array();
 
@@ -89,6 +94,14 @@ if ( ! class_exists( 'WP_Error' ) ) {
 		public function get_error_code() {
 			return $this->code;
 		}
+
+		public function get_error_message() {
+			return $this->message;
+		}
+
+		public function get_error_data() {
+			return $this->data;
+		}
 	}
 }
 
@@ -143,12 +156,170 @@ function current_time( $type, $gmt = 0 ) {
 function __( $text, $domain = null ) {
 	return $text;
 }
+function _n( $single, $plural, $number, $domain = null ) {
+	return 1 === (int) $number ? $single : $plural;
+}
 function wp_rand( $min = 0, $max = 0 ) {
 	return random_int( $min ? $min : 0, $max ? $max : PHP_INT_MAX );
 }
 function get_current_user_id() {
 	return 1;
 }
+function is_feed() {
+	return ! empty( $GLOBALS['__is_feed'] );
+}
+function is_embed() {
+	return ! empty( $GLOBALS['__is_embed'] );
+}
+function home_url( $path = '' ) {
+	return 'https://example.test' . $path;
+}
+function trailingslashit( $value ) {
+	return rtrim( (string) $value, '/\\' ) . '/';
+}
+
+// -- HTTP ------------------------------------------------------------------
+//
+// Requests are answered from a queue the suite fills, so the OAuth handshake
+// can be exercised without Google: the point of the tests is what this
+// plugin does with an answer, not that Google gives one.
+
+$GLOBALS['__http_queue']    = array();
+$GLOBALS['__http_requests'] = array();
+
+function is_wp_error( $thing ) {
+	return $thing instanceof WP_Error;
+}
+
+/**
+ * Queue the next HTTP answer.
+ *
+ * @param int   $status Status code.
+ * @param mixed $body   Body; arrays are JSON-encoded.
+ * @return void
+ */
+function queue_http( $status, $body ) {
+	$GLOBALS['__http_queue'][] = array(
+		'status' => $status,
+		'body'   => is_array( $body ) ? json_encode( $body ) : (string) $body,
+	);
+}
+
+function wp_remote_post( $url, $args = array() ) {
+	return __http( 'POST', $url, $args );
+}
+function wp_remote_get( $url, $args = array() ) {
+	return __http( 'GET', $url, $args );
+}
+function __http( $method, $url, $args ) {
+	$GLOBALS['__http_requests'][] = array(
+		'method' => $method,
+		'url'    => $url,
+		'args'   => $args,
+	);
+
+	if ( ! $GLOBALS['__http_queue'] ) {
+		return new WP_Error( 'http_request_failed', 'No queued response.' );
+	}
+
+	$next = array_shift( $GLOBALS['__http_queue'] );
+
+	if ( $next instanceof WP_Error ) {
+		return $next;
+	}
+
+	return array(
+		'response' => array( 'code' => $next['status'] ),
+		'body'     => $next['body'],
+	);
+}
+function wp_remote_retrieve_body( $response ) {
+	return is_array( $response ) && isset( $response['body'] ) ? $response['body'] : '';
+}
+function wp_remote_retrieve_response_code( $response ) {
+	return is_array( $response ) && isset( $response['response']['code'] ) ? $response['response']['code'] : 0;
+}
+
+// -- Transients ------------------------------------------------------------
+
+$GLOBALS['__transients'] = array();
+
+function set_transient( $key, $value, $ttl = 0 ) {
+	$GLOBALS['__transients'][ $key ] = $value;
+	return true;
+}
+function get_transient( $key ) {
+	return array_key_exists( $key, $GLOBALS['__transients'] ) ? $GLOBALS['__transients'][ $key ] : false;
+}
+function delete_transient( $key ) {
+	unset( $GLOBALS['__transients'][ $key ] );
+	return true;
+}
+
+// -- Admin URLs and redirects ----------------------------------------------
+
+$GLOBALS['__redirects'] = array();
+
+function admin_url( $path = '' ) {
+	return 'https://example.test/wp-admin/' . ltrim( (string) $path, '/' );
+}
+function wp_unslash( $value ) {
+	return is_string( $value ) ? stripslashes( $value ) : $value;
+}
+function wp_safe_redirect( $location, $status = 302 ) {
+	$GLOBALS['__redirects'][] = $location;
+	return true;
+}
+function esc_html__( $text, $domain = null ) {
+	return $text;
+}
+function esc_html( $text ) {
+	return $text;
+}
+
+// -- $wpdb ----------------------------------------------------------------
+//
+// Just enough for code paths that ask whether a table exists. Every answer
+// is "no", so anything touching the database becomes a no-op rather than a
+// fatal: these suites deliberately run with no database at all.
+
+class FHINT_Test_WPDB {
+	public $prefix = 'wp_';
+
+	public function get_var( $query ) {
+		return null;
+	}
+
+	public function prepare( $query, ...$args ) {
+		return $query;
+	}
+
+	public function esc_like( $text ) {
+		return $text;
+	}
+
+	public function get_row( $query, $output = null ) {
+		return null;
+	}
+
+	public function get_results( $query, $output = null ) {
+		return array();
+	}
+
+	public function query( $query ) {
+		return 0;
+	}
+
+	public function insert( $table, $data, $format = null ) {
+		return 1;
+	}
+
+	public function update( $table, $data, $where, $format = null, $where_format = null ) {
+		return 1;
+	}
+}
+
+$GLOBALS['wpdb'] = new FHINT_Test_WPDB();
 
 require dirname( __DIR__, 2 ) . '/vendor/autoload.php';
 

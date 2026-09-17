@@ -89,6 +89,15 @@ class Settings {
 	 */
 	public static function save( array $data ) {
 		update_option( FHINT_SETTINGS_NAME, self::sanitize_recursive( $data, self::defaults() ) );
+
+		/**
+		 * Fires after settings are written.
+		 *
+		 * Settings change what is published without touching business data,
+		 * so nothing here moves the data-changed stamp that normally
+		 * invalidates caches.
+		 */
+		do_action( 'fhint_settings_saved' );
 	}
 
 	/**

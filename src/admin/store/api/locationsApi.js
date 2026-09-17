@@ -27,7 +27,7 @@ export const locationsApi = baseApi.injectEndpoints({
     createLocation: builder.mutation({
       query: (body) => ({ url: "/locations", method: "POST", body }),
       transformResponse: (response) => response?.data ?? null,
-      invalidatesTags: ["Location"],
+      invalidatesTags: ["Location", "Schema"],
     }),
 
     updateLocation: builder.mutation({
@@ -40,13 +40,14 @@ export const locationsApi = baseApi.injectEndpoints({
       invalidatesTags: (result, error, { id }) => [
         "Location",
         { type: "Location", id },
+        "Schema",
       ],
     }),
 
     deleteLocation: builder.mutation({
       query: (id) => ({ url: `/locations/${id}`, method: "DELETE" }),
       transformResponse: (response) => response?.data ?? null,
-      invalidatesTags: ["Location"],
+      invalidatesTags: ["Location", "Schema"],
     }),
   }),
 });

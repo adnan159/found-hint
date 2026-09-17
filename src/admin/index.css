@@ -50,8 +50,14 @@
   --color-notice-foreground: var(--notice-foreground);
   --color-divider: var(--divider);
   --color-muted-strong: var(--muted-strong);
+  --color-foreground-soft: var(--foreground-soft);
   --color-link-accent: var(--link-accent);
   --color-success: var(--success);
+  --color-band-needs-work: var(--band-needs-work);
+  --color-band-fair: var(--band-fair);
+  --color-band-good: var(--band-good);
+  --color-band-excellent: var(--band-excellent);
+  --color-band-empty: var(--band-empty);
   --color-success-foreground: var(--success-foreground);
   --radius-sm: calc(var(--radius) * 0.6);
   --radius-md: calc(var(--radius) * 0.8);
@@ -119,6 +125,9 @@
 
   /* Muted body copy and the "Do this" links on the setup checklist. */
   --muted-strong: #605d5d;
+  /* Body copy on the welcome and decision cards, measured from the
+     prototype: a step darker than --muted-strong. */
+  --foreground-soft: #444141;
   --link-accent: #d8521f;
 
   /* Completed work is green, not the brand orange — orange is for things
@@ -126,6 +135,15 @@
      checklist look like an unfinished one. */
   --success: #157f4b;
   --success-foreground: #ffffff;
+  /* The health score's band colours, measured from the prototype's score
+     card. Excellent reuses the good green: the prototype only shows the
+     bands a score has reached, so there was no colour to measure for the
+     top one, and a fourth hue would suggest a meaning nobody defined. */
+  --band-needs-work: #c02718;
+  --band-fair: #b26a00;
+  --band-good: #157f4b;
+  --band-excellent: #157f4b;
+  --band-empty: #eae7e7;
 
   /* Plan-limit and "heads up" notices — an accent-tinted band, not an
      error. Defined as tokens so components use `bg-notice` rather than

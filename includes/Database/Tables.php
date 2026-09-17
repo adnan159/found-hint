@@ -18,13 +18,15 @@ defined( 'ABSPATH' ) || exit;
  */
 class Tables {
 
-	const BUSINESS       = 'business';
-	const LOCATIONS      = 'locations';
-	const LOCATION_HOURS = 'location_hours';
-	const SERVICES       = 'services';
-	const AUDITS         = 'audits';
-	const AUDIT_ISSUES   = 'audit_issues';
-	const LOGS           = 'logs';
+	const BUSINESS         = 'business';
+	const LOCATIONS        = 'locations';
+	const LOCATION_HOURS   = 'location_hours';
+	const SERVICES         = 'services';
+	const AUDITS           = 'audits';
+	const AUDIT_ISSUES     = 'audit_issues';
+	const LOGS             = 'logs';
+	const GOOGLE_LOCATIONS = 'google_locations';
+	const PLACE_LINKS      = 'place_links';
 
 	/**
 	 * Every table this plugin owns, unprefixed.
@@ -40,6 +42,8 @@ class Tables {
 			self::AUDITS,
 			self::AUDIT_ISSUES,
 			self::LOGS,
+			self::GOOGLE_LOCATIONS,
+			self::PLACE_LINKS,
 		);
 	}
 

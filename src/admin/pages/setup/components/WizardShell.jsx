@@ -1,6 +1,7 @@
 import { useEffect, useRef } from "react";
 import { __, sprintf } from "@wordpress/i18n";
 import { cn } from "cn";
+import logoUrl from "@/assets/foundhint-icon.png";
 
 /**
  * The frame every setup step renders inside.
@@ -31,12 +32,14 @@ export function WizardShell({
   return (
     <div className="fhint:-m-6 fhint:flex fhint:min-h-[calc(100vh-32px)] fhint:flex-col fhint:bg-background">
       <div className="fhint:sticky fhint:top-8 fhint:z-2 fhint:flex fhint:flex-wrap fhint:items-center fhint:gap-3 fhint:border-b-2 fhint:border-b-divider fhint:bg-card fhint:px-6 fhint:py-3">
-        <span
+        <img
+          src={logoUrl}
+          alt=""
           aria-hidden="true"
-          className="fhint:flex fhint:size-6 fhint:items-center fhint:justify-center fhint:rounded-full fhint:bg-primary fhint:text-[11px] fhint:font-extrabold fhint:text-primary-foreground"
-        >
-          F
-        </span>
+          width={24}
+          height={24}
+          className="fhint:size-6 fhint:shrink-0"
+        />
         <strong className="fhint:text-[14px] fhint:font-extrabold fhint:tracking-tight">
           {__("FoundHint", "found-hint")}
         </strong>

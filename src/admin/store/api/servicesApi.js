@@ -21,7 +21,7 @@ export const servicesApi = baseApi.injectEndpoints({
     createService: builder.mutation({
       query: (body) => ({ url: "/services", method: "POST", body }),
       transformResponse: (response) => response?.data ?? null,
-      invalidatesTags: ["Service"],
+      invalidatesTags: ["Service", "Schema"],
     }),
 
     updateService: builder.mutation({
@@ -31,13 +31,13 @@ export const servicesApi = baseApi.injectEndpoints({
         body,
       }),
       transformResponse: (response) => response?.data ?? null,
-      invalidatesTags: ["Service"],
+      invalidatesTags: ["Service", "Schema"],
     }),
 
     deleteService: builder.mutation({
       query: (id) => ({ url: `/services/${id}`, method: "DELETE" }),
       transformResponse: (response) => response?.data ?? null,
-      invalidatesTags: ["Service"],
+      invalidatesTags: ["Service", "Schema"],
     }),
 
     reorderServices: builder.mutation({
@@ -47,7 +47,7 @@ export const servicesApi = baseApi.injectEndpoints({
         body: { ids },
       }),
       transformResponse: (response) => response?.data ?? [],
-      invalidatesTags: ["Service"],
+      invalidatesTags: ["Service", "Schema"],
     }),
   }),
 });

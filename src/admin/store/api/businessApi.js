@@ -30,7 +30,7 @@ export const businessApi = baseApi.injectEndpoints({
       transformResponse: (response) => response?.data ?? null,
       // A business edit changes what the dashboard and the location
       // fallbacks show, so those are invalidated too.
-      invalidatesTags: ["Business", "Location"],
+      invalidatesTags: ["Business", "Location", "Schema"],
     }),
   }),
 });

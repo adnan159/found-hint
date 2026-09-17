@@ -3,6 +3,7 @@ import { __ } from "@wordpress/i18n";
 import { ChevronDownIcon } from "lucide-react";
 import { NavLink, useLocation, useNavigate } from "react-router";
 import { cn } from "cn";
+import logoUrl from "@/assets/foundhint-icon.png";
 
 /**
  * Primary navigation.
@@ -16,17 +17,24 @@ import { cn } from "cn";
  * read as pushing the label aside rather than sitting on top of it.
  *
  * **Only navigation that goes somewhere is listed.** The prototype also
- * shows Schema, Landing Pages, SEO Audit, Google Business Profile, Ranking
- * Grid, Performance and Recommendations; those have no engine behind them,
- * and a row opening an empty screen reads as a broken feature rather than
- * an absent one. The same test applies to the sub-items: the prototype's
+ * shows Landing Pages, Ranking Grid, Performance and Recommendations;
+ * those have no engine behind them, and a row opening an empty screen reads
+ * as a broken feature rather than an absent one. Schema, the audit and
+ * Google appear here because their engines are real; the review and
+ * comparison screens the prototype nests under Google do not, and are not
+ * listed.
+ * The same test applies to the sub-items: the prototype's
  * expandable groups are mostly decorative there, so a group survives here
  * only where its children are real destinations — the sections of the
  * Business and Settings screens, which carry matching ids.
  */
 const NAV_ITEMS = [
   { to: "/", label: () => __("Dashboard", "found-hint"), end: true },
-  { to: "/setup", label: () => __("Setup", "found-hint") },
+  // Setup is hidden for now — the guided wizard is being reworked, and the
+  // dashboard's own "get started" section covers a new site in the meantime.
+  // The route still exists (see routes.jsx), so a bookmark keeps working;
+  // put this row back when the wizard returns.
+  // { to: "/setup", label: () => __("Setup", "found-hint") },
   {
     to: "/business",
     label: () => __("Business", "found-hint"),
@@ -48,6 +56,41 @@ const NAV_ITEMS = [
   },
   { to: "/locations", label: () => __("Locations", "found-hint") },
   { to: "/services", label: () => __("Services", "found-hint") },
+  {
+    to: "/schema",
+    label: () => __("Schema", "found-hint"),
+    children: [
+      { id: "schema-owner", label: () => __("Who publishes it", "found-hint") },
+      {
+        id: "schema-preview",
+        label: () => __("What gets published", "found-hint"),
+      },
+    ],
+  },
+  {
+    to: "/audit",
+    label: () => __("SEO audit", "found-hint"),
+    children: [
+      { id: "audit-score", label: () => __("Score", "found-hint") },
+      { id: "audit-findings", label: () => __("What to fix", "found-hint") },
+    ],
+  },
+  {
+    to: "/google",
+    label: () => __("Google", "found-hint"),
+    children: [
+      { id: "google-client", label: () => __("Google client", "found-hint") },
+      { id: "google-connection", label: () => __("Connection", "found-hint") },
+      {
+        id: "google-profiles",
+        label: () => __("Business profiles", "found-hint"),
+      },
+      {
+        id: "google-mapping",
+        label: () => __("Location mapping", "found-hint"),
+      },
+    ],
+  },
   {
     to: "/settings",
     label: () => __("Settings", "found-hint"),
@@ -251,12 +294,16 @@ export function Sidebar({ counts }) {
       className="fhint:flex fhint:w-[236px] fhint:shrink-0 fhint:flex-col fhint:self-stretch fhint:border-r-2 fhint:border-r-divider fhint:bg-sidebar fhint:text-sidebar-foreground"
     >
       <div className="fhint:flex fhint:items-center fhint:gap-2.5 fhint:border-b-2 fhint:border-b-divider fhint:px-3.5 fhint:pt-4 fhint:pb-3.5">
-        <span
+        {/* Decorative: the wordmark beside it already names the product,
+            so an alt text here would be read out twice. */}
+        <img
+          src={logoUrl}
+          alt=""
           aria-hidden="true"
-          className="fhint:flex fhint:size-[30px] fhint:shrink-0 fhint:items-center fhint:justify-center fhint:bg-primary fhint:text-[15px] fhint:font-extrabold fhint:text-primary-foreground"
-        >
-          F
-        </span>
+          width={36}
+          height={36}
+          className="fhint:size-9 fhint:shrink-0"
+        />
         <span className="fhint:flex fhint:flex-col fhint:leading-[1.05]">
           <strong className="fhint:font-heading fhint:text-[15px] fhint:font-extrabold fhint:tracking-[-0.02em] fhint:uppercase">
             {__("FoundHint", "found-hint")}

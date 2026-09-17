@@ -91,6 +91,30 @@ const MESSAGES = {
     __("Enter a full image address, starting with https://", "found-hint"),
   "service.status.invalid": () =>
     __("Choose a status from the list.", "found-hint"),
+
+  // Schema. Not validation errors: these describe why the markup is not
+  // being published, or what would make it better.
+  "schema.business.missing": () =>
+    __("Add your business details before publishing markup.", "found-hint"),
+  "schema.location.missing": () =>
+    __("Add a location before publishing markup.", "found-hint"),
+  "schema.name.missing": () => __("A business name is required.", "found-hint"),
+  "schema.address.incomplete": () =>
+    __(
+      "The address needs a street, a city and a country at least.",
+      "found-hint",
+    ),
+  "schema.location.permanently_closed": () =>
+    __(
+      "This location is marked permanently closed, so nothing is published for it.",
+      "found-hint",
+    ),
+  "schema.phone.missing": () => __("No phone number.", "found-hint"),
+  "schema.website.missing": () => __("No website address.", "found-hint"),
+  "schema.logo.missing": () => __("No logo.", "found-hint"),
+  "schema.description.missing": () => __("No description.", "found-hint"),
+  "schema.geo.missing": () => __("No map coordinates.", "found-hint"),
+  "schema.hours.missing": () => __("No opening hours set.", "found-hint"),
 };
 
 /**

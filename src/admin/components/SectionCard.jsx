@@ -1,5 +1,6 @@
 import {
   Card,
+  CardAction,
   CardContent,
   CardDescription,
   CardHeader,
@@ -30,7 +31,10 @@ export function SectionCard({ id, title, description, action, children }) {
           {title}
         </CardTitle>
         {description ? <CardDescription>{description}</CardDescription> : null}
-        {action}
+        {/* Through CardAction, so the header becomes a two-column grid and
+            the control sits beside the title instead of stretching across
+            the full width below it. */}
+        {action ? <CardAction>{action}</CardAction> : null}
       </CardHeader>
       <CardContent>{children}</CardContent>
     </Card>

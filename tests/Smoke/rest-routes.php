@@ -55,6 +55,16 @@ $expected = array(
 	'fhint/v1/settings',
 	'fhint/v1/logs',
 	'fhint/v1/onboarding',
+	'fhint/v1/google',
+	'fhint/v1/google/credentials',
+	'fhint/v1/google/connect',
+	'fhint/v1/google/profiles',
+	'fhint/v1/google/mapping',
+	'fhint/v1/schema',
+	'fhint/v1/audits',
+	'fhint/v1/dashboard',
+	'fhint/v1/audits/issues/(?P<id>\\d+)',
+	'fhint/v1/audits/issues/(?P<id>\\d+)/fix',
 );
 
 foreach ( $expected as $route ) {

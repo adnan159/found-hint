@@ -275,6 +275,12 @@ class LocationRepository {
 		Logger::info( 'location', 'location.deleted', 'Location deleted.', array( 'location_id' => $id ) );
 		BusinessRepository::stamp_data_changed();
 
+		// Anything holding a reference to this location gets a chance to let
+		// go. A hook rather than a direct call: this repository must not
+		// have to know which modules exist, and the Google mapping is one of
+		// several things that will eventually need this.
+		do_action( 'fhint_location_deleted', $id );
+
 		return true;
 	}
 

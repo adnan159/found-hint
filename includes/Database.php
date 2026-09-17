@@ -37,25 +37,34 @@ class Database {
 	 * Create all custom plugin tables using dbDelta.
 	 *
 	 * Safe to run on every activation/update — dbDelta only applies changes.
-	 * Empty for now; add Database\Create<Name>Table::up( $prefix, $cc )
-	 * calls here as each table is designed.
+	 * Add Database\Create<Name>Table::up( $prefix, $cc ) calls here as each
+	 * table is designed.
 	 *
-	 * @return void
+	 * @return array Everything dbDelta changed; empty on an up-to-date
+	 *               database.
 	 */
 	public static function create_tables() {
 		require_once ABSPATH . 'wp-admin/includes/upgrade.php';
 
 		global $wpdb;
-		$prefix = $wpdb->prefix;
-		$cc     = $wpdb->get_charset_collate();
+		$prefix  = $wpdb->prefix;
+		$cc      = $wpdb->get_charset_collate();
+		$changes = array();
 
-		Database\CreateBusinessTable::up( $prefix, $cc );
-		Database\CreateLocationsTable::up( $prefix, $cc );
-		Database\CreateLocationHoursTable::up( $prefix, $cc );
-		Database\CreateServicesTable::up( $prefix, $cc );
-		Database\CreateAuditsTable::up( $prefix, $cc );
-		Database\CreateAuditIssuesTable::up( $prefix, $cc );
-		Database\CreateLogsTable::up( $prefix, $cc );
+		$changes = array_merge( $changes, Database\CreateBusinessTable::up( $prefix, $cc ) );
+		$changes = array_merge( $changes, Database\CreateLocationsTable::up( $prefix, $cc ) );
+		$changes = array_merge( $changes, Database\CreateLocationHoursTable::up( $prefix, $cc ) );
+		$changes = array_merge( $changes, Database\CreateServicesTable::up( $prefix, $cc ) );
+		$changes = array_merge( $changes, Database\CreateAuditsTable::up( $prefix, $cc ) );
+		$changes = array_merge( $changes, Database\CreateAuditIssuesTable::up( $prefix, $cc ) );
+		$changes = array_merge( $changes, Database\CreateLogsTable::up( $prefix, $cc ) );
+		$changes = array_merge( $changes, Database\CreateGoogleLocationsTable::up( $prefix, $cc ) );
+		$changes = array_merge( $changes, Database\CreatePlaceLinksTable::up( $prefix, $cc ) );
+
+		// Returned so the change set can be asserted empty against a
+		// database that is already up to date. dbDelta re-issuing the same
+		// ALTER on every request is invisible without this.
+		return $changes;
 	}
 
 	/**

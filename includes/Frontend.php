@@ -23,6 +23,6 @@ class Frontend {
 	 * @return void
 	 */
 	public static function init() {
-		// No frontend handlers yet.
+		Frontend\Schema::init();
 	}
 }

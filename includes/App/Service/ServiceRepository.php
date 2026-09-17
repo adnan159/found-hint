@@ -131,7 +131,14 @@ class ServiceRepository {
 
 		$record                = array_merge( Service::blank(), $data );
 		$record['business_id'] = $business_id;
-		$record['slug']        = self::unique_slug( $record['slug'], $business_id, 0 );
+
+		// Derived here rather than only in the REST controller: the slug is
+		// half of a unique key, so a caller that does not supply one would
+		// store an empty slug, and the *second* such service would collide
+		// with the first and fail the insert. Every caller gets the rule.
+		$slug = '' !== trim( (string) $record['slug'] ) ? $record['slug'] : $record['name'];
+
+		$record['slug'] = self::unique_slug( $slug, $business_id, 0 );
 
 		if ( ! isset( $data['sort_order'] ) ) {
 			$record['sort_order'] = self::next_sort_order( $business_id );

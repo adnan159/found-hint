@@ -6,10 +6,12 @@ The namespace and version are constants on `FHINT\API` (`NAMESPACE_NAME`,
 `VERSION`). Reference those rather than hardcoding route strings; the helper
 `fhint_rest_url( '/business' )` builds a full URL from them.
 
-> **Status:** every route below is registered and guarded, and that is
-> verified by `tests/Smoke/rest-routes.php`. **No route has yet been called
-> against a real database** — see `docs/PROGRESS.md`. Treat the response
-> examples as the intended contract, not as captured output.
+> **Status:** every route below is registered and guarded
+> (`tests/Smoke/rest-routes.php`), and the routes have been exercised
+> against a real WordPress and MySQL — reads, writes, validation failures,
+> plan limits and capability denial — by
+> `tests/Integration/database.php`. Response examples are illustrative;
+> field names and codes are authoritative.
 
 ## Authentication
 
@@ -455,6 +457,461 @@ through `has_data`, because the data is still there.
 
 Both methods return the same state object, so a client needs no follow-up
 read after a move.
+
+---
+
+# Dashboard
+
+### `GET /dashboard`
+
+**Reads stored figures and never measures.** There is no write method: the
+dashboard is the most-opened screen, and anything that ran the audit from
+here would put the rule set on its render. Running an audit is
+`POST /audits`. The route returns ids, statuses and counts — band names,
+"12 minutes ago" and "in the last 30 days" are composed in the admin bundle,
+where they can be translated.
+
+```json
+{
+  "data": {
+    "score": {
+      "has_audit": true,
+      "audit_id": 12,
+      "score": 86,
+      "band": "good",
+      "completed_at": "2026-09-16 08:48:27",
+      "rules_run": 19,
+      "rules_passed": 15,
+      "stale": false,
+      "open_findings": 4,
+      "open_by_severity": { "critical": 0, "high": 0, "medium": 1, "low": 3 },
+      "trend": {
+        "delta": 6,
+        "baseline_score": 80,
+        "baseline_completed_at": "2026-08-16 09:00:00",
+        "window_days": 30,
+        "covers_full_window": true
+      }
+    }
+  }
+}
+```
+
+With no audit yet, `score` is `{ "has_audit": false }`.
+
+**`open_findings` is counted from the rows, not the run's totals.** Those
+totals are fixed when the audit finished; a finding since fixed or ignored
+is no longer something to send the operator to.
+
+**`stale`** is true when business data changed after the run. The card
+shows the score **with a warning** — never hidden, never re-measured.
+
+### The trend never claims more history than exists
+
+`trend` compares the latest run with **the newest run at least
+`window_days` old**. When no run is that old — a new site, or a busy one
+whose history has been pruned to the last 30 runs — it compares with the
+oldest run there is and sets `covers_full_window` to `false`, so the card
+says "+6 since Sep 10" rather than a false "+6 in the last 30 days".
+
+- One run is a starting point, not a trend: `delta` is `null`, never `0`.
+- `0` is a real measurement — the score genuinely did not move.
+- Runs are compared **for the same location only**, and ordered by when
+  they finished rather than by id.
+
+---
+
+# SEO audit
+
+### `GET /audits`
+
+**Never measures.** It reads the most recent stored run; `meta.stale` says
+whether that run is older than the data it describes. Running the rule set
+on a GET would put every check on every render of the dashboard.
+
+```json
+{
+  "data": {
+    "id": 12,
+    "status": "completed",
+    "score": 86,
+    "score_band": "good",
+    "category_scores": {
+      "business": { "weight": 30, "effective_weight": 30, "earned": 23.3, "percent": 78, "checks": 6, "passed": 4, "failed": 2 }
+    },
+    "rules_run": 19,
+    "issues_total": 4,
+    "issues_passed": 15,
+    "triggered_by": "manual",
+    "completed_at": "2026-09-13 08:48:27"
+  },
+  "meta": {
+    "issues": [],
+    "passes": [],
+    "history": [],
+    "stale": false,
+    "bands": ["needs_work", "fair", "good", "excellent"]
+  }
+}
+```
+
+`meta.issues` comes back **most urgent first**, and ties keep rule order.
+`meta.passes` carries the rules that passed, so "19 ran, 15 passed" is a
+fact rather than a subtraction — and passes store **no severity**, which is
+what keeps `issues_critical` meaningful.
+
+### `POST /audits`
+
+Runs the rule set and stores it, answering `201` with the same shape.
+Optional `location_id`. `409 fhint_audit_no_business` when there is nothing
+to audit.
+
+### `POST|PUT|PATCH /audits/issues/{id}`
+
+Takes `status`: `open`, `resolved` or `ignored`.
+
+### `POST /audits/issues/{id}/fix`
+
+Applies the finding's fix handler, marks it resolved, and **re-runs the
+audit** so the score reflects the change — a fix that left a stale number
+on screen would look like it did nothing. `400 fhint_fix_unavailable` when
+the finding has no handler.
+
+## How the score works
+
+Each rule declares a **category** and a **weight within it**; categories
+carry relative weights (`fhint_audit_category_weights`). The per-category
+`earned` values sum to the score, so a number can always be decomposed into
+where the rest went.
+
+**A rule has three outcomes, not two.** A `skip` means it had nothing to
+judge — no Google connection to compare against, no services to check — and
+is removed from the denominator. Counting a skip as a pass would inflate a
+score nobody earned; counting it as a failure would penalise a site for a
+feature it never opted into. When a whole category skips, its weight is
+**redistributed** across the categories that ran, rather than scored as
+zero.
+
+Bands: `needs_work` under 50, `fair` 50–69, `good` 70–89, `excellent` 90+.
+
+**Severity and weight are deliberately separate.** Severity says how urgent
+a finding is; weight says how much it moves the score. A missing logo is
+low severity and still costs a point.
+
+## Fixes
+
+A fix handler runs only where **the correct value is already known** — the
+stored address with `https://` in front of it, the site's own home URL, or
+making the single existing location primary. Anything that would invent a
+value the operator never supplied is not a fix; those stay findings with a
+recommendation. With several locations and none primary the handler
+refuses, rather than choosing which branch represents the business.
+
+Filters: `fhint_audit_rules` (add or remove rules),
+`fhint_audit_fix_handlers` (add fixes),
+`fhint_audit_category_weights` (retune the score).
+
+Audits also run daily on `fhint_run_audit`, and history is pruned to the
+last 30 runs, their findings going with them.
+
+---
+
+# Schema
+
+### `GET /schema`
+
+Optional `location_id` (default 0, the primary location).
+
+```json
+{
+  "data": {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "Dentist",
+        "@id": "https://example.com/#localbusiness",
+        "name": "Northside Dental Care",
+        "telephone": "+1 512 555 0134",
+        "address": { "@type": "PostalAddress", "streetAddress": "401 Congress Ave", "addressLocality": "Austin" },
+        "openingHoursSpecification": [
+          { "@type": "OpeningHoursSpecification", "dayOfWeek": "Monday", "opens": "09:00", "closes": "17:00" }
+        ]
+      }
+    ]
+  },
+  "meta": {
+    "ownership": {
+      "mode": "auto",
+      "modes": ["auto", "plugin", "seo_plugin", "disabled"],
+      "should_publish": true,
+      "detected": [],
+      "conflict_certain": false,
+      "conflict_possible": false,
+      "deferring_to_plugin": false
+    },
+    "is_publishable": true,
+    "blockers": [],
+    "recommendations": ["schema.geo.missing"],
+    "location_id": 0
+  }
+}
+```
+
+**Read-only, and there is no write method.** The markup is derived from the
+business, its location, hours and services; the way to change it is to
+change those. A route that could edit the graph directly would be a second
+place where `name` lives, which the data model forbids. **Who** publishes it
+is a setting, saved through `/settings` as `schema_mode`.
+
+`data` comes from the same cache the front end prints, so the preview is
+what search engines see rather than a second rendering that could diverge.
+
+**`blockers` stop publication; `recommendations` do not.** A blocker means
+nothing is printed at all — no name, an incomplete address, or a location
+marked permanently closed, which schema.org has no way to express, so the
+honest output is none. A recommendation is a value that is simply absent.
+
+| Blocker | |
+|---|---|
+| `schema.business.missing` | No business record. |
+| `schema.location.missing` | No location. |
+| `schema.name.missing` | No name to publish. |
+| `schema.address.incomplete` | Street, city or country missing. |
+| `schema.location.permanently_closed` | Nothing is published for a closed place. |
+
+Recommendations: `schema.phone.missing`, `schema.website.missing`,
+`schema.logo.missing`, `schema.description.missing`, `schema.geo.missing`,
+`schema.hours.missing`.
+
+## Opening hours in the markup
+
+The three-state model survives into the output, and this is the rule most
+worth knowing:
+
+- A day **nobody configured** is omitted entirely. Publishing `00:00–00:00`
+  for it would tell Google the business is shut that day, which is a claim
+  the plugin has no basis to make.
+- A day **explicitly marked closed** *is* published as `00:00–00:00` —
+  there the operator did say so.
+- A **split shift** becomes two specifications for the same day.
+- **24 hours** becomes `00:00–23:59`.
+- A **temporarily closed** location publishes no hours at all: its stored
+  hours describe normal weeks, and normal weeks are not what is happening.
+
+Day names are the schema.org English identifiers and are never translated —
+they are vocabulary, not text for a reader.
+
+## Who publishes it
+
+`schema_mode` decides, and `meta.ownership` explains the outcome:
+
+| Mode | Behaviour |
+|---|---|
+| `auto` | Publish, unless a plugin **known** to publish LocalBusiness is active. |
+| `plugin` | Always publish. |
+| `seo_plugin` | Never publish; the SEO plugin owns it. |
+| `disabled` | Never publish. |
+
+Two LocalBusiness nodes on one page is a real problem — search engines pick
+one and the other's claims are ignored or merged unpredictably. But *an SEO
+plugin being active* does not mean it publishes this markup: Yoast only does
+with its Local SEO add-on, Rank Math only when configured as a local
+business. So `detected[].emits_local_business` is three-valued — `true`,
+`false`, or `null` when it cannot be determined — and **`auto` stands aside
+only for `true`**. A `null` never changes behaviour on its own; it is
+surfaced so the operator can look at their own page source and decide.
+Deferring to anything uncertain would leave many sites silently publishing
+nothing, which is the worse failure because it is invisible.
+
+Filters: `fhint_schema_graph` (add or change nodes),
+`fhint_schema_detected_plugins` (correct the detection),
+`fhint_schema_render` (suppress output on a particular request).
+
+---
+
+# Google Business Profile
+
+Three routes and one non-REST endpoint. **The connection is not completed
+over REST**, because Google redirects a browser, not an API client:
+`POST /google/connect` returns a URL to send the operator to, and Google
+returns them to `admin-post.php?action=fhint_google_callback`, where
+`App\Google\Connection` finishes the handshake and redirects back to the
+screen.
+
+**No route here returns a token or a client secret.** The secret is
+write-only and there is no route that reads one back — a route that can
+return a secret is a route that publishes it to anyone who can read the
+response. `tests/Smoke/google.php` asserts the serialized state contains
+neither the tokens nor the secret.
+
+### `GET /google`
+
+```json
+{
+  "data": {
+    "status": "connected",
+    "configured": true,
+    "client_id_hint": "1234567890-a…",
+    "redirect_uri": "https://example.com/wp-admin/admin-post.php?action=fhint_google_callback",
+    "account_email": "owner@example.com",
+    "connected_at": 1789240000,
+    "expires_at": 1789243600,
+    "scopes": ["https://www.googleapis.com/auth/business.manage"],
+    "can_manage_profile": true,
+    "notice": null
+  }
+}
+```
+
+`status` is one of:
+
+| Status | Meaning |
+|---|---|
+| `not_configured` | No OAuth client id and secret stored yet. |
+| `disconnected` | A client is configured; nobody has signed in. |
+| `connected` | Signed in, with permission to manage the profile. |
+| `needs_reconnect` | Signed in, but `business.manage` was not granted. |
+
+Deliberately coarse: a screen distinguishing "expired" from "revoked" would
+be describing a difference the operator cannot act on differently — both
+mean connect again.
+
+`notice` carries the reason a connection attempt failed, so the screen can
+explain a redirect it did not control. **It is read-once**: the server
+deletes it as it hands it over, and the client must only trust it from a
+read that finished after the screen opened, never from cache.
+
+### `POST|PUT|PATCH /google/credentials`
+
+Takes `client_id` and `client_secret`. **An empty string means "keep the
+stored value"**, so the client id can be corrected without re-entering a
+secret that is never sent back to be re-submitted. Returns the same state
+object as `GET /google`; `400 fhint_google_credentials_incomplete` when the
+result would still be missing a half.
+
+### `POST /google/connect`
+
+```json
+{ "data": { "authorize_url": "https://accounts.google.com/o/oauth2/v2/auth?…" } }
+```
+
+`409 fhint_google_not_configured` when no client is stored. The URL carries
+a single-use `state` and a PKCE `code_challenge`, both tied to a handshake
+recorded server-side for ten minutes and bound to the user who started it.
+
+### `DELETE /google`
+
+Disconnects, returning the new state with `meta.revoked` saying whether
+Google confirmed the revocation. **The local tokens are cleared either
+way** — the operator asked to disconnect, and leaving a working refresh
+token behind is the wrong way to fail. The stored client credentials
+survive: they disconnected an account, not their Google Cloud project.
+
+### `GET /google/profiles`
+
+The stored copy of what Google last said, plus the mapping:
+
+```json
+{
+  "data": {
+    "locations": [
+      {
+        "id": 1,
+        "name": "Downtown",
+        "address": "401 Congress Ave, Austin, TX, 78701, US",
+        "mapped_to": "locations/456",
+        "mapped_title": "Northside Dental Care",
+        "mapped_address": "401 Congress Ave, Austin, TX, 78701, US",
+        "suggestions": []
+      }
+    ],
+    "google_locations": [
+      {
+        "id": 3,
+        "account_name": "accounts/123",
+        "location_name": "locations/456",
+        "fhint_location_id": 1,
+        "title": "Northside Dental Care",
+        "store_code": "DT-01",
+        "address": "401 Congress Ave, Austin, TX, 78701, US",
+        "phone": "+1 512 555 0134",
+        "website": "https://example.com",
+        "verification_state": "OK",
+        "synced_at": "2026-09-13 01:20:00"
+      }
+    ],
+    "synced_at": "2026-09-13 01:20:00"
+  }
+}
+```
+
+**This route never calls Google.** It reads `wp_fhint_google_locations`.
+`synced_at` is returned so a screen can say how old the answer is — a
+cached list with no date is indistinguishable from a current one.
+
+`suggestions` are close matches for a location that is not yet mapped, best
+first and at most three, each with the score that produced it. They are
+candidates for a person, never applied automatically: two branches on one
+street can look nearly identical, and a confident wrong mapping ends with
+one branch's details published to another.
+
+`verification_state` is derived from Google's location metadata: `OK`,
+`PENDING_EDITS`, or `LIMITED`.
+
+### `POST /google/profiles`
+
+Reads Google and stores what comes back, then returns the same shape as the
+GET with `meta.accounts` and `meta.locations` counting what was found.
+
+A POST because it makes external requests and writes rows — doing that on
+the GET the screen makes on every visit would put external HTTP on a render
+path and spend the project's quota for nothing.
+
+**A sync never changes a mapping.** It reports what Google says about a
+place; which of our locations that is remains the operator's decision.
+
+Two Google APIs are involved: Account Management for the accounts, Business
+Information for the locations under each. Both must be enabled for the
+Cloud project, **and Google must have approved the project** before either
+returns anything — a correctly connected site otherwise looks broken.
+
+Google reports that refusal two different ways, and they need different
+answers:
+
+| From Google | What it means | What the operator is told |
+|---|---|---|
+| `403 PERMISSION_DENIED` | APIs not enabled, or project not approved | Enable them, and get the project approved |
+| `429` with `quota_limit_value: "0"` | No quota was ever granted — the project is not approved | Approval is a separate request; **waiting will not help** |
+| `429` with any other limit | A genuine rate limit | Wait a few minutes and try again |
+| `429` with no quota detail | Google did not say | Both causes, likelier one first |
+
+**A 429 from these APIs is usually not rate limiting.** Google starts every
+project at a quota of zero and lifts it on approval, so an unapproved
+project's *first* request comes back as "quota exceeded". Telling that
+operator to wait is advice that can never come true, which is why the limit
+Google states is read rather than assumed.
+
+### `POST /google/mapping`
+
+Takes `location_name` (Google's resource name) and `fhint_location_id`.
+One-to-one in both directions: any previous claim on either side is
+released first. `404` when either side is unknown — a Google location that
+is not in the last read cannot be mapped, and the message says to refresh.
+
+### `DELETE /google/mapping`
+
+Takes `location_name` and releases the link. Deleting one of *our*
+locations releases its mapping too, through the `fhint_location_deleted`
+action.
+
+### `admin-post.php?action=fhint_google_callback`
+
+Not a REST route. Checks the capability, claims the `state` (single use,
+matched to the user who began the handshake), exchanges the code using the
+stored PKCE verifier, saves the tokens, and redirects to `#/google`. Every
+failure path records a `notice` and redirects rather than rendering an
+error page — the operator arrives here from Google, not from a link they
+chose.
 
 ---
 

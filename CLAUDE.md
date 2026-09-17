@@ -35,17 +35,41 @@ composer lint:fix           # vendor/bin/phpcbf — auto-fix what's mechanically
 ```
 
 ```bash
-php tests/Smoke/domain-logic.php    # validation, hours parsing, limits, redaction — no DB
-php tests/Smoke/schema-format.php   # dbDelta formatting rules on every table definition
-php tests/Smoke/rest-routes.php     # every route is registered and guarded
+php tests/Smoke/domain-logic.php       # validation, hours parsing, limits, redaction
+php tests/Smoke/schema-format.php      # dbDelta formatting rules on every definition
+php tests/Smoke/rest-routes.php        # every route is registered and guarded
+php tests/Smoke/onboarding.php         # the guided-setup position store
+php tests/Smoke/google.php             # the OAuth handshake
+php tests/Smoke/google-profiles.php    # profile sync and mapping rules
+php tests/Smoke/schema-graph.php       # the JSON-LD graph and who publishes it
+php tests/Smoke/audit.php              # the rule set, scoring and the registry
+php tests/Smoke/dashboard.php          # the score trend and what the card may claim
 ```
 
 The smoke suites run on plain PHP against stubbed WordPress
 (`tests/Smoke/bootstrap.php`), so a failure is a real logic bug rather than
-an environment problem. They cover what can be proved without a database;
-**anything touching `$wpdb` still needs a real WordPress install**, and the
-repositories have not yet been exercised against one — see
-`docs/PROGRESS.md`.
+an environment problem. They cover what can be proved without a database.
+
+**Anything touching `$wpdb` is proved separately, against a real one:**
+
+```bash
+docker exec foundhunt_app php \
+  /var/www/html/wp-content/plugins/found-hint/tests/Integration/database.php
+```
+
+The site is `foundhunt_app` in Docker — `http://localhost:8100`, phpMyAdmin
+on `:8101`. That suite covers dbDelta idempotency, every repository round
+trip, the cascades, plan limits and capability denial. **It runs against
+its own tables**: it swaps `$wpdb->prefix`, since `Tables::name()` reads the
+prefix at call time, then drops them and restores the options it stamped.
+Keep it that way — a verification suite that eats the developer's own data
+gets run once and then never again.
+
+Two rules divide cleanly between them, and it is worth knowing which owns
+which: the **two-space `PRIMARY KEY  (id)`** rule is static
+(`schema-format`), because it causes no repeated `ALTER` and MySQL cannot
+reveal it; a **wrong column type** is only visible against MySQL, and
+`database.php` prints dbDelta's own explanation when it finds one.
 
 When you add a test, mutate the code it covers and confirm the test fails.
 A test that passes against broken code is worse than no test, because it
@@ -216,8 +240,11 @@ Filter the required capability with `fhint_manage_capability`.
 | Build | Vite (`vite.admin.config.js`) via `@kucrut/vite-for-wp` |
 
 One real WordPress admin page (`Admin\Menu`, slug `fhint`) mounts the SPA
-into `#fhint-app`; every sub-page is a hash route. Submenu entries point at
-`fhint#/route` — **keep `Menu.php`'s submenu list and `routes.jsx` in sync**.
+into `#fhint-app`; every sub-page is a hash route. **WordPress shows one
+FoundHint menu entry and no submenus** — clicking it opens the dashboard,
+and the plugin's own sidebar is the navigation. Adding a screen means a
+route in `routes.jsx` and an entry in the sidebar; do not add
+`add_submenu_page()` calls back.
 
 ### Rules
 

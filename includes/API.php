@@ -7,9 +7,14 @@
 
 namespace FHINT;
 
+use FHINT\API\Audits;
 use FHINT\API\Business;
+use FHINT\API\Dashboard;
+use FHINT\API\Google;
 use FHINT\API\Locations;
 use FHINT\API\Onboarding;
+use FHINT\API\Places;
+use FHINT\API\Schema;
 use FHINT\API\Services;
 use FHINT\API\Settings;
 
@@ -37,9 +42,14 @@ class API {
 	 * @return void
 	 */
 	public static function init() {
+		Audits::init();
 		Business::init();
+		Dashboard::init();
+		Google::init();
 		Locations::init();
 		Onboarding::init();
+		Places::init();
+		Schema::init();
 		Services::init();
 		Settings::init();
 	}

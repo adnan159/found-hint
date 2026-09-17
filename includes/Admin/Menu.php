@@ -14,17 +14,15 @@ defined( 'ABSPATH' ) || exit;
 /**
  * Registers the single wp-admin menu page that mounts the React SPA.
  *
- * One real WordPress top-level page is registered; React Router's hash
- * router handles every sub-page client-side (see src/admin/routes.jsx).
- * See CLAUDE.md for why a single page plus a client router was chosen.
+ * **One menu entry and no submenus.** Clicking FoundHint opens the
+ * dashboard; every other screen is reached from the plugin's own sidebar,
+ * which is a hash route inside the app (see src/admin/routes.jsx). A
+ * WordPress submenu repeated that sidebar in a second place, and the two
+ * lists had to be kept in step by hand every time a screen was added.
  *
- * Because the first submenu page shares the top-level slug, WordPress
- * assigns the hook suffix `toplevel_page_{SLUG}` — Enqueue relies on that
- * exact, well-known string rather than capturing a dynamic return value.
- *
- * The submenu list below is a placeholder shell reflecting the collapsed
- * sidebar IA in docs/NAVIGATION.md — wire real hash routes here as each
- * page lands in src/admin/pages/.
+ * `add_menu_page()` assigns the hook suffix `toplevel_page_{SLUG}` —
+ * Enqueue relies on that exact, well-known string rather than capturing a
+ * dynamic return value.
  */
 class Menu {
 
@@ -44,76 +42,67 @@ class Menu {
 	}
 
 	/**
-	 * Add the top-level page and its (hash-routed) submenu entries.
+	 * Add the top-level page.
+	 *
+	 * Deliberately without `add_submenu_page()`: with no submenu registered,
+	 * WordPress shows no flyout, and the menu item links straight to
+	 * `admin.php?page=fhint`, which opens the dashboard.
 	 *
 	 * @return void
 	 */
 	public static function register_menu() {
-		$capability = Capabilities::manage();
-
 		add_menu_page(
 			__( 'FoundHint', 'found-hint' ),
 			__( 'FoundHint', 'found-hint' ),
-			$capability,
+			Capabilities::manage(),
 			self::SLUG,
 			array( __CLASS__, 'render_page' ),
-			'dashicons-location-alt',
+			self::menu_icon(),
 			58
 		);
+	}
 
-		add_submenu_page(
-			self::SLUG,
-			__( 'Dashboard', 'found-hint' ),
-			__( 'Dashboard', 'found-hint' ),
-			$capability,
-			self::SLUG,
-			array( __CLASS__, 'render_page' )
-		);
+	/**
+	 * The FoundHint mark, as a menu icon.
+	 *
+	 * Handed to WordPress as an SVG data URI that wraps the PNG, for two
+	 * reasons. A plain image URL is rendered as an unsized `<img>`, so the
+	 * icon would need admin CSS to shrink it — CSS this plugin is not allowed
+	 * to load on every admin screen, and the menu appears on all of them. An
+	 * SVG data URI instead gets WordPress's own `background-size: 20px auto`,
+	 * so a 40px raster renders crisply at 20px on high-density displays with
+	 * nothing extra loaded.
+	 *
+	 * WordPress's svg-painter recolours menu SVGs to the admin colour scheme
+	 * by rewriting `fill` and `style` attributes. This SVG has neither — only
+	 * an embedded image — so the brand colours are left alone.
+	 *
+	 * Falls back to a dashicon if the file is missing, rather than leaving
+	 * the menu with an empty square.
+	 *
+	 * @return string
+	 */
+	public static function menu_icon() {
+		$file = FHINT_PATH . 'assets/images/foundhint-menu-icon.png';
 
-		add_submenu_page(
-			self::SLUG,
-			__( 'Setup', 'found-hint' ),
-			__( 'Setup', 'found-hint' ),
-			$capability,
-			self::SLUG . '#/setup',
-			array( __CLASS__, 'render_page' )
-		);
+		if ( ! is_readable( $file ) ) {
+			return 'dashicons-location-alt';
+		}
 
-		add_submenu_page(
-			self::SLUG,
-			__( 'Business', 'found-hint' ),
-			__( 'Business', 'found-hint' ),
-			$capability,
-			self::SLUG . '#/business',
-			array( __CLASS__, 'render_page' )
-		);
+		// phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents -- a local plugin file, not a remote request.
+		$png = file_get_contents( $file );
 
-		add_submenu_page(
-			self::SLUG,
-			__( 'Locations', 'found-hint' ),
-			__( 'Locations', 'found-hint' ),
-			$capability,
-			self::SLUG . '#/locations',
-			array( __CLASS__, 'render_page' )
-		);
+		if ( false === $png || '' === $png ) {
+			return 'dashicons-location-alt';
+		}
 
-		add_submenu_page(
-			self::SLUG,
-			__( 'Services', 'found-hint' ),
-			__( 'Services', 'found-hint' ),
-			$capability,
-			self::SLUG . '#/services',
-			array( __CLASS__, 'render_page' )
-		);
+		$svg = '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="20" height="20" viewBox="0 0 40 40">'
+			// phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions.obfuscation_base64_encode -- encoding a bundled image for a data URI.
+			. '<image width="40" height="40" xlink:href="data:image/png;base64,' . base64_encode( $png ) . '"/>'
+			. '</svg>';
 
-		add_submenu_page(
-			self::SLUG,
-			__( 'Settings', 'found-hint' ),
-			__( 'Settings', 'found-hint' ),
-			$capability,
-			self::SLUG . '#/settings',
-			array( __CLASS__, 'render_page' )
-		);
+		// phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions.obfuscation_base64_encode -- WordPress requires menu SVGs as base64 data URIs.
+		return 'data:image/svg+xml;base64,' . base64_encode( $svg );
 	}
 
 	/**

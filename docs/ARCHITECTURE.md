@@ -43,8 +43,30 @@ attached during boot would never fire.
 | Installer | `Installer.php` | activation, version-gated migrations, self-repair |
 | Database | `Database.php` + `Database/` | `dbDelta` table creation, `Tables` registry |
 | API | `API.php` + `API/` | REST controllers under `fhint/v1` |
-| Frontend | `Frontend.php` + `Frontend/` | public-request behaviour — empty so far |
+| Frontend | `Frontend.php` + `Frontend/` | JSON-LD output on `wp_head` |
 | Admin | `Admin.php` + `Admin/` | menu page, SPA asset loading |
+| Google | `Google.php` + `App/Google/` | the Business Profile OAuth connection |
+| Audit | `Audit.php` + `App/Audit/` | the rule set, scoring and the daily schedule |
+
+`App/Google/` holds the connection: `Credentials` (the site's own OAuth
+client), `Tokens` (storage, never logged and never sent to a browser),
+`OAuth` (the handshake, with PKCE and single-use state) and `Connection`
+(state, the `admin-post.php` callback, and disconnect). On top of those,
+`Client` (authenticated GET with one retry after a refresh), `Profiles`
+(reading accounts and locations, and flattening Google's shape into ours),
+`GoogleLocationRepository` and `Mapping` (which Google profile is which of
+our locations).
+
+`App/Audit/` is the audit engine: `Rule` (the contract), `Context` (the
+site gathered once), `Result` (pass, fail or **skip**), `Score` (weighted
+and renormalised), `Registry` (the filterable rule set), `Runner`,
+`AuditRepository` and `Fixes/FixRunner`. Rules live one per file in
+`App/Audit/Rules/`.
+
+`App/Schema/` builds the structured data: `Graph` (the JSON-LD document,
+built entirely from `Nap`), `Ownership` (the four publishing modes and SEO
+plugin detection) and `SchemaCache` (invalidated by the data stamp rather
+than by a purge anyone has to remember).
 
 `App/Core/` holds the cross-cutting pieces: `Settings` (one serialized
 option, dot-notation), `Capabilities`, `Limits`, `Logger`, `Validator`,
@@ -52,14 +74,14 @@ option, dot-notation), `Capabilities`, `Limits`, `Logger`, `Validator`,
 
 ## Data model
 
-Seven tables, all prefixed `{$wpdb->prefix}fhint_`, defined one class per
+Eight tables, all prefixed `{$wpdb->prefix}fhint_`, defined one class per
 table in `includes/Database/` and named only in `Database\Tables`.
 
 ```
 business ─┬─ locations ── location_hours
           └─ services
 
-audits ── audit_issues        logs
+audits ── audit_issues        logs        google_locations
 ```
 
 - **business** — one row. The single source of truth for name, phone,
@@ -73,6 +95,10 @@ audits ── audit_issues        logs
 - **audits** / **audit_issues** — one row per run, one row per rule result
   (passes included, so a score recalculates from the rows alone).
 - **logs** — event log, trimmed daily to the retention setting.
+- **google_locations** — one row per location Google reports, plus the link
+  to one of ours. The profile columns are a cache of Google's answer, never
+  a second source of truth; the mapping lives here because the relationship
+  is owned by the Google side.
 
 No foreign keys: hosts vary in storage engine, so referential integrity
 lives in the repositories, and both cascades (deleting a location removes

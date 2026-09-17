@@ -18,8 +18,8 @@ defined( 'ABSPATH' ) || exit;
  * Enqueues the admin-side React SPA bundle (Vite build) and its Tailwind CSS.
  *
  * Gated on the exact WP-assigned hook suffix for our own top-level page
- * (`toplevel_page_` . Menu::SLUG — the standard suffix WordPress assigns
- * when the first submenu shares the top-level slug, see Menu.php) so this
+ * (`toplevel_page_` . Menu::SLUG — the suffix `add_menu_page()` assigns to
+ * a top-level page, see Menu.php) so this
  * bundle never appears on any other admin page or the front end.
  * wp_localize_script exposes PHP data to the React app as window.FHINT,
  * read directly by src/admin/store/api/baseApi.js.

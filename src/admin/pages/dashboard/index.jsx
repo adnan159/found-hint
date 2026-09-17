@@ -19,19 +19,23 @@ import { Progress } from "@/components/ui/progress";
 import { Skeleton } from "@/components/ui/skeleton";
 import PageHeader from "@/components/PageHeader";
 import SectionCard from "@/components/SectionCard";
+import GetStarted, { useGetStartedState } from "./components/GetStarted";
+import GoogleCard from "./components/GoogleCard";
+import ScoreCard from "./components/ScoreCard";
 import { useGetBusinessQuery } from "@/store/api/businessApi";
+import { useGetDashboardQuery } from "@/store/api/dashboardApi";
 import { useGetLocationsQuery } from "@/store/api/locationsApi";
 import { useGetServicesQuery } from "@/store/api/servicesApi";
 
 /**
  * The dashboard.
  *
- * The prototype also shows a Local SEO health score, Google Business
- * Profile status, a ranking grid and a performance panel. None of those
- * have an engine behind them yet, and a card showing an invented number is
- * worse than no card: it would be indistinguishable from a real reading and
- * nobody would know not to trust it. What is here is computed from data the
- * site actually holds.
+ * The health score is the stored result of the last audit, read through
+ * `GET /dashboard`, which never measures. The prototype also shows a ranking
+ * grid and a performance panel; those have no engine behind them yet, and a
+ * card showing an invented number is worse than no card — it would be
+ * indistinguishable from a real reading and nobody would know not to trust
+ * it.
  */
 export default function DashboardPage() {
   const { data: businessData, isLoading: loadingBusiness } =
@@ -40,10 +44,27 @@ export default function DashboardPage() {
     useGetLocationsQuery();
   const { data: servicesData, isLoading: loadingServices } =
     useGetServicesQuery();
-
-  const isLoading = loadingBusiness || loadingLocations || loadingServices;
+  // Refetched whenever the dashboard is opened: whether the score is out of
+  // date depends on edits made on other screens, and a cached "up to date"
+  // would be exactly the silent staleness this card exists to prevent.
+  const { data: dashboard, isLoading: loadingDashboard } = useGetDashboardQuery(
+    undefined,
+    { refetchOnMountOrArgChange: true },
+  );
 
   const business = businessData?.business;
+  const { show: showGetStarted, isLoading: loadingGetStarted } =
+    useGetStartedState(business);
+
+  const isLoading =
+    loadingBusiness ||
+    loadingLocations ||
+    loadingServices ||
+    loadingDashboard ||
+    // Waited for too, so a fresh site never flashes an empty dashboard
+    // before the introduction replaces it.
+    loadingGetStarted;
+
   const locations = locationsData?.locations ?? [];
   const services = servicesData?.services ?? [];
   const primary = locations.find((item) => item.is_primary) ?? locations[0];
@@ -94,14 +115,25 @@ export default function DashboardPage() {
     return (
       <>
         <PageHeader title={__("Dashboard", "found-hint")} />
+        <div className="fhint:grid fhint:gap-4 fhint:lg:grid-cols-3">
+          <Skeleton className="fhint:h-80 fhint:w-full" />
+          <Skeleton className="fhint:h-80 fhint:w-full" />
+          <Skeleton className="fhint:h-80 fhint:w-full" />
+        </div>
         <div className="fhint:grid fhint:gap-4 fhint:md:grid-cols-3">
           {[0, 1, 2].map((card) => (
             <Skeleton key={card} className="fhint:h-36 fhint:w-full" />
           ))}
         </div>
-        <Skeleton className="fhint:h-64 fhint:w-full" />
       </>
     );
+  }
+
+  // A fresh site has no score to read and nothing to summarise, so the
+  // introduction is the screen rather than a banner above a row of empty
+  // cards. Skipping dismisses it and this renders the dashboard instead.
+  if (showGetStarted) {
+    return <GetStarted />;
   }
 
   return (
@@ -114,88 +146,100 @@ export default function DashboardPage() {
         )}
       />
 
-      {/* The setup checklist leads the screen: on a new site it is the only
-          thing worth doing, and it stays useful afterwards as a summary.
-          Styling follows the prototype — a large percentage, a square
-          8px bar, and rows that are never struck through when done. */}
-      <SectionCard
-        title={__("Setup progress", "found-hint")}
-        action={
-          <span className="fhint:text-[13px] fhint:text-muted-strong">
-            {sprintf(
-              /* translators: 1: number of completed steps, 2: total steps. */
-              __("%1$d of %2$d steps done", "found-hint"),
-              doneCount,
-              steps.length,
-            )}
-          </span>
-        }
-      >
-        <div className="fhint:flex fhint:flex-col fhint:gap-4">
-          <div className="fhint:flex fhint:items-baseline fhint:gap-3">
-            <span className="fhint:font-heading fhint:text-[40px] fhint:leading-none fhint:font-extrabold">
+      {/* Score and setup side by side, as in the prototype's top row. The
+          score leads: once a site is set up it is the figure people come
+          back for, and on a new site the setup checklist beside it is the
+          obvious next step. */}
+      {/* No `items-start`: the three cards stretch to the tallest, so the
+          row reads as one band rather than three ragged blocks. */}
+      <div className="fhint:grid fhint:gap-4 fhint:lg:grid-cols-3">
+        <ScoreCard summary={dashboard?.score} />
+
+        {/* The setup checklist stays useful afterwards as a summary. Styling
+          follows the prototype — a large percentage, a square 8px bar, and
+          rows that are never struck through when done. */}
+        <SectionCard
+          title={__("Setup progress", "found-hint")}
+          action={
+            <span className="fhint:text-[13px] fhint:text-muted-strong">
               {sprintf(
-                /* translators: %d: percentage of setup completed. */
-                __("%d%%", "found-hint"),
-                percent,
+                /* translators: 1: number of completed steps, 2: total steps. */
+                __("%1$d of %2$d steps done", "found-hint"),
+                doneCount,
+                steps.length,
               )}
             </span>
-          </div>
+          }
+        >
+          <div className="fhint:flex fhint:flex-col fhint:gap-4">
+            <div className="fhint:flex fhint:items-baseline fhint:gap-3">
+              <span className="fhint:font-heading fhint:text-[40px] fhint:leading-none fhint:font-extrabold">
+                {sprintf(
+                  /* translators: %d: percentage of setup completed. */
+                  __("%d%%", "found-hint"),
+                  percent,
+                )}
+              </span>
+            </div>
 
-          <Progress
-            value={percent}
-            aria-label={__("Setup progress", "found-hint")}
-          />
+            <Progress
+              value={percent}
+              aria-label={__("Setup progress", "found-hint")}
+            />
 
-          <ul className="fhint:flex fhint:flex-col">
-            {steps.map((step) => (
-              <li
-                key={step.id}
-                className="fhint:flex fhint:items-center fhint:gap-3 fhint:border-b fhint:border-b-border fhint:py-2.5 fhint:last:border-b-0"
-              >
-                <span
-                  aria-hidden="true"
-                  className={
-                    step.done
-                      ? "fhint:flex fhint:size-[17px] fhint:shrink-0 fhint:items-center fhint:justify-center fhint:bg-success fhint:text-success-foreground"
-                      : "fhint:flex fhint:size-[17px] fhint:shrink-0 fhint:items-center fhint:justify-center fhint:bg-muted fhint:ring-1 fhint:ring-border"
-                  }
+            <ul className="fhint:flex fhint:flex-col">
+              {steps.map((step) => (
+                <li
+                  key={step.id}
+                  className="fhint:flex fhint:items-center fhint:gap-3 fhint:border-b fhint:border-b-border fhint:py-2.5 fhint:last:border-b-0"
                 >
-                  {step.done ? <CheckIcon className="fhint:size-3" /> : null}
-                </span>
-
-                <span
-                  className={
-                    step.done
-                      ? "fhint:text-[13px] fhint:font-medium fhint:text-muted-strong"
-                      : "fhint:text-[13px] fhint:font-bold"
-                  }
-                >
-                  {step.label}
-                  <span className="fhint:sr-only">
-                    {step.done
-                      ? __(" — done", "found-hint")
-                      : __(" — still to do", "found-hint")}
-                  </span>
-                </span>
-
-                {!step.done ? (
-                  <Link
-                    to={step.to}
-                    className="fhint:ml-auto fhint:text-[12px] fhint:font-extrabold fhint:text-link-accent fhint:no-underline fhint:hover:underline"
+                  <span
+                    aria-hidden="true"
+                    className={
+                      step.done
+                        ? "fhint:flex fhint:size-[17px] fhint:shrink-0 fhint:items-center fhint:justify-center fhint:bg-success fhint:text-success-foreground"
+                        : "fhint:flex fhint:size-[17px] fhint:shrink-0 fhint:items-center fhint:justify-center fhint:bg-muted fhint:ring-1 fhint:ring-border"
+                    }
                   >
-                    {__("Do this", "found-hint")}
-                    <ArrowRightIcon
-                      aria-hidden="true"
-                      className="fhint:ml-1 fhint:inline fhint:size-3"
-                    />
-                  </Link>
-                ) : null}
-              </li>
-            ))}
-          </ul>
-        </div>
-      </SectionCard>
+                    {step.done ? <CheckIcon className="fhint:size-3" /> : null}
+                  </span>
+
+                  <span
+                    className={
+                      step.done
+                        ? "fhint:text-[13px] fhint:font-medium fhint:text-muted-strong"
+                        : "fhint:text-[13px] fhint:font-bold"
+                    }
+                  >
+                    {step.label}
+                    <span className="fhint:sr-only">
+                      {step.done
+                        ? __(" — done", "found-hint")
+                        : __(" — still to do", "found-hint")}
+                    </span>
+                  </span>
+
+                  {!step.done ? (
+                    <Link
+                      to={step.to}
+                      className="fhint:ml-auto fhint:text-[12px] fhint:font-extrabold fhint:text-link-accent fhint:no-underline fhint:hover:underline"
+                    >
+                      {__("Do this", "found-hint")}
+                      <ArrowRightIcon
+                        aria-hidden="true"
+                        className="fhint:ml-1 fhint:inline fhint:size-3"
+                      />
+                    </Link>
+                  ) : null}
+                </li>
+              ))}
+            </ul>
+          </div>
+        </SectionCard>
+
+        {/* The third column of the prototype's top row. */}
+        <GoogleCard />
+      </div>
 
       <div className="fhint:grid fhint:gap-4 fhint:md:grid-cols-3">
         <StatCard

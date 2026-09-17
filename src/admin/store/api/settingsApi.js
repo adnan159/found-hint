@@ -22,7 +22,9 @@ export const settingsApi = baseApi.injectEndpoints({
     updateSettings: builder.mutation({
       query: (body) => ({ url: "/settings", method: "PUT", body }),
       transformResponse: (response) => response?.data ?? {},
-      invalidatesTags: ["Settings"],
+      // The schema mode lives in settings, so a save can change what the
+      // site publishes without touching any business data.
+      invalidatesTags: ["Settings", "Schema"],
     }),
 
     purgeLogs: builder.mutation({
