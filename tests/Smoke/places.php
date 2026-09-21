@@ -282,6 +282,9 @@ check( ! $place['hours']['has_any_hours'], 'no periods means no hours' );
 
 foreach ( $place['hours']['days'] as $day ) {
 	check( ! $day['configured'], 'day ' . $day['day_of_week'] . ' is unknown, not closed' );
+	// Not configured *and* carrying no closed marker: a consumer reading
+	// periods rather than the flag must not find a "closed" in them either.
+	check_same( array(), $day['periods'], 'day ' . $day['day_of_week'] . ' holds no invented periods' );
 }
 
 // -- Hours: the three states ----------------------------------------------
@@ -398,7 +401,15 @@ $nap = array(
 	'name'    => 'Harbour Coffee',
 	'phone'   => '0117 496 0000',
 	'website' => 'http://www.harbourcoffee.example',
-	'address' => array( 'formatted' => '12 Dock Road, Bristol, BS1 4XY' ),
+	// Stored the way this plugin stores it: a two-letter country, where
+	// Google's formatted line says "UK".
+	'address' => array(
+		'line_1'    => '12 Dock Road',
+		'city'      => 'Bristol',
+		'postal'    => 'BS1 4XY',
+		'country'   => 'GB',
+		'formatted' => '12 Dock Road, Bristol, BS1 4XY, GB',
+	),
 	'hours'   => array( 'days' => array() ),
 );
 
@@ -412,12 +423,42 @@ foreach ( $result['fields'] as $field ) {
 check_same( Comparison::MATCH, $fields['name']['status'], 'identical names match' );
 check_same( Comparison::MATCH, $fields['phone']['status'], 'the same phone matches' );
 check_same( Comparison::MATCH, $fields['website']['status'], 'http/www differences are not differences' );
-check_same( Comparison::MATCH, $fields['address']['status'], 'a country suffix is not an address difference' );
+check_same( Comparison::MATCH, $fields['address']['status'], "GB here and UK on Google are not an address difference" );
+check_same( '12 Dock Road, Bristol, BS1 4XY, GB', $fields['address']['ours'], 'our formatted address is what is shown' );
+check_same( '12 Dock Road, Bristol BS1 4XY, UK', $fields['address']['theirs'], "and so is Google's" );
 check_same( 0, $result['summary']['attention'], 'nothing needs attention when everything agrees' );
 
 // Both values are returned, because the screen shows them side by side.
 check_same( 'Harbour Coffee', $fields['name']['ours'], 'our value is returned' );
 check_same( 'Harbour Coffee', $fields['name']['theirs'], "Google's value is returned" );
+
+// A different postcode is a different address.
+$moved = $nap;
+$moved['address']['postal'] = 'BS2 0AA';
+
+foreach ( Comparison::build( Place::from_details( place_payload() ), $moved )['fields'] as $field ) {
+	if ( 'address' === $field['key'] ) {
+		check_same( Comparison::DIFFERS, $field['status'], 'a different postcode differs' );
+	}
+}
+
+// Without components from Google, our street, town and postcode must all
+// appear in its formatted line.
+$no_parts = place_payload( array( 'addressComponents' => array() ) );
+
+foreach ( Comparison::build( Place::from_details( $no_parts ), $nap )['fields'] as $field ) {
+	if ( 'address' === $field['key'] ) {
+		check_same( Comparison::MATCH, $field['status'], 'a formatted-only address from Google still compares' );
+	}
+}
+
+$moved_no_parts = Comparison::build( Place::from_details( $no_parts ), $moved );
+
+foreach ( $moved_no_parts['fields'] as $field ) {
+	if ( 'address' === $field['key'] ) {
+		check_same( Comparison::DIFFERS, $field['status'], 'and still catches a different postcode' );
+	}
+}
 
 // A real difference is reported as one.
 $different = Comparison::build(

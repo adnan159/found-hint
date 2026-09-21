@@ -12,7 +12,7 @@
  *
  * **It does not touch the site's own data.** Every table name resolves
  * through `Tables::name()`, which reads `$wpdb->prefix` at call time, so
- * swapping the prefix gives this suite its own eight tables against the
+ * swapping the prefix gives this suite its own copy of every table against the
  * real MySQL. They are created at the start and dropped at the end. The
  * handful of `fhint_*` options the repositories stamp are snapshotted and
  * restored, so the site is left exactly as it was found.
@@ -27,11 +27,14 @@ use FHINT\App\Audit\Runner;
 use FHINT\App\Business\BusinessRepository;
 use FHINT\App\Core\Limits;
 use FHINT\App\Google\GoogleLocationRepository;
+use FHINT\App\Google\Import;
 use FHINT\App\Location\DayOfWeek;
 use FHINT\App\Location\Location;
 use FHINT\App\Location\LocationRepository;
 use FHINT\App\Location\OpeningHoursRepository;
 use FHINT\App\Nap\Nap;
+use FHINT\App\Places\PlaceLinkRepository;
+use FHINT\App\Places\Retention;
 use FHINT\App\Schema\Graph;
 use FHINT\App\Schema\SchemaCache;
 use FHINT\App\Service\ServiceRepository;
@@ -111,6 +114,8 @@ $touched_options = array(
 	'fhint_data_changed_at',
 	'fhint_schema_cache',
 	'fhint_settings',
+	'fhint_places_credentials',
+	'fhint_google_tokens',
 );
 
 $saved_options = array();
@@ -157,7 +162,7 @@ check( ! empty( $changes ), 'the first run creates tables' );
 $missing = Tables::missing();
 
 check_same( array(), $missing, 'every declared table exists after installation' );
-check_same( 8, count( Tables::all() ), 'all eight tables are declared' );
+check_same( 9, count( Tables::all() ), 'all nine tables are declared' );
 
 foreach ( array_keys( Tables::all() ) as $key ) {
 	check( Tables::exists( $key ), "table {$key} exists in MySQL" );
@@ -410,6 +415,226 @@ check_same(
 
 check( '' !== GoogleLocationRepository::last_synced_at(), 'the last sync time is readable' );
 
+// -- Places links: an id and coordinates, and the coordinates expire -------
+
+$links_table = Tables::name( Tables::PLACE_LINKS );
+
+// The table's columns are the compliance guarantee, so they are asserted
+// exactly. Google's terms allow keeping a place id and, for 30 days,
+// coordinates. A column for a name, address, phone or hours appearing here
+// is the failure this check exists to catch.
+check_same(
+	array( 'id', 'fhint_location_id', 'place_id', 'latitude', 'longitude', 'coordinates_cached_at', 'linked_at', 'created_at', 'updated_at' ),
+	$wpdb->get_col( "SHOW COLUMNS FROM {$links_table}" ),
+	'the place link table has no column for Google content'
+);
+
+check( PlaceLinkRepository::link( $location_id, 'ChIJround', 51.4491, -2.5987 ), 'a place link is stored' );
+
+$link = PlaceLinkRepository::for_location( $location_id );
+
+check_same( 'ChIJround', $link['place_id'], 'the place id comes back' );
+check_same( 51.4491, $link['latitude'], 'the latitude round-trips through decimal(10,7)' );
+check_same( -2.5987, $link['longitude'], 'the longitude round-trips too' );
+check( '' !== $link['coordinates_cached_at'], 'and the moment they were cached is recorded' );
+
+// Choosing another place replaces the link rather than adding a second.
+PlaceLinkRepository::link( $location_id, 'ChIJother', null, null );
+
+$link = PlaceLinkRepository::for_location( $location_id );
+
+check_same( 1, (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$links_table}" ), 'relinking keeps one row per location' );
+check_same( 'ChIJother', $link['place_id'], 'holding the new place' );
+check_same( null, $link['latitude'], 'a link without coordinates stores none' );
+check_same( '', $link['coordinates_cached_at'], 'and no cache time for them' );
+
+// Retention, against real rows at either side of the 30-day line.
+PlaceLinkRepository::store_coordinates( $location_id, 51.1, -2.1 );
+
+$wpdb->query(
+	$wpdb->prepare(
+		"UPDATE {$links_table} SET coordinates_cached_at = %s WHERE fhint_location_id = %d",
+		gmdate( 'Y-m-d H:i:s', time() - 29 * DAY_IN_SECONDS ),
+		$location_id
+	)
+);
+
+check_same( 0, Retention::run(), 'coordinates cached 29 days ago are kept' );
+check_same( 51.1, PlaceLinkRepository::for_location( $location_id )['latitude'], 'and are still readable' );
+
+$wpdb->query(
+	$wpdb->prepare(
+		"UPDATE {$links_table} SET coordinates_cached_at = %s WHERE fhint_location_id = %d",
+		gmdate( 'Y-m-d H:i:s', time() - 31 * DAY_IN_SECONDS ),
+		$location_id
+	)
+);
+
+check_same( 1, Retention::run(), 'coordinates cached 31 days ago are deleted' );
+
+$link = PlaceLinkRepository::for_location( $location_id );
+
+check_same( null, $link['latitude'], 'the latitude is gone from the row, not merely hidden' );
+check_same( null, $link['longitude'], 'so is the longitude' );
+check_same( '', $link['coordinates_cached_at'], 'and the cache time with them' );
+check_same( 'ChIJother', $link['place_id'], 'while the place id, which may be kept, survives' );
+
+// -- Importing a Google profile, with Google answered in-process -----------
+//
+// The read is stubbed; everything else is real: the mapping lookup, the
+// comparison, and the writes through the ordinary repositories.
+
+update_option(
+	'fhint_google_tokens',
+	array(
+		'access_token'  => 'ya29.integration',
+		'refresh_token' => '1//integration',
+		'expires_at'    => time() + 3600,
+		'scope'         => 'https://www.googleapis.com/auth/business.manage',
+		'token_type'    => 'Bearer',
+		'account_email' => 'integration@example.test',
+		'connected_at'  => time(),
+		'source'        => 'connect',
+	)
+);
+
+GoogleLocationRepository::upsert(
+	array(
+		'account_name'       => 'accounts/999',
+		'location_name'      => 'locations/import-me',
+		'store_code'         => '',
+		'title'              => 'Imported Coffee',
+		'address'            => '12 Dock Road, Bristol',
+		'phone'              => '0117 496 0000',
+		'website'            => 'https://imported.example',
+		'verification_state' => 'VERIFIED',
+		'payload'            => array(),
+	)
+);
+
+GoogleLocationRepository::map( 'locations/import-me', $location_id );
+
+$import_requests = array();
+
+$fake_business_information = static function ( $pre, $args, $url ) use ( &$import_requests ) {
+	if ( false === strpos( $url, 'mybusinessbusinessinformation.googleapis.com' ) ) {
+		return $pre;
+	}
+
+	$import_requests[] = $url;
+
+	return array(
+		'headers'  => array(),
+		'body'     => wp_json_encode(
+			array(
+				'name'              => 'locations/import-me',
+				'title'             => 'Imported Coffee',
+				'storefrontAddress' => array(
+					'addressLines'       => array( '12 Dock Road' ),
+					'locality'           => 'Bristol',
+					'administrativeArea' => 'England',
+					'postalCode'         => 'BS1 4XY',
+					'regionCode'         => 'GB',
+				),
+				'phoneNumbers'      => array( 'primaryPhone' => '0117 496 0000' ),
+				'websiteUri'        => 'https://imported.example',
+				'profile'           => array( 'description' => 'Coffee by the water.' ),
+				'regularHours'      => array(
+					'periods' => array(
+						array(
+							'openDay'   => 'MONDAY',
+							'openTime'  => array( 'hours' => 9 ),
+							'closeDay'  => 'MONDAY',
+							'closeTime' => array( 'hours' => 17 ),
+						),
+					),
+				),
+			)
+		),
+		'response' => array(
+			'code'    => 200,
+			'message' => 'OK',
+		),
+		'cookies'  => array(),
+	);
+};
+
+add_filter( 'pre_http_request', $fake_business_information, 10, 3 );
+
+// Cleared first, so "empty here is ticked" is tested against a known state
+// rather than whatever earlier sections happened to leave behind.
+BusinessRepository::save( array( 'description' => '' ) );
+
+$preview = Import::preview( $location_id );
+
+check( ! is_wp_error( $preview ), 'a preview can be read' );
+check_same( 'locations/import-me', $preview['location_name'], 'for the mapped profile' );
+check( false !== strpos( $import_requests[0], 'readMask=' ), 'the read carries a readMask, which Google requires' );
+check( false !== strpos( rawurldecode( $import_requests[0] ), 'locations/import-me' ), 'and names the location unencoded' );
+
+$preview_fields = array();
+
+foreach ( $preview['fields'] as $field ) {
+	$preview_fields[ $field['key'] ] = $field;
+}
+
+// The location already holds a phone and an address from earlier in this
+// suite, so those are the operator's call; the empty ones are ticked.
+check( $preview_fields['description']['suggested'], 'a field we hold nothing for is ticked' );
+check( ! $preview_fields['phone']['suggested'], 'a phone already stored here is not' );
+
+$before_phone = LocationRepository::find( $location_id )['phone'];
+
+$result = Import::apply( array( 'description', 'hours' ), $location_id );
+
+check( ! is_wp_error( $result ), 'the chosen fields import' );
+check_same( array( 'description', 'hours' ), $result['applied'], 'and only those' );
+
+check_same(
+	'Coffee by the water.',
+	BusinessRepository::get()['description'],
+	'the description reached the business record'
+);
+check_same( $before_phone, LocationRepository::find( $location_id )['phone'], 'an unticked phone was left alone' );
+
+$imported_hours = OpeningHoursRepository::for_location( $location_id );
+$monday         = array();
+$sunday         = array();
+
+foreach ( $imported_hours as $row ) {
+	if ( DayOfWeek::MONDAY === (int) $row['day_of_week'] ) {
+		$monday[] = $row;
+	}
+
+	if ( DayOfWeek::SUNDAY === (int) $row['day_of_week'] ) {
+		$sunday[] = $row;
+	}
+}
+
+check_same( '09:00:00', substr( (string) $monday[0]['open_time'], 0, 8 ), 'Monday opens at nine in the database' );
+check( (bool) $sunday[0]['is_closed'], 'and a day Google omits is stored closed' );
+
+// A field Google does not hold is skipped rather than blanking what is here.
+$name_before = BusinessRepository::get()['name'];
+$skipped     = Import::apply( array( 'website', 'name' ), $location_id );
+
+check( in_array( 'name', $skipped['applied'], true ) || in_array( 'name', $skipped['skipped'], true ), 'every chosen field is accounted for' );
+check_same( 'https://imported.example', LocationRepository::find( $location_id )['website'], 'the website imported' );
+
+remove_filter( 'pre_http_request', $fake_business_information, 10 );
+
+// Put the hours back as the sections after this one expect them, including
+// Wednesday being absent rather than closed.
+OpeningHoursRepository::replace(
+	$location_id,
+	array(
+		array( 'day_of_week' => DayOfWeek::MONDAY, 'period_index' => 0, 'open_time' => '09:00', 'close_time' => '12:00', 'is_closed' => false, 'is_24h' => false ),
+		array( 'day_of_week' => DayOfWeek::MONDAY, 'period_index' => 1, 'open_time' => '13:00', 'close_time' => '17:00', 'is_closed' => false, 'is_24h' => false ),
+		array( 'day_of_week' => DayOfWeek::TUESDAY, 'period_index' => 0, 'open_time' => '', 'close_time' => '', 'is_closed' => true, 'is_24h' => false ),
+		array( 'day_of_week' => DayOfWeek::SATURDAY, 'period_index' => 0, 'open_time' => '', 'close_time' => '', 'is_closed' => false, 'is_24h' => true ),
+	)
+);
+
 // -- Nap and the schema graph, from real rows ------------------------------
 
 $nap = Nap::resolve();
@@ -554,6 +779,7 @@ check_same(
 	GoogleLocationRepository::find_by_location_name( 'locations/789' )['fhint_location_id'],
 	'and the Google mapping was released by the fhint_location_deleted hook'
 );
+check_same( null, PlaceLinkRepository::for_location( $location_id ), 'and its place link was dropped by the same hook' );
 
 // Deleting the business takes its services with it.
 check_same( 3, ServiceRepository::count(), 'services exist before the business is deleted' );
@@ -591,6 +817,152 @@ if ( $admins ) {
 
 	$schema = rest_do_request( new WP_REST_Request( 'GET', '/fhint/v1/schema' ) );
 	check_same( 200, $schema->get_status(), '/schema answers' );
+
+	// -- Places: the key is write-only -------------------------------------
+
+	$save_key = new WP_REST_Request( 'POST', '/fhint/v1/places/key' );
+	$save_key->set_body_params( array( 'api_key' => 'AIzaIntegrationKeyValue0000' ) );
+
+	check_same( 200, rest_do_request( $save_key )->get_status(), 'a places key can be saved' );
+
+	$places = rest_do_request( new WP_REST_Request( 'GET', '/fhint/v1/places' ) );
+	$raw    = wp_json_encode( $places->get_data() );
+
+	check_same( 200, $places->get_status(), '/places answers' );
+	check( true === $places->get_data()['data']['configured'], 'and reports the key as present' );
+	check( false === strpos( $raw, 'IntegrationKeyValue' ), 'without the key anywhere in the response' );
+
+	// Nothing is linked, so a live read is refused before Google is called.
+	$live = rest_do_request( new WP_REST_Request( 'POST', '/fhint/v1/places/live' ) );
+
+	check_same( 409, $live->get_status(), 'a live read with nothing linked is refused with a 409' );
+
+	// -- Places end to end, with Google answered in-process ----------------
+	//
+	// `pre_http_request` short-circuits the HTTP call, so everything else —
+	// REST, the lookup, the normaliser, the comparison, the SQL — is real.
+
+	$places_location = LocationRepository::create(
+		array(
+			'business_id'    => (int) BusinessRepository::get()['id'],
+			'name'           => 'Harbour Coffee',
+			'address_line_1' => '12 Dock Road',
+			'city'           => 'Bristol',
+			'postal_code'    => 'BS1 4XY',
+			'country'        => 'GB',
+			'phone'          => '0117 496 0000',
+			'is_primary'     => true,
+		)
+	);
+
+	$places_location_id = (int) $places_location['id'];
+	$google_requests    = array();
+
+	$fake_google = static function ( $pre, $args, $url ) use ( &$google_requests ) {
+		if ( false === strpos( $url, 'places.googleapis.com' ) ) {
+			return $pre;
+		}
+
+		$google_requests[] = $url;
+
+		if ( false !== strpos( $url, 'places:searchText' ) ) {
+			$body = array(
+				'places' => array(
+					array(
+						'id'               => 'ChIJharbour',
+						'displayName'      => array( 'text' => 'Harbour Coffee' ),
+						'formattedAddress' => '12 Dock Road, Bristol BS1 4XY, UK',
+					),
+				),
+			);
+		} else {
+			// Google holds a different phone: the difference that must be
+			// reported and must never be written back.
+			$body = array(
+				'id'                  => 'ChIJharbour',
+				'displayName'         => array( 'text' => 'Harbour Coffee' ),
+				'formattedAddress'    => '12 Dock Road, Bristol BS1 4XY, UK',
+				'nationalPhoneNumber' => '0117 496 9999',
+				'location'            => array(
+					'latitude'  => 51.4491,
+					'longitude' => -2.5987,
+				),
+			);
+		}
+
+		return array(
+			'headers'  => array(),
+			'body'     => wp_json_encode( $body ),
+			'response' => array(
+				'code'    => 200,
+				'message' => 'OK',
+			),
+			'cookies'  => array(),
+		);
+	};
+
+	add_filter( 'pre_http_request', $fake_google, 10, 3 );
+
+	$search = new WP_REST_Request( 'POST', '/fhint/v1/places/search' );
+	$search->set_body_params( array( 'query' => 'Harbour Coffee Bristol' ) );
+
+	$found = rest_do_request( $search );
+
+	check_same( 200, $found->get_status(), 'a places search answers' );
+	check_same( 'ChIJharbour', $found->get_data()['data']['candidates'][0]['place_id'], 'returning the candidate' );
+	check_same( 0, (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$links_table}" ), 'and storing nothing' );
+
+	$choose = new WP_REST_Request( 'POST', '/fhint/v1/places/link' );
+	$choose->set_body_params( array( 'place_id' => 'ChIJharbour' ) );
+
+	$linked = rest_do_request( $choose );
+
+	check_same( 200, $linked->get_status(), 'choosing a place answers' );
+	check_same( 'ChIJharbour', $linked->get_data()['data']['link']['place_id'], 'and reports the link' );
+	check( $linked->get_data()['data']['link']['has_coordinates'], 'with coordinates held' );
+	check_same( 30, $linked->get_data()['data']['link']['coordinates_expire_in_days'], 'for the full 30 days' );
+
+	$before_live = LocationRepository::find( $places_location_id );
+	$live        = rest_do_request( new WP_REST_Request( 'POST', '/fhint/v1/places/live' ) );
+	$after_live  = LocationRepository::find( $places_location_id );
+
+	check_same( 200, $live->get_status(), 'a live read answers once linked' );
+
+	$live_fields = array();
+
+	foreach ( $live->get_data()['data']['comparison']['fields'] as $field ) {
+		$live_fields[ $field['key'] ] = $field;
+	}
+
+	check_same( 'match', $live_fields['name']['status'], 'the name matches' );
+	check_same( 'match', $live_fields['address']['status'], 'the address matches despite the country suffix' );
+	check_same( 'differs', $live_fields['phone']['status'], 'the different phone is reported' );
+	check_same( '0117 496 9999', $live_fields['phone']['theirs'], "with Google's value shown" );
+
+	// The promise the whole design rests on.
+	check_same( '0117 496 0000', $after_live['phone'], "a live read never writes Google's phone into the location" );
+	check_same( $before_live['name'], $after_live['name'], 'or touches the name' );
+	check_same( $before_live['address_line_1'], $after_live['address_line_1'], 'or the address' );
+	check_same( 1, (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$links_table}" ), 'and leaves exactly one link row' );
+
+	check_same( 3, count( $google_requests ), 'one request each for search, link and live read' );
+	check( '' === implode( '', array_filter( $google_requests, static function ( $url ) { return false !== strpos( $url, 'key=' ); } ) ), 'and none carried the key in its URL' );
+
+	remove_filter( 'pre_http_request', $fake_google, 10 );
+
+	$unlinked = rest_do_request( new WP_REST_Request( 'DELETE', '/fhint/v1/places/link' ) );
+
+	check_same( null, $unlinked->get_data()['data']['link'], 'unlinking removes the link' );
+	check_same( 0, (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$links_table}" ), 'and its row' );
+
+	// Leave the plan's single location free for the tests that follow.
+	LocationRepository::delete( $places_location_id );
+
+	check_same( 200, rest_do_request( new WP_REST_Request( 'DELETE', '/fhint/v1/places/key' ) )->get_status(), 'the key can be removed' );
+	check(
+		false === rest_do_request( new WP_REST_Request( 'GET', '/fhint/v1/places' ) )->get_data()['data']['configured'],
+		'and is gone afterwards'
+	);
 
 	// -- The dashboard reads stored figures and never measures -------------
 

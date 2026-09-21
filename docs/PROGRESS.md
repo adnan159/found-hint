@@ -698,6 +698,78 @@ and WP Reset holds no snapshot. Nothing in this plugin or its test suites
 can drop WordPress core tables — the integration suite only ever drops its
 own `fhitest_` tables.
 
+## Step 12 · Google Places lookup — done
+
+Finding the business on Google Maps **without signing in to Google**, and
+comparing what Google shows with what this site holds. Asked for as an
+*import*; built as a comparison, because the terms were read first.
+
+**Why it does not import.** The Google Maps Platform Terms of Service give,
+as an example of prohibited scraping, §3.2.3(a)(iii): *"copy and save
+business names, addresses, or user reviews"*; §3.2.3(b) forbids caching
+anything the Service Specific Terms do not expressly allow. For the Places
+API those allowances are two: the place id, indefinitely (General Service
+Terms §3), and latitude/longitude for at most 30 days (§14.3). There is no
+exception for a business's own listing. Importing through Places would put
+every site using it in breach, with key suspension as the realistic cost.
+The import that *is* permitted is the Business Profile API through OAuth
+(steps 6–7), which reads the owner's own listing under different terms.
+
+- **A ninth table, `place_links`**: place id, coordinates, their cache time.
+  No column for a name, address, phone or hours — the table's shape *is*
+  the compliance guarantee, and `tests/Integration/database.php` asserts
+  the exact column list. `FHINT_DB_VERSION` is `0.3.0`.
+- `App\Places\Retention` deletes coordinates 30 days after they were read,
+  from a daily event **and** on every read of the state, because WP-Cron
+  only runs when someone visits and the permission does not pause.
+- `App\Places\Client` sends the key as `X-Goog-Api-Key`, never in a URL,
+  with field masks that ask for no reviews and no photos. Google's 403s are
+  split into billing, key restriction and API-not-enabled messages.
+- `App\Places\Comparison` — phones compared as digits with the trunk zero
+  and country code reconciled; websites ignoring scheme, `www.` and a
+  trailing slash; addresses by street, town and postcode, leaving out
+  country and region; hours day by day, keeping the three states.
+- `API\Places` — `GET /places` (calls nobody), `POST|DELETE /places/key`,
+  `POST /places/search`, `POST|DELETE /places/link`, `POST /places/live`.
+  Every route that calls Google is a POST.
+- The Google screen gains **Find your business on Google** as its first
+  section, and the sidebar a *Find on Google* entry. Every Google value on
+  screen sits above Google's required text attribution, "Google Maps",
+  styled to their spec (12px, weight 400, `#5E5E5E`, untranslated, never
+  wrapped). There is no button that copies Google's values into the
+  business record, by design.
+
+**Verified:** `tests/Smoke/places.php` — 88 assertions, mutation-tested
+with sixteen defects, all caught (retention at 31 days, the cutoff's sign,
+reviews in the field mask, the key in the query string, no trunk-zero
+reconciliation, unknown days invented as closed, unconfigured days reported
+as different, id-less candidates offered, an empty save wiping the key,
+the hint showing the key's tail, `www.` significant, and four in the
+address comparison). `tests/Integration/database.php` — now 163, covering
+the table's columns, relinking, retention either side of the 30-day line
+against real rows, the location-deleted cascade, the key never appearing
+in a response, and search → link → live read end to end with Google
+answered in-process — including that a live read reporting a different
+phone leaves the stored phone untouched. `tests/Smoke/schema-format.php`
+puts the new table under the same dbDelta formatting checks as the rest;
+dbDelta is idempotent on the live site. Every screen state was driven in a
+browser.
+
+**Caught while verifying:** the address comparison first compared
+formatted lines, so every British address came out "different" — this
+plugin stores `GB` where Google writes `UK`. The stubbed unit fixture had
+masked it; the end-to-end integration test exposed it. The "Different"
+status was 4.24:1 against the card, under AA for 14px text; it now uses
+the notice colour at 7.73:1. The candidate buttons all read "This is my
+business", so each is now described by its own place for screen readers.
+
+**Unverified:** no request has reached the real Places API — there is no
+Maps Platform key on this site. Google recommends its **logo** as the
+attribution "whenever possible", with the text form for limited space; the
+text form is used until the official logo asset is added. At phone width
+every FoundHint screen is squeezed by the app sidebar, which never
+collapses — a layout problem that predates this step.
+
 ## Pending
 
 Everything in the Free plan's first cut is built. What remains is the

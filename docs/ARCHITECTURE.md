@@ -46,6 +46,7 @@ attached during boot would never fire.
 | Frontend | `Frontend.php` + `Frontend/` | JSON-LD output on `wp_head` |
 | Admin | `Admin.php` + `Admin/` | menu page, SPA asset loading |
 | Google | `Google.php` + `App/Google/` | the Business Profile OAuth connection |
+| Places | `Places.php` + `App/Places/` | finding the business on Google Maps with an API key, and comparing it — no sign-in, no import |
 | Audit | `Audit.php` + `App/Audit/` | the rule set, scoring and the daily schedule |
 
 `App/Google/` holds the connection: `Credentials` (the site's own OAuth
@@ -56,6 +57,17 @@ client), `Tokens` (storage, never logged and never sent to a browser),
 (reading accounts and locations, and flattening Google's shape into ours),
 `GoogleLocationRepository` and `Mapping` (which Google profile is which of
 our locations).
+
+`App/Places/` is the no-sign-in path: `Credentials` (the Maps Platform
+key, write-only), `Client` (search and details, with field masks that ask
+for nothing the plugin may not keep), `Place` (Google's answer reshaped to
+match `Nap::resolve()`, held in memory only), `Comparison` (field and hours
+agreement, as status codes), `PlaceLinkRepository`, `Retention` (deletes
+coordinates after 30 days, on a daily event *and* on read) and `Lookup`
+(what the REST layer calls). It exists alongside `App/Google/` rather than
+inside it because it is a different Google product under different terms:
+it reads the public listing, can never write, and may store only a place id
+and, briefly, coordinates.
 
 `App/Audit/` is the audit engine: `Rule` (the contract), `Context` (the
 site gathered once), `Result` (pass, fail or **skip**), `Score` (weighted
@@ -81,7 +93,7 @@ table in `includes/Database/` and named only in `Database\Tables`.
 business ─┬─ locations ── location_hours
           └─ services
 
-audits ── audit_issues        logs        google_locations
+audits ── audit_issues        logs        google_locations        place_links
 ```
 
 - **business** — one row. The single source of truth for name, phone,
@@ -99,6 +111,11 @@ audits ── audit_issues        logs        google_locations
   to one of ours. The profile columns are a cache of Google's answer, never
   a second source of truth; the mapping lives here because the relationship
   is owned by the Google side.
+- **place_links** — one row per location linked to a place on Google Maps:
+  a place id, coordinates and their cache time. **Deliberately no name,
+  address, phone or hours column** — Google's terms forbid storing them,
+  and the integration suite asserts the exact column list so one cannot be
+  added unnoticed. Coordinates are deleted 30 days after they were read.
 
 No foreign keys: hosts vary in storage engine, so referential integrity
 lives in the repositories, and both cascades (deleting a location removes

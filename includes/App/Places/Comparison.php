@@ -45,7 +45,7 @@ class Comparison {
 	public static function build( array $place, array $nap ) {
 		$fields = array(
 			self::field( 'name', self::get( $nap, 'name' ), self::get( $place, 'name' ), 'text' ),
-			self::field( 'address', self::our_address( $nap ), self::get_address( $place ), 'address' ),
+			self::address_field( $nap, $place ),
 			self::field( 'phone', self::get( $nap, 'phone' ), self::get( $place, 'phone' ), 'phone' ),
 			self::field( 'website', self::get( $nap, 'website' ), self::get( $place, 'website' ), 'url' ),
 		);
@@ -65,7 +65,7 @@ class Comparison {
 	 * @param string $key   Field key.
 	 * @param string $ours  Our value.
 	 * @param string $their Google's value.
-	 * @param string $kind  Comparison rule: text, address, phone or url.
+	 * @param string $kind  Comparison rule: text, phone or url.
 	 * @return array
 	 */
 	private static function field( $key, $ours, $their, $kind ) {
@@ -118,8 +118,6 @@ class Comparison {
 				return self::same_phone( $ours, $their );
 			case 'url':
 				return self::same_url( $ours, $their );
-			case 'address':
-				return self::same_address( $ours, $their );
 			default:
 				return self::plain( $ours ) === self::plain( $their );
 		}
@@ -204,32 +202,101 @@ class Comparison {
 	}
 
 	/**
-	 * Whether two addresses describe the same doorway.
+	 * The address, compared by what identifies a doorway.
 	 *
-	 * Formatted addresses differ by punctuation, country suffix and line
-	 * order between any two sources, so they are compared as the set of
-	 * their alphanumeric tokens: one side carrying "United Kingdom" or a
-	 * comma the other omits is not a difference an operator should be sent
-	 * to fix. A different street or postcode changes the tokens and is
-	 * reported.
+	 * Formatted addresses are the wrong thing to compare: two sources order
+	 * lines differently, abbreviate differently, and name the country
+	 * differently — this plugin stores "GB" where Google writes "UK", so a
+	 * string comparison would report every address in Britain as wrong.
 	 *
-	 * @param string $ours  Our formatted address.
-	 * @param string $their Google's formatted address.
+	 * So the comparison is of street, town and postcode, as sets of words.
+	 * Country and region are left out on purpose: they are spelled too many
+	 * ways (GB/UK, TX/Texas) to compare without a lookup table, and they are
+	 * never where a real NAP mistake lives — a wrong street or postcode is.
+	 *
+	 * The formatted strings are still what the screen shows.
+	 *
+	 * @param array $nap   Resolved NAP.
+	 * @param array $place Normalised place.
+	 * @return array
+	 */
+	private static function address_field( array $nap, array $place ) {
+		$ours  = isset( $nap['address'] ) && is_array( $nap['address'] ) ? $nap['address'] : array();
+		$their = isset( $place['address'] ) && is_array( $place['address'] ) ? $place['address'] : array();
+
+		$ours_formatted  = isset( $ours['formatted'] ) ? trim( (string) $ours['formatted'] ) : '';
+		$their_formatted = isset( $their['formatted'] ) ? trim( (string) $their['formatted'] ) : '';
+
+		if ( '' === $ours_formatted && '' === $their_formatted ) {
+			$status = self::UNKNOWN;
+		} elseif ( '' === $ours_formatted ) {
+			$status = self::MISSING_HERE;
+		} elseif ( '' === $their_formatted ) {
+			$status = self::MISSING_THERE;
+		} else {
+			$status = self::same_address( $ours, $their ) ? self::MATCH : self::DIFFERS;
+		}
+
+		return array(
+			'key'    => 'address',
+			'ours'   => $ours_formatted,
+			'theirs' => $their_formatted,
+			'status' => $status,
+		);
+	}
+
+	/**
+	 * Whether two addresses share street, town and postcode.
+	 *
+	 * When Google returned no components for the place, only its formatted
+	 * line is available, and the test becomes whether every word of ours
+	 * appears in it — the formatted line is a superset (it carries the
+	 * country), so containment is the fair question.
+	 *
+	 * @param array $ours  Our address parts.
+	 * @param array $their Google's address parts.
 	 * @return bool
 	 */
-	private static function same_address( $ours, $their ) {
-		$a = self::address_tokens( $ours );
-		$b = self::address_tokens( $their );
+	private static function same_address( array $ours, array $their ) {
+		$a = self::address_tokens( self::core_address( $ours ) );
 
-		if ( ! $a || ! $b ) {
+		if ( ! $a ) {
+			// We hold only a formatted line with no parts to compare by.
 			return false;
 		}
 
-		// Either side may carry a country or a county the other leaves out,
-		// so the test is that the shorter is wholly contained in the longer.
-		$common = array_intersect( $a, $b );
+		$their_core = self::core_address( $their );
 
-		return count( $common ) === min( count( $a ), count( $b ) );
+		if ( '' === trim( $their_core ) ) {
+			$b = self::address_tokens( isset( $their['formatted'] ) ? $their['formatted'] : '' );
+
+			return count( array_intersect( $a, $b ) ) === count( $a );
+		}
+
+		$b = self::address_tokens( $their_core );
+
+		sort( $a );
+		sort( $b );
+
+		return $a === $b;
+	}
+
+	/**
+	 * Street, town and postcode as one line.
+	 *
+	 * @param array $address Address parts.
+	 * @return string
+	 */
+	private static function core_address( array $address ) {
+		$parts = array();
+
+		foreach ( array( 'line_1', 'city', 'postal' ) as $key ) {
+			if ( isset( $address[ $key ] ) && '' !== trim( (string) $address[ $key ] ) ) {
+				$parts[] = (string) $address[ $key ];
+			}
+		}
+
+		return implode( ' ', $parts );
 	}
 
 	/**
@@ -255,26 +322,6 @@ class Comparison {
 		);
 
 		return array_values( array_unique( $tokens ) );
-	}
-
-	/**
-	 * Our formatted address.
-	 *
-	 * @param array $nap Resolved NAP.
-	 * @return string
-	 */
-	private static function our_address( array $nap ) {
-		return isset( $nap['address']['formatted'] ) ? (string) $nap['address']['formatted'] : '';
-	}
-
-	/**
-	 * Google's formatted address.
-	 *
-	 * @param array $place Normalised place.
-	 * @return string
-	 */
-	private static function get_address( array $place ) {
-		return isset( $place['address']['formatted'] ) ? (string) $place['address']['formatted'] : '';
 	}
 
 	/**

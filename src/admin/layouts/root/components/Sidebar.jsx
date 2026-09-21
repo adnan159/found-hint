@@ -79,6 +79,10 @@ const NAV_ITEMS = [
     to: "/google",
     label: () => __("Google", "found-hint"),
     children: [
+      {
+        id: "google-places",
+        label: () => __("Find on Google", "found-hint"),
+      },
       { id: "google-client", label: () => __("Google client", "found-hint") },
       { id: "google-connection", label: () => __("Connection", "found-hint") },
       {
@@ -88,6 +92,10 @@ const NAV_ITEMS = [
       {
         id: "google-mapping",
         label: () => __("Location mapping", "found-hint"),
+      },
+      {
+        id: "google-import",
+        label: () => __("Import from Google", "found-hint"),
       },
     ],
   },

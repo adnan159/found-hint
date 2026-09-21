@@ -59,6 +59,7 @@
   --color-band-excellent: var(--band-excellent);
   --color-band-empty: var(--band-empty);
   --color-success-foreground: var(--success-foreground);
+  --color-google-attribution: var(--google-attribution);
   --radius-sm: calc(var(--radius) * 0.6);
   --radius-md: calc(var(--radius) * 0.8);
   --radius-lg: var(--radius);
@@ -155,9 +156,14 @@
   /* The prototype's section-header rule: heavier than a normal border, and
      the single most recognisable detail of the card style. */
   --divider: rgb(32 30 29 / 40%);
+
+  /* Google's text attribution for Places content: one of white, #1F1F1F or
+     #5E5E5E, nothing else. #5E5E5E on a white card is 6.4:1. */
+  --google-attribution: #5e5e5e;
 }
 
 .dark {
+  --google-attribution: #ffffff;
   --background: oklch(0.145 0 0);
   --foreground: oklch(0.985 0 0);
   --card: oklch(0.205 0 0);

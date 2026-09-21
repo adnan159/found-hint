@@ -82,9 +82,8 @@ class Retention {
 	 * @return string UTC MySQL datetime.
 	 */
 	public static function cutoff() {
-		$now = current_time( 'timestamp', true ); // phpcs:ignore WordPress.DateTime.CurrentTimeTimestamp.Requested
-
-		return gmdate( 'Y-m-d H:i:s', $now - ( self::DAYS * DAY_IN_SECONDS ) );
+		// time() is already UTC, which is what the stored datetimes are.
+		return gmdate( 'Y-m-d H:i:s', time() - ( self::DAYS * DAY_IN_SECONDS ) );
 	}
 
 	/**
@@ -118,7 +117,7 @@ class Retention {
 
 		$cached  = strtotime( $cached_at . ' UTC' );
 		$expires = $cached + ( self::DAYS * DAY_IN_SECONDS );
-		$left    = $expires - current_time( 'timestamp', true ); // phpcs:ignore WordPress.DateTime.CurrentTimeTimestamp.Requested
+		$left    = $expires - time();
 
 		if ( $left <= 0 ) {
 			return 0;

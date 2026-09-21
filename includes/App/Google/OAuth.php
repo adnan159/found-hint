@@ -121,7 +121,11 @@ class OAuth {
 			// token and no refresh token, which looks like success and stops
 			// working an hour later.
 			'access_type'           => 'offline',
-			'prompt'                => 'consent',
+			// `select_account` as well as `consent`: somebody signed in to a
+			// personal and a business Google account must be able to choose
+			// which one manages the profile, rather than have Google pick the
+			// one it saw last.
+			'prompt'                => 'select_account consent',
 		);
 
 		return self::AUTHORIZE_URL . '?' . http_build_query( $query );

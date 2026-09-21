@@ -49,6 +49,45 @@ class Connection {
 	 */
 	public static function init() {
 		add_action( 'admin_post_' . self::CALLBACK_ACTION, array( __CLASS__, 'handle_callback' ) );
+
+		// A session can expire while somebody is on Google's consent screen.
+		// Without this, WordPress answers their return with a blank page and
+		// the connection is lost for no reason they can see; `auth_redirect()`
+		// sends them to log in and then back here to finish.
+		add_action( 'admin_post_nopriv_' . self::CALLBACK_ACTION, array( __CLASS__, 'handle_logged_out_callback' ) );
+	}
+
+	/**
+	 * Google returned somebody who is no longer logged in to WordPress.
+	 *
+	 * @return void
+	 */
+	public static function handle_logged_out_callback() {
+		self::breadcrumb( 'google.callback_logged_out' );
+
+		auth_redirect();
+	}
+
+	/**
+	 * Record that Google's return reached this site.
+	 *
+	 * @param string $event Event name.
+	 * @return void
+	 */
+	private static function breadcrumb( $event ) {
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		$names = array_keys( is_array( $_GET ) ? $_GET : array() );
+
+		Logger::log(
+			Logger::INFO,
+			'google',
+			$event,
+			sprintf(
+				/* translators: %s: the query parameter names Google's return carried. */
+				__( 'Google\'s return reached this site carrying: %s', 'found-hint' ),
+				implode( ', ', array_map( 'sanitize_key', $names ) )
+			)
+		);
 	}
 
 	/**
@@ -63,7 +102,11 @@ class Connection {
 
 		return array(
 			'status'            => self::status(),
-			'configured'        => Credentials::configured(),
+			// True through either route: the site's own Google client, or
+			// FoundHint's connect service. The screen only needs to know
+			// whether a sign-in can start.
+			'configured'        => self::can_connect(),
+			'connect_service'   => ConnectService::configured(),
 			'client_id_hint'    => Credentials::client_id_hint(),
 			'redirect_uri'      => Credentials::redirect_uri(),
 			'account_email'     => $tokens['account_email'],
@@ -81,7 +124,7 @@ class Connection {
 	 * @return string
 	 */
 	public static function status() {
-		if ( ! Credentials::configured() ) {
+		if ( ! self::can_connect() ) {
 			return self::STATUS_NOT_CONFIGURED;
 		}
 
@@ -102,7 +145,24 @@ class Connection {
 	 * @return string|WP_Error Authorize URL.
 	 */
 	public static function start() {
+		// The service is preferred when one is configured: it is the route
+		// that needs nothing of the operator. A site that has entered its own
+		// client keeps using it, so an agency's deliberate choice is not
+		// quietly overridden.
+		if ( ConnectService::configured() && ! Credentials::configured() ) {
+			return ConnectService::start( get_current_user_id() );
+		}
+
 		return OAuth::start( get_current_user_id() );
+	}
+
+	/**
+	 * Whether a sign-in can start at all.
+	 *
+	 * @return bool
+	 */
+	public static function can_connect() {
+		return Credentials::configured() || ConnectService::configured();
 	}
 
 	/**
@@ -116,12 +176,35 @@ class Connection {
 	 * @return void
 	 */
 	public static function handle_callback() {
+		// Recorded before anything can go wrong, so a connection that never
+		// completes can be told apart from one that never came back at all.
+		// Parameter *names* only: the values are a one-time code.
+		self::breadcrumb( 'google.callback_received' );
+
 		if ( ! Capabilities::current_user_can_manage() ) {
 			wp_die(
 				esc_html__( 'You do not have permission to manage this.', 'found-hint' ),
 				'',
 				array( 'response' => 403 )
 			);
+		}
+
+		// The connect service reports a refusal in its own parameter, because
+		// Google's `error` never reaches this site on that route — Google
+		// answers the service, and the service brings the person home.
+		if ( isset( $_GET['fhint_connect_error'] ) ) {
+			$reason = sanitize_text_field( wp_unslash( $_GET['fhint_connect_error'] ) );
+
+			self::fail(
+				'fhint_connect_' . $reason,
+				'access_denied' === $reason
+					? __( 'Access was declined on the Google consent screen. Nothing has changed.', 'found-hint' )
+					: __( 'The sign-in did not complete. Please try again.', 'found-hint' )
+			);
+		}
+
+		if ( isset( $_GET['fhint_handoff'] ) ) {
+			self::complete_through_service();
 		}
 
 		// Google reports a declined consent here rather than by not
@@ -234,7 +317,10 @@ class Connection {
 			return Tokens::access_token();
 		}
 
-		$refreshed = OAuth::refresh( Tokens::refresh_token() );
+		$stored    = Tokens::all();
+		$refreshed = 'connect' === $stored['source'] && ConnectService::configured()
+			? ConnectService::refresh( $stored['refresh_token'] )
+			: OAuth::refresh( $stored['refresh_token'] );
 
 		if ( is_wp_error( $refreshed ) ) {
 			// `invalid_grant` on a refresh means the grant is gone for good
@@ -262,6 +348,48 @@ class Connection {
 		Tokens::save( $refreshed );
 
 		return Tokens::access_token();
+	}
+
+	/**
+	 * Finish a connection made through FoundHint's connect service.
+	 *
+	 * The browser arrives carrying a one-time handoff code rather than
+	 * Google's authorization code: the code was already exchanged by the
+	 * service, which holds the client secret. This site presents the secret
+	 * it generated when it started the attempt, collects the tokens once, and
+	 * never sees the Google client at all.
+	 *
+	 * @return void
+	 */
+	private static function complete_through_service() {
+		$handoff = sanitize_text_field( wp_unslash( $_GET['fhint_handoff'] ) );
+		$session = isset( $_GET['fhint_session'] ) ? sanitize_text_field( wp_unslash( $_GET['fhint_session'] ) ) : '';
+
+		$tokens = ConnectService::claim( $session, $handoff, get_current_user_id() );
+
+		if ( is_wp_error( $tokens ) ) {
+			self::fail( $tokens->get_error_code(), $tokens->get_error_message() );
+		}
+
+		Tokens::save(
+			$tokens,
+			array(
+				'account_email' => OAuth::fetch_account_email( $tokens['access_token'] ),
+				'connected_at'  => time(),
+				// Remembered so the next refresh goes back to the service:
+				// this site has no client secret to renew a token with.
+				'source'        => 'connect',
+			)
+		);
+
+		Logger::log(
+			Logger::INFO,
+			'google',
+			'google.connected',
+			__( 'Connected to Google Business Profile.', 'found-hint' )
+		);
+
+		self::redirect_to_screen();
 	}
 
 	/**

@@ -60,6 +60,13 @@ $expected = array(
 	'fhint/v1/google/connect',
 	'fhint/v1/google/profiles',
 	'fhint/v1/google/mapping',
+	'fhint/v1/google/import',
+	'fhint/v1/google/import/preview',
+	'fhint/v1/places',
+	'fhint/v1/places/key',
+	'fhint/v1/places/search',
+	'fhint/v1/places/link',
+	'fhint/v1/places/live',
 	'fhint/v1/schema',
 	'fhint/v1/audits',
 	'fhint/v1/dashboard',
@@ -130,5 +137,13 @@ check_same(
 	$location_args['status']['enum'],
 	'the location status enum comes from the entity'
 );
+
+// Places: the only GET is the one that calls nobody. Every route that
+// reaches Google is a POST, so no screen can spend quota by being opened.
+check_same( array( 'GET' ), $methods_seen['fhint/v1/places'], 'places state is a plain read' );
+check_same( array( 'POST' ), $methods_seen['fhint/v1/places/search'], 'a places search is a POST' );
+check_same( array( 'POST' ), $methods_seen['fhint/v1/places/live'], 'a live places read is a POST' );
+check( in_array( 'DELETE', $methods_seen['fhint/v1/places/link'], true ), 'a place link can be removed' );
+check( in_array( 'DELETE', $methods_seen['fhint/v1/places/key'], true ), 'the places key can be removed' );
 
 finish( 'REST routes' );

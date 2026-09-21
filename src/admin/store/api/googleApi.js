@@ -63,6 +63,24 @@ export const googleApi = baseApi.injectEndpoints({
       invalidatesTags: ["GoogleProfiles"],
     }),
 
+    // Both call Google, so both are mutations: a query would run on mount
+    // and spend the project's quota for anyone opening the screen.
+    previewGoogleImport: builder.mutation({
+      query: (body = {}) => ({
+        url: "/google/import/preview",
+        method: "POST",
+        body,
+      }),
+      transformResponse: (response) => response?.data ?? null,
+    }),
+
+    importFromGoogle: builder.mutation({
+      query: (body) => ({ url: "/google/import", method: "POST", body }),
+      transformResponse: (response) => response?.data ?? null,
+      // What was imported is now the business's own data.
+      invalidatesTags: ["Business", "Location", "Schema", "Audit"],
+    }),
+
     disconnectGoogle: builder.mutation({
       query: () => ({ url: "/google", method: "DELETE" }),
       // Whether Google confirmed the revocation travels in `meta`, not in
@@ -86,4 +104,6 @@ export const {
   useSaveGoogleCredentialsMutation,
   useStartGoogleConnectMutation,
   useDisconnectGoogleMutation,
+  useImportFromGoogleMutation,
+  usePreviewGoogleImportMutation,
 } = googleApi;

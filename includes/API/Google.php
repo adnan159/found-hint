@@ -9,6 +9,7 @@ namespace FHINT\API;
 
 use FHINT\App\Google\Connection;
 use FHINT\App\Google\Credentials;
+use FHINT\App\Google\Import;
 use FHINT\App\Google\Mapping;
 use FHINT\App\Google\Profiles;
 use WP_Error;
@@ -150,6 +151,60 @@ class Google extends AbstractController {
 			)
 		);
 
+		// Both call Google, so both are POSTs: a GET the screen made on
+		// arrival would spend the project's quota for anyone opening a tab.
+		register_rest_route(
+			$this->namespace,
+			'/google/import/preview',
+			array(
+				array(
+					'methods'             => WP_REST_Server::CREATABLE,
+					'callback'            => array( $this, 'import_preview' ),
+					'permission_callback' => array( $this, 'permissions_check' ),
+					'args'                => $this->args(
+						array(
+							'location_id' => array(
+								'type'        => 'integer',
+								'minimum'     => 0,
+								'default'     => 0,
+								'description' => 'FoundHint location, 0 for the primary one.',
+							),
+						)
+					),
+				),
+			)
+		);
+
+		register_rest_route(
+			$this->namespace,
+			'/google/import',
+			array(
+				array(
+					'methods'             => WP_REST_Server::CREATABLE,
+					'callback'            => array( $this, 'import' ),
+					'permission_callback' => array( $this, 'permissions_check' ),
+					'args'                => $this->args(
+						array(
+							'fields'      => array(
+								'type'        => 'array',
+								'required'    => true,
+								'items'       => array(
+									'type' => 'string',
+									'enum' => Import::FIELDS,
+								),
+								'description' => 'Which fields to bring across.',
+							),
+							'location_id' => array(
+								'type'    => 'integer',
+								'minimum' => 0,
+								'default' => 0,
+							),
+						)
+					),
+				),
+			)
+		);
+
 		register_rest_route(
 			$this->namespace,
 			'/google/connect',
@@ -161,6 +216,43 @@ class Google extends AbstractController {
 				),
 			)
 		);
+	}
+
+	/**
+	 * Read the mapped Google profile and show both sides.
+	 *
+	 * Writes nothing: the operator chooses before anything is saved.
+	 *
+	 * @param \WP_REST_Request $request Request.
+	 * @return \WP_REST_Response|WP_Error
+	 */
+	public function import_preview( $request ) {
+		$result = Import::preview( (int) $request->get_param( 'location_id' ) );
+
+		if ( is_wp_error( $result ) ) {
+			return $result;
+		}
+
+		return $this->envelope( $result );
+	}
+
+	/**
+	 * Bring the chosen fields across.
+	 *
+	 * @param \WP_REST_Request $request Request.
+	 * @return \WP_REST_Response|WP_Error
+	 */
+	public function import( $request ) {
+		$result = Import::apply(
+			(array) $request->get_param( 'fields' ),
+			(int) $request->get_param( 'location_id' )
+		);
+
+		if ( is_wp_error( $result ) ) {
+			return $result;
+		}
+
+		return $this->envelope( $result );
 	}
 
 	/**

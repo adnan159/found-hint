@@ -54,6 +54,10 @@ class Tokens {
 			'token_type'    => isset( $stored['token_type'] ) ? (string) $stored['token_type'] : 'Bearer',
 			'account_email' => isset( $stored['account_email'] ) ? (string) $stored['account_email'] : '',
 			'connected_at'  => isset( $stored['connected_at'] ) ? (int) $stored['connected_at'] : 0,
+			// Which route issued these: 'connect' through FoundHint's connect
+			// service, 'own' through this site's own Google client. A refresh
+			// needs the client secret, and only one of those two has it.
+			'source'        => isset( $stored['source'] ) ? (string) $stored['source'] : 'own',
 		);
 	}
 
@@ -136,9 +140,13 @@ class Tokens {
 			'token_type'    => isset( $response['token_type'] ) ? (string) $response['token_type'] : $current['token_type'],
 			'account_email' => $current['account_email'],
 			'connected_at'  => $current['connected_at'] > 0 ? $current['connected_at'] : time(),
+			// Kept across refreshes: a connection does not change route
+			// halfway through, and losing this would send the next refresh
+			// to a client that has no secret for it.
+			'source'        => $current['source'],
 		);
 
-		foreach ( array( 'account_email', 'connected_at' ) as $key ) {
+		foreach ( array( 'account_email', 'connected_at', 'source' ) as $key ) {
 			if ( isset( $extra[ $key ] ) ) {
 				$record[ $key ] = 'connected_at' === $key ? (int) $extra[ $key ] : (string) $extra[ $key ];
 			}

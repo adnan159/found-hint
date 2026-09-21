@@ -37,7 +37,9 @@ import {
   useStartGoogleConnectMutation,
 } from "@/store/api/googleApi";
 import BusinessProfiles from "./components/BusinessProfiles";
+import ImportFromGoogle from "./components/ImportFromGoogle";
 import LocationMapping from "./components/LocationMapping";
+import PlaceFinder from "./components/PlaceFinder";
 
 /**
  * The Google Business Profile connection.
@@ -272,6 +274,10 @@ export default function GooglePage() {
         </NoticeBar>
       ) : null}
 
+      {/* First, because it is the shorter road: an API key and a search,
+          with no Google Cloud OAuth setup and no sign-in. */}
+      <PlaceFinder />
+
       <SectionCard
         id="google-client"
         title={__("Google client", "found-hint")}
@@ -478,6 +484,9 @@ export default function GooglePage() {
 
       <BusinessProfiles overview={overview} isConnected={connected} />
       <LocationMapping overview={overview} isConnected={connected} />
+      {/* Last, because it needs a mapping: you choose which Google profile
+          is this location before its values can be brought across. */}
+      <ImportFromGoogle isConnected={connected} />
     </>
   );
 }

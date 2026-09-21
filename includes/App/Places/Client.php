@@ -186,7 +186,7 @@ class Client {
 
 		if ( 403 === $status || 'PERMISSION_DENIED' === $reason ) {
 			if ( false !== stripos( $message, 'billing' ) ) {
-				return __( 'The Google Cloud project behind this key has no billing account. Places needs one enabled, even though normal use stays inside the free monthly credit.', 'found-hint' );
+				return __( 'The Google Cloud project behind this key has no billing account. Places needs one enabled, even for use small enough to stay within Google\'s free monthly allowance.', 'found-hint' );
 			}
 
 			if ( false !== stripos( $message, 'referer' ) || false !== stripos( $message, 'referrer' ) || false !== stripos( $message, 'restrict' ) ) {

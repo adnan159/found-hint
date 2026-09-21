@@ -29,6 +29,7 @@ export const baseApi = createApi({
     "Settings",
     "Google",
     "GoogleProfiles",
+    "Places",
     "Schema",
     "Audit",
   ],

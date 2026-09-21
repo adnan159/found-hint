@@ -915,6 +915,107 @@ chose.
 
 ---
 
+# Google Places
+
+Finding the business on Google Maps **without signing in**: the Places API
+reads what the public sees, with the site's own Maps Platform API key. It
+never writes to a listing and **never imports one** — Google's terms forbid
+storing what it returns beyond the place id and, for 30 days, coordinates
+(Maps Platform ToS §3.2.3(a)(iii) and (b); Service Specific Terms §14.3).
+The only table it writes is `place_links`.
+
+**Every route that calls Google is a POST, including the reads.** A GET
+the screen made on arrival would spend the project's quota for anyone who
+opened the tab. `GET /places` is the exception because it calls nobody.
+
+**No route returns the API key.** It is write-only; `GET /places` reports
+`key_hint`, the first eight characters and a mask, which identifies a key
+without being usable. The key travels to Google in the `X-Goog-Api-Key`
+header, never in a URL.
+
+### `GET /places`
+
+```json
+{
+  "data": {
+    "configured": true,
+    "key_hint": "AIzaSyD1••••••••",
+    "location_id": 7,
+    "has_location": true,
+    "retention_days": 30,
+    "link": {
+      "place_id": "ChIJ…",
+      "linked_at": "2026-09-18 19:40:00",
+      "has_coordinates": true,
+      "coordinates_expire_in_days": 30,
+      "latitude": 51.4491,
+      "longitude": -2.5987
+    }
+  }
+}
+```
+
+`link` is `null` until a place is chosen. Reading this route also enforces
+the 30-day expiry, so it holds on a site whose cron never runs.
+
+### `POST|PUT|PATCH /places/key` · `DELETE /places/key`
+
+Stores or forgets the key. Returns the `GET /places` state. An empty
+`api_key` is refused with `400 fhint_places_key_required`.
+
+### `POST /places/search`
+
+`{ "query": "Harbour Coffee Bristol" }` → up to eight candidates, each
+`{ place_id, name, address }`. Field mask
+`places.id,places.displayName,places.formattedAddress`, so nothing else is
+even received. Nothing is stored. `409 fhint_places_not_configured` without
+a key.
+
+### `POST /places/link` · `DELETE /places/link`
+
+`{ "place_id": "ChIJ…" }` links the primary location to a place, after
+reading it once to confirm Google knows it — which is also where the
+coordinates come from. Replaces any previous link. `409
+fhint_places_no_location` when there is no location yet. Returns the
+`GET /places` state.
+
+### `POST /places/live`
+
+Reads the linked place now and compares it with this site's data:
+
+```json
+{
+  "data": {
+    "place": { "place_id": "ChIJ…", "name": "…", "address": { … }, "hours": { … }, "maps_url": "…" },
+    "comparison": {
+      "fields": [
+        { "key": "phone", "ours": "0117 496 0000", "theirs": "0117 496 9999", "status": "differs" }
+      ],
+      "hours": { "days": [ … ], "differing": 1, "comparable": true },
+      "summary": { "match": 2, "differs": 1, "missing_here": 1, "missing_there": 0, "unknown": 0, "hours_differ": 1, "attention": 3 }
+    },
+    "read_at": "2026-09-18 19:41:00",
+    "storage": { "stored": ["place_id", "latitude", "longitude"], "retention": 30, "notice": "…" }
+  }
+}
+```
+
+Statuses: `match`, `differs`, `missing_here` (only Google has it),
+`missing_there` (only this site has it), `unknown` (neither). Phones are
+compared as digits with the trunk zero and country code reconciled;
+websites ignore scheme, `www.` and a trailing slash; addresses compare
+street, town and postcode as word sets, leaving out country and region
+(`GB` here, `UK` on Google). Hours keep the three states — a day this site
+never configured is `missing_here`, not "closed".
+
+**The place is returned for display and written nowhere.** The only write
+is refreshing the coordinates, whose 30-day clock restarts.
+`tests/Integration/database.php` asserts a live read that finds a
+different phone leaves the location's phone untouched. `409
+fhint_places_not_linked` when nothing is linked.
+
+---
+
 # Plan limits
 
 `meta.limits` entries all share one shape, from

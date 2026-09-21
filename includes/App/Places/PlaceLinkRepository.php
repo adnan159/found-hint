@@ -150,8 +150,9 @@ class PlaceLinkRepository {
 
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		$changed = $wpdb->query(
-			// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 			$wpdb->prepare(
+				// The table name comes from Tables::name(), never from input.
+				// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 				"UPDATE {$table}
 				SET latitude = NULL, longitude = NULL, coordinates_cached_at = NULL, updated_at = %s
 				WHERE coordinates_cached_at IS NOT NULL AND coordinates_cached_at <= %s",
