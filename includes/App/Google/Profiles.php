@@ -61,12 +61,14 @@ class Profiles {
 			return $accounts;
 		}
 
-		$found = 0;
+		$found  = 0;
+		$failed = array();
 
 		foreach ( $accounts as $account ) {
 			$locations = self::fetch_locations( $account['name'] );
 
 			if ( is_wp_error( $locations ) ) {
+				$failed[] = $locations;
 				// One account failing must not discard the accounts that
 				// worked — a profile the operator can see is more useful
 				// than a clean error about one they cannot.
@@ -106,9 +108,17 @@ class Profiles {
 			)
 		);
 
+		// Every account refused and nothing was read: reporting "0 locations"
+		// as a success would tell the operator their Google account is empty,
+		// when in fact this plugin never got an answer.
+		if ( $failed && 0 === $found ) {
+			return $failed[0];
+		}
+
 		return array(
 			'accounts'  => count( $accounts ),
 			'locations' => $found,
+			'failed'    => count( $failed ),
 		);
 	}
 
@@ -168,7 +178,11 @@ class Profiles {
 	 * @return array[]|WP_Error Normalised locations.
 	 */
 	public static function fetch_locations( $account_name ) {
-		$url       = sprintf( self::LOCATIONS_URL, rawurlencode( (string) $account_name ) );
+		// The account name carries its own slash and is part of the path, not
+		// a parameter: encoding it turns `accounts/123` into `accounts%2F123`
+		// and Google answers 404, which looks exactly like an account with no
+		// locations. Google's resource names go through unencoded.
+		$url       = sprintf( self::LOCATIONS_URL, (string) $account_name );
 		$locations = array();
 		$token     = '';
 

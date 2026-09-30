@@ -263,6 +263,17 @@ $GLOBALS['__redirects'] = array();
 function admin_url( $path = '' ) {
 	return 'https://example.test/wp-admin/' . ltrim( (string) $path, '/' );
 }
+$GLOBALS['__salt'] = 'test-salt';
+
+function wp_salt( $scheme = 'auth' ) {
+	return $GLOBALS['__salt'] . '|' . $scheme;
+}
+function untrailingslashit( $value ) {
+	return rtrim( (string) $value, '/\\' );
+}
+function wp_generate_password( $length = 12, $special = true, $extra = false ) {
+	return substr( str_repeat( 'abcdefghijklmnopqrstuvwxyz0123456789', 4 ), 0, (int) $length );
+}
 function wp_unslash( $value ) {
 	return is_string( $value ) ? stripslashes( $value ) : $value;
 }

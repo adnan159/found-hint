@@ -80,7 +80,7 @@ final class FHINT {
 	 */
 	public function define_constants() {
 		define( 'FHINT_VERSION', '0.1.0' );
-		define( 'FHINT_DB_VERSION', '0.3.0' );
+		define( 'FHINT_DB_VERSION', '0.4.0' );
 		define( 'FHINT_MIN_PHP', '7.4' );
 		define( 'FHINT_SETTINGS_NAME', 'fhint_settings' );
 		define( 'FHINT_FILE', __FILE__ );
@@ -144,7 +144,6 @@ final class FHINT {
 		FHINT\Database::init();
 		FHINT\API::init();
 		FHINT\Google::init();
-		FHINT\Places::init();
 		FHINT\Audit::init();
 		FHINT\Frontend::init();
 
@@ -208,8 +207,6 @@ final class FHINT {
 		if ( $timestamp ) {
 			wp_unschedule_event( $timestamp, 'fhint_purge_logs' );
 		}
-
-		FHINT\App\Places\Retention::unschedule();
 
 		do_action( 'fhint_deactivated' );
 	}

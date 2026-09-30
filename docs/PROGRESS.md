@@ -770,6 +770,101 @@ text form is used until the official logo asset is added. At phone width
 every FoundHint screen is squeezed by the app sidebar, which never
 collapses — a layout problem that predates this step.
 
+## Step 13 · Connect service, import, and removing Places — done
+
+`Continue with Google` with **no client id or secret on the user's site**, an
+import of the connected profile, and the removal of the Places lookup it made
+redundant.
+
+**The connect service.** Google will only return a browser to an address
+registered in advance, and a client secret shipped in a plugin download is
+not a secret — so one address holds the client for every install:
+`foundhint.com/wp-json/fhint-connect/v1/…`, a separate plugin
+(`/Users/adnan/sites/foundhint-connect-wp/`). It brokers the sign-in and
+token refreshes and **stores no tokens**: the browser carries a one-time
+handoff code, and the site collects the tokens server to server, proving it
+started the sign-in with a secret the service only ever saw hashed. A
+Node version of the same service exists at `/Users/adnan/sites/foundhint-connect/`
+for hosts without WordPress.
+
+- `App\Google\ConnectService` — the site's side: registers a sign-in, claims
+  the tokens once, refreshes through the service.
+- `Tokens` gained `source`, so a refresh goes back to whichever route issued
+  the grant. The site's own client stays available under **Advanced**, for
+  agencies that want their own project and as a fallback.
+- `prompt=select_account consent`, so somebody with a personal and a business
+  Google account can choose.
+
+**Import.** `App\Google\Import` reads the mapped profile and shows both
+sides; nothing is written until it is ticked. Empty fields are suggested,
+filled ones are left alone — this plugin cannot know which of two values is
+the newer. A site with **no location yet creates one from Google's address**,
+which is the ordinary first run.
+
+**Places removed.** It needed a Maps Platform API key with billing from every
+user — exactly the friction this step removes — and the connected path does
+the same job better and may actually import. Module, table, routes, screen
+and 88 tests deleted; `Database::clear_legacy_places()` drops the table, the
+key and the daily event on sites that ran 0.3.0. `FHINT_DB_VERSION` is
+`0.4.0`.
+
+**Verified against the real thing.** A live sign-in through foundhint.com
+connected `foundhint.plugin@gmail.com`; the import read two real profiles and
+filled a location. `tests/Smoke/google-import.php` — 72 assertions,
+mutation-tested with eight defects, all caught.
+`tests/Integration/database.php` — 132, including the import writing through
+the real repositories. The connect plugin — 47 assertions against a stubbed
+Google, seven security defects caught (tokens in a redirect, a reusable
+handoff, a replayable sign-in, a foreign return address, a wrong secret
+accepted, `http` for a remote site, a missing PKCE verifier).
+
+**Caught by real data, not by tests:** two bugs the suites had blessed.
+`Profiles::fetch_locations()` percent-encoded the account name into the path,
+so Google answered 404 and the sync reported "0 locations" as success — the
+old test had asserted the encoded form. And Google writes "open 24 hours" as
+`openTime: {}` with `closeTime: {hours: 24}`; read literally that became
+`24:00`, storage dropped it, and seven days read as "opens at midnight, never
+closes". Both fixed, both now covered, and a sync that reads nothing at all
+now reports the failure instead of an empty account.
+
+**Unverified:** Google has approved project `1070959180491`, but the app is
+still in Testing — only listed test users can connect until verification is
+submitted and passed.
+
+## Step 14 · Encrypting the stored tokens — done
+
+Google's access and refresh tokens are encrypted in `wp_options`. A refresh
+token is a live grant to somebody's Business Profile, and it outlives the
+database it sits in — travelling into every backup, staging copy and support
+export made from that site.
+
+- `App\Core\Secrets` — libsodium `secretbox`, a random nonce per value, and
+  a `fhintv1:` marker so ciphertext is distinguishable from a token stored
+  before this existed. The key is derived with HKDF from `wp_salt(
+  'secure_auth' )`, or from `FHINT_ENCRYPTION_KEY` when a site pins one.
+- `Tokens` encrypts on every write and decrypts on read, so no caller knows.
+  **Every** write path goes through one private method: `expire()` used to
+  put a decrypted record straight back, which would have undone it.
+- A value that cannot be decrypted — rotated salts, usually — reads as an
+  empty string, so the site reads as disconnected and reconnecting is one
+  click. Keeping an unreadable value would mean failing later at Google with
+  nothing to explain it.
+- `Installer::maybe_run_migrations()` rewrites what is already stored, once.
+
+**What this does and does not protect.** It defends against a leaked
+database: a dump, a backup on a shared drive, another plugin reading options.
+It does not defend against a compromised server, because anything that can
+read the tokens through this plugin can read them the same way. Documented on
+the class rather than implied.
+
+**Verified:** `tests/Smoke/secrets.php` — 35 assertions, mutation-tested with
+six defects, all caught (a write path storing plain text, encryption skipped
+on save, tampering accepted, a fixed nonce, pre-encryption tokens discarded,
+and the upgrade never rewriting). On the live site the migration ran by
+itself on the next admin load, a real sync returned two profiles, and a
+forced refresh through the connect service succeeded with the encrypted
+refresh token — still encrypted afterwards.
+
 ## Pending
 
 Everything in the Free plan's first cut is built. What remains is the
@@ -777,5 +872,6 @@ prototype's work that has no engine yet:
 
 1. **Landing pages**, **ranking grid**, **performance** and
    **recommendations** — each needs its engine before any screen.
-2. **Google reviews, posts and data comparison** — built on the connection
-   and mapping, and mostly Pro.
+2. **Google reviews, posts and performance** — built on the same connection,
+   needing only their APIs enabled on the approved project.
+

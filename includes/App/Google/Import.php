@@ -63,43 +63,99 @@ class Import {
 	/**
 	 * Read Google and show both sides.
 	 *
-	 * @param int $location_id FoundHint location, 0 for the primary one.
+	 * **A site with no location yet is the ordinary case**, not an error: the
+	 * whole point of importing is not typing the address twice. When there is
+	 * nothing here, the address Google holds becomes the location, and the
+	 * preview says so through `creates_location`.
+	 *
+	 * @param int    $location_id   FoundHint location, 0 for the primary one.
+	 * @param string $location_name Google profile to read, when none is
+	 *                              mapped yet.
 	 * @return array|WP_Error
 	 */
-	public static function preview( $location_id = 0 ) {
+	public static function preview( $location_id = 0, $location_name = '' ) {
 		$location = $location_id ? LocationRepository::find( $location_id ) : LocationRepository::primary();
+		$profile  = self::profile_for( $location, $location_name );
 
-		if ( ! $location ) {
-			return new WP_Error(
-				'fhint_import_no_location',
-				__( 'Add your business address first, so there is somewhere to import into.', 'found-hint' ),
-				array( 'status' => 409 )
-			);
+		if ( is_wp_error( $profile ) ) {
+			return $profile;
 		}
 
-		$mapped = GoogleLocationRepository::find_by_fhint_location( (int) $location['id'] );
-
-		if ( ! $mapped ) {
-			return new WP_Error(
-				'fhint_import_not_mapped',
-				__( 'Choose which Google profile is this location first, under Location mapping.', 'found-hint' ),
-				array( 'status' => 409 )
-			);
-		}
-
-		$theirs = self::read( $mapped['location_name'] );
+		$theirs = self::read( $profile['location_name'] );
 
 		if ( is_wp_error( $theirs ) ) {
 			return $theirs;
 		}
 
-		$nap = Nap::resolve( (int) $location['id'] );
+		$nap = Nap::resolve( $location ? (int) $location['id'] : 0 );
 
 		return array(
-			'location_id'   => (int) $location['id'],
-			'location_name' => $mapped['location_name'],
-			'fields'        => self::compare( $theirs, $nap ),
-			'read_at'       => current_time( 'mysql', true ),
+			'location_id'      => $location ? (int) $location['id'] : 0,
+			'location_name'    => $profile['location_name'],
+			'profile_title'    => $profile['title'],
+			// The screen says "this will create your location" rather than
+			// letting one appear unannounced.
+			'creates_location' => ! $location,
+			'fields'           => self::compare( $theirs, $nap ),
+			'read_at'          => current_time( 'mysql', true ),
+		);
+	}
+
+	/**
+	 * Which Google profile this import reads.
+	 *
+	 * A mapped location decides it. Without one, an explicit choice decides
+	 * it, and a site with exactly one profile needs no choice at all —
+	 * asking somebody to pick from a list of one is a question with no
+	 * information in it.
+	 *
+	 * @param array|null $location      FoundHint location, or null.
+	 * @param string     $location_name Google profile asked for.
+	 * @return array|WP_Error Stored Google location row.
+	 */
+	private static function profile_for( $location, $location_name ) {
+		if ( $location ) {
+			$mapped = GoogleLocationRepository::find_by_fhint_location( (int) $location['id'] );
+
+			if ( $mapped ) {
+				return $mapped;
+			}
+		}
+
+		$location_name = trim( (string) $location_name );
+
+		if ( '' !== $location_name ) {
+			$chosen = GoogleLocationRepository::find_by_location_name( $location_name );
+
+			if ( ! $chosen ) {
+				return new WP_Error(
+					'fhint_import_unknown_profile',
+					__( 'That Google profile is not one this site has read. Read your profiles again.', 'found-hint' ),
+					array( 'status' => 404 )
+				);
+			}
+
+			return $chosen;
+		}
+
+		$profiles = GoogleLocationRepository::all();
+
+		if ( 1 === count( $profiles ) ) {
+			return $profiles[0];
+		}
+
+		if ( ! $profiles ) {
+			return new WP_Error(
+				'fhint_import_no_profiles',
+				__( 'Read your Google profiles first, under Business profiles.', 'found-hint' ),
+				array( 'status' => 409 )
+			);
+		}
+
+		return new WP_Error(
+			'fhint_import_choose_profile',
+			__( 'Choose which Google profile to import from.', 'found-hint' ),
+			array( 'status' => 409 )
 		);
 	}
 
@@ -114,8 +170,8 @@ class Import {
 	 * @param int   $location_id FoundHint location, 0 for the primary one.
 	 * @return array|WP_Error What was written.
 	 */
-	public static function apply( array $keys, $location_id = 0 ) {
-		$preview = self::preview( $location_id );
+	public static function apply( array $keys, $location_id = 0, $location_name = '' ) {
+		$preview = self::preview( $location_id, $location_name );
 
 		if ( is_wp_error( $preview ) ) {
 			return $preview;
@@ -132,6 +188,21 @@ class Import {
 		$location_changes = array();
 		$applied          = array();
 		$skipped          = array();
+		$created          = false;
+
+		// Nothing here to import into: Google's address becomes the location,
+		// which is then mapped to the profile it came from, so a second
+		// import updates it rather than making another one.
+		if ( ! $preview['location_id'] ) {
+			$made = self::create_location( $available, $preview['location_name'], $preview['profile_title'] );
+
+			if ( is_wp_error( $made ) ) {
+				return $made;
+			}
+
+			$preview['location_id'] = (int) $made['id'];
+			$created                = true;
+		}
 
 		foreach ( $chosen as $key ) {
 			// A field Google does not hold is skipped rather than blanking
@@ -192,10 +263,71 @@ class Import {
 		}
 
 		return array(
-			'applied'     => $applied,
-			'skipped'     => $skipped,
-			'imported_at' => current_time( 'mysql', true ),
+			'applied'          => $applied,
+			'skipped'          => $skipped,
+			'location_id'      => (int) $preview['location_id'],
+			'created_location' => $created,
+			'imported_at'      => current_time( 'mysql', true ),
 		);
+	}
+
+	/**
+	 * Create this site's location from what Google holds.
+	 *
+	 * @param array  $fields        Compared fields, keyed.
+	 * @param string $location_name Google resource name, for the mapping.
+	 * @param string $title         Google's title, as a fallback label.
+	 * @return array|WP_Error The new location.
+	 */
+	private static function create_location( array $fields, $location_name, $title ) {
+		$business = BusinessRepository::get();
+
+		if ( ! $business ) {
+			return new WP_Error(
+				'fhint_import_no_business',
+				__( 'Add your business name first, so the location has something to belong to.', 'found-hint' ),
+				array( 'status' => 409 )
+			);
+		}
+
+		if ( empty( $fields['address']['available'] ) ) {
+			return new WP_Error(
+				'fhint_import_no_address',
+				__( 'Google holds no address for this profile, so there is nothing to create a location from.', 'found-hint' ),
+				array( 'status' => 409 )
+			);
+		}
+
+		$data = array_merge(
+			$fields['address']['theirs_raw'],
+			array(
+				'business_id' => (int) $business['id'],
+				'name'        => (string) $title,
+				'is_primary'  => true,
+			)
+		);
+
+		if ( ! empty( $fields['phone']['available'] ) ) {
+			$data['phone'] = $fields['phone']['theirs_raw'];
+		}
+
+		if ( ! empty( $fields['website']['available'] ) ) {
+			$data['website'] = $fields['website']['theirs_raw'];
+		}
+
+		$location = LocationRepository::create( $data );
+
+		if ( ! $location || empty( $location['id'] ) ) {
+			return new WP_Error(
+				'fhint_import_create_failed',
+				__( 'The location could not be created from Google\'s address.', 'found-hint' ),
+				array( 'status' => 500 )
+			);
+		}
+
+		GoogleLocationRepository::map( (string) $location_name, (int) $location['id'] );
+
+		return $location;
 	}
 
 	/**
@@ -285,8 +417,17 @@ class Import {
 			$open   = self::clock( isset( $period['openTime'] ) ? $period['openTime'] : array() );
 			$close  = self::clock( isset( $period['closeTime'] ) ? $period['closeTime'] : array() );
 
-			// Google writes around-the-clock as a period that opens and
-			// closes at midnight on consecutive days.
+			// Google writes the end of a day as hour 24, which is not a time
+			// anything else accepts — a real profile came back as "opens at
+			// midnight, closes at 24:00", and storage dropped the close,
+			// leaving every day looking like it never shut.
+			if ( '24:00' === $close ) {
+				$close = '00:00';
+			}
+
+			// Around the clock, in both the shapes Google uses for it:
+			// midnight to hour 24 of the same day, and midnight to midnight
+			// of the next.
 			$is_24h = '00:00' === $open && '00:00' === $close;
 
 			$by_day[ $number ][] = array(
@@ -414,7 +555,9 @@ class Import {
 		$their_value = isset( $theirs[ $key ] ) ? (string) $theirs[ $key ] : '';
 		$our_value   = isset( $nap[ $key ] ) ? (string) $nap[ $key ] : '';
 
-		return self::describe( $key, $our_value, $their_value, $their_value, '' !== trim( $their_value ) );
+		$available = '' !== trim( $their_value );
+
+		return self::describe( $key, $our_value, $their_value, $their_value, $available );
 	}
 
 	/**

@@ -7,6 +7,8 @@
 
 namespace FHINT\App\Google;
 
+use FHINT\App\Core\Secrets;
+
 defined( 'ABSPATH' ) || exit;
 
 /**
@@ -47,8 +49,14 @@ class Tokens {
 		$stored = is_array( $stored ) ? $stored : array();
 
 		return array(
-			'access_token'  => isset( $stored['access_token'] ) ? (string) $stored['access_token'] : '',
-			'refresh_token' => isset( $stored['refresh_token'] ) ? (string) $stored['refresh_token'] : '',
+			// Decrypted on the way out, so no caller has to know they were
+			// encrypted on the way in. A value stored before encryption
+			// existed passes through untouched and is encrypted at the next
+			// save; one that cannot be decrypted — changed salts, usually —
+			// comes back empty, which reads as "not connected" rather than
+			// as a token that will fail mysteriously at Google.
+			'access_token'  => isset( $stored['access_token'] ) ? Secrets::decrypt( $stored['access_token'] ) : '',
+			'refresh_token' => isset( $stored['refresh_token'] ) ? Secrets::decrypt( $stored['refresh_token'] ) : '',
 			'expires_at'    => isset( $stored['expires_at'] ) ? (int) $stored['expires_at'] : 0,
 			'scope'         => isset( $stored['scope'] ) ? (string) $stored['scope'] : '',
 			'token_type'    => isset( $stored['token_type'] ) ? (string) $stored['token_type'] : 'Bearer',
@@ -152,7 +160,53 @@ class Tokens {
 			}
 		}
 
+		self::write( $record );
+	}
+
+	/**
+	 * Store a record, with the two secrets encrypted.
+	 *
+	 * @param array $record Token record, in plain text.
+	 * @return void
+	 */
+	private static function write( array $record ) {
+		$record['access_token']  = Secrets::encrypt( $record['access_token'] );
+		$record['refresh_token'] = Secrets::encrypt( $record['refresh_token'] );
+
 		update_option( self::OPTION, $record );
+	}
+
+	/**
+	 * Encrypt what is already stored.
+	 *
+	 * Runs once, when a site upgrades to a version that encrypts: reading
+	 * decrypts nothing here, so without this the tokens would stay in plain
+	 * text until the next refresh happened to rewrite them.
+	 *
+	 * @return bool Whether anything was rewritten.
+	 */
+	public static function encrypt_stored() {
+		$stored = get_option( self::OPTION, array() );
+
+		if ( ! is_array( $stored ) || ! $stored ) {
+			return false;
+		}
+
+		$plain = false;
+
+		foreach ( array( 'access_token', 'refresh_token' ) as $key ) {
+			if ( isset( $stored[ $key ] ) && '' !== $stored[ $key ] && ! Secrets::is_encrypted( $stored[ $key ] ) ) {
+				$plain = true;
+			}
+		}
+
+		if ( ! $plain ) {
+			return false;
+		}
+
+		self::write( self::all() );
+
+		return true;
 	}
 
 	/**
@@ -194,7 +248,9 @@ class Tokens {
 
 		$record['expires_at'] = 0;
 
-		update_option( self::OPTION, $record );
+		// Through write(): all() handed back decrypted values, and putting
+		// them back with update_option() would store them in plain text.
+		self::write( $record );
 	}
 
 	/**

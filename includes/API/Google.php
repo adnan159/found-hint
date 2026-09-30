@@ -163,11 +163,16 @@ class Google extends AbstractController {
 					'permission_callback' => array( $this, 'permissions_check' ),
 					'args'                => $this->args(
 						array(
-							'location_id' => array(
+							'location_id'   => array(
 								'type'        => 'integer',
 								'minimum'     => 0,
 								'default'     => 0,
 								'description' => 'FoundHint location, 0 for the primary one.',
+							),
+							'location_name' => array(
+								'type'        => 'string',
+								'default'     => '',
+								'description' => 'Google profile to read when none is mapped yet.',
 							),
 						)
 					),
@@ -194,10 +199,14 @@ class Google extends AbstractController {
 								),
 								'description' => 'Which fields to bring across.',
 							),
-							'location_id' => array(
+							'location_id'   => array(
 								'type'    => 'integer',
 								'minimum' => 0,
 								'default' => 0,
+							),
+							'location_name' => array(
+								'type'    => 'string',
+								'default' => '',
 							),
 						)
 					),
@@ -227,7 +236,10 @@ class Google extends AbstractController {
 	 * @return \WP_REST_Response|WP_Error
 	 */
 	public function import_preview( $request ) {
-		$result = Import::preview( (int) $request->get_param( 'location_id' ) );
+		$result = Import::preview(
+			(int) $request->get_param( 'location_id' ),
+			(string) $request->get_param( 'location_name' )
+		);
 
 		if ( is_wp_error( $result ) ) {
 			return $result;
@@ -245,7 +257,8 @@ class Google extends AbstractController {
 	public function import( $request ) {
 		$result = Import::apply(
 			(array) $request->get_param( 'fields' ),
-			(int) $request->get_param( 'location_id' )
+			(int) $request->get_param( 'location_id' ),
+			(string) $request->get_param( 'location_name' )
 		);
 
 		if ( is_wp_error( $result ) ) {

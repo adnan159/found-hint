@@ -1,6 +1,11 @@
 import { useEffect, useRef, useState } from "react";
 import { __, sprintf } from "@wordpress/i18n";
-import { CheckIcon, CopyIcon, ExternalLinkIcon } from "lucide-react";
+import {
+  CheckIcon,
+  ChevronDownIcon,
+  CopyIcon,
+  ExternalLinkIcon,
+} from "lucide-react";
 import { toast } from "sonner";
 import {
   AlertDialog,
@@ -39,7 +44,6 @@ import {
 import BusinessProfiles from "./components/BusinessProfiles";
 import ImportFromGoogle from "./components/ImportFromGoogle";
 import LocationMapping from "./components/LocationMapping";
-import PlaceFinder from "./components/PlaceFinder";
 
 /**
  * The Google Business Profile connection.
@@ -274,114 +278,250 @@ export default function GooglePage() {
         </NoticeBar>
       ) : null}
 
-      {/* First, because it is the shorter road: an API key and a search,
-          with no Google Cloud OAuth setup and no sign-in. */}
-      <PlaceFinder />
+      {/* One thing, not a card inside a card. Collapsed by default because a
+          site connected through FoundHint's connect service needs no Google
+          client of its own; it stays for agencies that want their own Cloud
+          project and quota, and as a way back in if the service is ever
+          unreachable. A site that has already saved a client sees the
+          ordinary section instead — nothing is hidden from somebody relying
+          on it. */}
+      {state.connect_service && !state.client_id_hint ? (
+        <details
+          id="google-client"
+          className="fhint:group fhint:scroll-mt-6 fhint:border fhint:border-border fhint:bg-card"
+        >
+          <summary className="fhint:flex fhint:cursor-pointer fhint:list-none fhint:items-center fhint:justify-between fhint:gap-4 fhint:px-[22px] fhint:py-4 fhint:font-heading fhint:text-[13px] fhint:font-extrabold fhint:tracking-[0.1em] fhint:uppercase fhint:group-open:border-b-2 fhint:group-open:border-b-divider fhint:[&::-webkit-details-marker]:hidden">
+            {__("Advanced: use your own Google client", "found-hint")}
+            <ChevronDownIcon
+              aria-hidden="true"
+              className="fhint:size-4 fhint:shrink-0 fhint:text-sidebar-chevron fhint:transition-transform fhint:group-open:rotate-180"
+            />
+          </summary>
 
-      <SectionCard
-        id="google-client"
-        title={__("Google client", "found-hint")}
-        description={__(
-          "FoundHint uses your own Google Cloud project, so your data and your quota stay yours.",
-          "found-hint",
-        )}
-      >
-        <FieldGroup>
-          <Field>
-            <FieldLabel>{__("Redirect URI", "found-hint")}</FieldLabel>
-            <RedirectUri value={state.redirect_uri} />
-            <FieldDescription>
+          <div className="fhint:flex fhint:flex-col fhint:gap-5 fhint:px-[22px] fhint:py-5">
+            <p className="fhint:m-0 fhint:max-w-[76ch] fhint:text-[13px] fhint:text-muted-strong">
               {__(
-                "Add this to your OAuth client in Google Cloud under Authorised redirect URIs, exactly as shown. A mismatch here is the usual reason a first connection fails.",
+                "You do not need this. FoundHint signs you in through its own Google client, and your data and quota stay yours either way. Enter a client from your own Google Cloud project only if you want this site to use that project — once saved, it is used instead of FoundHint's.",
                 "found-hint",
               )}
-            </FieldDescription>
-          </Field>
+            </p>
 
-          <Field>
-            <FieldLabel htmlFor="google-client-id">
-              {__("Client ID", "found-hint")}
-            </FieldLabel>
-            <Input
-              id="google-client-id"
-              value={form.client_id}
-              autoComplete="off"
-              onChange={(event) =>
-                setForm((current) => ({
-                  ...current,
-                  client_id: event.target.value,
-                }))
-              }
-              placeholder={
-                state.client_id_hint ||
-                "1234567890-abc.apps.googleusercontent.com"
-              }
-            />
-            <FieldDescription>
-              {state.client_id_hint
-                ? sprintf(
-                    /* translators: %s: the start of the stored client id. */
-                    __("Currently %s — leave blank to keep it.", "found-hint"),
-                    state.client_id_hint,
-                  )
-                : __("From your OAuth client in Google Cloud.", "found-hint")}
-            </FieldDescription>
-          </Field>
-
-          <Field>
-            <FieldLabel htmlFor="google-client-secret">
-              {__("Client secret", "found-hint")}
-            </FieldLabel>
-            <Input
-              id="google-client-secret"
-              type="password"
-              autoComplete="new-password"
-              value={form.client_secret}
-              onChange={(event) =>
-                setForm((current) => ({
-                  ...current,
-                  client_secret: event.target.value,
-                }))
-              }
-            />
-            <FieldDescription>
-              {state.configured
-                ? __(
-                    "A secret is stored. It is never shown again — leave this blank to keep it, or paste a new one to replace it.",
-                    "found-hint",
-                  )
-                : __(
-                    "Stored on your site and never shown again once saved.",
+            <FieldGroup>
+              <Field>
+                <FieldLabel>{__("Redirect URI", "found-hint")}</FieldLabel>
+                <RedirectUri value={state.redirect_uri} />
+                <FieldDescription>
+                  {__(
+                    "Add this to your OAuth client in Google Cloud under Authorised redirect URIs, exactly as shown. A mismatch here is the usual reason a first connection fails.",
                     "found-hint",
                   )}
-            </FieldDescription>
-          </Field>
-        </FieldGroup>
+                </FieldDescription>
+              </Field>
 
-        <div className="fhint:mt-5 fhint:flex fhint:flex-wrap fhint:items-center fhint:gap-2.5">
-          <Button
-            type="button"
-            onClick={onSaveCredentials}
-            disabled={isSavingCredentials}
-          >
-            {isSavingCredentials ? <Spinner data-icon="inline-start" /> : null}
-            {__("Save client", "found-hint")}
-          </Button>
-          <Button
-            variant="outline"
-            render={
-              <a
-                href={GOOGLE_CONSOLE_URL}
-                target="_blank"
-                rel="noreferrer noopener"
+              <Field>
+                <FieldLabel htmlFor="google-client-id">
+                  {__("Client ID", "found-hint")}
+                </FieldLabel>
+                <Input
+                  id="google-client-id"
+                  value={form.client_id}
+                  autoComplete="off"
+                  onChange={(event) =>
+                    setForm((current) => ({
+                      ...current,
+                      client_id: event.target.value,
+                    }))
+                  }
+                  placeholder={
+                    state.client_id_hint ||
+                    "1234567890-abc.apps.googleusercontent.com"
+                  }
+                />
+                <FieldDescription>
+                  {state.client_id_hint
+                    ? sprintf(
+                        /* translators: %s: the start of the stored client id. */
+                        __(
+                          "Currently %s — leave blank to keep it.",
+                          "found-hint",
+                        ),
+                        state.client_id_hint,
+                      )
+                    : __(
+                        "From your OAuth client in Google Cloud.",
+                        "found-hint",
+                      )}
+                </FieldDescription>
+              </Field>
+
+              <Field>
+                <FieldLabel htmlFor="google-client-secret">
+                  {__("Client secret", "found-hint")}
+                </FieldLabel>
+                <Input
+                  id="google-client-secret"
+                  type="password"
+                  autoComplete="new-password"
+                  value={form.client_secret}
+                  onChange={(event) =>
+                    setForm((current) => ({
+                      ...current,
+                      client_secret: event.target.value,
+                    }))
+                  }
+                />
+                <FieldDescription>
+                  {state.configured
+                    ? __(
+                        "A secret is stored. It is never shown again — leave this blank to keep it, or paste a new one to replace it.",
+                        "found-hint",
+                      )
+                    : __(
+                        "Stored on your site and never shown again once saved.",
+                        "found-hint",
+                      )}
+                </FieldDescription>
+              </Field>
+            </FieldGroup>
+
+            <div className="fhint:mt-5 fhint:flex fhint:flex-wrap fhint:items-center fhint:gap-2.5">
+              <Button
+                type="button"
+                onClick={onSaveCredentials}
+                disabled={isSavingCredentials}
+              >
+                {isSavingCredentials ? (
+                  <Spinner data-icon="inline-start" />
+                ) : null}
+                {__("Save client", "found-hint")}
+              </Button>
+              <Button
+                variant="outline"
+                render={
+                  <a
+                    href={GOOGLE_CONSOLE_URL}
+                    target="_blank"
+                    rel="noreferrer noopener"
+                  />
+                }
+              >
+                <ExternalLinkIcon data-icon="inline-start" />
+                {__("Open Google Cloud credentials", "found-hint")}
+              </Button>
+            </div>
+          </div>
+        </details>
+      ) : (
+        <SectionCard
+          id="google-client"
+          title={__("Google client", "found-hint")}
+          description={__(
+            "This site uses your own Google Cloud project, so your data and your quota stay yours.",
+            "found-hint",
+          )}
+        >
+          <FieldGroup>
+            <Field>
+              <FieldLabel>{__("Redirect URI", "found-hint")}</FieldLabel>
+              <RedirectUri value={state.redirect_uri} />
+              <FieldDescription>
+                {__(
+                  "Add this to your OAuth client in Google Cloud under Authorised redirect URIs, exactly as shown. A mismatch here is the usual reason a first connection fails.",
+                  "found-hint",
+                )}
+              </FieldDescription>
+            </Field>
+
+            <Field>
+              <FieldLabel htmlFor="google-client-id">
+                {__("Client ID", "found-hint")}
+              </FieldLabel>
+              <Input
+                id="google-client-id"
+                value={form.client_id}
+                autoComplete="off"
+                onChange={(event) =>
+                  setForm((current) => ({
+                    ...current,
+                    client_id: event.target.value,
+                  }))
+                }
+                placeholder={
+                  state.client_id_hint ||
+                  "1234567890-abc.apps.googleusercontent.com"
+                }
               />
-            }
-          >
-            <ExternalLinkIcon data-icon="inline-start" />
-            {__("Open Google Cloud credentials", "found-hint")}
-          </Button>
-        </div>
-      </SectionCard>
+              <FieldDescription>
+                {state.client_id_hint
+                  ? sprintf(
+                      /* translators: %s: the start of the stored client id. */
+                      __(
+                        "Currently %s — leave blank to keep it.",
+                        "found-hint",
+                      ),
+                      state.client_id_hint,
+                    )
+                  : __("From your OAuth client in Google Cloud.", "found-hint")}
+              </FieldDescription>
+            </Field>
+
+            <Field>
+              <FieldLabel htmlFor="google-client-secret">
+                {__("Client secret", "found-hint")}
+              </FieldLabel>
+              <Input
+                id="google-client-secret"
+                type="password"
+                autoComplete="new-password"
+                value={form.client_secret}
+                onChange={(event) =>
+                  setForm((current) => ({
+                    ...current,
+                    client_secret: event.target.value,
+                  }))
+                }
+              />
+              <FieldDescription>
+                {state.configured
+                  ? __(
+                      "A secret is stored. It is never shown again — leave this blank to keep it, or paste a new one to replace it.",
+                      "found-hint",
+                    )
+                  : __(
+                      "Stored on your site and never shown again once saved.",
+                      "found-hint",
+                    )}
+              </FieldDescription>
+            </Field>
+          </FieldGroup>
+
+          <div className="fhint:mt-5 fhint:flex fhint:flex-wrap fhint:items-center fhint:gap-2.5">
+            <Button
+              type="button"
+              onClick={onSaveCredentials}
+              disabled={isSavingCredentials}
+            >
+              {isSavingCredentials ? (
+                <Spinner data-icon="inline-start" />
+              ) : null}
+              {__("Save client", "found-hint")}
+            </Button>
+            <Button
+              variant="outline"
+              render={
+                <a
+                  href={GOOGLE_CONSOLE_URL}
+                  target="_blank"
+                  rel="noreferrer noopener"
+                />
+              }
+            >
+              <ExternalLinkIcon data-icon="inline-start" />
+              {__("Open Google Cloud credentials", "found-hint")}
+            </Button>
+          </div>
+        </SectionCard>
+      )}
 
       <SectionCard
         id="google-connection"

@@ -15,6 +15,7 @@
 require __DIR__ . '/bootstrap.php';
 
 use FHINT\App\Google\Connection;
+use FHINT\App\Google\ConnectService;
 use FHINT\App\Google\Credentials;
 use FHINT\App\Google\OAuth;
 use FHINT\App\Google\Tokens;
@@ -45,16 +46,37 @@ function last_request() {
 	return $requests ? end( $requests ) : array();
 }
 
-// -- Status before anything is configured ---------------------------------
+// -- Status on a fresh install --------------------------------------------
+//
+// FoundHint ships the address of its own connect service, so an ordinary
+// install can sign in the moment it is activated: no client, no secret, and
+// nothing in wp-config.php. "Not configured" now means a site that has
+// deliberately switched that service off and has no client of its own.
 
 reset_google();
 
-check_same( Connection::STATUS_NOT_CONFIGURED, Connection::status(), 'status is not_configured with no credentials' );
-check( ! Credentials::configured(), 'credentials report themselves absent' );
+check_same( Connection::STATUS_DISCONNECTED, Connection::status(), 'a fresh install is ready to connect' );
+check( ! Credentials::configured(), 'without any Google client of its own' );
+check( ConnectService::configured(), 'because the connect service ships with the plugin' );
 
 $state = Connection::state();
-check( false === $state['configured'], 'state says not configured' );
+check( true === $state['configured'], 'so the screen offers Continue with Google' );
+check( true === $state['connect_service'], 'and says which route it will use' );
 check_same( '', $state['account_email'], 'no account email yet' );
+
+// Switching the service off, which is what an agency using its own Google
+// Cloud project does, brings the old meaning back.
+add_filter(
+	'fhint_connect_url',
+	static function () {
+		return '';
+	}
+);
+
+check( ! ConnectService::configured(), 'a site can switch the connect service off' );
+check_same( Connection::STATUS_NOT_CONFIGURED, Connection::status(), 'and is then not configured until it enters a client' );
+
+$GLOBALS['__filters']['fhint_connect_url'] = array();
 
 // Starting a handshake without credentials is refused rather than building
 // a URL Google would reject.
@@ -98,7 +120,10 @@ parse_str( (string) wp_parse_url( $url, PHP_URL_QUERY ), $query );
 
 check_same( 'code', $query['response_type'], 'asks for an authorization code' );
 check_same( 'offline', $query['access_type'], 'asks for offline access, so a refresh token is issued' );
-check_same( 'consent', $query['prompt'], 'forces consent, so reconnecting issues a refresh token again' );
+// `consent` so reconnecting issues a refresh token again, and
+// `select_account` so somebody signed in to a personal and a business Google
+// account can choose which one manages the profile.
+check_same( 'select_account consent', $query['prompt'], 'forces consent and offers the account chooser' );
 check_same( 'S256', $query['code_challenge_method'], 'uses PKCE with S256' );
 check( ! empty( $query['code_challenge'] ), 'sends a code challenge' );
 check( ! empty( $query['state'] ), 'sends a state' );
@@ -385,7 +410,10 @@ $stored = $GLOBALS['__options'][ Tokens::OPTION ];
 ksort( $stored );
 
 check_same(
-	array( 'access_token', 'account_email', 'connected_at', 'expires_at', 'refresh_token', 'scope', 'token_type' ),
+	// `source` records which route issued these — this site's own Google
+	// client, or FoundHint's connect service, which is where a refresh has
+	// to go because only it holds the client secret.
+	array( 'access_token', 'account_email', 'connected_at', 'expires_at', 'refresh_token', 'scope', 'source', 'token_type' ),
 	array_keys( $stored ),
 	'the token option holds exactly the expected keys'
 );

@@ -249,6 +249,65 @@ foreach ( $always['hours']['periods'] as $row ) {
 	}
 }
 
+// The shape a real profile came back in: Google ends a day at hour 24, which
+// is not a valid time. Read literally it produced "opens 00:00, closes 24:00",
+// storage dropped the close, and seven days looked like they never shut.
+$hour_24 = import_call(
+	'normalise',
+	array(
+		google_location(
+			array(
+				'regularHours' => array(
+					'periods' => array(
+						array(
+							'openDay'   => 'MONDAY',
+							'openTime'  => array(),
+							'closeDay'  => 'MONDAY',
+							'closeTime' => array( 'hours' => 24 ),
+						),
+					),
+				),
+			)
+		),
+	)
+);
+
+foreach ( $hour_24['hours']['periods'] as $row ) {
+	if ( DayOfWeek::MONDAY === $row['day_of_week'] ) {
+		check( $row['is_24h'], 'midnight to hour 24 is open all day' );
+		check_same( '00:00', $row['close_time'], 'and hour 24 is stored as midnight, not 24:00' );
+	}
+}
+
+// The same rule on a day that opens in the evening and runs to midnight.
+$to_midnight = import_call(
+	'normalise',
+	array(
+		google_location(
+			array(
+				'regularHours' => array(
+					'periods' => array(
+						array(
+							'openDay'   => 'FRIDAY',
+							'openTime'  => array( 'hours' => 18 ),
+							'closeDay'  => 'FRIDAY',
+							'closeTime' => array( 'hours' => 24 ),
+						),
+					),
+				),
+			)
+		),
+	)
+);
+
+foreach ( $to_midnight['hours']['periods'] as $row ) {
+	if ( DayOfWeek::FRIDAY === $row['day_of_week'] && empty( $row['is_closed'] ) ) {
+		check_same( '18:00', $row['open_time'], 'an evening shift keeps its opening time' );
+		check_same( '00:00', $row['close_time'], 'and closes at midnight' );
+		check( ! $row['is_24h'], 'without being mistaken for all day' );
+	}
+}
+
 // A period on a day Google does not name is dropped rather than guessed at.
 $nonsense = import_call(
 	'normalise',

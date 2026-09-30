@@ -12,9 +12,17 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import RequestError from "@/components/RequestError";
 import SectionCard from "@/components/SectionCard";
 import {
+  useGetGoogleProfilesQuery,
   useImportFromGoogleMutation,
   usePreviewGoogleImportMutation,
 } from "@/store/api/googleApi";
@@ -66,11 +74,22 @@ export function ImportFromGoogle({ isConnected }) {
   ] = usePreviewGoogleImportMutation();
   const [runImport, { isLoading: isImporting, error: importError }] =
     useImportFromGoogleMutation();
+  const { data: overview } = useGetGoogleProfilesQuery();
   const [chosen, setChosen] = useState({});
+  const [profile, setProfile] = useState("");
+
+  const profiles = overview?.google_locations ?? [];
+  // Nothing mapped yet is the ordinary first run: the profile is chosen here
+  // instead, and importing creates the location from it.
+  const needsChoice =
+    profiles.length > 1 &&
+    !profiles.some((candidate) => candidate.fhint_location_id > 0);
 
   const onRead = async () => {
     try {
-      const result = await preview().unwrap();
+      const result = await preview(
+        profile ? { location_name: profile } : {},
+      ).unwrap();
 
       // Start from what the server suggests, which the operator can change
       // before anything is written.
@@ -93,6 +112,7 @@ export function ImportFromGoogle({ isConnected }) {
     try {
       const result = await runImport({
         fields: selected.map((field) => field.key),
+        ...(profile ? { location_name: profile } : {}),
       }).unwrap();
 
       const count = result?.applied?.length ?? 0;
@@ -131,8 +151,39 @@ export function ImportFromGoogle({ isConnected }) {
     >
       <RequestError error={readError ?? importError} />
 
+      {needsChoice ? (
+        <div className="fhint:mb-4 fhint:flex fhint:flex-wrap fhint:items-center fhint:gap-2.5">
+          <span className="fhint:text-[13px] fhint:font-bold">
+            {__("Which profile is this site's business?", "found-hint")}
+          </span>
+          <Select value={profile} onValueChange={setProfile}>
+            <SelectTrigger className="fhint:min-w-[260px]">
+              <SelectValue
+                placeholder={__("Choose a Google profile", "found-hint")}
+              >
+                {(value) =>
+                  profiles.find((item) => item.location_name === value)
+                    ?.title ?? __("Choose a Google profile", "found-hint")
+                }
+              </SelectValue>
+            </SelectTrigger>
+            <SelectContent>
+              {profiles.map((item) => (
+                <SelectItem key={item.location_name} value={item.location_name}>
+                  {item.title || item.location_name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+      ) : null}
+
       <div className="fhint:flex fhint:flex-wrap fhint:items-center fhint:gap-2">
-        <Button type="button" onClick={onRead} disabled={isReading}>
+        <Button
+          type="button"
+          onClick={onRead}
+          disabled={isReading || (needsChoice && !profile)}
+        >
           {isReading ? (
             <Spinner data-icon="inline-start" />
           ) : (
@@ -151,6 +202,15 @@ export function ImportFromGoogle({ isConnected }) {
 
       {previewData ? (
         <div className="fhint:mt-5 fhint:flex fhint:flex-col fhint:gap-4">
+          {previewData.creates_location ? (
+            <p className="fhint:m-0 fhint:bg-notice fhint:px-3.5 fhint:py-2.5 fhint:text-[13px] fhint:text-notice-foreground">
+              {__(
+                "This site has no location yet, so importing will create one from Google's address and link it to this profile.",
+                "found-hint",
+              )}
+            </p>
+          ) : null}
+
           <p className="fhint:m-0 fhint:text-[13px] fhint:text-muted-strong">
             {__(
               "Fields you have not filled in are ticked. Fields you already hold are left for you to decide, because FoundHint cannot know which value is the newer one.",

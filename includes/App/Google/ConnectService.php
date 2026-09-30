@@ -43,12 +43,24 @@ class ConnectService {
 	const HANDSHAKE_TTL = 600;
 
 	/**
+	 * Where FoundHint's own connect service lives.
+	 *
+	 * **Shipped with the plugin, so an ordinary install needs no
+	 * configuration at all**: a person activates FoundHint and presses
+	 * Continue with Google. `FHINT_CONNECT_URL` in `wp-config.php` points a
+	 * site somewhere else — a staging copy of the service, or an empty
+	 * string to switch the service off and use this site's own Google client
+	 * instead.
+	 */
+	const DEFAULT_URL = 'https://foundhint.com/wp-json/fhint-connect';
+
+	/**
 	 * The address PHP calls.
 	 *
-	 * @return string Empty when no connect service is configured.
+	 * @return string Empty only when a site has switched the service off.
 	 */
 	public static function url() {
-		$url = defined( 'FHINT_CONNECT_URL' ) ? (string) FHINT_CONNECT_URL : '';
+		$url = defined( 'FHINT_CONNECT_URL' ) ? (string) FHINT_CONNECT_URL : self::DEFAULT_URL;
 
 		/**
 		 * Filter the connect service address used for server-to-server calls.

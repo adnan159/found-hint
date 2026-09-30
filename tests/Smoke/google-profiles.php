@@ -298,9 +298,43 @@ $query = request_query( 0 );
 check( ! empty( $query['readMask'] ), 'the request sends a readMask' );
 check( false !== strpos( $query['readMask'], 'storefrontAddress' ), 'asking for the address' );
 check( false !== strpos( $query['readMask'], 'title' ), 'and the title' );
+// Google's resource names are path segments, slash and all. Encoding that
+// slash makes Google answer 404, which reads exactly like an account with no
+// locations — this assertion used to require the encoded form, and that is
+// how a real account's two locations went missing.
 check(
-	false !== strpos( requests()[0]['url'], 'accounts%2F1/locations' ),
-	'the account name is URL-encoded into the path'
+	false !== strpos( requests()[0]['url'], 'accounts/1/locations' ),
+	'the account name goes into the path unencoded'
+);
+check(
+	false === strpos( requests()[0]['url'], 'accounts%2F1' ),
+	'and is never percent-encoded'
+);
+
+// -- Every account refusing is an error, not an empty account --------------
+
+reset_connected();
+queue_http(
+	200,
+	array(
+		'accounts' => array(
+			array(
+				'name'        => 'accounts/1',
+				'accountName' => 'Harbour Coffee',
+				'type'        => 'PERSONAL',
+			),
+		),
+	)
+);
+queue_http( 404, array( 'error' => array( 'status' => 'NOT_FOUND', 'message' => 'Requested entity was not found.' ) ) );
+
+$all_failed = Profiles::sync();
+
+check( is_wp_error( $all_failed ), 'a sync that read nothing at all reports the failure' );
+check_same(
+	'fhint_google_request_failed',
+	$all_failed->get_error_code(),
+	'carrying Google\'s refusal rather than a count of zero'
 );
 
 // -- Locations Google says less about --------------------------------------

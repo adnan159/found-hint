@@ -39,9 +39,6 @@ $fhint_google_options = array(
 	'fhint_google_credentials',
 	'fhint_google_tokens',
 	'fhint_google_notice',
-	// The Maps Platform key is a bearer credential too: anyone holding it
-	// can spend the project's quota, so it goes with the others whatever
-	// the operator chose about their own data.
 	'fhint_places_credentials',
 );
 
@@ -78,7 +75,6 @@ $fhint_tables = array(
 	'audit_issues',
 	'logs',
 	'google_locations',
-	'place_links',
 );
 
 foreach ( $fhint_tables as $fhint_table ) {
@@ -105,10 +101,4 @@ $fhint_timestamp = wp_next_scheduled( 'fhint_purge_logs' );
 
 if ( $fhint_timestamp ) {
 	wp_unschedule_event( $fhint_timestamp, 'fhint_purge_logs' );
-}
-
-$fhint_places_timestamp = wp_next_scheduled( 'fhint_places_expire_coordinates' );
-
-if ( $fhint_places_timestamp ) {
-	wp_unschedule_event( $fhint_places_timestamp, 'fhint_places_expire_coordinates' );
 }

@@ -7,6 +7,7 @@
 
 namespace FHINT;
 
+use FHINT\App\Google\Tokens;
 use FHINT\App\Core\Settings;
 use FHINT\Database\Tables;
 
@@ -95,7 +96,11 @@ class Installer {
 	 * @return void
 	 */
 	private static function maybe_run_migrations() {
-		// No tables exist yet — nothing to migrate. See Database::create_tables().
+		// Tokens stored before this plugin encrypted them stay readable, so
+		// nothing breaks — but they stay in plain text until something
+		// rewrites them, which for a working connection might be months.
+		// This rewrites them once, and costs a single option read after that.
+		Tokens::encrypt_stored();
 	}
 
 	/**

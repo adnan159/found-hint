@@ -79,10 +79,6 @@ const NAV_ITEMS = [
     to: "/google",
     label: () => __("Google", "found-hint"),
     children: [
-      {
-        id: "google-places",
-        label: () => __("Find on Google", "found-hint"),
-      },
       { id: "google-client", label: () => __("Google client", "found-hint") },
       { id: "google-connection", label: () => __("Connection", "found-hint") },
       {
@@ -135,6 +131,12 @@ function revealSection(id) {
 
   if (!el) {
     return false;
+  }
+
+  // A collapsed disclosure would otherwise be jumped to and show nothing
+  // but its own title — the sidebar promised that section, so open it.
+  if (el.tagName === "DETAILS") {
+    el.open = true;
   }
 
   el.scrollIntoView({ behavior: "smooth", block: "start" });
