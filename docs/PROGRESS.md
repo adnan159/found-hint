@@ -865,6 +865,27 @@ itself on the next admin load, a real sync returned two profiles, and a
 forced refresh through the connect service succeeded with the encrypted
 refresh token — still encrypted afterwards.
 
+## Step 15 · REST URLs on plain permalinks — fixed
+
+The Schema screen loaded nothing on this site, and the cause was a bug that
+would have hit **every site with plain permalinks**, which is WordPress's
+default until somebody changes it.
+
+WordPress serves REST two ways: `…/wp-json/fhint/v1` with pretty permalinks,
+and `…/index.php?rest_route=/fhint/v1` without. Two endpoints appended their
+own query string to the path — ``/schema?location_id=0`` and
+``/logs?mode=all`` — which on the second kind produces two `?`,
+and WordPress answers 404. The screen showed empty panels with no error.
+
+RTK Query's own `params` option does not help: it appends to the path
+*before* the base URL is joined on, so it makes the same broken URL.
+`store/api/baseApi.js` now exports `withQuery()`, which picks the separator
+by looking at the REST base, and both endpoints use it.
+
+**Verified on the running site:** `…/schema&location_id=0` and
+`…/logs&mode=all` both answer 200, the Schema screen renders its markup, and
+no hand-built query strings remain in the store.
+
 ## Pending
 
 Everything in the Free plan's first cut is built. What remains is the

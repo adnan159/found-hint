@@ -1,4 +1,4 @@
-import { baseApi } from "./baseApi";
+import { baseApi, withQuery } from "./baseApi";
 
 /**
  * GET /schema.
@@ -12,7 +12,12 @@ import { baseApi } from "./baseApi";
 export const schemaApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
     getSchema: builder.query({
-      query: (locationId = 0) => `/schema?location_id=${locationId}`,
+      // Through withQuery(), because a site with plain permalinks serves
+      // REST from `index.php?rest_route=…`: appending "?location_id=0" there
+      // made a second "?", WordPress answered 404, and this screen stayed
+      // empty on every such site.
+      query: (locationId = 0) =>
+        withQuery("/schema", { location_id: locationId }),
       transformResponse: (response) => ({
         graph: response?.data ?? null,
         ownership: response?.meta?.ownership ?? null,

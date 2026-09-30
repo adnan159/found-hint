@@ -1,4 +1,4 @@
-import { baseApi } from "./baseApi";
+import { baseApi, withQuery } from "./baseApi";
 
 /**
  * GET/PUT /settings and DELETE /logs.
@@ -28,8 +28,11 @@ export const settingsApi = baseApi.injectEndpoints({
     }),
 
     purgeLogs: builder.mutation({
+      // Through withQuery() for the same reason as the schema read: a site
+      // with plain permalinks serves REST from `index.php?rest_route=…`, and
+      // a second "?" makes WordPress answer 404.
       query: (mode = "expired") => ({
-        url: `/logs?mode=${mode}`,
+        url: withQuery("/logs", { mode }),
         method: "DELETE",
       }),
       transformResponse: (response) => response?.data ?? {},
