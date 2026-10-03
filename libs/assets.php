@@ -11,6 +11,12 @@ declare(strict_types=1);
 
 namespace FHINT\Libs\Assets;
 
+// Vendored from kucrut/vite-for-wp (GPL-2.0-or-later), namespaced under this
+// plugin so two copies cannot collide. Kept as close to upstream as possible;
+// the guard below is the one addition, because every PHP file in a plugin
+// should refuse to run on its own.
+defined( 'ABSPATH' ) || exit;
+
 use Exception;
 use WP_HTML_Tag_Processor;
 

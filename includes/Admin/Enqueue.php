@@ -77,6 +77,17 @@ class Enqueue {
 
 		wp_localize_script( self::SCRIPT_HANDLE, self::LOCALIZE_OBJ_NAME, self::bootstrap_data() );
 
+		// Without this every __() in the React app silently stays English:
+		// WordPress has no way to know which script carries which text
+		// domain, so a translation file is loaded for nobody.
+		if ( function_exists( 'wp_set_script_translations' ) ) {
+			wp_set_script_translations(
+				self::SCRIPT_HANDLE,
+				'found-hint',
+				FHINT_PATH . 'languages'
+			);
+		}
+
 		if ( function_exists( 'wp_enqueue_media' ) ) {
 			wp_enqueue_media();
 		}

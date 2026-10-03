@@ -317,7 +317,8 @@ check_same( array( 'Cleaning', 'Check-up', 'Whitening' ), $ordered, 'reordering 
 $limits = Limits::report( Limits::LOCATIONS, LocationRepository::count() );
 
 check_same( 1, (int) $limits['used'], 'the location limit counts the real row' );
-check( ! $limits['can_add'], 'and refuses a second on the free plan' );
+check( $limits['can_add'], 'and a second location is allowed, because Free is not capped at one' );
+check( $limits['unlimited'], 'which the report says plainly' );
 
 // The limit is enforced by the REST layer, not the repository — so it is
 // checked there, over the real stack, further down.
@@ -456,12 +457,51 @@ $fake_business_information = static function ( $pre, $args, $url ) use ( &$impor
 
 	$import_requests[] = $url;
 
+	if ( false !== strpos( $url, '/attributes' ) ) {
+		return array(
+			'headers'  => array(),
+			'body'     => wp_json_encode(
+				array(
+					'attributes' => array(
+						array(
+							'name'      => 'attributes/url_facebook',
+							'uriValues' => array( array( 'uri' => 'https://facebook.com/imported' ) ),
+						),
+						array(
+							'name'   => 'attributes/has_delivery',
+							'values' => array( true ),
+						),
+					),
+				)
+			),
+			'response' => array(
+				'code'    => 200,
+				'message' => 'OK',
+			),
+			'cookies'  => array(),
+		);
+	}
+
 	return array(
 		'headers'  => array(),
 		'body'     => wp_json_encode(
 			array(
 				'name'              => 'locations/import-me',
 				'title'             => 'Imported Coffee',
+				'categories'        => array(
+					'primaryCategory' => array(
+						'displayName'  => 'Coffee shop',
+						'serviceTypes' => array(
+							array(
+								'serviceTypeId' => 'job_type_id:espresso',
+								'displayName'   => 'Espresso bar',
+							),
+						),
+					),
+				),
+				'serviceItems'      => array(
+					array( 'structuredServiceItem' => array( 'serviceTypeId' => 'job_type_id:espresso' ) ),
+				),
 				'storefrontAddress' => array(
 					'addressLines'       => array( '12 Dock Road' ),
 					'locality'           => 'Bristol',
@@ -500,7 +540,7 @@ add_filter( 'pre_http_request', $fake_business_information, 10, 3 );
 // rather than whatever earlier sections happened to leave behind.
 BusinessRepository::save( array( 'description' => '' ) );
 
-$preview = Import::preview( $location_id );
+$preview = Import::preview( 'locations/import-me' );
 
 check( ! is_wp_error( $preview ), 'a preview can be read' );
 check_same( 'locations/import-me', $preview['location_name'], 'for the mapped profile' );
@@ -519,7 +559,7 @@ check( ! $preview_fields['phone']['suggested'], 'a phone already stored here is 
 
 $before_phone = LocationRepository::find( $location_id )['phone'];
 
-$result = Import::apply( array( 'description', 'hours' ), $location_id );
+$result = Import::apply( array( 'description', 'hours' ), 'locations/import-me' );
 
 check( ! is_wp_error( $result ), 'the chosen fields import' );
 check_same( array( 'description', 'hours' ), $result['applied'], 'and only those' );
@@ -543,10 +583,166 @@ foreach ( $imported_hours as $row ) {
 check( (bool) $monday[0]['is_24h'], 'a day Google says is open round the clock is stored as 24 hours' );
 check_same( 7, count( $imported_hours ), 'and every other day is stored closed, as Google means it' );
 
-$skipped = Import::apply( array( 'website' ), $location_id );
+$skipped = Import::apply( array( 'website' ), 'locations/import-me' );
 
 check_same( 'https://imported.example', LocationRepository::find( $location_id )['website'], 'a second import writes the website' );
 check( in_array( 'website', $skipped['applied'], true ), 'and reports it as applied' );
+
+// A site with nothing in it at all: the ordinary first run, where Google's
+// profile has to become the business as well as the location. This used to
+// refuse with "add your business name first", which is exactly the typing
+// an import exists to avoid.
+$saved_business = BusinessRepository::get();
+
+BusinessRepository::delete();
+GoogleLocationRepository::map( 'locations/import-me', 0 );
+
+check_same( null, BusinessRepository::get(), 'the site now has no business' );
+check_same( 0, LocationRepository::count(), 'and no location' );
+
+$empty_preview = Import::preview( 'locations/import-me' );
+
+check( true === $empty_preview['creates_business'], 'the preview says it will create the business' );
+check( true === $empty_preview['creates_location'], 'and the location' );
+
+$from_nothing = Import::apply(
+	array( 'name', 'description', 'phone', 'address', 'hours' ),
+	'locations/import-me'
+);
+
+check( ! is_wp_error( $from_nothing ), 'importing into an empty site works' );
+check( true === $from_nothing['created_business'], 'and reports creating the business' );
+
+$new_business = BusinessRepository::get();
+
+check_same( 'Imported Coffee', $new_business['name'], 'whose name came from Google' );
+check_same( '0117 496 0000', $new_business['phone'], 'with the phone on the business, where the screens read it' );
+check_same( 1, LocationRepository::count(), 'and one location to go with it' );
+check(
+	(bool) LocationRepository::find( (int) $from_nothing['location_id'] )['is_primary'],
+	'marked primary, being the first'
+);
+
+// Put the suite's own business and location back for the sections below.
+LocationRepository::delete( (int) $from_nothing['location_id'] );
+BusinessRepository::delete();
+
+$restored = BusinessRepository::save( $saved_business );
+$location = LocationRepository::create(
+	array(
+		'business_id'    => (int) $restored['id'],
+		'name'           => 'Downtown',
+		'address_line_1' => '401 Congress Ave',
+		'city'           => 'Round Rock',
+		'region'         => 'TX',
+		'postal_code'    => '78701',
+		'country'        => 'US',
+		'phone'          => '+1 512 555 0134',
+		'is_primary'     => true,
+	)
+);
+
+$location_id = (int) $location['id'];
+
+GoogleLocationRepository::map( 'locations/import-me', $location_id );
+OpeningHoursRepository::replace(
+	$location_id,
+	array(
+		array( 'day_of_week' => DayOfWeek::MONDAY, 'period_index' => 0, 'open_time' => '09:00', 'close_time' => '12:00', 'is_closed' => false, 'is_24h' => false ),
+		array( 'day_of_week' => DayOfWeek::MONDAY, 'period_index' => 1, 'open_time' => '13:00', 'close_time' => '17:00', 'is_closed' => false, 'is_24h' => false ),
+		array( 'day_of_week' => DayOfWeek::TUESDAY, 'period_index' => 0, 'open_time' => '', 'close_time' => '', 'is_closed' => true, 'is_24h' => false ),
+		array( 'day_of_week' => DayOfWeek::SATURDAY, 'period_index' => 0, 'open_time' => '', 'close_time' => '', 'is_closed' => false, 'is_24h' => true ),
+	)
+);
+
+// Social links, services and the business type: the parts a real profile
+// showed were not importing at all.
+$everything = Import::apply(
+	array( 'social', 'services', 'business_type', 'coordinates' ),
+	'locations/import-me'
+);
+
+check( ! is_wp_error( $everything ), 'social links, services and the type import together' );
+
+$business_now = BusinessRepository::get();
+
+check_same(
+	'https://facebook.com/imported',
+	$business_now['social_profiles']['facebook'],
+	'a social link read from Google\'s attributes reaches the business'
+);
+check_same( 'CafeOrCoffeeShop', $business_now['business_type'], 'and Google\'s category becomes a schema.org type' );
+
+$imported_services = array();
+
+foreach ( ServiceRepository::all() as $service ) {
+	$imported_services[] = $service['name'];
+}
+
+check( in_array( 'Espresso bar', $imported_services, true ), 'a service named by the category is created' );
+
+$before_services = count( $imported_services );
+
+Import::apply( array( 'services' ), 'locations/import-me' );
+
+check_same( $before_services, ServiceRepository::count(), 'importing services twice does not duplicate them' );
+
+// A second profile is a second branch, not an overwrite of the first.
+GoogleLocationRepository::upsert(
+	array(
+		'account_name'       => 'accounts/999',
+		'location_name'      => 'locations/branch-two',
+		'store_code'         => '',
+		'title'              => 'Imported Coffee — Harbourside',
+		'address'            => '2 Quay Street, Bristol',
+		'phone'              => '0117 496 1111',
+		'website'            => 'https://imported.example',
+		'verification_state' => 'VERIFIED',
+		'payload'            => array(),
+	)
+);
+
+$branch_preview = Import::preview( 'locations/branch-two' );
+
+check( true === $branch_preview['creates_location'], 'a profile with no location of its own will create one' );
+check( false === $branch_preview['creates_business'], 'while the business it belongs to already exists' );
+
+$branch_fields = array();
+
+foreach ( $branch_preview['fields'] as $field ) {
+	$branch_fields[ $field['key'] ] = $field;
+}
+
+check_same( 'business', $branch_fields['name']['scope'], 'the name is shared by every location' );
+check_same( 'location', $branch_fields['address']['scope'], 'the address belongs to this one' );
+
+$business_phone_before = BusinessRepository::get()['phone'];
+$branch                = Import::apply( array( 'address', 'phone', 'hours' ), 'locations/branch-two' );
+
+check( ! is_wp_error( $branch ), 'the branch imports' );
+check( true === $branch['created_location'], 'creating its own location' );
+check_same( 2, LocationRepository::count(), 'so the site now has two, which Free allows' );
+check(
+	(int) $branch['location_id'] !== (int) $location_id,
+	'and the first location was not overwritten'
+);
+check_same(
+	$business_phone_before,
+	BusinessRepository::get()['phone'],
+	'a branch phone stays on the branch rather than becoming the business phone'
+);
+check_same(
+	'0117 496 0000',
+	LocationRepository::find( (int) $branch['location_id'] )['phone'],
+	'while the branch keeps its own'
+);
+
+GoogleLocationRepository::release_for_location( (int) $branch['location_id'] );
+LocationRepository::delete( (int) $branch['location_id'] );
+
+// The import genuinely changed the business type; the sections below assert
+// the one this suite set up.
+BusinessRepository::save( array( 'business_type' => 'Dentist' ) );
 
 remove_filter( 'pre_http_request', $fake_business_information, 10 );
 
@@ -707,8 +903,9 @@ check_same(
 	'and the Google mapping was released by the fhint_location_deleted hook'
 );
 
-// Deleting the business takes its services with it.
-check_same( 3, ServiceRepository::count(), 'services exist before the business is deleted' );
+// Deleting the business takes its services with it. The count is read rather
+// than fixed: the import section above adds one of its own.
+check( ServiceRepository::count() > 0, 'services exist before the business is deleted' );
 
 BusinessRepository::delete();
 
@@ -816,27 +1013,51 @@ if ( $admins ) {
 
 	$response = rest_do_request( $second );
 
-	check_same( 403, $response->get_status(), 'a second location is refused on the free plan' );
-	check_same(
-		'fhint_location_limit_reached',
-		$response->as_error()->get_error_code(),
-		'with the documented code, so the screen can explain it'
-	);
-	check_same( 1, LocationRepository::count(), 'and no row was written' );
+	// A business with branches is an ordinary small business, and importing
+	// its Google profiles creates one location each — so Free allows them.
+	check_same( 201, $response->get_status(), 'a second location is allowed' );
+	check_same( 2, LocationRepository::count(), 'and both rows are written' );
 
-	// Services allow five, so the sixth is the one that fails.
-	for ( $i = 1; $i <= 5; $i++ ) {
+	for ( $i = 1; $i <= 6; $i++ ) {
 		$request = new WP_REST_Request( 'POST', '/fhint/v1/services' );
 		$request->set_body_params( array( 'name' => 'Service ' . $i ) );
 
-		check_same( 201, rest_do_request( $request )->get_status(), "service {$i} of 5 is created" );
+		check_same( 201, rest_do_request( $request )->get_status(), "service {$i} is created" );
 	}
 
-	$sixth = new WP_REST_Request( 'POST', '/fhint/v1/services' );
-	$sixth->set_body_params( array( 'name' => 'Service 6' ) );
+	check( ServiceRepository::count() >= 6, 'services are not capped either' );
 
-	check_same( 403, rest_do_request( $sixth )->get_status(), 'the sixth service is refused' );
-	check_same( 5, ServiceRepository::count(), 'and the plan limit holds in the database' );
+	// The limits remain enforceable: a filter is still the way to cap them,
+	// which is what a Pro plan would use.
+	add_filter(
+		'fhint_limits',
+		static function ( $limits ) {
+			$limits['locations'] = 1;
+
+			return $limits;
+		}
+	);
+
+	$capped = new WP_REST_Request( 'POST', '/fhint/v1/locations' );
+	$capped->set_body_params(
+		array(
+			'name'           => 'Over The Cap',
+			'address_line_1' => '3 Third St',
+			'city'           => 'Austin',
+			'country'        => 'US',
+		)
+	);
+
+	$refused = rest_do_request( $capped );
+
+	check_same( 403, $refused->get_status(), 'a filtered limit still refuses' );
+	check_same(
+		'fhint_location_limit_reached',
+		$refused->as_error()->get_error_code(),
+		'with the documented code, so the screen can explain it'
+	);
+
+	$GLOBALS['wp_filter']['fhint_limits'] = new WP_Hook();
 
 	// Slugs are unique per business, derived from the name.
 	$slugs = array_map(

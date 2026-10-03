@@ -54,8 +54,33 @@ function fieldLabel(key) {
       return __("Description", "found-hint");
     case "hours":
       return __("Opening hours", "found-hint");
+    case "business_type":
+      return __("Business type", "found-hint");
+    case "social":
+      return __("Social profiles", "found-hint");
+    case "services":
+      return __("Services", "found-hint");
+    case "coordinates":
+      return __("Map position", "found-hint");
     default:
       return key;
+  }
+}
+
+/**
+ * What a tick changes: this location, or the business every location shares.
+ *
+ * Worth saying on a site with branches — importing a second shop's name
+ * would otherwise rename the whole business without warning.
+ */
+function scopeLabel(scope) {
+  switch (scope) {
+    case "business":
+      return __("Shared by all locations", "found-hint");
+    case "services":
+      return __("Added to your services", "found-hint");
+    default:
+      return __("This location", "found-hint");
   }
 }
 
@@ -79,11 +104,10 @@ export function ImportFromGoogle({ isConnected }) {
   const [profile, setProfile] = useState("");
 
   const profiles = overview?.google_locations ?? [];
-  // Nothing mapped yet is the ordinary first run: the profile is chosen here
-  // instead, and importing creates the location from it.
-  const needsChoice =
-    profiles.length > 1 &&
-    !profiles.some((candidate) => candidate.fhint_location_id > 0);
+  // Always offered once there is more than one profile, mapped or not: each
+  // profile is its own location, so "import" has to say which one. Only a
+  // single-profile site needs no question.
+  const needsChoice = profiles.length > 1;
 
   const onRead = async () => {
     try {
@@ -154,7 +178,7 @@ export function ImportFromGoogle({ isConnected }) {
       {needsChoice ? (
         <div className="fhint:mb-4 fhint:flex fhint:flex-wrap fhint:items-center fhint:gap-2.5">
           <span className="fhint:text-[13px] fhint:font-bold">
-            {__("Which profile is this site's business?", "found-hint")}
+            {__("Which profile are you importing?", "found-hint")}
           </span>
           <Select value={profile} onValueChange={setProfile}>
             <SelectTrigger className="fhint:min-w-[260px]">
@@ -202,10 +226,19 @@ export function ImportFromGoogle({ isConnected }) {
 
       {previewData ? (
         <div className="fhint:mt-5 fhint:flex fhint:flex-col fhint:gap-4">
+          {previewData.creates_business ? (
+            <p className="fhint:m-0 fhint:bg-notice fhint:px-3.5 fhint:py-2.5 fhint:text-[13px] fhint:text-notice-foreground">
+              {__(
+                "This site has no business details yet, so importing will create them from this profile.",
+                "found-hint",
+              )}
+            </p>
+          ) : null}
+
           {previewData.creates_location ? (
             <p className="fhint:m-0 fhint:bg-notice fhint:px-3.5 fhint:py-2.5 fhint:text-[13px] fhint:text-notice-foreground">
               {__(
-                "This site has no location yet, so importing will create one from Google's address and link it to this profile.",
+                "Importing will create a location from this profile's address and link the two, so a later import updates it rather than adding another.",
                 "found-hint",
               )}
             </p>
@@ -258,6 +291,9 @@ export function ImportFromGoogle({ isConnected }) {
                         >
                           {fieldLabel(field.key)}
                         </label>
+                        <span className="fhint:mt-0.5 fhint:block fhint:text-[11.5px] fhint:font-normal fhint:text-muted-strong">
+                          {scopeLabel(field.scope)}
+                        </span>
                         {field.differs ? (
                           <span className="fhint:mt-0.5 fhint:block fhint:text-[12px] fhint:font-bold fhint:text-notice-foreground">
                             {__("Different here", "found-hint")}

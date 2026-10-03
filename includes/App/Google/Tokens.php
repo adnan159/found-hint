@@ -7,6 +7,7 @@
 
 namespace FHINT\App\Google;
 
+use FHINT\App\Core\Logger;
 use FHINT\App\Core\Secrets;
 
 defined( 'ABSPATH' ) || exit;
@@ -170,6 +171,20 @@ class Tokens {
 	 * @return void
 	 */
 	private static function write( array $record ) {
+		// A host without libsodium stores these as they are. That is better
+		// than refusing to connect, but it must not pass unnoticed: the
+		// difference is invisible on screen and in every backup.
+		if ( ! Secrets::available() && ! get_option( 'fhint_encryption_unavailable' ) ) {
+			update_option( 'fhint_encryption_unavailable', time(), false );
+
+			Logger::log(
+				Logger::WARNING,
+				'google',
+				'google.tokens_unencrypted',
+				__( 'This server has no libsodium, so Google tokens are stored without encryption.', 'found-hint' )
+			);
+		}
+
 		$record['access_token']  = Secrets::encrypt( $record['access_token'] );
 		$record['refresh_token'] = Secrets::encrypt( $record['refresh_token'] );
 

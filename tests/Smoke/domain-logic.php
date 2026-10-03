@@ -302,13 +302,16 @@ check( isset( $svc->errors()['currency'] ), 'a non-ISO currency is rejected' );
 
 // -- Limits ----------------------------------------------------------------
 
-check_same( 1, Limits::get( Limits::LOCATIONS ), 'free allows one location' );
-check_same( 5, Limits::get( Limits::SERVICES ), 'free allows five services' );
+// A business with branches is an ordinary small business, and importing its
+// Google profiles creates a location each, so neither is capped. 0 is
+// unlimited.
+check_same( 0, Limits::get( Limits::LOCATIONS ), 'locations are not capped' );
+check_same( 0, Limits::get( Limits::SERVICES ), 'and neither are services' );
 check( Limits::can_add( Limits::LOCATIONS, 0 ), 'the first location is allowed' );
-check( ! Limits::can_add( Limits::LOCATIONS, 1 ), 'a second location is refused' );
+check( Limits::can_add( Limits::LOCATIONS, 50 ), 'and so is the fifty-first' );
 
-// Raising a limit must be a filter, not a code change — this is what stops a
-// Pro tier having to rewrite core.
+// Capping is still a filter, not a code change — which is what lets a plan
+// impose one without rewriting core.
 add_filter(
 	'fhint_limits',
 	static function ( $limits ) {
@@ -316,8 +319,8 @@ add_filter(
 		return $limits;
 	}
 );
-check_same( 5, Limits::get( Limits::LOCATIONS ), 'the limits filter raises the ceiling' );
-check( Limits::can_add( Limits::LOCATIONS, 1 ), 'a second location is allowed once filtered' );
+check_same( 5, Limits::get( Limits::LOCATIONS ), 'the limits filter can impose a ceiling' );
+check( ! Limits::can_add( Limits::LOCATIONS, 5 ), 'which is then enforced' );
 
 $report = Limits::report( Limits::LOCATIONS, 2 );
 check_same( 3, $report['remaining'], 'the limit report counts what is left' );

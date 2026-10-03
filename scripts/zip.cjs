@@ -53,7 +53,10 @@ function createZip() {
     archive.on("error", (err) => reject(err));
 
     archive.pipe(output);
-    archive.directory(buildDir + "/", false);
+    // Nested under the plugin's own folder: WordPress installs a zip by
+    // unpacking it into wp-content/plugins, so a flat archive scatters the
+    // plugin across that directory instead of installing it.
+    archive.directory(buildDir + "/", "found-hint");
     archive.finalize();
   });
 }

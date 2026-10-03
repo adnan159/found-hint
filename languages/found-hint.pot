@@ -1,0 +1,2498 @@
+# Copyright (C) 2026 FoundHint
+# This file is distributed under the GPL-2.0-or-later license.
+msgid ""
+msgstr ""
+"Project-Id-Version: FoundHint\n"
+"Report-Msgid-Bugs-To: https://foundhint.com/\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Domain: found-hint\n"
+
+#: includes/API/AbstractController.php:47
+msgid "You must be logged in to do that."
+msgstr ""
+
+#: includes/API/AbstractController.php:55 includes/App/Google/Connection.php:186
+msgid "You do not have permission to manage this."
+msgstr ""
+
+#: includes/API/AbstractController.php:97
+msgid "Some of the submitted values are not valid."
+msgstr ""
+
+#: includes/API/AbstractController.php:113
+msgid "Create the business profile first."
+msgstr ""
+
+#: includes/API/AbstractController.php:127
+msgid "That item could not be found."
+msgstr ""
+
+#: includes/API/AbstractController.php:140
+msgid "The changes could not be saved."
+msgstr ""
+
+#: includes/API/AbstractController.php:157
+msgid "This plan allows up to %d of these."
+msgstr ""
+
+#: includes/API/Audits.php:200
+msgid "This one has to be done by hand."
+msgstr ""
+
+#: includes/API/Google.php:281
+msgid "Both the client id and the client secret are needed."
+msgstr ""
+
+#: includes/API/Services.php:283
+msgid "None of those services belong to this business."
+msgstr ""
+
+#: includes/Admin/Menu.php:55 includes/Admin/Menu.php:56 src/admin/components/PageHeader.jsx:27 src/admin/layouts/root/components/Sidebar.jsx:303 src/admin/layouts/root/components/Sidebar.jsx:319 src/admin/pages/setup/components/WizardShell.jsx:44
+msgid "FoundHint"
+msgstr ""
+
+#: includes/Admin.php:42 src/admin/layouts/root/components/Sidebar.jsx:100 src/admin/pages/settings/index.jsx:87 src/admin/pages/settings/index.jsx:96
+msgid "Settings"
+msgstr ""
+
+#: includes/App/Audit/Fixes/FixRunner.php:78
+msgid "There is no automatic fix for that."
+msgstr ""
+
+#: includes/App/Audit/Fixes/FixRunner.php:96
+msgid "Applied the fix \"%s\"."
+msgstr ""
+
+#: includes/App/Audit/Fixes/FixRunner.php:120
+msgid "There is no website address to correct."
+msgstr ""
+
+#: includes/App/Audit/Fixes/FixRunner.php:136
+msgid "That address is not a plain http one, so it was left alone."
+msgstr ""
+
+#: includes/App/Audit/Fixes/FixRunner.php:173
+msgid "This site has no address to use."
+msgstr ""
+
+#: includes/App/Audit/Fixes/FixRunner.php:205
+msgid "There are no locations to mark."
+msgstr ""
+
+#: includes/App/Audit/Fixes/FixRunner.php:237
+msgid "Several locations exist and none is marked as the main one. Choose which represents the business."
+msgstr ""
+
+#: includes/App/Audit/Rules/BusinessDescription.php:70 src/admin/lib/errors.js:115
+msgid "No description."
+msgstr ""
+
+#: includes/App/Audit/Rules/BusinessDescription.php:71
+msgid "Your description is very short."
+msgstr ""
+
+#: includes/App/Audit/Rules/BusinessDescription.php:72
+msgid "Describe what you do in a sentence or two."
+msgstr ""
+
+#: includes/App/Audit/Rules/BusinessLogo.php:62 src/admin/lib/errors.js:114
+msgid "No logo."
+msgstr ""
+
+#: includes/App/Audit/Rules/BusinessLogo.php:63
+msgid "Add a logo — it is published in your structured data and used in some search results."
+msgstr ""
+
+#: includes/App/Audit/Rules/BusinessName.php:71
+msgid "Your business has no name."
+msgstr ""
+
+#: includes/App/Audit/Rules/BusinessName.php:72
+msgid "Add the name customers know you by on the Business screen."
+msgstr ""
+
+#: includes/App/Audit/Rules/BusinessPhone.php:71 src/admin/lib/errors.js:112
+msgid "No phone number."
+msgstr ""
+
+#: includes/App/Audit/Rules/BusinessPhone.php:72
+msgid "Add a phone number — it is the first thing people look for on a local result."
+msgstr ""
+
+#: includes/App/Audit/Rules/BusinessServices.php:62
+msgid "No services listed."
+msgstr ""
+
+#: includes/App/Audit/Rules/BusinessServices.php:63
+msgid "Add the things people actually come to you for. They are published as part of your structured data."
+msgstr ""
+
+#: includes/App/Audit/Rules/BusinessType.php:64
+msgid "Your business type is generic."
+msgstr ""
+
+#: includes/App/Audit/Rules/BusinessType.php:65
+msgid "Choose the most specific type that fits — \"Dentist\" tells a search engine far more than \"Local business\"."
+msgstr ""
+
+#: includes/App/Audit/Rules/GoogleConnected.php:79
+msgid "Your Google connection is missing permission to manage the profile."
+msgstr ""
+
+#: includes/App/Audit/Rules/GoogleConnected.php:80
+msgid "Connect again and accept all the requested permissions."
+msgstr ""
+
+#: includes/App/Audit/Rules/GoogleConnected.php:85
+msgid "No Google Business Profile connected."
+msgstr ""
+
+#: includes/App/Audit/Rules/GoogleConnected.php:86
+msgid "Connect one to see how Google shows your business today."
+msgstr ""
+
+#: includes/App/Audit/Rules/GoogleMapped.php:73
+msgid "This location is not linked to a Google profile."
+msgstr ""
+
+#: includes/App/Audit/Rules/GoogleMapped.php:74
+msgid "Link it on the Google screen so the two can be compared."
+msgstr ""
+
+#: includes/App/Audit/Rules/GoogleNameMatches.php:91
+msgid "Your business name does not match your Google profile."
+msgstr ""
+
+#: includes/App/Audit/Rules/GoogleNameMatches.php:92
+msgid "Make them identical. The same business described two ways is what search engines treat as two businesses."
+msgstr ""
+
+#: includes/App/Audit/Rules/GooglePhoneMatches.php:88
+msgid "Your phone number does not match your Google profile."
+msgstr ""
+
+#: includes/App/Audit/Rules/GooglePhoneMatches.php:89
+msgid "Use the same number in both places."
+msgstr ""
+
+#: includes/App/Audit/Rules/HoursComplete.php:88
+msgid "Set every day to open or closed. A day left blank publishes nothing, which is not the same as saying you are shut."
+msgstr ""
+
+#: includes/App/Audit/Rules/HoursComplete.php:85
+msgid "%d day has no answer."
+msgid_plural "%d days have no answer."
+msgstr[0] ""
+msgstr[1] ""
+
+#: includes/App/Audit/Rules/HoursSet.php:79 src/admin/lib/errors.js:117
+msgid "No opening hours set."
+msgstr ""
+
+#: includes/App/Audit/Rules/HoursSet.php:80
+msgid "Fill in the week. \"When are they open?\" is the question a local search is usually answering."
+msgstr ""
+
+#: includes/App/Audit/Rules/LocationAddress.php:68
+msgid "No location."
+msgstr ""
+
+#: includes/App/Audit/Rules/LocationAddress.php:69
+msgid "Add the address customers visit. Without it there is nothing to put on a map."
+msgstr ""
+
+#: includes/App/Audit/Rules/LocationAddress.php:86
+msgid "The address is incomplete."
+msgstr ""
+
+#: includes/App/Audit/Rules/LocationAddress.php:87
+msgid "A street, a city and a country are the minimum a search engine needs."
+msgstr ""
+
+#: includes/App/Audit/Rules/LocationCoordinates.php:66 src/admin/lib/errors.js:116
+msgid "No map coordinates."
+msgstr ""
+
+#: includes/App/Audit/Rules/LocationCoordinates.php:67
+msgid "Add a latitude and longitude so you can be placed precisely rather than approximately."
+msgstr ""
+
+#: includes/App/Audit/Rules/LocationPrimary.php:88
+msgid "No location is marked as the main one."
+msgstr ""
+
+#: includes/App/Audit/Rules/LocationPrimary.php:89
+msgid "More than one location is marked as the main one."
+msgstr ""
+
+#: includes/App/Audit/Rules/LocationPrimary.php:90
+msgid "Mark exactly one location as primary — it is the one published when a single place is needed."
+msgstr ""
+
+#: includes/App/Audit/Rules/LocationStatus.php:68
+msgid "This location is not marked as open."
+msgstr ""
+
+#: includes/App/Audit/Rules/LocationStatus.php:69
+msgid "While it is closed or inactive, less of your information is published."
+msgstr ""
+
+#: includes/App/Audit/Rules/SchemaConflict.php:107
+msgid "%s may also be publishing local business markup."
+msgstr ""
+
+#: includes/App/Audit/Rules/SchemaConflict.php:110
+msgid "Two descriptions of one business on a page compete. View your page source, then decide who publishes it on the Schema screen."
+msgstr ""
+
+#: includes/App/Audit/Rules/SchemaHours.php:68
+msgid "Your published markup carries no opening hours."
+msgstr ""
+
+#: includes/App/Audit/Rules/SchemaHours.php:69
+msgid "Set the week on the location, and make sure the location is marked open."
+msgstr ""
+
+#: includes/App/Audit/Rules/SchemaPublished.php:77
+msgid "No structured data is being published."
+msgstr ""
+
+#: includes/App/Audit/Rules/SchemaPublished.php:78
+msgid "Check the Schema screen — something is either missing or another plugin has been given the job."
+msgstr ""
+
+#: includes/App/Audit/Rules/SocialProfiles.php:66
+msgid "No social profiles."
+msgstr ""
+
+#: includes/App/Audit/Rules/SocialProfiles.php:67
+msgid "Add at least one. They are published as corroborating links for the same business."
+msgstr ""
+
+#: includes/App/Audit/Rules/WebsiteAddress.php:70 src/admin/lib/errors.js:113
+msgid "No website address."
+msgstr ""
+
+#: includes/App/Audit/Rules/WebsiteAddress.php:71
+msgid "Add your website so it can be published with your business details."
+msgstr ""
+
+#: includes/App/Audit/Rules/WebsiteSecure.php:73
+msgid "Your website address is not secure."
+msgstr ""
+
+#: includes/App/Audit/Rules/WebsiteSecure.php:74
+msgid "Use the https:// version of the address."
+msgstr ""
+
+#: includes/App/Audit/Runner.php:49
+msgid "Add your business details before running an audit."
+msgstr ""
+
+#: includes/App/Audit/Runner.php:64
+msgid "The audit could not be started."
+msgstr ""
+
+#: includes/App/Audit/Runner.php:95
+msgid "Audit scored %1$d with %2$d findings."
+msgstr ""
+
+#: includes/App/Audit/Runner.php:111
+msgid "The audit did not finish."
+msgstr ""
+
+#: includes/App/Audit/Runner.php:137
+msgid "The check \"%s\" could not run."
+msgstr ""
+
+#: includes/App/Audit/Runner.php:140
+msgid "This is a fault in the check itself, not in your business details."
+msgstr ""
+
+#: includes/App/Google/Client.php:105 includes/App/Google/OAuth.php:281
+msgid "Google could not be reached. Please try again."
+msgstr ""
+
+#: includes/App/Google/Client.php:146
+msgid "Google refused the request. The Business Profile APIs have to be enabled for your Google Cloud project, and Google has to approve your project for them before they return anything."
+msgstr ""
+
+#: includes/App/Google/Client.php:154
+msgid "Google rejected the sign-in. Connect again."
+msgstr ""
+
+#: includes/App/Google/Client.php:161
+msgid "Google refused the request."
+msgstr ""
+
+#: includes/App/Google/Client.php:186
+msgid "Google has granted this project no quota for the Business Profile APIs, which means it has not been approved for them yet. Approval is a separate request to Google — waiting will not change this."
+msgstr ""
+
+#: includes/App/Google/Client.php:190
+msgid "Google is rate limiting this project. Wait a few minutes and try again."
+msgstr ""
+
+#: includes/App/Google/Client.php:193
+msgid "Google refused the request as over quota. On a new project this normally means Google has not approved it for the Business Profile APIs yet; on an approved one it means too many requests just now."
+msgstr ""
+
+#: includes/App/Google/ConnectService.php:132
+msgid "No connect service is configured for this site."
+msgstr ""
+
+#: includes/App/Google/ConnectService.php:159
+msgid "The connect service did not start a sign-in. Please try again."
+msgstr ""
+
+#: includes/App/Google/ConnectService.php:198
+msgid "That sign-in has expired. Start again from this screen."
+msgstr ""
+
+#: includes/App/Google/ConnectService.php:206
+msgid "That sign-in does not match the one this site started."
+msgstr ""
+
+#: includes/App/Google/ConnectService.php:217
+msgid "This sign-in was started by a different user."
+msgstr ""
+
+#: includes/App/Google/ConnectService.php:238
+msgid "The connect service returned no access token."
+msgstr ""
+
+#: includes/App/Google/ConnectService.php:260
+msgid "There is no refresh token to renew."
+msgstr ""
+
+#: includes/App/Google/ConnectService.php:291
+msgid "FoundHint\\'s connect service could not be reached. Please try again in a moment."
+msgstr ""
+
+#: includes/App/Google/ConnectService.php:329
+msgid "Google has withdrawn this connection. Connect again."
+msgstr ""
+
+#: includes/App/Google/ConnectService.php:331
+msgid "FoundHint\\'s connect service is busy. Try again in a minute."
+msgstr ""
+
+#: includes/App/Google/ConnectService.php:333
+msgid "That sign-in has already been completed or has expired. Start again."
+msgstr ""
+
+#: includes/App/Google/ConnectService.php:338
+msgid "The connect service refused this site\\'s return address. Check the site address in Settings → General."
+msgstr ""
+
+#: includes/App/Google/ConnectService.php:340
+msgid "The connect service needs this site to be served over https before it can connect."
+msgstr ""
+
+#: includes/App/Google/ConnectService.php:347
+msgid "FoundHint\\'s connect service refused the request."
+msgstr ""
+
+#: includes/App/Google/Connection.php:87
+msgid "Google\\'s return reached this site carrying: %s"
+msgstr ""
+
+#: includes/App/Google/Connection.php:201 includes/App/Google/Connection.php:215
+msgid "Access was declined on the Google consent screen. Nothing has changed."
+msgstr ""
+
+#: includes/App/Google/Connection.php:202
+msgid "The sign-in did not complete. Please try again."
+msgstr ""
+
+#: includes/App/Google/Connection.php:229
+msgid "Google did not return an authorization code."
+msgstr ""
+
+#: includes/App/Google/Connection.php:252 includes/App/Google/Connection.php:389
+msgid "Connected to Google Business Profile."
+msgstr ""
+
+#: includes/App/Google/Connection.php:289
+msgid "Disconnected from Google Business Profile."
+msgstr ""
+
+#: includes/App/Google/Connection.php:290
+msgid "Disconnected locally; Google did not confirm the revocation."
+msgstr ""
+
+#: includes/App/Google/Connection.php:311
+msgid "Connect your Google account first."
+msgstr ""
+
+#: includes/App/Google/Connection.php:341
+msgid "Google rejected the stored grant; the connection was cleared."
+msgstr ""
+
+#: includes/App/Google/Import.php:195
+msgid "That Google profile is not one this site has read. Read your profiles again."
+msgstr ""
+
+#: includes/App/Google/Import.php:208
+msgid "Read your Google profiles first, under Business profiles."
+msgstr ""
+
+#: includes/App/Google/Import.php:225
+msgid "Choose which Google profile to import from."
+msgstr ""
+
+#: includes/App/Google/Import.php:276
+msgid "Google holds no business name for this profile, so there is nothing to create a business from."
+msgstr ""
+
+#: includes/App/Google/Import.php:286
+msgid "The business could not be created."
+msgstr ""
+
+#: includes/App/Google/Import.php:315
+msgid "Google holds no address for this profile, so there is nothing to create a location from."
+msgstr ""
+
+#: includes/App/Google/Import.php:346
+msgid "The location could not be created from Google\\'s address."
+msgstr ""
+
+#: includes/App/Google/Import.php:582
+msgid "Already set"
+msgstr ""
+
+#: includes/App/Google/Import.php:613
+msgid "%1$d from Google: %2$s"
+msgstr ""
+
+#: includes/App/Google/Import.php:649
+msgid "%1$s → %2$s"
+msgstr ""
+
+#: includes/App/Google/Import.php:826
+msgid "%1$d days with hours, %2$d closed"
+msgstr ""
+
+#: includes/App/Google/Import.php:623 src/admin/layouts/root/index.jsx:38
+msgid "%d service"
+msgid_plural "%d services"
+msgstr[0] ""
+msgstr[1] ""
+
+#: includes/App/Google/Mapping.php:83
+msgid "That location could not be found."
+msgstr ""
+
+#: includes/App/Google/Mapping.php:91
+msgid "That Google location is not in the last read from Google. Refresh and try again."
+msgstr ""
+
+#: includes/App/Google/Mapping.php:106
+msgid "Mapped %1$s to location #%2$d."
+msgstr ""
+
+#: includes/App/Google/Mapping.php:131
+msgid "Unmapped %s."
+msgstr ""
+
+#: includes/App/Google/OAuth.php:91
+msgid "Add your Google client id and secret first."
+msgstr ""
+
+#: includes/App/Google/OAuth.php:147
+msgid "That sign-in could not be verified."
+msgstr ""
+
+#: includes/App/Google/OAuth.php:156
+msgid "That sign-in could not be verified. Please try connecting again."
+msgstr ""
+
+#: includes/App/Google/OAuth.php:160
+msgid "That sign-in was started by a different user."
+msgstr ""
+
+#: includes/App/Google/OAuth.php:228
+msgid "Google would not confirm the disconnection."
+msgstr ""
+
+#: includes/App/Google/OAuth.php:308
+msgid "Google did not return an access token."
+msgstr ""
+
+#: includes/App/Google/OAuth.php:325
+msgid "Google did not recognise the client id or secret. Check both, then try again."
+msgstr ""
+
+#: includes/App/Google/OAuth.php:327
+msgid "Google has expired or withdrawn this connection. Connect again to restore it."
+msgstr ""
+
+#: includes/App/Google/OAuth.php:329
+msgid "The redirect URI does not match the one registered in Google Cloud. Copy it from this screen exactly."
+msgstr ""
+
+#: includes/App/Google/OAuth.php:331
+msgid "Access was declined on the Google consent screen."
+msgstr ""
+
+#: includes/App/Google/OAuth.php:333
+msgid "Google refused the request. Please try connecting again."
+msgstr ""
+
+#: includes/App/Google/Profiles.php:97 src/admin/pages/google/components/BusinessProfiles.jsx:49
+msgid "Read %1$s across %2$s."
+msgstr ""
+
+#: includes/App/Google/Profiles.php:100 src/admin/layouts/root/index.jsx:33 src/admin/pages/google/components/BusinessProfiles.jsx:52
+msgid "%d location"
+msgid_plural "%d locations"
+msgstr[0] ""
+msgstr[1] ""
+
+#: includes/App/Google/Profiles.php:105 src/admin/pages/google/components/BusinessProfiles.jsx:57
+msgid "%d account"
+msgid_plural "%d accounts"
+msgstr[0] ""
+msgstr[1] ""
+
+#: includes/App/Google/Tokens.php:184
+msgid "This server has no libsodium, so Google tokens are stored without encryption."
+msgstr ""
+
+#: src/admin/components/GoogleSignInButton.jsx:47 src/admin/pages/google/index.jsx:576
+msgid "Continue with Google"
+msgstr ""
+
+#: src/admin/components/RequestError.jsx:20
+msgid "That did not save"
+msgstr ""
+
+#: src/admin/layouts/root/components/Sidebar.jsx:32 src/admin/pages/dashboard/index.jsx:117 src/admin/pages/dashboard/index.jsx:142
+msgid "Dashboard"
+msgstr ""
+
+#: src/admin/layouts/root/components/Sidebar.jsx:37 src/admin/pages/setup/components/WizardShell.jsx:47
+msgid "Setup"
+msgstr ""
+
+#: src/admin/layouts/root/components/Sidebar.jsx:40 src/admin/pages/audit/index.jsx:39 src/admin/pages/business/index.jsx:132 src/admin/pages/dashboard/index.jsx:247 src/admin/pages/setup/index.jsx:70
+msgid "Business"
+msgstr ""
+
+#: src/admin/layouts/root/components/Sidebar.jsx:44 src/admin/pages/business/index.jsx:147 src/admin/pages/setup/components/DoneStep.jsx:6
+msgid "Business details"
+msgstr ""
+
+#: src/admin/layouts/root/components/Sidebar.jsx:46 src/admin/pages/business/index.jsx:281 src/admin/pages/locations/detail.jsx:346
+msgid "Contact"
+msgstr ""
+
+#: src/admin/layouts/root/components/Sidebar.jsx:49 src/admin/pages/business/index.jsx:337
+msgid "Presentation"
+msgstr ""
+
+#: src/admin/layouts/root/components/Sidebar.jsx:53 src/admin/pages/business/index.jsx:393 src/admin/pages/google/components/ImportFromGoogle.jsx:60
+msgid "Social profiles"
+msgstr ""
+
+#: src/admin/layouts/root/components/Sidebar.jsx:57 src/admin/pages/dashboard/index.jsx:261 src/admin/pages/locations/index.jsx:53 src/admin/pages/locations/index.jsx:82
+msgid "Locations"
+msgstr ""
+
+#: src/admin/layouts/root/components/Sidebar.jsx:58 src/admin/pages/dashboard/index.jsx:271 src/admin/pages/google/components/ImportFromGoogle.jsx:62 src/admin/pages/services/index.jsx:124 src/admin/pages/setup/components/DoneStep.jsx:9 src/admin/pages/setup/index.jsx:73
+msgid "Services"
+msgstr ""
+
+#: src/admin/layouts/root/components/Sidebar.jsx:61 src/admin/pages/audit/index.jsx:42 src/admin/pages/schema/index.jsx:122 src/admin/pages/schema/index.jsx:149
+msgid "Schema"
+msgstr ""
+
+#: src/admin/layouts/root/components/Sidebar.jsx:63 src/admin/pages/schema/index.jsx:162
+msgid "Who publishes it"
+msgstr ""
+
+#: src/admin/layouts/root/components/Sidebar.jsx:66 src/admin/pages/schema/index.jsx:261
+msgid "What gets published"
+msgstr ""
+
+#: src/admin/layouts/root/components/Sidebar.jsx:72 src/admin/pages/audit/index.jsx:157 src/admin/pages/audit/index.jsx:220 src/admin/pages/audit/index.jsx:238
+msgid "SEO audit"
+msgstr ""
+
+#: src/admin/layouts/root/components/Sidebar.jsx:74 src/admin/pages/audit/index.jsx:260
+msgid "Score"
+msgstr ""
+
+#: src/admin/layouts/root/components/Sidebar.jsx:75 src/admin/pages/audit/index.jsx:306
+msgid "What to fix"
+msgstr ""
+
+#: src/admin/layouts/root/components/Sidebar.jsx:80
+msgid "Google"
+msgstr ""
+
+#: src/admin/layouts/root/components/Sidebar.jsx:82 src/admin/pages/google/index.jsx:417
+msgid "Google client"
+msgstr ""
+
+#: src/admin/layouts/root/components/Sidebar.jsx:83 src/admin/pages/google/index.jsx:528
+msgid "Connection"
+msgstr ""
+
+#: src/admin/layouts/root/components/Sidebar.jsx:86 src/admin/pages/google/components/BusinessProfiles.jsx:104
+msgid "Business profiles"
+msgstr ""
+
+#: src/admin/layouts/root/components/Sidebar.jsx:90 src/admin/pages/google/components/LocationMapping.jsx:173
+msgid "Location mapping"
+msgstr ""
+
+#: src/admin/layouts/root/components/Sidebar.jsx:94 src/admin/pages/google/components/ImportFromGoogle.jsx:170
+msgid "Import from Google"
+msgstr ""
+
+#: src/admin/layouts/root/components/Sidebar.jsx:102 src/admin/pages/settings/index.jsx:108
+msgid "Your data"
+msgstr ""
+
+#: src/admin/layouts/root/components/Sidebar.jsx:103 src/admin/pages/settings/index.jsx:145
+msgid "Activity log"
+msgstr ""
+
+#: src/admin/layouts/root/components/Sidebar.jsx:104 src/admin/pages/settings/index.jsx:228
+msgid "System"
+msgstr ""
+
+#: src/admin/layouts/root/components/Sidebar.jsx:264
+msgid "Collapse section list"
+msgstr ""
+
+#: src/admin/layouts/root/components/Sidebar.jsx:265
+msgid "Expand section list"
+msgstr ""
+
+#: src/admin/layouts/root/components/Sidebar.jsx:322
+msgid "Local SEO"
+msgstr ""
+
+#: src/admin/layouts/root/components/Sidebar.jsx:352
+msgid "FoundHint Free"
+msgstr ""
+
+#: src/admin/layouts/root/index.jsx:28
+msgid "%d business"
+msgid_plural "%d businesses"
+msgstr[0] ""
+msgstr[1] ""
+
+#: src/admin/lib/errors.js:14
+msgid "Enter the name customers know you by."
+msgstr ""
+
+#: src/admin/lib/errors.js:16 src/admin/lib/errors.js:42 src/admin/lib/errors.js:76
+msgid "That name is too long — 255 characters at most."
+msgstr ""
+
+#: src/admin/lib/errors.js:18
+msgid "That legal name is too long — 255 characters at most."
+msgstr ""
+
+#: src/admin/lib/errors.js:20
+msgid "Choose a business type from the list."
+msgstr ""
+
+#: src/admin/lib/errors.js:22
+msgid "That category is too long — 150 characters at most."
+msgstr ""
+
+#: src/admin/lib/errors.js:24 src/admin/lib/errors.js:52
+msgid "That does not look like an email address."
+msgstr ""
+
+#: src/admin/lib/errors.js:26 src/admin/lib/errors.js:54
+msgid "That does not look like a phone number."
+msgstr ""
+
+#: src/admin/lib/errors.js:28 src/admin/lib/errors.js:56 src/admin/lib/errors.js:89
+msgid "Enter a full web address, starting with https://"
+msgstr ""
+
+#: src/admin/lib/errors.js:30 src/admin/lib/errors.js:91
+msgid "Enter a full image address, starting with https://"
+msgstr ""
+
+#: src/admin/lib/errors.js:32
+msgid "Keep the price range short, like $$."
+msgstr ""
+
+#: src/admin/lib/errors.js:34
+msgid "Enter a real date in YYYY-MM-DD form."
+msgstr ""
+
+#: src/admin/lib/errors.js:36
+msgid "Enter the full profile address, starting with https://"
+msgstr ""
+
+#: src/admin/lib/errors.js:40
+msgid "Give this location a name, such as Downtown."
+msgstr ""
+
+#: src/admin/lib/errors.js:44
+msgid "That is too long — 255 characters at most."
+msgstr ""
+
+#: src/admin/lib/errors.js:46
+msgid "Use a two-letter country code, such as US or BD."
+msgstr ""
+
+#: src/admin/lib/errors.js:48
+msgid "Latitude must be between -90 and 90."
+msgstr ""
+
+#: src/admin/lib/errors.js:50
+msgid "Longitude must be between -180 and 180."
+msgstr ""
+
+#: src/admin/lib/errors.js:58
+msgid "Choose a time zone from the list."
+msgstr ""
+
+#: src/admin/lib/errors.js:60 src/admin/lib/errors.js:93
+msgid "Choose a status from the list."
+msgstr ""
+
+#: src/admin/lib/errors.js:63
+msgid "That is not a valid day."
+msgstr ""
+
+#: src/admin/lib/errors.js:65
+msgid "Add an opening time, or mark the day closed."
+msgstr ""
+
+#: src/admin/lib/errors.js:67
+msgid "Add a closing time, or mark the day closed."
+msgstr ""
+
+#: src/admin/lib/errors.js:69
+msgid "Opening and closing time cannot be the same."
+msgstr ""
+
+#: src/admin/lib/errors.js:71
+msgid "These times overlap each other."
+msgstr ""
+
+#: src/admin/lib/errors.js:74
+msgid "Give this service a name."
+msgstr ""
+
+#: src/admin/lib/errors.js:78
+msgid "A service needs a URL slug."
+msgstr ""
+
+#: src/admin/lib/errors.js:80
+msgid "That slug is too long — 200 characters at most."
+msgstr ""
+
+#: src/admin/lib/errors.js:81
+msgid "Enter a number."
+msgstr ""
+
+#: src/admin/lib/errors.js:83
+msgid "A price cannot be negative."
+msgstr ""
+
+#: src/admin/lib/errors.js:85
+msgid "Choose a currency for this price."
+msgstr ""
+
+#: src/admin/lib/errors.js:87
+msgid "Use a three-letter currency code, such as USD."
+msgstr ""
+
+#: src/admin/lib/errors.js:98
+msgid "Add your business details before publishing markup."
+msgstr ""
+
+#: src/admin/lib/errors.js:100
+msgid "Add a location before publishing markup."
+msgstr ""
+
+#: src/admin/lib/errors.js:101
+msgid "A business name is required."
+msgstr ""
+
+#: src/admin/lib/errors.js:103
+msgid "The address needs a street, a city and a country at least."
+msgstr ""
+
+#: src/admin/lib/errors.js:108
+msgid "This location is marked permanently closed, so nothing is published for it."
+msgstr ""
+
+#: src/admin/lib/errors.js:182
+msgid "Your session has expired. Reload the page and sign in."
+msgstr ""
+
+#: src/admin/lib/errors.js:187
+msgid "You do not have permission to change this."
+msgstr ""
+
+#: src/admin/lib/errors.js:189
+msgid "Add your business details first."
+msgstr ""
+
+#: src/admin/lib/errors.js:191
+msgid "That location no longer exists."
+msgstr ""
+
+#: src/admin/lib/errors.js:193
+msgid "That service no longer exists."
+msgstr ""
+
+#: src/admin/lib/errors.js:195
+msgid "The changes could not be saved. Try again."
+msgstr ""
+
+#: src/admin/lib/errors.js:196
+msgid "Nothing to reorder."
+msgstr ""
+
+#: src/admin/lib/errors.js:198
+msgid "Check the highlighted fields and try again."
+msgstr ""
+
+#: src/admin/lib/errors.js:208
+msgid "Your plan includes %d location."
+msgstr ""
+
+#: src/admin/lib/errors.js:216
+msgid "Your plan includes %d services."
+msgstr ""
+
+#: src/admin/lib/errors.js:222
+msgid "Something went wrong. Try again."
+msgstr ""
+
+#: src/admin/pages/audit/index.jsx:32 src/admin/pages/dashboard/components/ScoreCard.jsx:29
+msgid "Needs work"
+msgstr ""
+
+#: src/admin/pages/audit/index.jsx:33 src/admin/pages/dashboard/components/ScoreCard.jsx:34
+msgid "Fair"
+msgstr ""
+
+#: src/admin/pages/audit/index.jsx:34 src/admin/pages/dashboard/components/ScoreCard.jsx:39
+msgid "Good"
+msgstr ""
+
+#: src/admin/pages/audit/index.jsx:35 src/admin/pages/dashboard/components/ScoreCard.jsx:44
+msgid "Excellent"
+msgstr ""
+
+#: src/admin/pages/audit/index.jsx:40 src/admin/pages/locations/detail.jsx:182 src/admin/pages/locations/index.jsx:134
+msgid "Location"
+msgstr ""
+
+#: src/admin/pages/audit/index.jsx:41 src/admin/pages/locations/index.jsx:136 src/admin/pages/setup/index.jsx:72
+msgid "Hours"
+msgstr ""
+
+#: src/admin/pages/audit/index.jsx:43 src/admin/pages/business/index.jsx:318 src/admin/pages/google/components/ImportFromGoogle.jsx:52 src/admin/pages/locations/detail.jsx:383 src/admin/pages/setup/components/BusinessStep.jsx:175
+msgid "Website"
+msgstr ""
+
+#: src/admin/pages/audit/index.jsx:44
+msgid "Technical"
+msgstr ""
+
+#: src/admin/pages/audit/index.jsx:48
+msgid "Critical"
+msgstr ""
+
+#: src/admin/pages/audit/index.jsx:49
+msgid "High"
+msgstr ""
+
+#: src/admin/pages/audit/index.jsx:50
+msgid "Medium"
+msgstr ""
+
+#: src/admin/pages/audit/index.jsx:51
+msgid "Low"
+msgstr ""
+
+#: src/admin/pages/audit/index.jsx:68
+msgid "Nothing to fix"
+msgstr ""
+
+#: src/admin/pages/audit/index.jsx:70
+msgid "Every check passed on the last run."
+msgstr ""
+
+#: src/admin/pages/audit/index.jsx:105
+msgid "Here: %1$s · Google: %2$s"
+msgstr ""
+
+#: src/admin/pages/audit/index.jsx:125
+msgid "Fix this"
+msgstr ""
+
+#: src/admin/pages/audit/index.jsx:134
+msgid "Ignore"
+msgstr ""
+
+#: src/admin/pages/audit/index.jsx:169
+msgid "Audit finished."
+msgstr ""
+
+#: src/admin/pages/audit/index.jsx:183
+msgid "Fixed, and the score has been recalculated."
+msgstr ""
+
+#: src/admin/pages/audit/index.jsx:184
+msgid "There was nothing left to change."
+msgstr ""
+
+#: src/admin/pages/audit/index.jsx:187
+msgid "That could not be fixed automatically."
+msgstr ""
+
+#: src/admin/pages/audit/index.jsx:198
+msgid "Ignored."
+msgstr ""
+
+#: src/admin/pages/audit/index.jsx:200
+msgid "Could not update that."
+msgstr ""
+
+#: src/admin/pages/audit/index.jsx:213
+msgid "Run audit"
+msgstr ""
+
+#: src/admin/pages/audit/index.jsx:223
+msgid "No audit yet"
+msgstr ""
+
+#: src/admin/pages/audit/index.jsx:225
+msgid "Run one to see how complete and consistent your local SEO is."
+msgstr ""
+
+#: src/admin/pages/audit/index.jsx:241
+msgid "Last run %s."
+msgstr ""
+
+#: src/admin/pages/audit/index.jsx:251
+msgid "Your details have changed since this audit ran, so the score below is out of date."
+msgstr ""
+
+#: src/admin/pages/audit/index.jsx:263
+msgid "%1$d checks ran, %2$d passed."
+msgstr ""
+
+#: src/admin/pages/audit/index.jsx:289
+msgid "%1$s of %2$s"
+msgstr ""
+
+#: src/admin/pages/audit/index.jsx:319
+msgid "Nothing outstanding."
+msgstr ""
+
+#: src/admin/pages/audit/index.jsx:333
+msgid "What is already right"
+msgstr ""
+
+#: src/admin/pages/audit/index.jsx:334
+msgid "Recorded so the score has a denominator you can see."
+msgstr ""
+
+#: src/admin/pages/audit/index.jsx:311
+msgid "%d thing to look at, most urgent first."
+msgid_plural "%d things to look at, most urgent first."
+msgstr[0] ""
+msgstr[1] ""
+
+#: src/admin/pages/business/index.jsx:118
+msgid "Business details saved."
+msgstr ""
+
+#: src/admin/pages/business/index.jsx:133
+msgid "The details customers and search engines see. Everything else in FoundHint reads from here, so it only needs entering once."
+msgstr ""
+
+#: src/admin/pages/business/index.jsx:148
+msgid "How your business is identified."
+msgstr ""
+
+#: src/admin/pages/business/index.jsx:153 src/admin/pages/google/components/ImportFromGoogle.jsx:46 src/admin/pages/setup/components/BusinessStep.jsx:93
+msgid "Business name"
+msgstr ""
+
+#: src/admin/pages/business/index.jsx:166
+msgid "The name customers know you by."
+msgstr ""
+
+#: src/admin/pages/business/index.jsx:173
+msgid "Legal name"
+msgstr ""
+
+#: src/admin/pages/business/index.jsx:185
+msgid "Only if it differs from the trading name."
+msgstr ""
+
+#: src/admin/pages/business/index.jsx:195 src/admin/pages/google/components/ImportFromGoogle.jsx:58 src/admin/pages/setup/components/BusinessStep.jsx:113
+msgid "Business type"
+msgstr ""
+
+#: src/admin/pages/business/index.jsx:215 src/admin/pages/setup/components/BusinessStep.jsx:124
+msgid "Choose a type"
+msgstr ""
+
+#: src/admin/pages/business/index.jsx:232
+msgid "Used in your structured data."
+msgstr ""
+
+#: src/admin/pages/business/index.jsx:239
+msgid "Primary category"
+msgstr ""
+
+#: src/admin/pages/business/index.jsx:251
+msgid "In your own words, e.g. Grocery Store."
+msgstr ""
+
+#: src/admin/pages/business/index.jsx:261 src/admin/pages/google/components/ImportFromGoogle.jsx:54 src/admin/pages/services/components/ServiceDialog.jsx:174
+msgid "Description"
+msgstr ""
+
+#: src/admin/pages/business/index.jsx:270
+msgid "A short summary of what you do and who you serve."
+msgstr ""
+
+#: src/admin/pages/business/index.jsx:282
+msgid "Locations can override these; leave a location's field empty to use the business value."
+msgstr ""
+
+#: src/admin/pages/business/index.jsx:290 src/admin/pages/google/components/BusinessProfiles.jsx:151 src/admin/pages/google/components/ImportFromGoogle.jsx:50 src/admin/pages/locations/detail.jsx:355 src/admin/pages/setup/components/BusinessStep.jsx:147
+msgid "Phone"
+msgstr ""
+
+#: src/admin/pages/business/index.jsx:304 src/admin/pages/locations/detail.jsx:369 src/admin/pages/setup/components/BusinessStep.jsx:161
+msgid "Email"
+msgstr ""
+
+#: src/admin/pages/business/index.jsx:342
+msgid "Logo URL"
+msgstr ""
+
+#: src/admin/pages/business/index.jsx:359
+msgid "Price range"
+msgstr ""
+
+#: src/admin/pages/business/index.jsx:375
+msgid "Founded"
+msgstr ""
+
+#: src/admin/pages/business/index.jsx:394
+msgid "Published as the profiles that belong to this business."
+msgstr ""
+
+#: src/admin/pages/business/index.jsx:431 src/admin/pages/locations/detail.jsx:500
+msgid "Save changes"
+msgstr ""
+
+#: src/admin/pages/business/index.jsx:435 src/admin/pages/locations/detail.jsx:505 src/admin/pages/settings/index.jsx:220
+msgid "You have unsaved changes."
+msgstr ""
+
+#: src/admin/pages/dashboard/components/GetStarted.jsx:36
+msgid "BUILD"
+msgstr ""
+
+#: src/admin/pages/dashboard/components/GetStarted.jsx:37 src/admin/pages/setup/components/WelcomeStep.jsx:14
+msgid "Your details, once"
+msgstr ""
+
+#: src/admin/pages/dashboard/components/GetStarted.jsx:39 src/admin/pages/setup/components/WelcomeStep.jsx:15
+msgid "Name, address, hours and services live in one place."
+msgstr ""
+
+#: src/admin/pages/dashboard/components/GetStarted.jsx:42
+msgid "CONNECT"
+msgstr ""
+
+#: src/admin/pages/dashboard/components/GetStarted.jsx:43
+msgid "Link Google"
+msgstr ""
+
+#: src/admin/pages/dashboard/components/GetStarted.jsx:45
+msgid "See exactly how Google shows your business today."
+msgstr ""
+
+#: src/admin/pages/dashboard/components/GetStarted.jsx:48
+msgid "OPTIMIZE"
+msgstr ""
+
+#: src/admin/pages/dashboard/components/GetStarted.jsx:49
+msgid "Fix what matters"
+msgstr ""
+
+#: src/admin/pages/dashboard/components/GetStarted.jsx:51
+msgid "A short list of problems, most important first."
+msgstr ""
+
+#: src/admin/pages/dashboard/components/GetStarted.jsx:54
+msgid "TRACK"
+msgstr ""
+
+#: src/admin/pages/dashboard/components/GetStarted.jsx:55
+msgid "Watch it improve"
+msgstr ""
+
+#: src/admin/pages/dashboard/components/GetStarted.jsx:57
+msgid "See where you appear when people search nearby."
+msgstr ""
+
+#: src/admin/pages/dashboard/components/GetStarted.jsx:78
+msgid "Welcome to FoundHint"
+msgstr ""
+
+#: src/admin/pages/dashboard/components/GetStarted.jsx:85 src/admin/pages/setup/index.jsx:26
+msgid "Make sure customers find you"
+msgstr ""
+
+#: src/admin/pages/dashboard/components/GetStarted.jsx:88
+msgid "Set up your business details, connect your Google Business Profile, fix what is holding you back, and see where you show up when people search nearby — all from one place."
+msgstr ""
+
+#: src/admin/pages/dashboard/components/GetStarted.jsx:99 src/admin/pages/setup/components/WelcomeStep.jsx:51
+msgid "Get started"
+msgstr ""
+
+#: src/admin/pages/dashboard/components/GetStarted.jsx:109 src/admin/pages/setup/components/WelcomeStep.jsx:54
+msgid "Skip to dashboard"
+msgstr ""
+
+#: src/admin/pages/dashboard/components/GetStarted.jsx:134
+msgid "Takes about 5 minutes. You can change anything later."
+msgstr ""
+
+#: src/admin/pages/dashboard/components/GetStarted.jsx:175
+msgid "Do you already have a Google Business Profile?"
+msgstr ""
+
+#: src/admin/pages/dashboard/components/GetStarted.jsx:178
+msgid "A Google Business Profile is the business listing that shows up on Google Search and Google Maps — with your hours, phone number and reviews. If you are not sure, choose No and we will help you prepare one."
+msgstr ""
+
+#: src/admin/pages/dashboard/components/GetStarted.jsx:187
+msgid "Option A"
+msgstr ""
+
+#: src/admin/pages/dashboard/components/GetStarted.jsx:188
+msgid "Yes, I have a Google Business Profile"
+msgstr ""
+
+#: src/admin/pages/dashboard/components/GetStarted.jsx:189
+msgid "Connect it and we will bring your business name, address, hours and services into FoundHint so you do not have to type them twice."
+msgstr ""
+
+#: src/admin/pages/dashboard/components/GetStarted.jsx:194
+msgid "Import your existing details"
+msgstr ""
+
+#: src/admin/pages/dashboard/components/GetStarted.jsx:195
+msgid "Compare Google with your website"
+msgstr ""
+
+#: src/admin/pages/dashboard/components/GetStarted.jsx:196
+msgid "Keep both in step from here on"
+msgstr ""
+
+#: src/admin/pages/dashboard/components/GetStarted.jsx:209
+msgid "Option B"
+msgstr ""
+
+#: src/admin/pages/dashboard/components/GetStarted.jsx:210
+msgid "No, I don't have one"
+msgstr ""
+
+#: src/admin/pages/dashboard/components/GetStarted.jsx:211
+msgid "Fill in your business details here first. We will get everything ready so you can create your Google Business Profile afterwards without repeating yourself."
+msgstr ""
+
+#: src/admin/pages/dashboard/components/GetStarted.jsx:216
+msgid "Creating one on Google is free"
+msgstr ""
+
+#: src/admin/pages/dashboard/components/GetStarted.jsx:217
+msgid "Your details power your website too"
+msgstr ""
+
+#: src/admin/pages/dashboard/components/GetStarted.jsx:218
+msgid "Connect Google whenever you are ready"
+msgstr ""
+
+#: src/admin/pages/dashboard/components/GetStarted.jsx:236
+msgid "Create one on Google"
+msgstr ""
+
+#: src/admin/pages/dashboard/components/GetStarted.jsx:242
+msgid "Fill in my business details"
+msgstr ""
+
+#: src/admin/pages/dashboard/components/GetStarted.jsx:292
+msgid "Getting started"
+msgstr ""
+
+#: src/admin/pages/dashboard/components/GetStarted.jsx:295
+msgid "Could not start the Google sign-in"
+msgstr ""
+
+#: src/admin/pages/dashboard/components/GoogleCard.jsx:66 src/admin/pages/google/components/BusinessProfiles.jsx:93
+msgid "Read your Google profiles."
+msgstr ""
+
+#: src/admin/pages/dashboard/components/GoogleCard.jsx:81 src/admin/pages/google/index.jsx:180 src/admin/pages/google/index.jsx:255
+msgid "Google Business Profile"
+msgstr ""
+
+#: src/admin/pages/dashboard/components/GoogleCard.jsx:91 src/admin/pages/google/index.jsx:76
+msgid "Connected"
+msgstr ""
+
+#: src/admin/pages/dashboard/components/GoogleCard.jsx:99 src/admin/pages/google/index.jsx:77
+msgid "Needs reconnecting"
+msgstr ""
+
+#: src/admin/pages/dashboard/components/GoogleCard.jsx:106
+msgid "Google account"
+msgstr ""
+
+#: src/admin/pages/dashboard/components/GoogleCard.jsx:107 src/admin/pages/google/index.jsx:549
+msgid "Unknown"
+msgstr ""
+
+#: src/admin/pages/dashboard/components/GoogleCard.jsx:109
+msgid "Profiles read"
+msgstr ""
+
+#: src/admin/pages/dashboard/components/GoogleCard.jsx:112
+msgid "Locations linked"
+msgstr ""
+
+#: src/admin/pages/dashboard/components/GoogleCard.jsx:113
+msgid "Last read"
+msgstr ""
+
+#: src/admin/pages/dashboard/components/GoogleCard.jsx:116
+msgid "Never"
+msgstr ""
+
+#: src/admin/pages/dashboard/components/GoogleCard.jsx:126 src/admin/pages/google/index.jsx:575
+msgid "Reconnect with Google"
+msgstr ""
+
+#: src/admin/pages/dashboard/components/GoogleCard.jsx:136 src/admin/pages/google/components/BusinessProfiles.jsx:126
+msgid "Read from Google"
+msgstr ""
+
+#: src/admin/pages/dashboard/components/GoogleCard.jsx:144 src/admin/pages/dashboard/index.jsx:298 src/admin/pages/locations/index.jsx:183
+msgid "Manage"
+msgstr ""
+
+#: src/admin/pages/dashboard/components/GoogleCard.jsx:157
+msgid "Connect your Google Business Profile"
+msgstr ""
+
+#: src/admin/pages/dashboard/components/GoogleCard.jsx:160
+msgid "See how Google shows your business right now, spot details that do not match your website, and reply to reviews from here."
+msgstr ""
+
+#: src/admin/pages/dashboard/components/ScoreCard.jsx:100
+msgid "Your first check — no trend yet."
+msgstr ""
+
+#: src/admin/pages/dashboard/components/ScoreCard.jsx:119
+msgid "No change in the last %d days"
+msgstr ""
+
+#: src/admin/pages/dashboard/components/ScoreCard.jsx:124
+msgid "No change since %s"
+msgstr ""
+
+#: src/admin/pages/dashboard/components/ScoreCard.jsx:140
+msgid "%1$s in the last %2$d days"
+msgstr ""
+
+#: src/admin/pages/dashboard/components/ScoreCard.jsx:146
+msgid "%1$s since %2$s"
+msgstr ""
+
+#: src/admin/pages/dashboard/components/ScoreCard.jsx:217
+msgid "Local SEO health score"
+msgstr ""
+
+#: src/admin/pages/dashboard/components/ScoreCard.jsx:223
+msgid "Checked %s"
+msgstr ""
+
+#: src/admin/pages/dashboard/components/ScoreCard.jsx:234
+msgid "The check did not run"
+msgstr ""
+
+#: src/admin/pages/dashboard/components/ScoreCard.jsx:243
+msgid " out of 100"
+msgstr ""
+
+#: src/admin/pages/dashboard/components/ScoreCard.jsx:270
+msgid "Your details have changed since this check, so this score may be out of date."
+msgstr ""
+
+#: src/admin/pages/dashboard/components/ScoreCard.jsx:278
+msgid "This is FoundHint's own read on how complete and consistent your local details are. It is not a Google ranking."
+msgstr ""
+
+#: src/admin/pages/dashboard/components/ScoreCard.jsx:292
+msgid "See what to fix (%d)"
+msgstr ""
+
+#: src/admin/pages/dashboard/components/ScoreCard.jsx:295
+msgid "View the audit"
+msgstr ""
+
+#: src/admin/pages/dashboard/components/ScoreCard.jsx:297
+msgid "Check again"
+msgstr ""
+
+#: src/admin/pages/dashboard/components/ScoreCard.jsx:303
+msgid "No score yet"
+msgstr ""
+
+#: src/admin/pages/dashboard/components/ScoreCard.jsx:307
+msgid "Run a check to see how complete and consistent your local details are. It takes a moment and changes nothing."
+msgstr ""
+
+#: src/admin/pages/dashboard/components/ScoreCard.jsx:313
+msgid "Run your first check"
+msgstr ""
+
+#: src/admin/pages/dashboard/index.jsx:75
+msgid "Add your business name"
+msgstr ""
+
+#: src/admin/pages/dashboard/index.jsx:81
+msgid "Add a phone number or email"
+msgstr ""
+
+#: src/admin/pages/dashboard/index.jsx:87
+msgid "Add your website"
+msgstr ""
+
+#: src/admin/pages/dashboard/index.jsx:93
+msgid "Add your address"
+msgstr ""
+
+#: src/admin/pages/dashboard/index.jsx:99
+msgid "Set your opening hours"
+msgstr ""
+
+#: src/admin/pages/dashboard/index.jsx:105
+msgid "List what you offer"
+msgstr ""
+
+#: src/admin/pages/dashboard/index.jsx:143
+msgid "What you have told FoundHint about your business so far."
+msgstr ""
+
+#: src/admin/pages/dashboard/index.jsx:162 src/admin/pages/dashboard/index.jsx:187
+msgid "Setup progress"
+msgstr ""
+
+#: src/admin/pages/dashboard/index.jsx:167
+msgid "%1$d of %2$d steps done"
+msgstr ""
+
+#: src/admin/pages/dashboard/index.jsx:179
+msgid "%d%%"
+msgstr ""
+
+#: src/admin/pages/dashboard/index.jsx:217
+msgid " — done"
+msgstr ""
+
+#: src/admin/pages/dashboard/index.jsx:218
+msgid " — still to do"
+msgstr ""
+
+#: src/admin/pages/dashboard/index.jsx:227
+msgid "Do this"
+msgstr ""
+
+#: src/admin/pages/dashboard/index.jsx:252
+msgid "%d%% complete"
+msgstr ""
+
+#: src/admin/pages/dashboard/index.jsx:255
+msgid "Not started"
+msgstr ""
+
+#: src/admin/pages/dashboard/index.jsx:264 src/admin/pages/dashboard/index.jsx:274
+msgid "%d added"
+msgstr ""
+
+#: src/admin/pages/google/components/BusinessProfiles.jsx:30
+msgid "Ready"
+msgstr ""
+
+#: src/admin/pages/google/components/BusinessProfiles.jsx:31
+msgid "Pending edits"
+msgstr ""
+
+#: src/admin/pages/google/components/BusinessProfiles.jsx:32
+msgid "Limited"
+msgstr ""
+
+#: src/admin/pages/google/components/BusinessProfiles.jsx:109
+msgid "What Google last told us, read %s."
+msgstr ""
+
+#: src/admin/pages/google/components/BusinessProfiles.jsx:112
+msgid "The places this Google account manages."
+msgstr ""
+
+#: src/admin/pages/google/components/BusinessProfiles.jsx:134
+msgid "Nothing read yet"
+msgstr ""
+
+#: src/admin/pages/google/components/BusinessProfiles.jsx:137
+msgid "Read from Google to list the places this account manages. Google has to have approved your Cloud project for the Business Profile APIs before anything comes back."
+msgstr ""
+
+#: src/admin/pages/google/components/BusinessProfiles.jsx:141 src/admin/pages/google/components/LocationMapping.jsx:202
+msgid "Connect a Google account first."
+msgstr ""
+
+#: src/admin/pages/google/components/BusinessProfiles.jsx:149
+msgid "Profile"
+msgstr ""
+
+#: src/admin/pages/google/components/BusinessProfiles.jsx:150 src/admin/pages/google/components/ImportFromGoogle.jsx:48 src/admin/pages/locations/detail.jsx:198 src/admin/pages/locations/index.jsx:135 src/admin/pages/setup/components/DoneStep.jsx:7 src/admin/pages/setup/index.jsx:71
+msgid "Address"
+msgstr ""
+
+#: src/admin/pages/google/components/BusinessProfiles.jsx:152
+msgid "State"
+msgstr ""
+
+#: src/admin/pages/google/components/BusinessProfiles.jsx:153
+msgid "Mapped to"
+msgstr ""
+
+#: src/admin/pages/google/components/BusinessProfiles.jsx:198
+msgid "Not mapped"
+msgstr ""
+
+#: src/admin/pages/google/components/ImportFromGoogle.jsx:56 src/admin/pages/locations/detail.jsx:401 src/admin/pages/setup/components/DoneStep.jsx:8
+msgid "Opening hours"
+msgstr ""
+
+#: src/admin/pages/google/components/ImportFromGoogle.jsx:64
+msgid "Map position"
+msgstr ""
+
+#: src/admin/pages/google/components/ImportFromGoogle.jsx:79
+msgid "Shared by all locations"
+msgstr ""
+
+#: src/admin/pages/google/components/ImportFromGoogle.jsx:81
+msgid "Added to your services"
+msgstr ""
+
+#: src/admin/pages/google/components/ImportFromGoogle.jsx:83
+msgid "This location"
+msgstr ""
+
+#: src/admin/pages/google/components/ImportFromGoogle.jsx:171
+msgid "Fill in your FoundHint details from the Google profile you have mapped to this location."
+msgstr ""
+
+#: src/admin/pages/google/components/ImportFromGoogle.jsx:181
+msgid "Which profile are you importing?"
+msgstr ""
+
+#: src/admin/pages/google/components/ImportFromGoogle.jsx:186 src/admin/pages/google/components/ImportFromGoogle.jsx:190 src/admin/pages/google/components/LocationMapping.jsx:97
+msgid "Choose a Google profile"
+msgstr ""
+
+#: src/admin/pages/google/components/ImportFromGoogle.jsx:217
+msgid "Read Google again"
+msgstr ""
+
+#: src/admin/pages/google/components/ImportFromGoogle.jsx:218
+msgid "Read my Google profile"
+msgstr ""
+
+#: src/admin/pages/google/components/ImportFromGoogle.jsx:222
+msgid "Nothing is saved until you choose."
+msgstr ""
+
+#: src/admin/pages/google/components/ImportFromGoogle.jsx:231
+msgid "This site has no business details yet, so importing will create them from this profile."
+msgstr ""
+
+#: src/admin/pages/google/components/ImportFromGoogle.jsx:240
+msgid "Importing will create a location from this profile's address and link the two, so a later import updates it rather than adding another."
+msgstr ""
+
+#: src/admin/pages/google/components/ImportFromGoogle.jsx:248
+msgid "Fields you have not filled in are ticked. Fields you already hold are left for you to decide, because FoundHint cannot know which value is the newer one."
+msgstr ""
+
+#: src/admin/pages/google/components/ImportFromGoogle.jsx:259
+msgid "Import"
+msgstr ""
+
+#: src/admin/pages/google/components/ImportFromGoogle.jsx:261
+msgid "Detail"
+msgstr ""
+
+#: src/admin/pages/google/components/ImportFromGoogle.jsx:262
+msgid "In FoundHint"
+msgstr ""
+
+#: src/admin/pages/google/components/ImportFromGoogle.jsx:263
+msgid "On Google"
+msgstr ""
+
+#: src/admin/pages/google/components/ImportFromGoogle.jsx:299
+msgid "Different here"
+msgstr ""
+
+#: src/admin/pages/google/components/ImportFromGoogle.jsx:311
+msgid "Google has nothing here"
+msgstr ""
+
+#: src/admin/pages/google/components/ImportFromGoogle.jsx:330
+msgid "Choose what to import"
+msgstr ""
+
+#: src/admin/pages/google/components/ImportFromGoogle.jsx:343
+msgid "Imported values are saved as your own details and can be edited afterwards."
+msgstr ""
+
+#: src/admin/pages/google/components/ImportFromGoogle.jsx:147
+msgid "Imported %d field from Google."
+msgid_plural "Imported %d fields from Google."
+msgstr[0] ""
+msgstr[1] ""
+
+#: src/admin/pages/google/components/ImportFromGoogle.jsx:333
+msgid "Import %d field"
+msgid_plural "Import %d fields"
+msgstr[0] ""
+msgstr[1] ""
+
+#: src/admin/pages/google/components/LocationMapping.jsx:47 src/admin/pages/google/components/LocationMapping.jsx:79
+msgid "Untitled location"
+msgstr ""
+
+#: src/admin/pages/google/components/LocationMapping.jsx:69
+msgid "Unlink"
+msgstr ""
+
+#: src/admin/pages/google/components/LocationMapping.jsx:92
+msgid "Google profile for %s"
+msgstr ""
+
+#: src/admin/pages/google/components/LocationMapping.jsx:108
+msgid "looks like a match"
+msgstr ""
+
+#: src/admin/pages/google/components/LocationMapping.jsx:119
+msgid "Closest match: %s"
+msgstr ""
+
+#: src/admin/pages/google/components/LocationMapping.jsx:133 src/admin/pages/services/components/ServiceDialog.jsx:227
+msgid "Link"
+msgstr ""
+
+#: src/admin/pages/google/components/LocationMapping.jsx:155
+msgid "Linked."
+msgstr ""
+
+#: src/admin/pages/google/components/LocationMapping.jsx:164
+msgid "Unlinked."
+msgstr ""
+
+#: src/admin/pages/google/components/LocationMapping.jsx:174
+msgid "Say which Google profile is which of your locations. Nothing is linked for you."
+msgstr ""
+
+#: src/admin/pages/google/components/LocationMapping.jsx:183 src/admin/pages/locations/index.jsx:114
+msgid "No locations yet"
+msgstr ""
+
+#: src/admin/pages/google/components/LocationMapping.jsx:185
+msgid "Add a location first, then come back to link it to its Google profile."
+msgstr ""
+
+#: src/admin/pages/google/components/LocationMapping.jsx:194
+msgid "No Google profiles read yet"
+msgstr ""
+
+#: src/admin/pages/google/components/LocationMapping.jsx:198
+msgid "Read from Google above, then link each location to its profile."
+msgstr ""
+
+#: src/admin/pages/google/index.jsx:83
+msgid "as %s"
+msgstr ""
+
+#: src/admin/pages/google/index.jsx:94
+msgid "Not connected"
+msgstr ""
+
+#: src/admin/pages/google/index.jsx:111
+msgid "Could not copy. Select the address instead."
+msgstr ""
+
+#: src/admin/pages/google/index.jsx:127
+msgid "Copied"
+msgstr ""
+
+#: src/admin/pages/google/index.jsx:127 src/admin/pages/schema/index.jsx:281
+msgid "Copy"
+msgstr ""
+
+#: src/admin/pages/google/index.jsx:201
+msgid "Google client saved."
+msgstr ""
+
+#: src/admin/pages/google/index.jsx:241
+msgid "Disconnected here. Google did not confirm, so check your Google account's connected apps."
+msgstr ""
+
+#: src/admin/pages/google/index.jsx:245
+msgid "Disconnected from Google."
+msgstr ""
+
+#: src/admin/pages/google/index.jsx:248
+msgid "Could not disconnect."
+msgstr ""
+
+#: src/admin/pages/google/index.jsx:256
+msgid "Connect the Google account that manages your business, so FoundHint can see how Google shows you today."
+msgstr ""
+
+#: src/admin/pages/google/index.jsx:267
+msgid "That did not work"
+msgstr ""
+
+#: src/admin/pages/google/index.jsx:274
+msgid "This connection is missing permission to manage your business profile. Connect again and accept all the requested permissions."
+msgstr ""
+
+#: src/admin/pages/google/index.jsx:294
+msgid "Advanced: use your own Google client"
+msgstr ""
+
+#: src/admin/pages/google/index.jsx:303
+msgid "You do not need this. FoundHint signs you in through its own Google client, and your data and quota stay yours either way. Enter a client from your own Google Cloud project only if you want this site to use that project — once saved, it is used instead of FoundHint's."
+msgstr ""
+
+#: src/admin/pages/google/index.jsx:311 src/admin/pages/google/index.jsx:425
+msgid "Redirect URI"
+msgstr ""
+
+#: src/admin/pages/google/index.jsx:314 src/admin/pages/google/index.jsx:428
+msgid "Add this to your OAuth client in Google Cloud under Authorised redirect URIs, exactly as shown. A mismatch here is the usual reason a first connection fails."
+msgstr ""
+
+#: src/admin/pages/google/index.jsx:323 src/admin/pages/google/index.jsx:437
+msgid "Client ID"
+msgstr ""
+
+#: src/admin/pages/google/index.jsx:344 src/admin/pages/google/index.jsx:458
+msgid "Currently %s — leave blank to keep it."
+msgstr ""
+
+#: src/admin/pages/google/index.jsx:350 src/admin/pages/google/index.jsx:464
+msgid "From your OAuth client in Google Cloud."
+msgstr ""
+
+#: src/admin/pages/google/index.jsx:359 src/admin/pages/google/index.jsx:470
+msgid "Client secret"
+msgstr ""
+
+#: src/admin/pages/google/index.jsx:375 src/admin/pages/google/index.jsx:486
+msgid "A secret is stored. It is never shown again — leave this blank to keep it, or paste a new one to replace it."
+msgstr ""
+
+#: src/admin/pages/google/index.jsx:379 src/admin/pages/google/index.jsx:490
+msgid "Stored on your site and never shown again once saved."
+msgstr ""
+
+#: src/admin/pages/google/index.jsx:396 src/admin/pages/google/index.jsx:507
+msgid "Save client"
+msgstr ""
+
+#: src/admin/pages/google/index.jsx:409 src/admin/pages/google/index.jsx:520
+msgid "Open Google Cloud credentials"
+msgstr ""
+
+#: src/admin/pages/google/index.jsx:418
+msgid "This site uses your own Google Cloud project, so your data and your quota stay yours."
+msgstr ""
+
+#: src/admin/pages/google/index.jsx:529
+msgid "Sign in with the Google account that manages your business."
+msgstr ""
+
+#: src/admin/pages/google/index.jsx:538
+msgid "You sign in on Google's own page. FoundHint never sees your password, and nothing on your profile changes without your confirmation."
+msgstr ""
+
+#: src/admin/pages/google/index.jsx:547
+msgid "Account"
+msgstr ""
+
+#: src/admin/pages/google/index.jsx:554
+msgid "Permissions"
+msgstr ""
+
+#: src/admin/pages/google/index.jsx:558
+msgid "Can manage your business profile"
+msgstr ""
+
+#: src/admin/pages/google/index.jsx:559
+msgid "Cannot manage your business profile"
+msgstr ""
+
+#: src/admin/pages/google/index.jsx:585 src/admin/pages/google/index.jsx:604
+msgid "Disconnect"
+msgstr ""
+
+#: src/admin/pages/google/index.jsx:590
+msgid "Disconnect from Google?"
+msgstr ""
+
+#: src/admin/pages/google/index.jsx:593
+msgid "FoundHint will stop reading your Google Business Profile. Nothing on your Google profile changes, and your business details here are untouched. You can connect again at any time."
+msgstr ""
+
+#: src/admin/pages/google/index.jsx:601
+msgid "Keep connected"
+msgstr ""
+
+#: src/admin/pages/google/index.jsx:617
+msgid "Add your Google client ID and secret above first — this button will take you to them."
+msgstr ""
+
+#: src/admin/pages/locations/components/OpeningHoursEditor.jsx:142 src/admin/pages/locations/components/OpeningHoursEditor.jsx:200 src/admin/pages/locations/index.jsx:164
+msgid "Not set"
+msgstr ""
+
+#: src/admin/pages/locations/components/OpeningHoursEditor.jsx:143 src/admin/pages/locations/components/OpeningHoursEditor.jsx:203
+msgid "Open"
+msgstr ""
+
+#: src/admin/pages/locations/components/OpeningHoursEditor.jsx:144 src/admin/pages/locations/components/OpeningHoursEditor.jsx:206
+msgid "Closed"
+msgstr ""
+
+#: src/admin/pages/locations/components/OpeningHoursEditor.jsx:145 src/admin/pages/locations/components/OpeningHoursEditor.jsx:209
+msgid "Open 24 hours"
+msgstr ""
+
+#: src/admin/pages/locations/components/OpeningHoursEditor.jsx:191
+msgid "Opening hours for %s"
+msgstr ""
+
+#: src/admin/pages/locations/components/OpeningHoursEditor.jsx:239
+msgid "Opens on %s"
+msgstr ""
+
+#: src/admin/pages/locations/components/OpeningHoursEditor.jsx:249
+msgid "to"
+msgstr ""
+
+#: src/admin/pages/locations/components/OpeningHoursEditor.jsx:258
+msgid "Closes on %s"
+msgstr ""
+
+#: src/admin/pages/locations/components/OpeningHoursEditor.jsx:272
+msgid "Remove this period"
+msgstr ""
+
+#: src/admin/pages/locations/components/OpeningHoursEditor.jsx:311
+msgid "Split shift"
+msgstr ""
+
+#: src/admin/pages/locations/detail.jsx:53 src/admin/pages/locations/index.jsx:31 src/admin/pages/services/components/ServiceDialog.jsx:40 src/admin/pages/services/index.jsx:201
+msgid "Active"
+msgstr ""
+
+#: src/admin/pages/locations/detail.jsx:54 src/admin/pages/locations/index.jsx:32 src/admin/pages/services/components/ServiceDialog.jsx:41 src/admin/pages/services/index.jsx:202
+msgid "Inactive"
+msgstr ""
+
+#: src/admin/pages/locations/detail.jsx:55 src/admin/pages/locations/index.jsx:33
+msgid "Temporarily closed"
+msgstr ""
+
+#: src/admin/pages/locations/detail.jsx:56 src/admin/pages/locations/index.jsx:34
+msgid "Permanently closed"
+msgstr ""
+
+#: src/admin/pages/locations/detail.jsx:146
+msgid "Location added."
+msgstr ""
+
+#: src/admin/pages/locations/detail.jsx:154
+msgid "Location saved."
+msgstr ""
+
+#: src/admin/pages/locations/detail.jsx:163
+msgid "Location deleted."
+msgstr ""
+
+#: src/admin/pages/locations/detail.jsx:166
+msgid "Could not delete the location."
+msgstr ""
+
+#: src/admin/pages/locations/detail.jsx:173
+msgid "Loading location…"
+msgstr ""
+
+#: src/admin/pages/locations/detail.jsx:181 src/admin/pages/locations/detail.jsx:499 src/admin/pages/locations/index.jsx:90
+msgid "Add location"
+msgstr ""
+
+#: src/admin/pages/locations/detail.jsx:187
+msgid "All locations"
+msgstr ""
+
+#: src/admin/pages/locations/detail.jsx:205 src/admin/pages/setup/components/LocationStep.jsx:91
+msgid "Location name"
+msgstr ""
+
+#: src/admin/pages/locations/detail.jsx:218
+msgid "For example Downtown, or Main Office."
+msgstr ""
+
+#: src/admin/pages/locations/detail.jsx:225 src/admin/pages/setup/components/LocationStep.jsx:117
+msgid "Street address"
+msgstr ""
+
+#: src/admin/pages/locations/detail.jsx:240
+msgid "Suite, unit or floor"
+msgstr ""
+
+#: src/admin/pages/locations/detail.jsx:251 src/admin/pages/setup/components/LocationStep.jsx:132
+msgid "City"
+msgstr ""
+
+#: src/admin/pages/locations/detail.jsx:264 src/admin/pages/setup/components/LocationStep.jsx:145
+msgid "State or region"
+msgstr ""
+
+#: src/admin/pages/locations/detail.jsx:277 src/admin/pages/setup/components/LocationStep.jsx:158
+msgid "Postal code"
+msgstr ""
+
+#: src/admin/pages/locations/detail.jsx:288 src/admin/pages/setup/components/LocationStep.jsx:169
+msgid "Country"
+msgstr ""
+
+#: src/admin/pages/locations/detail.jsx:302 src/admin/pages/setup/components/LocationStep.jsx:183
+msgid "Two-letter country code."
+msgstr ""
+
+#: src/admin/pages/locations/detail.jsx:309
+msgid "Latitude"
+msgstr ""
+
+#: src/admin/pages/locations/detail.jsx:322
+msgid "Leave empty if you don't know it."
+msgstr ""
+
+#: src/admin/pages/locations/detail.jsx:329
+msgid "Longitude"
+msgstr ""
+
+#: src/admin/pages/locations/detail.jsx:347
+msgid "Leave a field empty to use the business value."
+msgstr ""
+
+#: src/admin/pages/locations/detail.jsx:402
+msgid "A day left as Not set publishes nothing — which is different from being closed."
+msgstr ""
+
+#: src/admin/pages/locations/detail.jsx:417 src/admin/pages/locations/detail.jsx:421 src/admin/pages/locations/index.jsx:137 src/admin/pages/services/components/ServiceDialog.jsx:242 src/admin/pages/services/index.jsx:178
+msgid "Status"
+msgstr ""
+
+#: src/admin/pages/locations/detail.jsx:451 src/admin/pages/settings/index.jsx:268
+msgid "Time zone"
+msgstr ""
+
+#: src/admin/pages/locations/detail.jsx:482
+msgid "Primary location"
+msgstr ""
+
+#: src/admin/pages/locations/detail.jsx:485
+msgid "Used wherever a single place is needed. Only one location can be primary."
+msgstr ""
+
+#: src/admin/pages/locations/detail.jsx:517 src/admin/pages/locations/detail.jsx:539
+msgid "Delete location"
+msgstr ""
+
+#: src/admin/pages/locations/detail.jsx:527
+msgid "Delete this location?"
+msgstr ""
+
+#: src/admin/pages/locations/detail.jsx:530
+msgid "Its opening hours go with it. This cannot be undone."
+msgstr ""
+
+#: src/admin/pages/locations/detail.jsx:537 src/admin/pages/services/index.jsx:308
+msgid "Keep it"
+msgstr ""
+
+#: src/admin/pages/locations/index.jsx:60
+msgid "Add your business first"
+msgstr ""
+
+#: src/admin/pages/locations/index.jsx:63
+msgid "A location belongs to a business, so start with your business details."
+msgstr ""
+
+#: src/admin/pages/locations/index.jsx:71
+msgid "Go to Business"
+msgstr ""
+
+#: src/admin/pages/locations/index.jsx:83
+msgid "Where you trade from. Leave a contact field empty and the business value is used instead."
+msgstr ""
+
+#: src/admin/pages/locations/index.jsx:97
+msgid "Could not load locations"
+msgstr ""
+
+#: src/admin/pages/locations/index.jsx:116
+msgid "Add the address customers visit. It is what puts you on the map."
+msgstr ""
+
+#: src/admin/pages/locations/index.jsx:125
+msgid "Add your first location"
+msgstr ""
+
+#: src/admin/pages/locations/index.jsx:139 src/admin/pages/services/index.jsx:180
+msgid "Actions"
+msgstr ""
+
+#: src/admin/pages/locations/index.jsx:150
+msgid "Primary"
+msgstr ""
+
+#: src/admin/pages/locations/index.jsx:161
+msgid "%d periods"
+msgstr ""
+
+#: src/admin/pages/locations/index.jsx:197
+msgid "Your plan includes %d location. Multi-location management is a Pro feature."
+msgstr ""
+
+#: src/admin/pages/not-found/index.jsx:7
+msgid "Page not found"
+msgstr ""
+
+#: src/admin/pages/schema/index.jsx:34
+msgid "Automatic"
+msgstr ""
+
+#: src/admin/pages/schema/index.jsx:35
+msgid "FoundHint publishes it"
+msgstr ""
+
+#: src/admin/pages/schema/index.jsx:36
+msgid "My SEO plugin publishes it"
+msgstr ""
+
+#: src/admin/pages/schema/index.jsx:37
+msgid "Nobody publishes it"
+msgstr ""
+
+#: src/admin/pages/schema/index.jsx:42
+msgid "FoundHint publishes the markup unless it finds another plugin already doing it."
+msgstr ""
+
+#: src/admin/pages/schema/index.jsx:47
+msgid "Always publish, even if something else might be publishing too."
+msgstr ""
+
+#: src/admin/pages/schema/index.jsx:52
+msgid "Never publish. Use this when your SEO plugin already describes the business."
+msgstr ""
+
+#: src/admin/pages/schema/index.jsx:57
+msgid "No local business markup is published from this site."
+msgstr ""
+
+#: src/admin/pages/schema/index.jsx:71
+msgid "FoundHint is not publishing this markup, because a plugin known to publish it is active."
+msgstr ""
+
+#: src/admin/pages/schema/index.jsx:75
+msgid "FoundHint is not publishing this markup, because of the setting below."
+msgstr ""
+
+#: src/admin/pages/schema/index.jsx:87
+msgid "Nothing is being published"
+msgstr ""
+
+#: src/admin/pages/schema/index.jsx:109
+msgid "This markup is published on your site."
+msgstr ""
+
+#: src/admin/pages/schema/index.jsx:138
+msgid "Saved."
+msgstr ""
+
+#: src/admin/pages/schema/index.jsx:150
+msgid "The structured data that tells search engines what your business is, where it is, and when it is open."
+msgstr ""
+
+#: src/admin/pages/schema/index.jsx:163
+msgid "Two descriptions of the same business on one page is worse than one — search engines pick one and ignore the other."
+msgstr ""
+
+#: src/admin/pages/schema/index.jsx:170
+msgid "Publishing"
+msgstr ""
+
+#: src/admin/pages/schema/index.jsx:197
+msgid "Also installed"
+msgstr ""
+
+#: src/admin/pages/schema/index.jsx:219
+msgid "— publishes local business markup of its own."
+msgstr ""
+
+#: src/admin/pages/schema/index.jsx:224
+msgid "— does not publish local business markup."
+msgstr ""
+
+#: src/admin/pages/schema/index.jsx:228
+msgid "— may publish local business markup, depending on how it is set up. Check your page source if you are not sure."
+msgstr ""
+
+#: src/admin/pages/schema/index.jsx:243
+msgid "What would make this better"
+msgstr ""
+
+#: src/admin/pages/schema/index.jsx:244
+msgid "None of these stop the markup being published. They just leave less for a search engine to work with."
+msgstr ""
+
+#: src/admin/pages/schema/index.jsx:262
+msgid "Exactly what appears in your pages' head, read from the same cache the front end uses."
+msgstr ""
+
+#: src/admin/pages/schema/index.jsx:273
+msgid "Copied."
+msgstr ""
+
+#: src/admin/pages/schema/index.jsx:276
+msgid "Could not copy. Select the text instead."
+msgstr ""
+
+#: src/admin/pages/services/components/ServiceDialog.jsx:116
+msgid "Service updated."
+msgstr ""
+
+#: src/admin/pages/services/components/ServiceDialog.jsx:119
+msgid "Service added."
+msgstr ""
+
+#: src/admin/pages/services/components/ServiceDialog.jsx:138
+msgid "Edit service"
+msgstr ""
+
+#: src/admin/pages/services/components/ServiceDialog.jsx:139 src/admin/pages/services/components/ServiceDialog.jsx:308 src/admin/pages/services/index.jsx:132
+msgid "Add service"
+msgstr ""
+
+#: src/admin/pages/services/components/ServiceDialog.jsx:142
+msgid "Services appear in your structured data and on your location pages."
+msgstr ""
+
+#: src/admin/pages/services/components/ServiceDialog.jsx:157
+msgid "Name"
+msgstr ""
+
+#: src/admin/pages/services/components/ServiceDialog.jsx:186 src/admin/pages/services/index.jsx:177
+msgid "Price"
+msgstr ""
+
+#: src/admin/pages/services/components/ServiceDialog.jsx:199
+msgid "Leave empty to publish no price."
+msgstr ""
+
+#: src/admin/pages/services/components/ServiceDialog.jsx:206
+msgid "Currency"
+msgstr ""
+
+#: src/admin/pages/services/components/ServiceDialog.jsx:220
+msgid "Required when a price is set."
+msgstr ""
+
+#: src/admin/pages/services/components/ServiceDialog.jsx:274
+msgid "URL slug"
+msgstr ""
+
+#: src/admin/pages/services/components/ServiceDialog.jsx:286
+msgid "Renaming the service does not change this, because it may already be in a published link."
+msgstr ""
+
+#: src/admin/pages/services/components/ServiceDialog.jsx:302
+msgid "Cancel"
+msgstr ""
+
+#: src/admin/pages/services/components/ServiceDialog.jsx:307
+msgid "Save service"
+msgstr ""
+
+#: src/admin/pages/services/index.jsx:102
+msgid "Could not reorder the services."
+msgstr ""
+
+#: src/admin/pages/services/index.jsx:113
+msgid "Service deleted."
+msgstr ""
+
+#: src/admin/pages/services/index.jsx:115
+msgid "Could not delete the service."
+msgstr ""
+
+#: src/admin/pages/services/index.jsx:125
+msgid "What you offer. The order here is the order they are published in."
+msgstr ""
+
+#: src/admin/pages/services/index.jsx:139
+msgid "Could not load services"
+msgstr ""
+
+#: src/admin/pages/services/index.jsx:156
+msgid "No services yet"
+msgstr ""
+
+#: src/admin/pages/services/index.jsx:158
+msgid "Add the things you actually sell. Search engines use them to tell what your business does."
+msgstr ""
+
+#: src/admin/pages/services/index.jsx:167
+msgid "Add your first service"
+msgstr ""
+
+#: src/admin/pages/services/index.jsx:176
+msgid "Service"
+msgstr ""
+
+#: src/admin/pages/services/index.jsx:214
+msgid "Move %s up"
+msgstr ""
+
+#: src/admin/pages/services/index.jsx:227
+msgid "Move %s down"
+msgstr ""
+
+#: src/admin/pages/services/index.jsx:239
+msgid "Edit %s"
+msgstr ""
+
+#: src/admin/pages/services/index.jsx:251
+msgid "Delete %s"
+msgstr ""
+
+#: src/admin/pages/services/index.jsx:270
+msgid "You are using all %d services included in your plan."
+msgstr ""
+
+#: src/admin/pages/services/index.jsx:292
+msgid "Delete this service?"
+msgstr ""
+
+#: src/admin/pages/services/index.jsx:298
+msgid "%s will be removed from your structured data. This cannot be undone."
+msgstr ""
+
+#: src/admin/pages/services/index.jsx:310
+msgid "Delete service"
+msgstr ""
+
+#: src/admin/pages/settings/index.jsx:63
+msgid "Settings saved."
+msgstr ""
+
+#: src/admin/pages/settings/index.jsx:75
+msgid "Removed %d log entries."
+msgstr ""
+
+#: src/admin/pages/settings/index.jsx:80
+msgid "Could not clear the log."
+msgstr ""
+
+#: src/admin/pages/settings/index.jsx:97
+msgid "How FoundHint behaves on this site."
+msgstr ""
+
+#: src/admin/pages/settings/index.jsx:109
+msgid "Nothing is deleted when you remove the plugin unless you ask for it here."
+msgstr ""
+
+#: src/admin/pages/settings/index.jsx:128
+msgid "Delete everything when the plugin is removed"
+msgstr ""
+
+#: src/admin/pages/settings/index.jsx:134
+msgid "Off by default. Deleting the plugin to troubleshoot should not cost you your business details, locations and services."
+msgstr ""
+
+#: src/admin/pages/settings/index.jsx:146
+msgid "FoundHint records what it does, so a problem can be traced later."
+msgstr ""
+
+#: src/admin/pages/settings/index.jsx:157
+msgid "Keep entries for"
+msgstr ""
+
+#: src/admin/pages/settings/index.jsx:178
+msgid "Days, between 1 and 365."
+msgstr ""
+
+#: src/admin/pages/settings/index.jsx:187
+msgid "%d entries stored."
+msgstr ""
+
+#: src/admin/pages/settings/index.jsx:198
+msgid "Remove expired entries"
+msgstr ""
+
+#: src/admin/pages/settings/index.jsx:207
+msgid "Clear the log"
+msgstr ""
+
+#: src/admin/pages/settings/index.jsx:216
+msgid "Save settings"
+msgstr ""
+
+#: src/admin/pages/settings/index.jsx:229
+msgid "Read-only. Safe to copy into a support request."
+msgstr ""
+
+#: src/admin/pages/settings/index.jsx:236
+msgid "Plugin version"
+msgstr ""
+
+#: src/admin/pages/settings/index.jsx:240
+msgid "Database version"
+msgstr ""
+
+#: src/admin/pages/settings/index.jsx:244
+msgid "Tables"
+msgstr ""
+
+#: src/admin/pages/settings/index.jsx:249
+msgid "Missing: %s"
+msgstr ""
+
+#: src/admin/pages/settings/index.jsx:254
+msgid "%d present"
+msgstr ""
+
+#: src/admin/pages/settings/index.jsx:260
+msgid "PHP version"
+msgstr ""
+
+#: src/admin/pages/settings/index.jsx:264
+msgid "WordPress version"
+msgstr ""
+
+#: src/admin/pages/setup/components/BusinessStep.jsx:106
+msgid "Exactly as customers know you."
+msgstr ""
+
+#: src/admin/pages/setup/components/BusinessStep.jsx:140
+msgid "What kind of business this is."
+msgstr ""
+
+#: src/admin/pages/setup/components/DoneStep.jsx:50
+msgid "Done"
+msgstr ""
+
+#: src/admin/pages/setup/components/DoneStep.jsx:51
+msgid "Still to do"
+msgstr ""
+
+#: src/admin/pages/setup/components/DoneStep.jsx:59
+msgid "That is everything. You can change any of it at any time — the dashboard keeps track from here."
+msgstr ""
+
+#: src/admin/pages/setup/components/DoneStep.jsx:65
+msgid "You can finish the remaining %d from the dashboard whenever you like; nothing here is locked in."
+msgstr ""
+
+#: src/admin/pages/setup/components/DoneStep.jsx:75
+msgid "Go to the dashboard"
+msgstr ""
+
+#: src/admin/pages/setup/components/DoneStep.jsx:78 src/admin/pages/setup/components/StepActions.jsx:22
+msgid "Back"
+msgstr ""
+
+#: src/admin/pages/setup/components/HoursStep.jsx:57
+msgid "No location yet"
+msgstr ""
+
+#: src/admin/pages/setup/components/HoursStep.jsx:59
+msgid "Opening hours belong to a location. Go back a step and add your address first."
+msgstr ""
+
+#: src/admin/pages/setup/components/HoursStep.jsx:69 src/admin/pages/setup/components/ServicesStep.jsx:131
+msgid "Continue"
+msgstr ""
+
+#: src/admin/pages/setup/components/LocationStep.jsx:104
+msgid "Something you would recognise, like Downtown or Main Office."
+msgstr ""
+
+#: src/admin/pages/setup/components/ServicesStep.jsx:59
+msgid "Service name"
+msgstr ""
+
+#: src/admin/pages/setup/components/ServicesStep.jsx:65
+msgid "Routine check-up"
+msgstr ""
+
+#: src/admin/pages/setup/components/ServicesStep.jsx:71
+msgid "Add"
+msgstr ""
+
+#: src/admin/pages/setup/components/ServicesStep.jsx:92
+msgid "Remove %s"
+msgstr ""
+
+#: src/admin/pages/setup/components/ServicesStep.jsx:104
+msgid "Nothing listed yet. Add the things people actually come to you for."
+msgstr ""
+
+#: src/admin/pages/setup/components/ServicesStep.jsx:115
+msgid "That is all %d services your plan includes."
+msgstr ""
+
+#: src/admin/pages/setup/components/StepActions.jsx:17
+msgid "Save and continue"
+msgstr ""
+
+#: src/admin/pages/setup/components/StepActions.jsx:32
+msgid "Skip this step"
+msgstr ""
+
+#: src/admin/pages/setup/components/WelcomeStep.jsx:13
+msgid "Build"
+msgstr ""
+
+#: src/admin/pages/setup/components/WelcomeStep.jsx:21
+msgid "Publish"
+msgstr ""
+
+#: src/admin/pages/setup/components/WelcomeStep.jsx:22
+msgid "Say it consistently"
+msgstr ""
+
+#: src/admin/pages/setup/components/WelcomeStep.jsx:23
+msgid "The same details everywhere they appear, so nothing contradicts itself."
+msgstr ""
+
+#: src/admin/pages/setup/components/WelcomeStep.jsx:29
+msgid "Keep"
+msgstr ""
+
+#: src/admin/pages/setup/components/WelcomeStep.jsx:30
+msgid "Change it in one place"
+msgstr ""
+
+#: src/admin/pages/setup/components/WelcomeStep.jsx:31
+msgid "Move premises or change your hours and you edit it once."
+msgstr ""
+
+#: src/admin/pages/setup/components/WelcomeStep.jsx:43
+msgid "Set up your business details so customers and search engines find the same answers wherever they look — your address, your opening hours and what you offer."
+msgstr ""
+
+#: src/admin/pages/setup/components/WelcomeStep.jsx:76
+msgid "Takes about five minutes. You can change anything later."
+msgstr ""
+
+#: src/admin/pages/setup/components/WizardShell.jsx:53
+msgid "Step %1$d of %2$d"
+msgstr ""
+
+#: src/admin/pages/setup/components/WizardShell.jsx:63
+msgid "I'll do this later"
+msgstr ""
+
+#: src/admin/pages/setup/index.jsx:30
+msgid "Tell us about your business"
+msgstr ""
+
+#: src/admin/pages/setup/index.jsx:32
+msgid "This is what search engines read and what customers see. You only enter it once — everything else in FoundHint reads from here."
+msgstr ""
+
+#: src/admin/pages/setup/index.jsx:38
+msgid "Where do customers find you?"
+msgstr ""
+
+#: src/admin/pages/setup/index.jsx:40
+msgid "The address people visit. It is what puts you on the map."
+msgstr ""
+
+#: src/admin/pages/setup/index.jsx:46
+msgid "When are you open?"
+msgstr ""
+
+#: src/admin/pages/setup/index.jsx:48
+msgid "Leave a day as Not set if you would rather not say — that is different from being closed, and it publishes nothing."
+msgstr ""
+
+#: src/admin/pages/setup/index.jsx:54
+msgid "What do you offer?"
+msgstr ""
+
+#: src/admin/pages/setup/index.jsx:56
+msgid "A short list is enough to start. You can add prices and details later."
+msgstr ""
+
+#: src/admin/pages/setup/index.jsx:62
+msgid "You are set up"
+msgstr ""
+
+#: src/admin/pages/setup/index.jsx:64
+msgid "Here is what your site now knows about your business."
+msgstr ""
+
+#: src/admin/pages/setup/index.jsx:69
+msgid "Welcome"
+msgstr ""
+
+#: src/admin/pages/setup/index.jsx:74
+msgid "Finish"
+msgstr ""
+
+#: found-hint.php:175
+msgid "FoundHint requires PHP %1$s or higher. This site is running PHP %2$s."
+msgstr ""

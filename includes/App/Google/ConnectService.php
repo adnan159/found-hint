@@ -7,6 +7,7 @@
 
 namespace FHINT\App\Google;
 
+use FHINT\App\Core\Secrets;
 use WP_Error;
 
 defined( 'ABSPATH' ) || exit;
@@ -164,7 +165,10 @@ class ConnectService {
 			self::HANDSHAKE_TRANSIENT,
 			array(
 				'session_id' => (string) $response['session_id'],
-				'secret'     => $secret,
+				// Encrypted like the tokens are: for ten minutes this is the
+				// one thing that proves a site may collect them, and a
+				// database dump taken in that window should not carry it.
+				'secret'     => Secrets::encrypt( $secret ),
 				'user_id'    => (int) $user_id,
 			),
 			self::HANDSHAKE_TTL
@@ -220,7 +224,7 @@ class ConnectService {
 			array(
 				'session_id' => (string) $session_id,
 				'handoff'    => (string) $handoff,
-				'secret'     => (string) $pending['secret'],
+				'secret'     => Secrets::decrypt( (string) $pending['secret'] ),
 			)
 		);
 

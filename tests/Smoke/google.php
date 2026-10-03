@@ -15,6 +15,7 @@
 require __DIR__ . '/bootstrap.php';
 
 use FHINT\App\Google\Connection;
+use FHINT\App\Core\Secrets;
 use FHINT\App\Google\ConnectService;
 use FHINT\App\Google\Credentials;
 use FHINT\App\Google\OAuth;
@@ -417,5 +418,75 @@ check_same(
 	array_keys( $stored ),
 	'the token option holds exactly the expected keys'
 );
+
+// -- The connect handshake's secret is not left lying in the database -------
+//
+// For ten minutes that secret is the one thing that proves this site may
+// collect the tokens, so a database dump taken in that window must not carry
+// it in the clear.
+
+reset_google();
+
+add_filter(
+	'fhint_connect_url',
+	static function () {
+		return 'https://connect.example.test';
+	}
+);
+
+queue_http(
+	201,
+	array(
+		'session_id' => 'session-abc',
+		'start_url'  => 'https://connect.example.test/v1/start?session=session-abc',
+		'expires_in' => 600,
+	)
+);
+
+$start = ConnectService::start( 7 );
+
+check( ! is_wp_error( $start ), 'a connect handshake starts' );
+
+$stored = $GLOBALS['__transients'][ ConnectService::HANDSHAKE_TRANSIENT ];
+
+check( Secrets::is_encrypted( $stored['secret'] ), 'the stored handshake secret is encrypted' );
+check_same( 'session-abc', $stored['session_id'], 'while the session id, which is not a secret, is readable' );
+
+// The hash sent to the service is of the real secret, not of the ciphertext —
+// otherwise the exchange would be refused every time.
+$sent = json_decode( last_request()['args']['body'], true );
+
+check_same(
+	$sent['secret_hash'],
+	hash( 'sha256', Secrets::decrypt( $stored['secret'] ) ),
+	'and the hash the service holds matches the secret this site can read back'
+);
+
+// Collecting the tokens must present the secret itself, not the ciphertext —
+// the service compares a hash of the real value and would refuse otherwise.
+$plain = Secrets::decrypt( $stored['secret'] );
+
+queue_http(
+	200,
+	array(
+		'access_token'  => 'ya29.from-connect',
+		'refresh_token' => '1//from-connect',
+		'expires_in'    => 3600,
+		'scope'         => OAuth::SCOPE_BUSINESS,
+	)
+);
+
+$claimed = ConnectService::claim( 'session-abc', 'handoff-xyz', 7 );
+
+check( ! is_wp_error( $claimed ), 'the tokens can be collected' );
+check_same( 'ya29.from-connect', $claimed['access_token'], 'and come back intact' );
+
+$exchange = json_decode( last_request()['args']['body'], true );
+
+check_same( $plain, $exchange['secret'], 'the secret sent is the real one' );
+check( ! Secrets::is_encrypted( $exchange['secret'] ), 'never the stored ciphertext' );
+check_same( 'handoff-xyz', $exchange['handoff'], 'with the handoff from the redirect' );
+
+$GLOBALS['__filters']['fhint_connect_url'] = array();
 
 finish( 'Google Business Profile' );
