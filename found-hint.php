@@ -1,6 +1,6 @@
 <?php
 /**
- * Plugin Name:       FoundHint
+ * Plugin Name:       FoundHint — Local SEO & Schema for Google Business Profile
  * Plugin URI:        https://www.foundhint.com/
  * Description:       Local SEO command center — business profile, locations, schema, audits, Google Business Profile and ranking, all from one place.
  * Version:           0.1.0

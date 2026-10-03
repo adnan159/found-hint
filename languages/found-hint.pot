@@ -13,7 +13,7 @@ msgstr ""
 msgid "You must be logged in to do that."
 msgstr ""
 
-#: includes/API/AbstractController.php:55 includes/App/Google/Connection.php:186
+#: includes/API/AbstractController.php:55 includes/App/Google/Connection.php:191
 msgid "You do not have permission to manage this."
 msgstr ""
 
@@ -399,35 +399,35 @@ msgstr ""
 msgid "Google\\'s return reached this site carrying: %s"
 msgstr ""
 
-#: includes/App/Google/Connection.php:201 includes/App/Google/Connection.php:215
+#: includes/App/Google/Connection.php:206 includes/App/Google/Connection.php:220
 msgid "Access was declined on the Google consent screen. Nothing has changed."
 msgstr ""
 
-#: includes/App/Google/Connection.php:202
+#: includes/App/Google/Connection.php:207
 msgid "The sign-in did not complete. Please try again."
 msgstr ""
 
-#: includes/App/Google/Connection.php:229
+#: includes/App/Google/Connection.php:234
 msgid "Google did not return an authorization code."
 msgstr ""
 
-#: includes/App/Google/Connection.php:252 includes/App/Google/Connection.php:389
+#: includes/App/Google/Connection.php:257 includes/App/Google/Connection.php:394
 msgid "Connected to Google Business Profile."
 msgstr ""
 
-#: includes/App/Google/Connection.php:289
+#: includes/App/Google/Connection.php:294
 msgid "Disconnected from Google Business Profile."
 msgstr ""
 
-#: includes/App/Google/Connection.php:290
+#: includes/App/Google/Connection.php:295
 msgid "Disconnected locally; Google did not confirm the revocation."
 msgstr ""
 
-#: includes/App/Google/Connection.php:311
+#: includes/App/Google/Connection.php:316
 msgid "Connect your Google account first."
 msgstr ""
 
-#: includes/App/Google/Connection.php:341
+#: includes/App/Google/Connection.php:346
 msgid "Google rejected the stored grant; the connection was cleared."
 msgstr ""
 

@@ -175,6 +175,11 @@ class Connection {
 	 *
 	 * @return void
 	 */
+	// Google redirects the browser here; a redirect cannot carry a nonce.
+	// Cross-site forgery is covered instead by `state`, which is single use
+	// and bound to the user who began the handshake — a borrowed or replayed
+	// redirect claims nothing. Every value below is unslashed and sanitised.
+	// phpcs:disable WordPress.Security.NonceVerification.Recommended
 	public static function handle_callback() {
 		// Recorded before anything can go wrong, so a connection that never
 		// completes can be told apart from one that never came back at all.
@@ -362,7 +367,7 @@ class Connection {
 	 * @return void
 	 */
 	private static function complete_through_service() {
-		$handoff = sanitize_text_field( wp_unslash( $_GET['fhint_handoff'] ) );
+		$handoff = isset( $_GET['fhint_handoff'] ) ? sanitize_text_field( wp_unslash( $_GET['fhint_handoff'] ) ) : '';
 		$session = isset( $_GET['fhint_session'] ) ? sanitize_text_field( wp_unslash( $_GET['fhint_session'] ) ) : '';
 
 		$tokens = ConnectService::claim( $session, $handoff, get_current_user_id() );
@@ -399,6 +404,7 @@ class Connection {
 	 * @param string $message Operator-facing sentence.
 	 * @return void
 	 */
+	// phpcs:enable WordPress.Security.NonceVerification.Recommended
 	private static function fail( $code, $message ) {
 		update_option(
 			self::NOTICE_OPTION,

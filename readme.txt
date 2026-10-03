@@ -1,4 +1,4 @@
-=== FoundHint — Local SEO, Schema and Google Business Profile ===
+=== FoundHint — Local SEO & Schema for Google Business Profile ===
 Contributors: foundhint
 Tags: local seo, schema, google business profile, structured data, local business
 Requires at least: 6.4
@@ -53,6 +53,20 @@ Google requires an OAuth client, and an OAuth client requires one fixed web addr
 * Privacy policy: https://foundhint.com/privacy
 
 If you would rather not use that service, open **Google → Advanced: use your own Google client** and enter a client ID and secret from your own Google Cloud project. The plugin then talks only to Google.
+
+== Bundled resources ==
+
+The compiled admin application in `assets/build/` is built from the uncompressed
+JavaScript in `src/admin/`, which ships with the plugin. To reproduce it:
+
+`npm install --legacy-peer-deps && npm run build`
+
+It bundles one third-party resource, which is GPL-compatible:
+
+* **Archivo Variable** (webfont) — Omnibus-Type, SIL Open Font License 1.1. Source and licence: https://github.com/Omnibus-Type/Archivo
+
+No script or stylesheet is loaded from a remote host; everything is served from
+the plugin folder.
 
 == Installation ==
 
