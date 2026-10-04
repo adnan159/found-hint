@@ -60,7 +60,7 @@ export default function SettingsPage() {
         log_retention_days: Number(form.log_retention_days),
       }).unwrap();
       setDirty(false);
-      toast.success(__("Settings saved.", "found-hint"));
+      toast.success(__("Settings saved.", "foundhint-local-seo"));
     } catch {
       // Shown inline.
     }
@@ -72,19 +72,19 @@ export default function SettingsPage() {
       toast.success(
         sprintf(
           /* translators: %d: number of log entries removed. */
-          __("Removed %d log entries.", "found-hint"),
+          __("Removed %d log entries.", "foundhint-local-seo"),
           result.removed ?? 0,
         ),
       );
     } catch {
-      toast.error(__("Could not clear the log.", "found-hint"));
+      toast.error(__("Could not clear the log.", "foundhint-local-seo"));
     }
   };
 
   if (isLoading) {
     return (
       <>
-        <PageHeader title={__("Settings", "found-hint")} />
+        <PageHeader title={__("Settings", "foundhint-local-seo")} />
         <Skeleton className="fhint:h-64 fhint:w-full" />
       </>
     );
@@ -93,8 +93,11 @@ export default function SettingsPage() {
   return (
     <>
       <PageHeader
-        title={__("Settings", "found-hint")}
-        description={__("How FoundHint behaves on this site.", "found-hint")}
+        title={__("Settings", "foundhint-local-seo")}
+        description={__(
+          "How FoundHint behaves on this site.",
+          "foundhint-local-seo",
+        )}
       />
 
       <form
@@ -105,10 +108,10 @@ export default function SettingsPage() {
 
         <SectionCard
           id="settings-data"
-          title={__("Your data", "found-hint")}
+          title={__("Your data", "foundhint-local-seo")}
           description={__(
             "Nothing is deleted when you remove the plugin unless you ask for it here.",
-            "found-hint",
+            "foundhint-local-seo",
           )}
         >
           <Field orientation="horizontal">
@@ -127,13 +130,13 @@ export default function SettingsPage() {
               <FieldLabel htmlFor="fhint-delete-data">
                 {__(
                   "Delete everything when the plugin is removed",
-                  "found-hint",
+                  "foundhint-local-seo",
                 )}
               </FieldLabel>
               <FieldDescription>
                 {__(
                   "Off by default. Deleting the plugin to troubleshoot should not cost you your business details, locations and services.",
-                  "found-hint",
+                  "foundhint-local-seo",
                 )}
               </FieldDescription>
             </div>
@@ -142,10 +145,10 @@ export default function SettingsPage() {
 
         <SectionCard
           id="settings-log"
-          title={__("Activity log", "found-hint")}
+          title={__("Activity log", "foundhint-local-seo")}
           description={__(
             "FoundHint records what it does, so a problem can be traced later.",
-            "found-hint",
+            "foundhint-local-seo",
           )}
         >
           <FieldGroup className="fhint:flex fhint:flex-col fhint:gap-4">
@@ -154,7 +157,7 @@ export default function SettingsPage() {
               data-invalid={errors.log_retention_days ? true : undefined}
             >
               <FieldLabel htmlFor="fhint-retention">
-                {__("Keep entries for", "found-hint")}
+                {__("Keep entries for", "foundhint-local-seo")}
               </FieldLabel>
               <Input
                 id="fhint-retention"
@@ -175,7 +178,7 @@ export default function SettingsPage() {
                 <FieldError>{errors.log_retention_days}</FieldError>
               ) : (
                 <FieldDescription>
-                  {__("Days, between 1 and 365.", "found-hint")}
+                  {__("Days, between 1 and 365.", "foundhint-local-seo")}
                 </FieldDescription>
               )}
             </Field>
@@ -184,7 +187,7 @@ export default function SettingsPage() {
               <span className="fhint:text-sm fhint:text-muted-foreground">
                 {sprintf(
                   /* translators: %d: number of entries currently stored. */
-                  __("%d entries stored.", "found-hint"),
+                  __("%d entries stored.", "foundhint-local-seo"),
                   system.log_entries ?? 0,
                 )}
               </span>
@@ -195,7 +198,7 @@ export default function SettingsPage() {
                 disabled={isPurging}
                 onClick={() => onPurge("expired")}
               >
-                {__("Remove expired entries", "found-hint")}
+                {__("Remove expired entries", "foundhint-local-seo")}
               </Button>
               <Button
                 type="button"
@@ -204,7 +207,7 @@ export default function SettingsPage() {
                 disabled={isPurging}
                 onClick={() => onPurge("all")}
               >
-                {__("Clear the log", "found-hint")}
+                {__("Clear the log", "foundhint-local-seo")}
               </Button>
             </div>
           </FieldGroup>
@@ -213,11 +216,11 @@ export default function SettingsPage() {
         <div className="fhint:flex fhint:items-center fhint:gap-3">
           <Button type="submit" disabled={isSaving}>
             {isSaving ? <Spinner data-icon="inline-start" /> : null}
-            {__("Save settings", "found-hint")}
+            {__("Save settings", "foundhint-local-seo")}
           </Button>
           {dirty ? (
             <span className="fhint:text-sm fhint:text-muted-foreground">
-              {__("You have unsaved changes.", "found-hint")}
+              {__("You have unsaved changes.", "foundhint-local-seo")}
             </span>
           ) : null}
         </div>
@@ -225,47 +228,47 @@ export default function SettingsPage() {
 
       <SectionCard
         id="settings-system"
-        title={__("System", "found-hint")}
+        title={__("System", "foundhint-local-seo")}
         description={__(
           "Read-only. Safe to copy into a support request.",
-          "found-hint",
+          "foundhint-local-seo",
         )}
       >
         <dl className="fhint:grid fhint:grid-cols-1 fhint:gap-x-8 fhint:gap-y-2 fhint:text-sm fhint:sm:grid-cols-2">
           <SystemRow
-            label={__("Plugin version", "found-hint")}
+            label={__("Plugin version", "foundhint-local-seo")}
             value={system.plugin_version}
           />
           <SystemRow
-            label={__("Database version", "found-hint")}
+            label={__("Database version", "foundhint-local-seo")}
             value={system.db_version}
           />
           <SystemRow
-            label={__("Tables", "found-hint")}
+            label={__("Tables", "foundhint-local-seo")}
             value={
               system.db_needs_install
                 ? sprintf(
                     /* translators: %s: comma-separated list of missing table names. */
-                    __("Missing: %s", "found-hint"),
+                    __("Missing: %s", "foundhint-local-seo"),
                     (system.tables_missing ?? []).join(", "),
                   )
                 : sprintf(
                     /* translators: %d: number of database tables. */
-                    __("%d present", "found-hint"),
+                    __("%d present", "foundhint-local-seo"),
                     system.tables_total ?? 0,
                   )
             }
           />
           <SystemRow
-            label={__("PHP version", "found-hint")}
+            label={__("PHP version", "foundhint-local-seo")}
             value={system.php_version}
           />
           <SystemRow
-            label={__("WordPress version", "found-hint")}
+            label={__("WordPress version", "foundhint-local-seo")}
             value={system.wp_version}
           />
           <SystemRow
-            label={__("Time zone", "found-hint")}
+            label={__("Time zone", "foundhint-local-seo")}
             value={system.timezone}
           />
         </dl>

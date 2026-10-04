@@ -76,14 +76,14 @@ class GoogleConnected extends Rule {
 
 		if ( 'needs_reconnect' === $status ) {
 			return Result::fail(
-				__( 'Your Google connection is missing permission to manage the profile.', 'found-hint' ),
-				__( 'Connect again and accept all the requested permissions.', 'found-hint' )
+				__( 'Your Google connection is missing permission to manage the profile.', 'foundhint-local-seo' ),
+				__( 'Connect again and accept all the requested permissions.', 'foundhint-local-seo' )
 			)->about( 'business', $context->business_id() );
 		}
 
 		return Result::fail(
-			__( 'No Google Business Profile connected.', 'found-hint' ),
-			__( 'Connect one to see how Google shows your business today.', 'found-hint' ),
+			__( 'No Google Business Profile connected.', 'foundhint-local-seo' ),
+			__( 'Connect one to see how Google shows your business today.', 'foundhint-local-seo' ),
 			array( 'status' => $status )
 		)->about( 'business', $context->business_id() );
 	}

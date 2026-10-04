@@ -39,7 +39,7 @@ class Admin {
 		$settings_link = sprintf(
 			'<a href="%s">%s</a>',
 			esc_url( admin_url( 'admin.php?page=' . Menu::SLUG . '#/settings' ) ),
-			esc_html__( 'Settings', 'found-hint' )
+			esc_html__( 'Settings', 'foundhint-local-seo' )
 		);
 
 		array_unshift( $links, $settings_link );

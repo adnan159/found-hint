@@ -104,10 +104,10 @@ class SchemaConflict extends Rule {
 		return Result::fail(
 			sprintf(
 				/* translators: %s: comma-separated plugin names. */
-				__( '%s may also be publishing local business markup.', 'found-hint' ),
+				__( '%s may also be publishing local business markup.', 'foundhint-local-seo' ),
 				implode( ', ', $risky )
 			),
-			__( 'Two descriptions of one business on a page compete. View your page source, then decide who publishes it on the Schema screen.', 'found-hint' ),
+			__( 'Two descriptions of one business on a page compete. View your page source, then decide who publishes it on the Schema screen.', 'foundhint-local-seo' ),
 			array( 'plugins' => $risky )
 		)->about( 'business', $context->business_id() );
 	}

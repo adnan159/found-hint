@@ -44,7 +44,7 @@ function MappingRow({ location, googleLocations, onMap, onUnmap, isBusy }) {
       <div className="fhint:flex fhint:flex-wrap fhint:items-start fhint:gap-4 fhint:border fhint:border-border fhint:px-4 fhint:py-3.5">
         <div className="fhint:min-w-0 fhint:flex-1">
           <div className="fhint:text-[13px] fhint:font-bold">
-            {location.name || __("Untitled location", "found-hint")}
+            {location.name || __("Untitled location", "foundhint-local-seo")}
           </div>
           <div className="fhint:text-[12.5px] fhint:text-muted-strong">
             {location.address}
@@ -66,7 +66,7 @@ function MappingRow({ location, googleLocations, onMap, onUnmap, isBusy }) {
           onClick={() => onUnmap(location.mapped_to)}
         >
           <UnlinkIcon data-icon="inline-start" />
-          {__("Unlink", "found-hint")}
+          {__("Unlink", "foundhint-local-seo")}
         </Button>
       </div>
     );
@@ -76,7 +76,7 @@ function MappingRow({ location, googleLocations, onMap, onUnmap, isBusy }) {
     <div className="fhint:flex fhint:flex-wrap fhint:items-start fhint:gap-4 fhint:border fhint:border-border fhint:px-4 fhint:py-3.5">
       <div className="fhint:min-w-0 fhint:flex-1">
         <div className="fhint:text-[13px] fhint:font-bold">
-          {location.name || __("Untitled location", "found-hint")}
+          {location.name || __("Untitled location", "foundhint-local-seo")}
         </div>
         <div className="fhint:text-[12.5px] fhint:text-muted-strong">
           {location.address}
@@ -89,12 +89,12 @@ function MappingRow({ location, googleLocations, onMap, onUnmap, isBusy }) {
             id={`fhint-map-${location.id}`}
             aria-label={sprintf(
               /* translators: %s: name of one of this site's locations. */
-              __("Google profile for %s", "found-hint"),
+              __("Google profile for %s", "foundhint-local-seo"),
               location.name,
             )}
           >
             <SelectValue
-              placeholder={__("Choose a Google profile", "found-hint")}
+              placeholder={__("Choose a Google profile", "foundhint-local-seo")}
             />
           </SelectTrigger>
           <SelectContent>
@@ -105,7 +105,7 @@ function MappingRow({ location, googleLocations, onMap, onUnmap, isBusy }) {
               >
                 {candidate.title || candidate.location_name}
                 {suggestionNames.has(candidate.location_name)
-                  ? ` — ${__("looks like a match", "found-hint")}`
+                  ? ` — ${__("looks like a match", "foundhint-local-seo")}`
                   : ""}
               </SelectItem>
             ))}
@@ -116,7 +116,7 @@ function MappingRow({ location, googleLocations, onMap, onUnmap, isBusy }) {
           <p className="fhint:text-[12.5px] fhint:text-muted-strong">
             {sprintf(
               /* translators: %s: name of the closest matching Google profile. */
-              __("Closest match: %s", "found-hint"),
+              __("Closest match: %s", "foundhint-local-seo"),
               location.suggestions[0].title ||
                 location.suggestions[0].location_name,
             )}
@@ -130,7 +130,7 @@ function MappingRow({ location, googleLocations, onMap, onUnmap, isBusy }) {
         onClick={() => onMap(choice, location.id)}
       >
         <LinkIcon data-icon="inline-start" />
-        {__("Link", "found-hint")}
+        {__("Link", "foundhint-local-seo")}
       </Button>
     </div>
   );
@@ -152,7 +152,7 @@ export function LocationMapping({ overview, isConnected }) {
         location_name: locationName,
         fhint_location_id: fhintLocationId,
       }).unwrap();
-      toast.success(__("Linked.", "found-hint"));
+      toast.success(__("Linked.", "foundhint-local-seo"));
     } catch {
       // Shown inline.
     }
@@ -161,7 +161,7 @@ export function LocationMapping({ overview, isConnected }) {
   const onUnmap = async (locationName) => {
     try {
       await unmap({ location_name: locationName }).unwrap();
-      toast.success(__("Unlinked.", "found-hint"));
+      toast.success(__("Unlinked.", "foundhint-local-seo"));
     } catch {
       // Shown inline.
     }
@@ -170,36 +170,38 @@ export function LocationMapping({ overview, isConnected }) {
   return (
     <SectionCard
       id="google-mapping"
-      title={__("Location mapping", "found-hint")}
+      title={__("Location mapping", "foundhint-local-seo")}
       description={__(
         "Say which Google profile is which of your locations. Nothing is linked for you.",
-        "found-hint",
+        "foundhint-local-seo",
       )}
     >
       <RequestError error={mapError ?? unmapError} />
 
       {locations.length === 0 ? (
         <Empty>
-          <EmptyTitle>{__("No locations yet", "found-hint")}</EmptyTitle>
+          <EmptyTitle>
+            {__("No locations yet", "foundhint-local-seo")}
+          </EmptyTitle>
           <EmptyDescription>
             {__(
               "Add a location first, then come back to link it to its Google profile.",
-              "found-hint",
+              "foundhint-local-seo",
             )}
           </EmptyDescription>
         </Empty>
       ) : googleLocations.length === 0 ? (
         <Empty>
           <EmptyTitle>
-            {__("No Google profiles read yet", "found-hint")}
+            {__("No Google profiles read yet", "foundhint-local-seo")}
           </EmptyTitle>
           <EmptyDescription>
             {isConnected
               ? __(
                   "Read from Google above, then link each location to its profile.",
-                  "found-hint",
+                  "foundhint-local-seo",
                 )
-              : __("Connect a Google account first.", "found-hint")}
+              : __("Connect a Google account first.", "foundhint-local-seo")}
           </EmptyDescription>
         </Empty>
       ) : (

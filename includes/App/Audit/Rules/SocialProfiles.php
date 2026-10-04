@@ -63,8 +63,8 @@ class SocialProfiles extends Rule {
 		}
 
 		return Result::fail(
-			__( 'No social profiles.', 'found-hint' ),
-			__( 'Add at least one. They are published as corroborating links for the same business.', 'found-hint' )
+			__( 'No social profiles.', 'foundhint-local-seo' ),
+			__( 'Add at least one. They are published as corroborating links for the same business.', 'foundhint-local-seo' )
 		)->about( 'business', $context->business_id() );
 	}
 }

@@ -44,7 +44,7 @@ export function GoogleSignInButton({
       )}
     >
       {isBusy ? <Spinner className="fhint:size-[18px]" /> : <GoogleMark />}
-      {label || __("Continue with Google", "found-hint")}
+      {label || __("Continue with Google", "foundhint-local-seo")}
     </button>
   );
 }

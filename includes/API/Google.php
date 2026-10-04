@@ -278,7 +278,7 @@ class Google extends AbstractController {
 		if ( ! Credentials::configured() ) {
 			return new WP_Error(
 				'fhint_google_credentials_incomplete',
-				__( 'Both the client id and the client secret are needed.', 'found-hint' ),
+				__( 'Both the client id and the client secret are needed.', 'foundhint-local-seo' ),
 				array( 'status' => 400 )
 			);
 		}

@@ -82,10 +82,10 @@ class HoursComplete extends Rule {
 		return Result::fail(
 			sprintf(
 				/* translators: %d: number of days with no answer. */
-				_n( '%d day has no answer.', '%d days have no answer.', count( $unset ), 'found-hint' ),
+				_n( '%d day has no answer.', '%d days have no answer.', count( $unset ), 'foundhint-local-seo' ),
 				count( $unset )
 			),
-			__( 'Set every day to open or closed. A day left blank publishes nothing, which is not the same as saying you are shut.', 'found-hint' ),
+			__( 'Set every day to open or closed. A day left blank publishes nothing, which is not the same as saying you are shut.', 'foundhint-local-seo' ),
 			array( 'days' => $unset )
 		)->about( 'location', $context->location_id() );
 	}

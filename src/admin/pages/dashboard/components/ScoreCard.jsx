@@ -26,22 +26,22 @@ import { useRunAuditMutation } from "@/store/api/auditsApi";
 const BANDS = [
   {
     id: "needs_work",
-    label: () => __("Needs work", "found-hint"),
+    label: () => __("Needs work", "foundhint-local-seo"),
     fill: "fhint:bg-band-needs-work",
   },
   {
     id: "fair",
-    label: () => __("Fair", "found-hint"),
+    label: () => __("Fair", "foundhint-local-seo"),
     fill: "fhint:bg-band-fair",
   },
   {
     id: "good",
-    label: () => __("Good", "found-hint"),
+    label: () => __("Good", "foundhint-local-seo"),
     fill: "fhint:bg-band-good",
   },
   {
     id: "excellent",
-    label: () => __("Excellent", "found-hint"),
+    label: () => __("Excellent", "foundhint-local-seo"),
     fill: "fhint:bg-band-excellent",
   },
 ];
@@ -97,7 +97,7 @@ export function relativeTime(value, now = Date.now()) {
 export function trendCopy(trend) {
   if (!trend || trend.delta === null || trend.delta === undefined) {
     return {
-      text: __("Your first check — no trend yet.", "found-hint"),
+      text: __("Your first check — no trend yet.", "foundhint-local-seo"),
       tone: "muted",
     };
   }
@@ -116,12 +116,12 @@ export function trendCopy(trend) {
       text: trend.covers_full_window
         ? sprintf(
             /* translators: %d: number of days. */
-            __("No change in the last %d days", "found-hint"),
+            __("No change in the last %d days", "foundhint-local-seo"),
             trend.window_days,
           )
         : sprintf(
             /* translators: %s: a date, e.g. "Sep 9". */
-            __("No change since %s", "found-hint"),
+            __("No change since %s", "foundhint-local-seo"),
             date,
           ),
       tone: "muted",
@@ -137,13 +137,13 @@ export function trendCopy(trend) {
     text: trend.covers_full_window
       ? sprintf(
           /* translators: 1: signed change, e.g. "+6", 2: number of days. */
-          __("%1$s in the last %2$d days", "found-hint"),
+          __("%1$s in the last %2$d days", "foundhint-local-seo"),
           signed,
           trend.window_days,
         )
       : sprintf(
           /* translators: 1: signed change, e.g. "+6", 2: a date, e.g. "Sep 9". */
-          __("%1$s since %2$s", "found-hint"),
+          __("%1$s since %2$s", "foundhint-local-seo"),
           signed,
           date,
         ),
@@ -214,13 +214,13 @@ export function ScoreCard({ summary }) {
           id="fhint-score-title"
           className="fhint:m-0 fhint:font-heading fhint:text-[13px] fhint:font-extrabold fhint:tracking-[0.1em] fhint:uppercase"
         >
-          {__("Local SEO health score", "found-hint")}
+          {__("Local SEO health score", "foundhint-local-seo")}
         </h2>
         {hasAudit ? (
           <span className="fhint:ml-auto fhint:text-[11.5px] fhint:text-muted-foreground">
             {sprintf(
               /* translators: %s: relative time, e.g. "12 minutes ago". */
-              __("Checked %s", "found-hint"),
+              __("Checked %s", "foundhint-local-seo"),
               relativeTime(summary.completed_at),
             )}
           </span>
@@ -231,7 +231,7 @@ export function ScoreCard({ summary }) {
           default "That did not save" would describe the wrong failure. */}
       <RequestError
         error={runError}
-        title={__("The check did not run", "found-hint")}
+        title={__("The check did not run", "foundhint-local-seo")}
       />
 
       {hasAudit ? (
@@ -240,7 +240,7 @@ export function ScoreCard({ summary }) {
             <div className="fhint:font-heading fhint:text-[68px] fhint:leading-[0.9] fhint:font-extrabold fhint:tracking-[-0.04em]">
               {summary.score}
               <span className="fhint:sr-only">
-                {__(" out of 100", "found-hint")}
+                {__(" out of 100", "foundhint-local-seo")}
               </span>
             </div>
             <div className="fhint:pb-1.5">
@@ -269,7 +269,7 @@ export function ScoreCard({ summary }) {
             >
               {__(
                 "Your details have changed since this check, so this score may be out of date.",
-                "found-hint",
+                "foundhint-local-seo",
               )}
             </div>
           ) : null}
@@ -277,7 +277,7 @@ export function ScoreCard({ summary }) {
           <p className="fhint:mt-3.5 fhint:mb-0 fhint:text-[12.5px] fhint:leading-[1.45] fhint:text-muted-strong">
             {__(
               "This is FoundHint's own read on how complete and consistent your local details are. It is not a Google ranking.",
-              "found-hint",
+              "foundhint-local-seo",
             )}
           </p>
 
@@ -289,28 +289,30 @@ export function ScoreCard({ summary }) {
               {summary.open_findings > 0
                 ? sprintf(
                     /* translators: %d: number of open findings. */
-                    __("See what to fix (%d)", "found-hint"),
+                    __("See what to fix (%d)", "foundhint-local-seo"),
                     summary.open_findings,
                   )
-                : __("View the audit", "found-hint")}
+                : __("View the audit", "foundhint-local-seo")}
             </Button>
-            {summary.stale ? runButton(__("Check again", "found-hint")) : null}
+            {summary.stale
+              ? runButton(__("Check again", "foundhint-local-seo"))
+              : null}
           </div>
         </>
       ) : (
         <>
           <div className="fhint:mt-3.5 fhint:font-heading fhint:text-[18px] fhint:font-extrabold">
-            {__("No score yet", "found-hint")}
+            {__("No score yet", "foundhint-local-seo")}
           </div>
           <BandBar band={null} />
           <p className="fhint:mt-3.5 fhint:mb-0 fhint:text-[12.5px] fhint:leading-[1.45] fhint:text-muted-strong">
             {__(
               "Run a check to see how complete and consistent your local details are. It takes a moment and changes nothing.",
-              "found-hint",
+              "foundhint-local-seo",
             )}
           </p>
           <div className="fhint:mt-auto">
-            {runButton(__("Run your first check", "found-hint"))}
+            {runButton(__("Run your first check", "foundhint-local-seo"))}
           </div>
         </>
       )}

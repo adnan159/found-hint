@@ -102,7 +102,7 @@ class Client {
 		if ( is_wp_error( $response ) ) {
 			return new WP_Error(
 				'fhint_google_unreachable',
-				__( 'Google could not be reached. Please try again.', 'found-hint' ),
+				__( 'Google could not be reached. Please try again.', 'foundhint-local-seo' ),
 				array( 'status' => 502 )
 			);
 		}
@@ -143,7 +143,7 @@ class Client {
 		$reason = isset( $decoded['error']['status'] ) ? (string) $decoded['error']['status'] : '';
 
 		if ( 403 === $status || 'PERMISSION_DENIED' === $reason ) {
-			return __( 'Google refused the request. The Business Profile APIs have to be enabled for your Google Cloud project, and Google has to approve your project for them before they return anything.', 'found-hint' );
+			return __( 'Google refused the request. The Business Profile APIs have to be enabled for your Google Cloud project, and Google has to approve your project for them before they return anything.', 'foundhint-local-seo' );
 		}
 
 		if ( 429 === $status || 'RESOURCE_EXHAUSTED' === $reason ) {
@@ -151,14 +151,14 @@ class Client {
 		}
 
 		if ( 401 === $status ) {
-			return __( 'Google rejected the sign-in. Connect again.', 'found-hint' );
+			return __( 'Google rejected the sign-in. Connect again.', 'foundhint-local-seo' );
 		}
 
 		if ( isset( $decoded['error']['message'] ) ) {
 			return (string) $decoded['error']['message'];
 		}
 
-		return __( 'Google refused the request.', 'found-hint' );
+		return __( 'Google refused the request.', 'foundhint-local-seo' );
 	}
 
 	/**
@@ -183,14 +183,14 @@ class Client {
 		$limit = self::quota_limit_value( $decoded );
 
 		if ( '0' === $limit ) {
-			return __( 'Google has granted this project no quota for the Business Profile APIs, which means it has not been approved for them yet. Approval is a separate request to Google — waiting will not change this.', 'found-hint' );
+			return __( 'Google has granted this project no quota for the Business Profile APIs, which means it has not been approved for them yet. Approval is a separate request to Google — waiting will not change this.', 'foundhint-local-seo' );
 		}
 
 		if ( null !== $limit ) {
-			return __( 'Google is rate limiting this project. Wait a few minutes and try again.', 'found-hint' );
+			return __( 'Google is rate limiting this project. Wait a few minutes and try again.', 'foundhint-local-seo' );
 		}
 
-		return __( 'Google refused the request as over quota. On a new project this normally means Google has not approved it for the Business Profile APIs yet; on an approved one it means too many requests just now.', 'found-hint' );
+		return __( 'Google refused the request as over quota. On a new project this normally means Google has not approved it for the Business Profile APIs yet; on an approved one it means too many requests just now.', 'foundhint-local-seo' );
 	}
 
 	/**

@@ -85,8 +85,8 @@ class GooglePhoneMatches extends Rule {
 		}
 
 		return Result::fail(
-			__( 'Your phone number does not match your Google profile.', 'found-hint' ),
-			__( 'Use the same number in both places.', 'found-hint' ),
+			__( 'Your phone number does not match your Google profile.', 'foundhint-local-seo' ),
+			__( 'Use the same number in both places.', 'foundhint-local-seo' ),
 			array(
 				'found'    => $context->nap_value( 'phone' ),
 				'expected' => (string) $context->google_location['phone'],

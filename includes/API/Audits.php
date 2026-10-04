@@ -197,7 +197,7 @@ class Audits extends AbstractController {
 		if ( empty( $issue['fix_handler'] ) ) {
 			return new WP_Error(
 				'fhint_fix_unavailable',
-				__( 'This one has to be done by hand.', 'found-hint' ),
+				__( 'This one has to be done by hand.', 'foundhint-local-seo' ),
 				array( 'status' => 400 )
 			);
 		}

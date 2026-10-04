@@ -10,27 +10,27 @@ import { Button } from "@/components/ui/button";
  */
 const PILLARS = [
   {
-    eyebrow: __("Build", "found-hint"),
-    title: __("Your details, once", "found-hint"),
+    eyebrow: __("Build", "foundhint-local-seo"),
+    title: __("Your details, once", "foundhint-local-seo"),
     body: __(
       "Name, address, hours and services live in one place.",
-      "found-hint",
+      "foundhint-local-seo",
     ),
   },
   {
-    eyebrow: __("Publish", "found-hint"),
-    title: __("Say it consistently", "found-hint"),
+    eyebrow: __("Publish", "foundhint-local-seo"),
+    title: __("Say it consistently", "foundhint-local-seo"),
     body: __(
       "The same details everywhere they appear, so nothing contradicts itself.",
-      "found-hint",
+      "foundhint-local-seo",
     ),
   },
   {
-    eyebrow: __("Keep", "found-hint"),
-    title: __("Change it in one place", "found-hint"),
+    eyebrow: __("Keep", "foundhint-local-seo"),
+    title: __("Change it in one place", "foundhint-local-seo"),
     body: __(
       "Move premises or change your hours and you edit it once.",
-      "found-hint",
+      "foundhint-local-seo",
     ),
   },
 ];
@@ -42,16 +42,16 @@ export function WelcomeStep({ onStart, onSkipToDashboard }) {
         <p className="fhint:max-w-[58ch] fhint:text-[16.5px] fhint:leading-relaxed fhint:text-[#444141]">
           {__(
             "Set up your business details so customers and search engines find the same answers wherever they look — your address, your opening hours and what you offer.",
-            "found-hint",
+            "foundhint-local-seo",
           )}
         </p>
 
         <div className="fhint:flex fhint:flex-wrap fhint:gap-2.5">
           <Button size="lg" onClick={onStart}>
-            {__("Get started", "found-hint")}
+            {__("Get started", "foundhint-local-seo")}
           </Button>
           <Button size="lg" variant="outline" onClick={onSkipToDashboard}>
-            {__("Skip to dashboard", "found-hint")}
+            {__("Skip to dashboard", "foundhint-local-seo")}
           </Button>
         </div>
       </div>
@@ -75,7 +75,7 @@ export function WelcomeStep({ onStart, onSkipToDashboard }) {
       <p className="fhint:text-[12.5px] fhint:text-muted-foreground">
         {__(
           "Takes about five minutes. You can change anything later.",
-          "found-hint",
+          "foundhint-local-seo",
         )}
       </p>
     </div>

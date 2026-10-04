@@ -3,10 +3,10 @@ import { CheckIcon, MinusIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 const LABELS = {
-  business: () => __("Business details", "found-hint"),
-  location: () => __("Address", "found-hint"),
-  hours: () => __("Opening hours", "found-hint"),
-  services: () => __("Services", "found-hint"),
+  business: () => __("Business details", "foundhint-local-seo"),
+  location: () => __("Address", "foundhint-local-seo"),
+  hours: () => __("Opening hours", "foundhint-local-seo"),
+  services: () => __("Services", "foundhint-local-seo"),
 };
 
 /**
@@ -47,8 +47,8 @@ export function DoneStep({ steps, onFinish, onBack }) {
             </span>
             <span className="fhint:ml-auto fhint:text-[12.5px] fhint:text-muted-strong">
               {step.done
-                ? __("Done", "found-hint")
-                : __("Still to do", "found-hint")}
+                ? __("Done", "foundhint-local-seo")
+                : __("Still to do", "foundhint-local-seo")}
             </span>
           </li>
         ))}
@@ -58,13 +58,13 @@ export function DoneStep({ steps, onFinish, onBack }) {
         {outstanding.length === 0
           ? __(
               "That is everything. You can change any of it at any time — the dashboard keeps track from here.",
-              "found-hint",
+              "foundhint-local-seo",
             )
           : sprintf(
               /* translators: %d: number of steps not yet completed. */
               __(
                 "You can finish the remaining %d from the dashboard whenever you like; nothing here is locked in.",
-                "found-hint",
+                "foundhint-local-seo",
               ),
               outstanding.length,
             )}
@@ -72,10 +72,10 @@ export function DoneStep({ steps, onFinish, onBack }) {
 
       <div className="fhint:flex fhint:flex-wrap fhint:items-center fhint:gap-2.5 fhint:border-t fhint:border-t-border fhint:pt-5">
         <Button size="lg" onClick={onFinish}>
-          {__("Go to the dashboard", "found-hint")}
+          {__("Go to the dashboard", "foundhint-local-seo")}
         </Button>
         <Button size="lg" variant="outline" onClick={onBack}>
-          {__("Back", "found-hint")}
+          {__("Back", "foundhint-local-seo")}
         </Button>
       </div>
     </div>

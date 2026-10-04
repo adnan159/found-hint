@@ -63,7 +63,7 @@ export function GoogleCard() {
   const onSync = async () => {
     try {
       await sync().unwrap();
-      toast.success(__("Read your Google profiles.", "found-hint"));
+      toast.success(__("Read your Google profiles.", "foundhint-local-seo"));
     } catch {
       // Shown inline: Google's refusals are specific enough to read.
     }
@@ -78,7 +78,7 @@ export function GoogleCard() {
         id="fhint-google-card-title"
         className="fhint:m-0 fhint:mb-3.5 fhint:font-heading fhint:text-[13px] fhint:font-extrabold fhint:tracking-[0.1em] fhint:uppercase"
       >
-        {__("Google Business Profile", "found-hint")}
+        {__("Google Business Profile", "foundhint-local-seo")}
       </h2>
 
       <RequestError error={error ?? syncError} />
@@ -88,7 +88,7 @@ export function GoogleCard() {
           {connected ? (
             <div className="fhint:flex fhint:items-center fhint:gap-2 fhint:text-[15px] fhint:font-extrabold fhint:text-success">
               <CheckIcon aria-hidden="true" className="fhint:size-[17px]" />
-              {__("Connected", "found-hint")}
+              {__("Connected", "foundhint-local-seo")}
             </div>
           ) : (
             <div className="fhint:flex fhint:items-center fhint:gap-2 fhint:text-[15px] fhint:font-extrabold fhint:text-band-fair">
@@ -96,24 +96,26 @@ export function GoogleCard() {
                 aria-hidden="true"
                 className="fhint:size-[17px]"
               />
-              {__("Needs reconnecting", "found-hint")}
+              {__("Needs reconnecting", "foundhint-local-seo")}
             </div>
           )}
 
           <div className="fhint:my-3.5 fhint:mb-4.5 fhint:grid fhint:gap-[9px] fhint:text-[13px]">
             {/* The address is the one fact that proves *which* account is
                 connected, which is the question this card answers. */}
-            <Fact label={__("Google account", "found-hint")}>
-              {google?.account_email || __("Unknown", "found-hint")}
+            <Fact label={__("Google account", "foundhint-local-seo")}>
+              {google?.account_email || __("Unknown", "foundhint-local-seo")}
             </Fact>
-            <Fact label={__("Profiles read", "found-hint")}>
+            <Fact label={__("Profiles read", "foundhint-local-seo")}>
               {profiles.length}
             </Fact>
-            <Fact label={__("Locations linked", "found-hint")}>{linked}</Fact>
-            <Fact label={__("Last read", "found-hint")}>
+            <Fact label={__("Locations linked", "foundhint-local-seo")}>
+              {linked}
+            </Fact>
+            <Fact label={__("Last read", "foundhint-local-seo")}>
               {overview?.synced_at
                 ? formatWhen(overview.synced_at)
-                : __("Never", "found-hint")}
+                : __("Never", "foundhint-local-seo")}
             </Fact>
           </div>
 
@@ -123,7 +125,7 @@ export function GoogleCard() {
                 onClick={connect}
                 disabled={isConnecting}
                 isBusy={isConnecting}
-                label={__("Reconnect with Google", "found-hint")}
+                label={__("Reconnect with Google", "foundhint-local-seo")}
               />
             ) : (
               <Button
@@ -133,7 +135,7 @@ export function GoogleCard() {
                 className="fhint:h-auto fhint:px-[15px] fhint:py-2.5 fhint:text-[13.5px] fhint:font-extrabold"
               >
                 {isSyncing ? <Spinner data-icon="inline-start" /> : null}
-                {__("Read from Google", "found-hint")}
+                {__("Read from Google", "foundhint-local-seo")}
               </Button>
             )}
             <Button
@@ -141,7 +143,7 @@ export function GoogleCard() {
               render={<Link to="/google" />}
               className="fhint:h-auto fhint:px-[15px] fhint:py-2.5 fhint:text-[13.5px] fhint:font-bold"
             >
-              {__("Manage", "found-hint")}
+              {__("Manage", "foundhint-local-seo")}
             </Button>
           </div>
         </div>
@@ -154,12 +156,15 @@ export function GoogleCard() {
               className="fhint:mb-3 fhint:size-[26px] fhint:text-sidebar-chevron"
             />
             <strong className="fhint:mb-1.5 fhint:block fhint:font-heading fhint:text-[16px] fhint:font-extrabold">
-              {__("Connect your Google Business Profile", "found-hint")}
+              {__(
+                "Connect your Google Business Profile",
+                "foundhint-local-seo",
+              )}
             </strong>
             <p className="fhint:mb-4 fhint:text-[13px] fhint:leading-[1.5] fhint:text-muted-strong">
               {__(
                 "See how Google shows your business right now, spot details that do not match your website, and reply to reviews from here.",
-                "found-hint",
+                "foundhint-local-seo",
               )}
             </p>
             <GoogleSignInButton

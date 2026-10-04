@@ -49,8 +49,8 @@ Google requires an OAuth client, and an OAuth client requires one fixed web addr
 * What is sent: your site's address, the address Google should return your browser to, and — when an access token expires — your refresh token, so a new access token can be issued. Tokens pass through and are not stored by the service.
 * What is **not** sent: your business data. Once your site has a token it talks to Google directly, and nothing about your business reaches foundhint.com.
 * When: when you start a Google sign-in, and when an access token needs renewing (about hourly while you use the Google screens).
-* Terms of service: https://foundhint.com/terms
-* Privacy policy: https://foundhint.com/privacy
+* Terms of service: https://foundhint.com/terms-and-conditions/
+* Privacy policy: https://foundhint.com/privacy-policy/
 
 If you would rather not use that service, open **Google → Advanced: use your own Google client** and enter a client ID and secret from your own Google Cloud project. The plugin then talks only to Google.
 

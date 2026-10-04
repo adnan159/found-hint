@@ -88,7 +88,7 @@ export function LocationStep({ onDone, onBack, onSkip }) {
           data-invalid={errors.name ? true : undefined}
         >
           <FieldLabel htmlFor="setup-loc-name">
-            {__("Location name", "found-hint")}
+            {__("Location name", "foundhint-local-seo")}
           </FieldLabel>
           <Input
             id="setup-loc-name"
@@ -103,7 +103,7 @@ export function LocationStep({ onDone, onBack, onSkip }) {
             <FieldDescription>
               {__(
                 "Something you would recognise, like Downtown or Main Office.",
-                "found-hint",
+                "foundhint-local-seo",
               )}
             </FieldDescription>
           )}
@@ -114,7 +114,7 @@ export function LocationStep({ onDone, onBack, onSkip }) {
           data-invalid={errors.address_line_1 ? true : undefined}
         >
           <FieldLabel htmlFor="setup-loc-address">
-            {__("Street address", "found-hint")}
+            {__("Street address", "foundhint-local-seo")}
           </FieldLabel>
           <Input
             id="setup-loc-address"
@@ -129,7 +129,7 @@ export function LocationStep({ onDone, onBack, onSkip }) {
 
         <Field data-invalid={errors.city ? true : undefined}>
           <FieldLabel htmlFor="setup-loc-city">
-            {__("City", "found-hint")}
+            {__("City", "foundhint-local-seo")}
           </FieldLabel>
           <Input
             id="setup-loc-city"
@@ -142,7 +142,7 @@ export function LocationStep({ onDone, onBack, onSkip }) {
 
         <Field data-invalid={errors.region ? true : undefined}>
           <FieldLabel htmlFor="setup-loc-region">
-            {__("State or region", "found-hint")}
+            {__("State or region", "foundhint-local-seo")}
           </FieldLabel>
           <Input
             id="setup-loc-region"
@@ -155,7 +155,7 @@ export function LocationStep({ onDone, onBack, onSkip }) {
 
         <Field data-invalid={errors.postal_code ? true : undefined}>
           <FieldLabel htmlFor="setup-loc-postal">
-            {__("Postal code", "found-hint")}
+            {__("Postal code", "foundhint-local-seo")}
           </FieldLabel>
           <Input
             id="setup-loc-postal"
@@ -166,7 +166,7 @@ export function LocationStep({ onDone, onBack, onSkip }) {
 
         <Field data-invalid={errors.country ? true : undefined}>
           <FieldLabel htmlFor="setup-loc-country">
-            {__("Country", "found-hint")}
+            {__("Country", "foundhint-local-seo")}
           </FieldLabel>
           <Input
             id="setup-loc-country"
@@ -180,7 +180,7 @@ export function LocationStep({ onDone, onBack, onSkip }) {
             <FieldError>{errors.country}</FieldError>
           ) : (
             <FieldDescription>
-              {__("Two-letter country code.", "found-hint")}
+              {__("Two-letter country code.", "foundhint-local-seo")}
             </FieldDescription>
           )}
         </Field>

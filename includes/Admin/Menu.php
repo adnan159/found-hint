@@ -52,8 +52,8 @@ class Menu {
 	 */
 	public static function register_menu() {
 		add_menu_page(
-			__( 'FoundHint', 'found-hint' ),
-			__( 'FoundHint', 'found-hint' ),
+			__( 'FoundHint', 'foundhint-local-seo' ),
+			__( 'FoundHint', 'foundhint-local-seo' ),
 			Capabilities::manage(),
 			self::SLUG,
 			array( __CLASS__, 'render_page' ),

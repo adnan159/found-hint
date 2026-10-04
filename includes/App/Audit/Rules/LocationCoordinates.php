@@ -63,8 +63,8 @@ class LocationCoordinates extends Rule {
 		}
 
 		return Result::fail(
-			__( 'No map coordinates.', 'found-hint' ),
-			__( 'Add a latitude and longitude so you can be placed precisely rather than approximately.', 'found-hint' )
+			__( 'No map coordinates.', 'foundhint-local-seo' ),
+			__( 'Add a latitude and longitude so you can be placed precisely rather than approximately.', 'foundhint-local-seo' )
 		)->about( 'location', $context->location_id() );
 	}
 }

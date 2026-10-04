@@ -54,11 +54,13 @@ export function HoursStep({ onDone, onBack, onSkip }) {
             <EmptyMedia variant="icon">
               <MapPinIcon />
             </EmptyMedia>
-            <EmptyTitle>{__("No location yet", "found-hint")}</EmptyTitle>
+            <EmptyTitle>
+              {__("No location yet", "foundhint-local-seo")}
+            </EmptyTitle>
             <EmptyDescription>
               {__(
                 "Opening hours belong to a location. Go back a step and add your address first.",
-                "found-hint",
+                "foundhint-local-seo",
               )}
             </EmptyDescription>
           </EmptyHeader>
@@ -66,7 +68,7 @@ export function HoursStep({ onDone, onBack, onSkip }) {
         <StepActions
           onBack={onBack}
           onSkip={onSkip}
-          submitLabel={__("Continue", "found-hint")}
+          submitLabel={__("Continue", "foundhint-local-seo")}
           isSaving={false}
         />
       </div>

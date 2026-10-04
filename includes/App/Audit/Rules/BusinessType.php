@@ -61,8 +61,8 @@ class BusinessType extends Rule {
 		}
 
 		return Result::fail(
-			__( 'Your business type is generic.', 'found-hint' ),
-			__( 'Choose the most specific type that fits — "Dentist" tells a search engine far more than "Local business".', 'found-hint' ),
+			__( 'Your business type is generic.', 'foundhint-local-seo' ),
+			__( 'Choose the most specific type that fits — "Dentist" tells a search engine far more than "Local business".', 'foundhint-local-seo' ),
 			array( 'found' => $type )
 		)->about( 'business', $context->business_id() );
 	}

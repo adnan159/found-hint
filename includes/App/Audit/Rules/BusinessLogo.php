@@ -59,8 +59,8 @@ class BusinessLogo extends Rule {
 		}
 
 		return Result::fail(
-			__( 'No logo.', 'found-hint' ),
-			__( 'Add a logo — it is published in your structured data and used in some search results.', 'found-hint' )
+			__( 'No logo.', 'foundhint-local-seo' ),
+			__( 'Add a logo — it is published in your structured data and used in some search results.', 'foundhint-local-seo' )
 		)->about( 'business', $context->business_id() );
 	}
 }

@@ -1,6 +1,6 @@
 /* eslint-disable */
 /**
- * Build languages/found-hint.pot from the PHP and JavaScript sources.
+ * Build languages/foundhint-local-seo.pot from the PHP and JavaScript sources.
  *
  * WordPress.org generates translations from the plugin's own strings, but a
  * .pot is what lets anybody translate before that — and it is the only way
@@ -11,7 +11,7 @@ const fs = require("fs");
 const path = require("path");
 
 const root = process.cwd();
-const domain = "found-hint";
+const domain = "foundhint-local-seo";
 const roots = ["includes", "src", "found-hint.php", "uninstall.php"];
 
 const files = [];

@@ -85,9 +85,9 @@ class LocationPrimary extends Rule {
 
 		return Result::fail(
 			0 === $primaries
-				? __( 'No location is marked as the main one.', 'found-hint' )
-				: __( 'More than one location is marked as the main one.', 'found-hint' ),
-			__( 'Mark exactly one location as primary — it is the one published when a single place is needed.', 'found-hint' ),
+				? __( 'No location is marked as the main one.', 'foundhint-local-seo' )
+				: __( 'More than one location is marked as the main one.', 'foundhint-local-seo' ),
+			__( 'Mark exactly one location as primary — it is the one published when a single place is needed.', 'foundhint-local-seo' ),
 			array( 'primaries' => $primaries )
 		)->about( 'location', $context->location_id() )->fixable_by( 'location.set_primary' );
 	}

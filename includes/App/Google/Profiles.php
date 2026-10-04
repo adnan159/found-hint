@@ -94,15 +94,15 @@ class Profiles {
 			'google.profiles_synced',
 			sprintf(
 				/* translators: 1: e.g. "3 locations", 2: e.g. "1 account". */
-				__( 'Read %1$s across %2$s.', 'found-hint' ),
+				__( 'Read %1$s across %2$s.', 'foundhint-local-seo' ),
 				sprintf(
 					/* translators: %d: number of Google locations. */
-					_n( '%d location', '%d locations', $found, 'found-hint' ),
+					_n( '%d location', '%d locations', $found, 'foundhint-local-seo' ),
 					$found
 				),
 				sprintf(
 					/* translators: %d: number of Google accounts. */
-					_n( '%d account', '%d accounts', count( $accounts ), 'found-hint' ),
+					_n( '%d account', '%d accounts', count( $accounts ), 'foundhint-local-seo' ),
 					count( $accounts )
 				)
 			)

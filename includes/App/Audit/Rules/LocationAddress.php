@@ -65,8 +65,8 @@ class LocationAddress extends Rule {
 	public function evaluate( Context $context ) {
 		if ( ! $context->location ) {
 			return Result::fail(
-				__( 'No location.', 'found-hint' ),
-				__( 'Add the address customers visit. Without it there is nothing to put on a map.', 'found-hint' )
+				__( 'No location.', 'foundhint-local-seo' ),
+				__( 'Add the address customers visit. Without it there is nothing to put on a map.', 'foundhint-local-seo' )
 			)->about( 'business', $context->business_id() );
 		}
 
@@ -83,8 +83,8 @@ class LocationAddress extends Rule {
 		}
 
 		return Result::fail(
-			__( 'The address is incomplete.', 'found-hint' ),
-			__( 'A street, a city and a country are the minimum a search engine needs.', 'found-hint' ),
+			__( 'The address is incomplete.', 'foundhint-local-seo' ),
+			__( 'A street, a city and a country are the minimum a search engine needs.', 'foundhint-local-seo' ),
 			array( 'missing' => $missing )
 		)->about( 'location', $context->location_id() );
 	}

@@ -75,7 +75,7 @@ class FixRunner {
 		if ( ! self::can_handle( $handler ) ) {
 			return new WP_Error(
 				'fhint_fix_unknown',
-				__( 'There is no automatic fix for that.', 'found-hint' ),
+				__( 'There is no automatic fix for that.', 'foundhint-local-seo' ),
 				array( 'status' => 400 )
 			);
 		}
@@ -93,7 +93,7 @@ class FixRunner {
 			'audit.fix_applied',
 			sprintf(
 				/* translators: %s: fix handler identifier. */
-				__( 'Applied the fix "%s".', 'found-hint' ),
+				__( 'Applied the fix "%s".', 'foundhint-local-seo' ),
 				$handler
 			)
 		);
@@ -117,7 +117,7 @@ class FixRunner {
 		if ( '' === $website ) {
 			return new WP_Error(
 				'fhint_fix_nothing_to_do',
-				__( 'There is no website address to correct.', 'found-hint' ),
+				__( 'There is no website address to correct.', 'foundhint-local-seo' ),
 				array( 'status' => 409 )
 			);
 		}
@@ -133,7 +133,7 @@ class FixRunner {
 			// be rewriting blind.
 			return new WP_Error(
 				'fhint_fix_not_applicable',
-				__( 'That address is not a plain http one, so it was left alone.', 'found-hint' ),
+				__( 'That address is not a plain http one, so it was left alone.', 'foundhint-local-seo' ),
 				array( 'status' => 409 )
 			);
 		}
@@ -170,7 +170,7 @@ class FixRunner {
 		if ( '' === $home ) {
 			return new WP_Error(
 				'fhint_fix_nothing_to_do',
-				__( 'This site has no address to use.', 'found-hint' ),
+				__( 'This site has no address to use.', 'foundhint-local-seo' ),
 				array( 'status' => 409 )
 			);
 		}
@@ -202,7 +202,7 @@ class FixRunner {
 		if ( ! $locations ) {
 			return new WP_Error(
 				'fhint_fix_nothing_to_do',
-				__( 'There are no locations to mark.', 'found-hint' ),
+				__( 'There are no locations to mark.', 'foundhint-local-seo' ),
 				array( 'status' => 409 )
 			);
 		}
@@ -234,7 +234,7 @@ class FixRunner {
 		if ( count( $locations ) > 1 ) {
 			return new WP_Error(
 				'fhint_fix_needs_a_decision',
-				__( 'Several locations exist and none is marked as the main one. Choose which represents the business.', 'found-hint' ),
+				__( 'Several locations exist and none is marked as the main one. Choose which represents the business.', 'foundhint-local-seo' ),
 				array( 'status' => 409 )
 			);
 		}

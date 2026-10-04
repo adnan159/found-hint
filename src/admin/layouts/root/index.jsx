@@ -25,17 +25,17 @@ export const RootLayout = () => {
   const counts = [
     sprintf(
       /* translators: %d: number of business profiles, always 0 or 1. */
-      _n("%d business", "%d businesses", businesses, "found-hint"),
+      _n("%d business", "%d businesses", businesses, "foundhint-local-seo"),
       businesses,
     ),
     sprintf(
       /* translators: %d: number of locations. */
-      _n("%d location", "%d locations", locations, "found-hint"),
+      _n("%d location", "%d locations", locations, "foundhint-local-seo"),
       locations,
     ),
     sprintf(
       /* translators: %d: number of services. */
-      _n("%d service", "%d services", services, "found-hint"),
+      _n("%d service", "%d services", services, "foundhint-local-seo"),
       services,
     ),
   ].join(" · ");

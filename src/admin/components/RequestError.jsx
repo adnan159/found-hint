@@ -17,7 +17,9 @@ export function RequestError({ error, title }) {
   return (
     <Alert variant="destructive" role="alert">
       <TriangleAlertIcon />
-      <AlertTitle>{title || __("That did not save", "found-hint")}</AlertTitle>
+      <AlertTitle>
+        {title || __("That did not save", "foundhint-local-seo")}
+      </AlertTitle>
       <AlertDescription>{errorMessage(error)}</AlertDescription>
     </Alert>
   );

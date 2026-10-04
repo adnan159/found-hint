@@ -73,14 +73,14 @@ function StatusLine({ state }) {
             <CheckIcon aria-hidden="true" data-icon="inline-start" />
           ) : null}
           {connected
-            ? __("Connected", "found-hint")
-            : __("Needs reconnecting", "found-hint")}
+            ? __("Connected", "foundhint-local-seo")
+            : __("Needs reconnecting", "foundhint-local-seo")}
         </span>
         {state.account_email ? (
           <span className="fhint:text-[13px] fhint:text-muted-strong">
             {sprintf(
               /* translators: %s: the Google account email address. */
-              __("as %s", "found-hint"),
+              __("as %s", "foundhint-local-seo"),
               state.account_email,
             )}
           </span>
@@ -91,7 +91,7 @@ function StatusLine({ state }) {
 
   return (
     <span className="fhint:inline-flex fhint:items-center fhint:bg-muted fhint:px-2 fhint:py-1 fhint:text-[11px] fhint:font-extrabold fhint:tracking-[0.1em] fhint:text-muted-strong fhint:uppercase">
-      {__("Not connected", "found-hint")}
+      {__("Not connected", "foundhint-local-seo")}
     </span>
   );
 }
@@ -108,7 +108,10 @@ function RedirectUri({ value }) {
       // Clipboard access can be refused; the value is selectable on screen,
       // so there is nothing to recover from.
       toast.error(
-        __("Could not copy. Select the address instead.", "found-hint"),
+        __(
+          "Could not copy. Select the address instead.",
+          "foundhint-local-seo",
+        ),
       );
     }
   };
@@ -124,7 +127,9 @@ function RedirectUri({ value }) {
         ) : (
           <CopyIcon data-icon="inline-start" />
         )}
-        {copied ? __("Copied", "found-hint") : __("Copy", "found-hint")}
+        {copied
+          ? __("Copied", "foundhint-local-seo")
+          : __("Copy", "foundhint-local-seo")}
       </Button>
     </div>
   );
@@ -177,7 +182,9 @@ export default function GooglePage() {
   if (isLoading || !state) {
     return (
       <>
-        <PageHeader title={__("Google Business Profile", "found-hint")} />
+        <PageHeader
+          title={__("Google Business Profile", "foundhint-local-seo")}
+        />
         <Skeleton className="fhint:h-[60vh] fhint:w-full" />
       </>
     );
@@ -198,7 +205,7 @@ export default function GooglePage() {
       // The secret is write-only and is never sent back, so the field is
       // cleared rather than left holding a value the server may not have.
       setForm({ client_id: "", client_secret: "" });
-      toast.success(__("Google client saved.", "found-hint"));
+      toast.success(__("Google client saved.", "foundhint-local-seo"));
     } catch {
       // Shown inline by RequestError.
     }
@@ -240,22 +247,22 @@ export default function GooglePage() {
         result && false === result.revoked
           ? __(
               "Disconnected here. Google did not confirm, so check your Google account's connected apps.",
-              "found-hint",
+              "foundhint-local-seo",
             )
-          : __("Disconnected from Google.", "found-hint"),
+          : __("Disconnected from Google.", "foundhint-local-seo"),
       );
     } catch {
-      toast.error(__("Could not disconnect.", "found-hint"));
+      toast.error(__("Could not disconnect.", "foundhint-local-seo"));
     }
   };
 
   return (
     <>
       <PageHeader
-        title={__("Google Business Profile", "found-hint")}
+        title={__("Google Business Profile", "foundhint-local-seo")}
         description={__(
           "Connect the Google account that manages your business, so FoundHint can see how Google shows you today.",
-          "found-hint",
+          "foundhint-local-seo",
         )}
         actions={<StatusLine state={state} />}
       />
@@ -264,7 +271,9 @@ export default function GooglePage() {
 
       {notice ? (
         <Alert variant="destructive" role="alert">
-          <AlertTitle>{__("That did not work", "found-hint")}</AlertTitle>
+          <AlertTitle>
+            {__("That did not work", "foundhint-local-seo")}
+          </AlertTitle>
           <AlertDescription>{notice.message}</AlertDescription>
         </Alert>
       ) : null}
@@ -273,7 +282,7 @@ export default function GooglePage() {
         <NoticeBar>
           {__(
             "This connection is missing permission to manage your business profile. Connect again and accept all the requested permissions.",
-            "found-hint",
+            "foundhint-local-seo",
           )}
         </NoticeBar>
       ) : null}
@@ -291,7 +300,7 @@ export default function GooglePage() {
           className="fhint:group fhint:scroll-mt-6 fhint:border fhint:border-border fhint:bg-card"
         >
           <summary className="fhint:flex fhint:cursor-pointer fhint:list-none fhint:items-center fhint:justify-between fhint:gap-4 fhint:px-[22px] fhint:py-4 fhint:font-heading fhint:text-[13px] fhint:font-extrabold fhint:tracking-[0.1em] fhint:uppercase fhint:group-open:border-b-2 fhint:group-open:border-b-divider fhint:[&::-webkit-details-marker]:hidden">
-            {__("Advanced: use your own Google client", "found-hint")}
+            {__("Advanced: use your own Google client", "foundhint-local-seo")}
             <ChevronDownIcon
               aria-hidden="true"
               className="fhint:size-4 fhint:shrink-0 fhint:text-sidebar-chevron fhint:transition-transform fhint:group-open:rotate-180"
@@ -302,25 +311,27 @@ export default function GooglePage() {
             <p className="fhint:m-0 fhint:max-w-[76ch] fhint:text-[13px] fhint:text-muted-strong">
               {__(
                 "You do not need this. FoundHint signs you in through its own Google client, and your data and quota stay yours either way. Enter a client from your own Google Cloud project only if you want this site to use that project — once saved, it is used instead of FoundHint's.",
-                "found-hint",
+                "foundhint-local-seo",
               )}
             </p>
 
             <FieldGroup>
               <Field>
-                <FieldLabel>{__("Redirect URI", "found-hint")}</FieldLabel>
+                <FieldLabel>
+                  {__("Redirect URI", "foundhint-local-seo")}
+                </FieldLabel>
                 <RedirectUri value={state.redirect_uri} />
                 <FieldDescription>
                   {__(
                     "Add this to your OAuth client in Google Cloud under Authorised redirect URIs, exactly as shown. A mismatch here is the usual reason a first connection fails.",
-                    "found-hint",
+                    "foundhint-local-seo",
                   )}
                 </FieldDescription>
               </Field>
 
               <Field>
                 <FieldLabel htmlFor="google-client-id">
-                  {__("Client ID", "found-hint")}
+                  {__("Client ID", "foundhint-local-seo")}
                 </FieldLabel>
                 <Input
                   id="google-client-id"
@@ -343,20 +354,20 @@ export default function GooglePage() {
                         /* translators: %s: the start of the stored client id. */
                         __(
                           "Currently %s — leave blank to keep it.",
-                          "found-hint",
+                          "foundhint-local-seo",
                         ),
                         state.client_id_hint,
                       )
                     : __(
                         "From your OAuth client in Google Cloud.",
-                        "found-hint",
+                        "foundhint-local-seo",
                       )}
                 </FieldDescription>
               </Field>
 
               <Field>
                 <FieldLabel htmlFor="google-client-secret">
-                  {__("Client secret", "found-hint")}
+                  {__("Client secret", "foundhint-local-seo")}
                 </FieldLabel>
                 <Input
                   id="google-client-secret"
@@ -374,11 +385,11 @@ export default function GooglePage() {
                   {state.configured
                     ? __(
                         "A secret is stored. It is never shown again — leave this blank to keep it, or paste a new one to replace it.",
-                        "found-hint",
+                        "foundhint-local-seo",
                       )
                     : __(
                         "Stored on your site and never shown again once saved.",
-                        "found-hint",
+                        "foundhint-local-seo",
                       )}
                 </FieldDescription>
               </Field>
@@ -393,7 +404,7 @@ export default function GooglePage() {
                 {isSavingCredentials ? (
                   <Spinner data-icon="inline-start" />
                 ) : null}
-                {__("Save client", "found-hint")}
+                {__("Save client", "foundhint-local-seo")}
               </Button>
               <Button
                 variant="outline"
@@ -406,7 +417,7 @@ export default function GooglePage() {
                 }
               >
                 <ExternalLinkIcon data-icon="inline-start" />
-                {__("Open Google Cloud credentials", "found-hint")}
+                {__("Open Google Cloud credentials", "foundhint-local-seo")}
               </Button>
             </div>
           </div>
@@ -414,27 +425,29 @@ export default function GooglePage() {
       ) : (
         <SectionCard
           id="google-client"
-          title={__("Google client", "found-hint")}
+          title={__("Google client", "foundhint-local-seo")}
           description={__(
             "This site uses your own Google Cloud project, so your data and your quota stay yours.",
-            "found-hint",
+            "foundhint-local-seo",
           )}
         >
           <FieldGroup>
             <Field>
-              <FieldLabel>{__("Redirect URI", "found-hint")}</FieldLabel>
+              <FieldLabel>
+                {__("Redirect URI", "foundhint-local-seo")}
+              </FieldLabel>
               <RedirectUri value={state.redirect_uri} />
               <FieldDescription>
                 {__(
                   "Add this to your OAuth client in Google Cloud under Authorised redirect URIs, exactly as shown. A mismatch here is the usual reason a first connection fails.",
-                  "found-hint",
+                  "foundhint-local-seo",
                 )}
               </FieldDescription>
             </Field>
 
             <Field>
               <FieldLabel htmlFor="google-client-id">
-                {__("Client ID", "found-hint")}
+                {__("Client ID", "foundhint-local-seo")}
               </FieldLabel>
               <Input
                 id="google-client-id"
@@ -457,17 +470,20 @@ export default function GooglePage() {
                       /* translators: %s: the start of the stored client id. */
                       __(
                         "Currently %s — leave blank to keep it.",
-                        "found-hint",
+                        "foundhint-local-seo",
                       ),
                       state.client_id_hint,
                     )
-                  : __("From your OAuth client in Google Cloud.", "found-hint")}
+                  : __(
+                      "From your OAuth client in Google Cloud.",
+                      "foundhint-local-seo",
+                    )}
               </FieldDescription>
             </Field>
 
             <Field>
               <FieldLabel htmlFor="google-client-secret">
-                {__("Client secret", "found-hint")}
+                {__("Client secret", "foundhint-local-seo")}
               </FieldLabel>
               <Input
                 id="google-client-secret"
@@ -485,11 +501,11 @@ export default function GooglePage() {
                 {state.configured
                   ? __(
                       "A secret is stored. It is never shown again — leave this blank to keep it, or paste a new one to replace it.",
-                      "found-hint",
+                      "foundhint-local-seo",
                     )
                   : __(
                       "Stored on your site and never shown again once saved.",
-                      "found-hint",
+                      "foundhint-local-seo",
                     )}
               </FieldDescription>
             </Field>
@@ -504,7 +520,7 @@ export default function GooglePage() {
               {isSavingCredentials ? (
                 <Spinner data-icon="inline-start" />
               ) : null}
-              {__("Save client", "found-hint")}
+              {__("Save client", "foundhint-local-seo")}
             </Button>
             <Button
               variant="outline"
@@ -517,7 +533,7 @@ export default function GooglePage() {
               }
             >
               <ExternalLinkIcon data-icon="inline-start" />
-              {__("Open Google Cloud credentials", "found-hint")}
+              {__("Open Google Cloud credentials", "foundhint-local-seo")}
             </Button>
           </div>
         </SectionCard>
@@ -525,10 +541,10 @@ export default function GooglePage() {
 
       <SectionCard
         id="google-connection"
-        title={__("Connection", "found-hint")}
+        title={__("Connection", "foundhint-local-seo")}
         description={__(
           "Sign in with the Google account that manages your business.",
-          "found-hint",
+          "foundhint-local-seo",
         )}
       >
         {/* The prototype's trust line, kept word for word: it is the
@@ -537,26 +553,34 @@ export default function GooglePage() {
         <p className="fhint:max-w-[76ch] fhint:text-[13.5px] fhint:text-muted-strong">
           {__(
             "You sign in on Google's own page. FoundHint never sees your password, and nothing on your profile changes without your confirmation.",
-            "found-hint",
+            "foundhint-local-seo",
           )}
         </p>
 
         {connected ? (
           <dl className="fhint:mt-5 fhint:flex fhint:flex-col fhint:gap-2 fhint:text-[13px]">
             <div className="fhint:flex fhint:gap-2">
-              <dt className="fhint:font-bold">{__("Account", "found-hint")}</dt>
+              <dt className="fhint:font-bold">
+                {__("Account", "foundhint-local-seo")}
+              </dt>
               <dd className="fhint:text-muted-strong">
-                {state.account_email || __("Unknown", "found-hint")}
+                {state.account_email || __("Unknown", "foundhint-local-seo")}
               </dd>
             </div>
             <div className="fhint:flex fhint:gap-2">
               <dt className="fhint:font-bold">
-                {__("Permissions", "found-hint")}
+                {__("Permissions", "foundhint-local-seo")}
               </dt>
               <dd className="fhint:text-muted-strong">
                 {state.can_manage_profile
-                  ? __("Can manage your business profile", "found-hint")
-                  : __("Cannot manage your business profile", "found-hint")}
+                  ? __(
+                      "Can manage your business profile",
+                      "foundhint-local-seo",
+                    )
+                  : __(
+                      "Cannot manage your business profile",
+                      "foundhint-local-seo",
+                    )}
               </dd>
             </div>
           </dl>
@@ -572,8 +596,8 @@ export default function GooglePage() {
             }
             label={
               connected
-                ? __("Reconnect with Google", "found-hint")
-                : __("Continue with Google", "found-hint")
+                ? __("Reconnect with Google", "foundhint-local-seo")
+                : __("Continue with Google", "foundhint-local-seo")
             }
           />
 
@@ -582,26 +606,26 @@ export default function GooglePage() {
               <AlertDialogTrigger
                 render={<Button variant="outline" disabled={isDisconnecting} />}
               >
-                {__("Disconnect", "found-hint")}
+                {__("Disconnect", "foundhint-local-seo")}
               </AlertDialogTrigger>
               <AlertDialogContent>
                 <AlertDialogHeader>
                   <AlertDialogTitle>
-                    {__("Disconnect from Google?", "found-hint")}
+                    {__("Disconnect from Google?", "foundhint-local-seo")}
                   </AlertDialogTitle>
                   <AlertDialogDescription>
                     {__(
                       "FoundHint will stop reading your Google Business Profile. Nothing on your Google profile changes, and your business details here are untouched. You can connect again at any time.",
-                      "found-hint",
+                      "foundhint-local-seo",
                     )}
                   </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>
                   <AlertDialogCancel>
-                    {__("Keep connected", "found-hint")}
+                    {__("Keep connected", "foundhint-local-seo")}
                   </AlertDialogCancel>
                   <AlertDialogAction onClick={onDisconnect}>
-                    {__("Disconnect", "found-hint")}
+                    {__("Disconnect", "foundhint-local-seo")}
                   </AlertDialogAction>
                 </AlertDialogFooter>
               </AlertDialogContent>
@@ -616,7 +640,7 @@ export default function GooglePage() {
           >
             {__(
               "Add your Google client ID and secret above first — this button will take you to them.",
-              "found-hint",
+              "foundhint-local-seo",
             )}
           </p>
         ) : null}

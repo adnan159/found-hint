@@ -181,7 +181,7 @@ class Tokens {
 				Logger::WARNING,
 				'google',
 				'google.tokens_unencrypted',
-				__( 'This server has no libsodium, so Google tokens are stored without encryption.', 'found-hint' )
+				__( 'This server has no libsodium, so Google tokens are stored without encryption.', 'foundhint-local-seo' )
 			);
 		}
 

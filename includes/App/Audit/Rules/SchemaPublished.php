@@ -74,8 +74,8 @@ class SchemaPublished extends Rule {
 		}
 
 		return Result::fail(
-			__( 'No structured data is being published.', 'found-hint' ),
-			__( 'Check the Schema screen — something is either missing or another plugin has been given the job.', 'found-hint' )
+			__( 'No structured data is being published.', 'foundhint-local-seo' ),
+			__( 'Check the Schema screen — something is either missing or another plugin has been given the job.', 'foundhint-local-seo' )
 		)->about( 'business', $context->business_id() );
 	}
 }

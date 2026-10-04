@@ -14,12 +14,12 @@ export function StepActions({ isSaving, onBack, onSkip, submitLabel }) {
     <div className="fhint:flex fhint:flex-wrap fhint:items-center fhint:gap-2.5 fhint:border-t fhint:border-t-border fhint:pt-5">
       <Button type="submit" size="lg" disabled={isSaving}>
         {isSaving ? <Spinner data-icon="inline-start" /> : null}
-        {submitLabel || __("Save and continue", "found-hint")}
+        {submitLabel || __("Save and continue", "foundhint-local-seo")}
       </Button>
 
       {onBack ? (
         <Button type="button" size="lg" variant="outline" onClick={onBack}>
-          {__("Back", "found-hint")}
+          {__("Back", "foundhint-local-seo")}
         </Button>
       ) : null}
 
@@ -29,7 +29,7 @@ export function StepActions({ isSaving, onBack, onSkip, submitLabel }) {
         className="fhint:ml-auto"
         onClick={onSkip}
       >
-        {__("Skip this step", "found-hint")}
+        {__("Skip this step", "foundhint-local-seo")}
       </Button>
     </div>
   );

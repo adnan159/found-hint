@@ -4,7 +4,7 @@ const NotFound = () => {
   return (
     <div className="fhint:p-6 fhint:space-y-2">
       <h1 className="fhint:text-xl fhint:font-semibold">
-        {__("Page not found", "found-hint")}
+        {__("Page not found", "foundhint-local-seo")}
       </h1>
     </div>
   );

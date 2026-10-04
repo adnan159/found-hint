@@ -99,7 +99,7 @@ export default function ServicesPage() {
     try {
       await reorderServices(ids).unwrap();
     } catch {
-      toast.error(__("Could not reorder the services.", "found-hint"));
+      toast.error(__("Could not reorder the services.", "foundhint-local-seo"));
     }
   };
 
@@ -110,9 +110,9 @@ export default function ServicesPage() {
 
     try {
       await deleteService(pendingDelete.id).unwrap();
-      toast.success(__("Service deleted.", "found-hint"));
+      toast.success(__("Service deleted.", "foundhint-local-seo"));
     } catch {
-      toast.error(__("Could not delete the service.", "found-hint"));
+      toast.error(__("Could not delete the service.", "foundhint-local-seo"));
     } finally {
       setPendingDelete(null);
     }
@@ -121,22 +121,22 @@ export default function ServicesPage() {
   return (
     <>
       <PageHeader
-        title={__("Services", "found-hint")}
+        title={__("Services", "foundhint-local-seo")}
         description={__(
           "What you offer. The order here is the order they are published in.",
-          "found-hint",
+          "foundhint-local-seo",
         )}
         actions={
           <Button onClick={openAdd} disabled={!canAdd}>
             <PlusIcon data-icon="inline-start" />
-            {__("Add service", "found-hint")}
+            {__("Add service", "foundhint-local-seo")}
           </Button>
         }
       />
 
       <RequestError
         error={error}
-        title={__("Could not load services", "found-hint")}
+        title={__("Could not load services", "foundhint-local-seo")}
       />
 
       {isLoading ? (
@@ -153,18 +153,20 @@ export default function ServicesPage() {
             <EmptyMedia variant="icon">
               <WrenchIcon />
             </EmptyMedia>
-            <EmptyTitle>{__("No services yet", "found-hint")}</EmptyTitle>
+            <EmptyTitle>
+              {__("No services yet", "foundhint-local-seo")}
+            </EmptyTitle>
             <EmptyDescription>
               {__(
                 "Add the things you actually sell. Search engines use them to tell what your business does.",
-                "found-hint",
+                "foundhint-local-seo",
               )}
             </EmptyDescription>
           </EmptyHeader>
           <EmptyContent>
             <Button onClick={openAdd}>
               <PlusIcon data-icon="inline-start" />
-              {__("Add your first service", "found-hint")}
+              {__("Add your first service", "foundhint-local-seo")}
             </Button>
           </EmptyContent>
         </Empty>
@@ -173,11 +175,11 @@ export default function ServicesPage() {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>{__("Service", "found-hint")}</TableHead>
-                <TableHead>{__("Price", "found-hint")}</TableHead>
-                <TableHead>{__("Status", "found-hint")}</TableHead>
+                <TableHead>{__("Service", "foundhint-local-seo")}</TableHead>
+                <TableHead>{__("Price", "foundhint-local-seo")}</TableHead>
+                <TableHead>{__("Status", "foundhint-local-seo")}</TableHead>
                 <TableHead className="fhint:text-right">
-                  {__("Actions", "found-hint")}
+                  {__("Actions", "foundhint-local-seo")}
                 </TableHead>
               </TableRow>
             </TableHeader>
@@ -198,8 +200,8 @@ export default function ServicesPage() {
                       }
                     >
                       {service.status === "active"
-                        ? __("Active", "found-hint")
-                        : __("Inactive", "found-hint")}
+                        ? __("Active", "foundhint-local-seo")
+                        : __("Inactive", "foundhint-local-seo")}
                     </Badge>
                   </TableCell>
                   <TableCell>
@@ -211,7 +213,7 @@ export default function ServicesPage() {
                         onClick={() => move(index, -1)}
                         aria-label={sprintf(
                           /* translators: %s: service name. */
-                          __("Move %s up", "found-hint"),
+                          __("Move %s up", "foundhint-local-seo"),
                           service.name,
                         )}
                       >
@@ -224,7 +226,7 @@ export default function ServicesPage() {
                         onClick={() => move(index, 1)}
                         aria-label={sprintf(
                           /* translators: %s: service name. */
-                          __("Move %s down", "found-hint"),
+                          __("Move %s down", "foundhint-local-seo"),
                           service.name,
                         )}
                       >
@@ -236,7 +238,7 @@ export default function ServicesPage() {
                         onClick={() => openEdit(service)}
                         aria-label={sprintf(
                           /* translators: %s: service name. */
-                          __("Edit %s", "found-hint"),
+                          __("Edit %s", "foundhint-local-seo"),
                           service.name,
                         )}
                       >
@@ -248,7 +250,7 @@ export default function ServicesPage() {
                         onClick={() => setPendingDelete(service)}
                         aria-label={sprintf(
                           /* translators: %s: service name. */
-                          __("Delete %s", "found-hint"),
+                          __("Delete %s", "foundhint-local-seo"),
                           service.name,
                         )}
                       >
@@ -269,7 +271,7 @@ export default function ServicesPage() {
             /* translators: %d: number of services included in the plan. */
             __(
               "You are using all %d services included in your plan.",
-              "found-hint",
+              "foundhint-local-seo",
             ),
             limits.limit,
           )}
@@ -289,7 +291,7 @@ export default function ServicesPage() {
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>
-              {__("Delete this service?", "found-hint")}
+              {__("Delete this service?", "foundhint-local-seo")}
             </AlertDialogTitle>
             <AlertDialogDescription>
               {pendingDelete
@@ -297,7 +299,7 @@ export default function ServicesPage() {
                     /* translators: %s: service name. */
                     __(
                       "%s will be removed from your structured data. This cannot be undone.",
-                      "found-hint",
+                      "foundhint-local-seo",
                     ),
                     pendingDelete.name,
                   )
@@ -305,9 +307,11 @@ export default function ServicesPage() {
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>{__("Keep it", "found-hint")}</AlertDialogCancel>
+            <AlertDialogCancel>
+              {__("Keep it", "foundhint-local-seo")}
+            </AlertDialogCancel>
             <AlertDialogAction onClick={confirmDelete}>
-              {__("Delete service", "found-hint")}
+              {__("Delete service", "foundhint-local-seo")}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

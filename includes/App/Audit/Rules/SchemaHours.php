@@ -65,8 +65,8 @@ class SchemaHours extends Rule {
 		}
 
 		return Result::fail(
-			__( 'Your published markup carries no opening hours.', 'found-hint' ),
-			__( 'Set the week on the location, and make sure the location is marked open.', 'found-hint' )
+			__( 'Your published markup carries no opening hours.', 'foundhint-local-seo' ),
+			__( 'Set the week on the location, and make sure the location is marked open.', 'foundhint-local-seo' )
 		)->about( 'location', $context->location_id() );
 	}
 }

@@ -139,10 +139,13 @@ export function stateToPayload(state) {
 // Built per render rather than at module load so the labels follow the
 // active locale rather than whichever one was loaded first.
 const modeItems = () => [
-  { value: DAY_MODES.UNSET, label: __("Not set", "found-hint") },
-  { value: DAY_MODES.OPEN, label: __("Open", "found-hint") },
-  { value: DAY_MODES.CLOSED, label: __("Closed", "found-hint") },
-  { value: DAY_MODES.TWENTY_FOUR, label: __("Open 24 hours", "found-hint") },
+  { value: DAY_MODES.UNSET, label: __("Not set", "foundhint-local-seo") },
+  { value: DAY_MODES.OPEN, label: __("Open", "foundhint-local-seo") },
+  { value: DAY_MODES.CLOSED, label: __("Closed", "foundhint-local-seo") },
+  {
+    value: DAY_MODES.TWENTY_FOUR,
+    label: __("Open 24 hours", "foundhint-local-seo"),
+  },
 ];
 
 export function OpeningHoursEditor({ value, onChange, errors = {} }) {
@@ -188,7 +191,7 @@ export function OpeningHoursEditor({ value, onChange, errors = {} }) {
                   className="fhint:w-40"
                   aria-label={sprintf(
                     /* translators: %s: day name. */
-                    __("Opening hours for %s", "found-hint"),
+                    __("Opening hours for %s", "foundhint-local-seo"),
                     day.dayName,
                   )}
                 >
@@ -197,16 +200,16 @@ export function OpeningHoursEditor({ value, onChange, errors = {} }) {
                 <SelectContent>
                   <SelectGroup>
                     <SelectItem value={DAY_MODES.UNSET}>
-                      {__("Not set", "found-hint")}
+                      {__("Not set", "foundhint-local-seo")}
                     </SelectItem>
                     <SelectItem value={DAY_MODES.OPEN}>
-                      {__("Open", "found-hint")}
+                      {__("Open", "foundhint-local-seo")}
                     </SelectItem>
                     <SelectItem value={DAY_MODES.CLOSED}>
-                      {__("Closed", "found-hint")}
+                      {__("Closed", "foundhint-local-seo")}
                     </SelectItem>
                     <SelectItem value={DAY_MODES.TWENTY_FOUR}>
-                      {__("Open 24 hours", "found-hint")}
+                      {__("Open 24 hours", "foundhint-local-seo")}
                     </SelectItem>
                   </SelectGroup>
                 </SelectContent>
@@ -236,7 +239,7 @@ export function OpeningHoursEditor({ value, onChange, errors = {} }) {
                           aria-invalid={openError ? true : undefined}
                           aria-label={sprintf(
                             /* translators: %s: day name. */
-                            __("Opens on %s", "found-hint"),
+                            __("Opens on %s", "foundhint-local-seo"),
                             day.dayName,
                           )}
                           onChange={(event) =>
@@ -246,7 +249,7 @@ export function OpeningHoursEditor({ value, onChange, errors = {} }) {
                           }
                         />
                         <span className="fhint:text-muted-foreground">
-                          {__("to", "found-hint")}
+                          {__("to", "foundhint-local-seo")}
                         </span>
                         <Input
                           type="time"
@@ -255,7 +258,7 @@ export function OpeningHoursEditor({ value, onChange, errors = {} }) {
                           aria-invalid={closeError ? true : undefined}
                           aria-label={sprintf(
                             /* translators: %s: day name. */
-                            __("Closes on %s", "found-hint"),
+                            __("Closes on %s", "foundhint-local-seo"),
                             day.dayName,
                           )}
                           onChange={(event) =>
@@ -269,7 +272,10 @@ export function OpeningHoursEditor({ value, onChange, errors = {} }) {
                             type="button"
                             variant="ghost"
                             size="icon"
-                            aria-label={__("Remove this period", "found-hint")}
+                            aria-label={__(
+                              "Remove this period",
+                              "foundhint-local-seo",
+                            )}
                             onClick={() =>
                               update(dayIndex, {
                                 periods: day.periods.filter(
@@ -308,7 +314,7 @@ export function OpeningHoursEditor({ value, onChange, errors = {} }) {
                     }
                   >
                     <PlusIcon data-icon="inline-start" />
-                    {__("Split shift", "found-hint")}
+                    {__("Split shift", "foundhint-local-seo")}
                   </Button>
                 </div>
               ) : null}

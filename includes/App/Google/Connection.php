@@ -84,7 +84,7 @@ class Connection {
 			$event,
 			sprintf(
 				/* translators: %s: the query parameter names Google's return carried. */
-				__( 'Google\'s return reached this site carrying: %s', 'found-hint' ),
+				__( 'Google\'s return reached this site carrying: %s', 'foundhint-local-seo' ),
 				implode( ', ', array_map( 'sanitize_key', $names ) )
 			)
 		);
@@ -188,7 +188,7 @@ class Connection {
 
 		if ( ! Capabilities::current_user_can_manage() ) {
 			wp_die(
-				esc_html__( 'You do not have permission to manage this.', 'found-hint' ),
+				esc_html__( 'You do not have permission to manage this.', 'foundhint-local-seo' ),
 				'',
 				array( 'response' => 403 )
 			);
@@ -203,8 +203,8 @@ class Connection {
 			self::fail(
 				'fhint_connect_' . $reason,
 				'access_denied' === $reason
-					? __( 'Access was declined on the Google consent screen. Nothing has changed.', 'found-hint' )
-					: __( 'The sign-in did not complete. Please try again.', 'found-hint' )
+					? __( 'Access was declined on the Google consent screen. Nothing has changed.', 'foundhint-local-seo' )
+					: __( 'The sign-in did not complete. Please try again.', 'foundhint-local-seo' )
 			);
 		}
 
@@ -217,7 +217,7 @@ class Connection {
 		if ( isset( $_GET['error'] ) ) {
 			self::fail(
 				'access_denied',
-				__( 'Access was declined on the Google consent screen. Nothing has changed.', 'found-hint' )
+				__( 'Access was declined on the Google consent screen. Nothing has changed.', 'foundhint-local-seo' )
 			);
 		}
 
@@ -231,7 +231,7 @@ class Connection {
 		}
 
 		if ( '' === $code ) {
-			self::fail( 'fhint_google_code_missing', __( 'Google did not return an authorization code.', 'found-hint' ) );
+			self::fail( 'fhint_google_code_missing', __( 'Google did not return an authorization code.', 'foundhint-local-seo' ) );
 		}
 
 		$tokens = OAuth::exchange_code( $code, $handshake['verifier'] );
@@ -254,7 +254,7 @@ class Connection {
 			Logger::INFO,
 			'google',
 			'google.connected',
-			__( 'Connected to Google Business Profile.', 'found-hint' )
+			__( 'Connected to Google Business Profile.', 'foundhint-local-seo' )
 		);
 
 		self::redirect_to_screen();
@@ -291,8 +291,8 @@ class Connection {
 			'google',
 			'google.disconnected',
 			$revoked
-				? __( 'Disconnected from Google Business Profile.', 'found-hint' )
-				: __( 'Disconnected locally; Google did not confirm the revocation.', 'found-hint' )
+				? __( 'Disconnected from Google Business Profile.', 'foundhint-local-seo' )
+				: __( 'Disconnected locally; Google did not confirm the revocation.', 'foundhint-local-seo' )
 		);
 
 		return array(
@@ -313,7 +313,7 @@ class Connection {
 		if ( ! Tokens::exists() ) {
 			return new WP_Error(
 				'fhint_google_not_connected',
-				__( 'Connect your Google account first.', 'found-hint' ),
+				__( 'Connect your Google account first.', 'foundhint-local-seo' ),
 				array( 'status' => 409 )
 			);
 		}
@@ -343,7 +343,7 @@ class Connection {
 					Logger::WARNING,
 					'google',
 					'google.grant_revoked',
-					__( 'Google rejected the stored grant; the connection was cleared.', 'found-hint' )
+					__( 'Google rejected the stored grant; the connection was cleared.', 'foundhint-local-seo' )
 				);
 			}
 
@@ -391,7 +391,7 @@ class Connection {
 			Logger::INFO,
 			'google',
 			'google.connected',
-			__( 'Connected to Google Business Profile.', 'found-hint' )
+			__( 'Connected to Google Business Profile.', 'foundhint-local-seo' )
 		);
 
 		self::redirect_to_screen();

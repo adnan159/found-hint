@@ -44,7 +44,7 @@ abstract class AbstractController extends WP_REST_Controller {
 		if ( ! is_user_logged_in() ) {
 			return new WP_Error(
 				'fhint_not_logged_in',
-				__( 'You must be logged in to do that.', 'found-hint' ),
+				__( 'You must be logged in to do that.', 'foundhint-local-seo' ),
 				array( 'status' => 401 )
 			);
 		}
@@ -52,7 +52,7 @@ abstract class AbstractController extends WP_REST_Controller {
 		if ( ! Capabilities::current_user_can_manage() ) {
 			return new WP_Error(
 				'fhint_forbidden',
-				__( 'You do not have permission to manage this.', 'found-hint' ),
+				__( 'You do not have permission to manage this.', 'foundhint-local-seo' ),
 				array( 'status' => 403 )
 			);
 		}
@@ -94,7 +94,7 @@ abstract class AbstractController extends WP_REST_Controller {
 	protected function validation_error( ValidationResult $result ) {
 		return new WP_Error(
 			'fhint_validation_failed',
-			__( 'Some of the submitted values are not valid.', 'found-hint' ),
+			__( 'Some of the submitted values are not valid.', 'foundhint-local-seo' ),
 			array(
 				'status' => 400,
 				'fields' => $result->errors(),
@@ -110,7 +110,7 @@ abstract class AbstractController extends WP_REST_Controller {
 	protected function business_required() {
 		return new WP_Error(
 			'fhint_business_required',
-			__( 'Create the business profile first.', 'found-hint' ),
+			__( 'Create the business profile first.', 'foundhint-local-seo' ),
 			array( 'status' => 409 )
 		);
 	}
@@ -124,7 +124,7 @@ abstract class AbstractController extends WP_REST_Controller {
 	protected function not_found( $resource ) {
 		return new WP_Error(
 			'fhint_' . $resource . '_not_found',
-			__( 'That item could not be found.', 'found-hint' ),
+			__( 'That item could not be found.', 'foundhint-local-seo' ),
 			array( 'status' => 404 )
 		);
 	}
@@ -137,7 +137,7 @@ abstract class AbstractController extends WP_REST_Controller {
 	protected function save_failed() {
 		return new WP_Error(
 			'fhint_save_failed',
-			__( 'The changes could not be saved.', 'found-hint' ),
+			__( 'The changes could not be saved.', 'foundhint-local-seo' ),
 			array( 'status' => 500 )
 		);
 	}
@@ -154,7 +154,7 @@ abstract class AbstractController extends WP_REST_Controller {
 			'fhint_' . $resource . '_limit_reached',
 			sprintf(
 				/* translators: %d: the maximum number allowed on this plan. */
-				__( 'This plan allows up to %d of these.', 'found-hint' ),
+				__( 'This plan allows up to %d of these.', 'foundhint-local-seo' ),
 				(int) $limit
 			),
 			array(

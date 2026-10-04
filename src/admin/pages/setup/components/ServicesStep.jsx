@@ -56,19 +56,19 @@ export function ServicesStep({ onDone, onBack, onSkip }) {
       >
         <Field className="fhint:min-w-[260px] fhint:flex-1">
           <FieldLabel htmlFor="setup-service">
-            {__("Service name", "found-hint")}
+            {__("Service name", "foundhint-local-seo")}
           </FieldLabel>
           <Input
             id="setup-service"
             value={name}
             onChange={(event) => setName(event.target.value)}
-            placeholder={__("Routine check-up", "found-hint")}
+            placeholder={__("Routine check-up", "foundhint-local-seo")}
             disabled={!canAdd}
           />
         </Field>
         <Button type="submit" disabled={isLoading || !canAdd || !name.trim()}>
           <PlusIcon data-icon="inline-start" />
-          {__("Add", "found-hint")}
+          {__("Add", "foundhint-local-seo")}
         </Button>
       </form>
 
@@ -89,7 +89,7 @@ export function ServicesStep({ onDone, onBack, onSkip }) {
                 className="fhint:ml-auto"
                 aria-label={sprintf(
                   /* translators: %s: service name. */
-                  __("Remove %s", "found-hint"),
+                  __("Remove %s", "foundhint-local-seo"),
                   service.name,
                 )}
                 onClick={() => deleteService(service.id)}
@@ -103,7 +103,7 @@ export function ServicesStep({ onDone, onBack, onSkip }) {
         <p className="fhint:text-[13px] fhint:text-muted-strong">
           {__(
             "Nothing listed yet. Add the things people actually come to you for.",
-            "found-hint",
+            "foundhint-local-seo",
           )}
         </p>
       )}
@@ -112,7 +112,10 @@ export function ServicesStep({ onDone, onBack, onSkip }) {
         <p className="fhint:text-[13px] fhint:text-muted-strong">
           {sprintf(
             /* translators: %d: number of services included in the plan. */
-            __("That is all %d services your plan includes.", "found-hint"),
+            __(
+              "That is all %d services your plan includes.",
+              "foundhint-local-seo",
+            ),
             limits.limit,
           )}
         </p>
@@ -128,7 +131,7 @@ export function ServicesStep({ onDone, onBack, onSkip }) {
           isSaving={false}
           onBack={onBack}
           onSkip={onSkip}
-          submitLabel={__("Continue", "found-hint")}
+          submitLabel={__("Continue", "foundhint-local-seo")}
         />
       </form>
     </div>

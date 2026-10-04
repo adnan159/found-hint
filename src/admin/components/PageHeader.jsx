@@ -24,7 +24,7 @@ export function PageHeader({ title, description, actions }) {
     <div className="fhint:flex fhint:flex-wrap fhint:items-start fhint:justify-between fhint:gap-4 fhint:border-b fhint:border-b-border fhint:pb-4">
       <div className="fhint:flex fhint:flex-col fhint:gap-1">
         <span className="fhint:text-[11px] fhint:font-extrabold fhint:tracking-[0.14em] fhint:text-muted-foreground fhint:uppercase">
-          {__("FoundHint", "found-hint")}
+          {__("FoundHint", "foundhint-local-seo")}
         </span>
         <h1
           ref={headingRef}

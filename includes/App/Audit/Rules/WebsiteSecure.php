@@ -70,8 +70,8 @@ class WebsiteSecure extends Rule {
 		}
 
 		return Result::fail(
-			__( 'Your website address is not secure.', 'found-hint' ),
-			__( 'Use the https:// version of the address.', 'found-hint' ),
+			__( 'Your website address is not secure.', 'foundhint-local-seo' ),
+			__( 'Use the https:// version of the address.', 'foundhint-local-seo' ),
 			array( 'found' => $website )
 		)->about( 'business', $context->business_id() )->fixable_by( 'business.force_https' );
 	}

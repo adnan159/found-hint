@@ -90,7 +90,7 @@ export function BusinessStep({ onDone, onBack, onSkip }) {
           data-invalid={errors.name ? true : undefined}
         >
           <FieldLabel htmlFor="setup-name">
-            {__("Business name", "found-hint")}
+            {__("Business name", "foundhint-local-seo")}
           </FieldLabel>
           <Input
             id="setup-name"
@@ -103,14 +103,14 @@ export function BusinessStep({ onDone, onBack, onSkip }) {
             <FieldError>{errors.name}</FieldError>
           ) : (
             <FieldDescription>
-              {__("Exactly as customers know you.", "found-hint")}
+              {__("Exactly as customers know you.", "foundhint-local-seo")}
             </FieldDescription>
           )}
         </Field>
 
         <Field data-invalid={errors.business_type ? true : undefined}>
           <FieldLabel htmlFor="setup-type">
-            {__("Business type", "found-hint")}
+            {__("Business type", "foundhint-local-seo")}
           </FieldLabel>
           <Select
             items={typeItems}
@@ -121,7 +121,9 @@ export function BusinessStep({ onDone, onBack, onSkip }) {
             }}
           >
             <SelectTrigger id="setup-type" className="fhint:w-full">
-              <SelectValue placeholder={__("Choose a type", "found-hint")} />
+              <SelectValue
+                placeholder={__("Choose a type", "foundhint-local-seo")}
+              />
             </SelectTrigger>
             <SelectContent>
               <SelectGroup>
@@ -137,14 +139,14 @@ export function BusinessStep({ onDone, onBack, onSkip }) {
             <FieldError>{errors.business_type}</FieldError>
           ) : (
             <FieldDescription>
-              {__("What kind of business this is.", "found-hint")}
+              {__("What kind of business this is.", "foundhint-local-seo")}
             </FieldDescription>
           )}
         </Field>
 
         <Field data-invalid={errors.phone ? true : undefined}>
           <FieldLabel htmlFor="setup-phone">
-            {__("Phone", "found-hint")}
+            {__("Phone", "foundhint-local-seo")}
           </FieldLabel>
           <Input
             id="setup-phone"
@@ -158,7 +160,7 @@ export function BusinessStep({ onDone, onBack, onSkip }) {
 
         <Field data-invalid={errors.email ? true : undefined}>
           <FieldLabel htmlFor="setup-email">
-            {__("Email", "found-hint")}
+            {__("Email", "foundhint-local-seo")}
           </FieldLabel>
           <Input
             id="setup-email"
@@ -172,7 +174,7 @@ export function BusinessStep({ onDone, onBack, onSkip }) {
 
         <Field data-invalid={errors.website ? true : undefined}>
           <FieldLabel htmlFor="setup-website">
-            {__("Website", "found-hint")}
+            {__("Website", "foundhint-local-seo")}
           </FieldLabel>
           <Input
             id="setup-website"

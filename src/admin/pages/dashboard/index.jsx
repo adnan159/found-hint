@@ -72,37 +72,37 @@ export default function DashboardPage() {
   const steps = [
     {
       id: "business",
-      label: __("Add your business name", "found-hint"),
+      label: __("Add your business name", "foundhint-local-seo"),
       done: Boolean(business?.name),
       to: "/business",
     },
     {
       id: "contact",
-      label: __("Add a phone number or email", "found-hint"),
+      label: __("Add a phone number or email", "foundhint-local-seo"),
       done: Boolean(business?.phone || business?.email),
       to: "/business",
     },
     {
       id: "website",
-      label: __("Add your website", "found-hint"),
+      label: __("Add your website", "foundhint-local-seo"),
       done: Boolean(business?.website),
       to: "/business",
     },
     {
       id: "location",
-      label: __("Add your address", "found-hint"),
+      label: __("Add your address", "foundhint-local-seo"),
       done: Boolean(primary?.address_line_1 && primary?.city),
       to: "/locations",
     },
     {
       id: "hours",
-      label: __("Set your opening hours", "found-hint"),
+      label: __("Set your opening hours", "foundhint-local-seo"),
       done: Boolean(primary?.opening_hours?.has_any_hours),
       to: primary ? `/locations/${primary.id}` : "/locations",
     },
     {
       id: "services",
-      label: __("List what you offer", "found-hint"),
+      label: __("List what you offer", "foundhint-local-seo"),
       done: services.length > 0,
       to: "/services",
     },
@@ -114,7 +114,7 @@ export default function DashboardPage() {
   if (isLoading) {
     return (
       <>
-        <PageHeader title={__("Dashboard", "found-hint")} />
+        <PageHeader title={__("Dashboard", "foundhint-local-seo")} />
         <div className="fhint:grid fhint:gap-4 fhint:lg:grid-cols-3">
           <Skeleton className="fhint:h-80 fhint:w-full" />
           <Skeleton className="fhint:h-80 fhint:w-full" />
@@ -139,10 +139,10 @@ export default function DashboardPage() {
   return (
     <>
       <PageHeader
-        title={__("Dashboard", "found-hint")}
+        title={__("Dashboard", "foundhint-local-seo")}
         description={__(
           "What you have told FoundHint about your business so far.",
-          "found-hint",
+          "foundhint-local-seo",
         )}
       />
 
@@ -159,12 +159,12 @@ export default function DashboardPage() {
           follows the prototype — a large percentage, a square 8px bar, and
           rows that are never struck through when done. */}
         <SectionCard
-          title={__("Setup progress", "found-hint")}
+          title={__("Setup progress", "foundhint-local-seo")}
           action={
             <span className="fhint:text-[13px] fhint:text-muted-strong">
               {sprintf(
                 /* translators: 1: number of completed steps, 2: total steps. */
-                __("%1$d of %2$d steps done", "found-hint"),
+                __("%1$d of %2$d steps done", "foundhint-local-seo"),
                 doneCount,
                 steps.length,
               )}
@@ -176,7 +176,7 @@ export default function DashboardPage() {
               <span className="fhint:font-heading fhint:text-[40px] fhint:leading-none fhint:font-extrabold">
                 {sprintf(
                   /* translators: %d: percentage of setup completed. */
-                  __("%d%%", "found-hint"),
+                  __("%d%%", "foundhint-local-seo"),
                   percent,
                 )}
               </span>
@@ -184,7 +184,7 @@ export default function DashboardPage() {
 
             <Progress
               value={percent}
-              aria-label={__("Setup progress", "found-hint")}
+              aria-label={__("Setup progress", "foundhint-local-seo")}
             />
 
             <ul className="fhint:flex fhint:flex-col">
@@ -214,8 +214,8 @@ export default function DashboardPage() {
                     {step.label}
                     <span className="fhint:sr-only">
                       {step.done
-                        ? __(" — done", "found-hint")
-                        : __(" — still to do", "found-hint")}
+                        ? __(" — done", "foundhint-local-seo")
+                        : __(" — still to do", "foundhint-local-seo")}
                     </span>
                   </span>
 
@@ -224,7 +224,7 @@ export default function DashboardPage() {
                       to={step.to}
                       className="fhint:ml-auto fhint:text-[12px] fhint:font-extrabold fhint:text-link-accent fhint:no-underline fhint:hover:underline"
                     >
-                      {__("Do this", "found-hint")}
+                      {__("Do this", "foundhint-local-seo")}
                       <ArrowRightIcon
                         aria-hidden="true"
                         className="fhint:ml-1 fhint:inline fhint:size-3"
@@ -244,34 +244,34 @@ export default function DashboardPage() {
       <div className="fhint:grid fhint:gap-4 fhint:md:grid-cols-3">
         <StatCard
           icon={BriefcaseBusinessIcon}
-          label={__("Business", "found-hint")}
+          label={__("Business", "foundhint-local-seo")}
           value={
             business?.completeness != null
               ? sprintf(
                   /* translators: %d: percentage of the profile that is filled in. */
-                  __("%d%% complete", "found-hint"),
+                  __("%d%% complete", "foundhint-local-seo"),
                   business.completeness,
                 )
-              : __("Not started", "found-hint")
+              : __("Not started", "foundhint-local-seo")
           }
           to="/business"
         />
         <StatCard
           icon={MapPinIcon}
-          label={__("Locations", "found-hint")}
+          label={__("Locations", "foundhint-local-seo")}
           value={sprintf(
             /* translators: %d: number of locations. */
-            __("%d added", "found-hint"),
+            __("%d added", "foundhint-local-seo"),
             locationsData?.total ?? 0,
           )}
           to="/locations"
         />
         <StatCard
           icon={WrenchIcon}
-          label={__("Services", "found-hint")}
+          label={__("Services", "foundhint-local-seo")}
           value={sprintf(
             /* translators: %d: number of services. */
-            __("%d added", "found-hint"),
+            __("%d added", "foundhint-local-seo"),
             servicesData?.total ?? 0,
           )}
           to="/services"
@@ -295,7 +295,7 @@ function StatCard({ icon: Icon, label, value, to }) {
       </CardHeader>
       <CardContent>
         <Button variant="outline" size="sm" render={<Link to={to} />}>
-          {__("Manage", "found-hint")}
+          {__("Manage", "foundhint-local-seo")}
         </Button>
       </CardContent>
     </Card>

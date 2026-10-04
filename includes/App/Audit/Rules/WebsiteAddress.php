@@ -67,8 +67,8 @@ class WebsiteAddress extends Rule {
 
 		if ( '' === $website ) {
 			return Result::fail(
-				__( 'No website address.', 'found-hint' ),
-				__( 'Add your website so it can be published with your business details.', 'found-hint' )
+				__( 'No website address.', 'foundhint-local-seo' ),
+				__( 'Add your website so it can be published with your business details.', 'foundhint-local-seo' )
 			)->about( 'business', $context->business_id() )->fixable_by( 'business.set_website' );
 		}
 

@@ -129,7 +129,7 @@ class ConnectService {
 		if ( ! self::configured() ) {
 			return new WP_Error(
 				'fhint_connect_not_configured',
-				__( 'No connect service is configured for this site.', 'found-hint' ),
+				__( 'No connect service is configured for this site.', 'foundhint-local-seo' ),
 				array( 'status' => 409 )
 			);
 		}
@@ -156,7 +156,7 @@ class ConnectService {
 		if ( empty( $response['session_id'] ) || empty( $response['start_url'] ) ) {
 			return new WP_Error(
 				'fhint_connect_bad_session',
-				__( 'The connect service did not start a sign-in. Please try again.', 'found-hint' ),
+				__( 'The connect service did not start a sign-in. Please try again.', 'foundhint-local-seo' ),
 				array( 'status' => 502 )
 			);
 		}
@@ -195,7 +195,7 @@ class ConnectService {
 		if ( ! is_array( $pending ) || empty( $pending['session_id'] ) ) {
 			return new WP_Error(
 				'fhint_connect_no_handshake',
-				__( 'That sign-in has expired. Start again from this screen.', 'found-hint' ),
+				__( 'That sign-in has expired. Start again from this screen.', 'foundhint-local-seo' ),
 				array( 'status' => 400 )
 			);
 		}
@@ -203,7 +203,7 @@ class ConnectService {
 		if ( ! hash_equals( (string) $pending['session_id'], (string) $session_id ) ) {
 			return new WP_Error(
 				'fhint_connect_session_mismatch',
-				__( 'That sign-in does not match the one this site started.', 'found-hint' ),
+				__( 'That sign-in does not match the one this site started.', 'foundhint-local-seo' ),
 				array( 'status' => 400 )
 			);
 		}
@@ -214,7 +214,7 @@ class ConnectService {
 		if ( (int) $pending['user_id'] !== (int) $user_id ) {
 			return new WP_Error(
 				'fhint_connect_wrong_user',
-				__( 'This sign-in was started by a different user.', 'found-hint' ),
+				__( 'This sign-in was started by a different user.', 'foundhint-local-seo' ),
 				array( 'status' => 403 )
 			);
 		}
@@ -235,7 +235,7 @@ class ConnectService {
 		if ( empty( $tokens['access_token'] ) ) {
 			return new WP_Error(
 				'fhint_connect_no_tokens',
-				__( 'The connect service returned no access token.', 'found-hint' ),
+				__( 'The connect service returned no access token.', 'foundhint-local-seo' ),
 				array( 'status' => 502 )
 			);
 		}
@@ -257,7 +257,7 @@ class ConnectService {
 		if ( '' === (string) $refresh_token ) {
 			return new WP_Error(
 				'fhint_connect_no_refresh_token',
-				__( 'There is no refresh token to renew.', 'found-hint' ),
+				__( 'There is no refresh token to renew.', 'foundhint-local-seo' ),
 				array( 'status' => 409 )
 			);
 		}
@@ -288,7 +288,7 @@ class ConnectService {
 		if ( is_wp_error( $response ) ) {
 			return new WP_Error(
 				'fhint_connect_unreachable',
-				__( 'FoundHint\'s connect service could not be reached. Please try again in a moment.', 'found-hint' ),
+				__( 'FoundHint\'s connect service could not be reached. Please try again in a moment.', 'foundhint-local-seo' ),
 				array( 'status' => 502 )
 			);
 		}
@@ -326,25 +326,25 @@ class ConnectService {
 	private static function describe( $code, array $decoded ) {
 		switch ( $code ) {
 			case 'invalid_grant':
-				return __( 'Google has withdrawn this connection. Connect again.', 'found-hint' );
+				return __( 'Google has withdrawn this connection. Connect again.', 'foundhint-local-seo' );
 			case 'rate_limited':
-				return __( 'FoundHint\'s connect service is busy. Try again in a minute.', 'found-hint' );
+				return __( 'FoundHint\'s connect service is busy. Try again in a minute.', 'foundhint-local-seo' );
 			case 'no_handoff':
-				return __( 'That sign-in has already been completed or has expired. Start again.', 'found-hint' );
+				return __( 'That sign-in has already been completed or has expired. Start again.', 'foundhint-local-seo' );
 			case 'bad_secret':
 			case 'origin_mismatch':
 			case 'bad_return_path':
 			case 'bad_return_action':
-				return __( 'The connect service refused this site\'s return address. Check the site address in Settings → General.', 'found-hint' );
+				return __( 'The connect service refused this site\'s return address. Check the site address in Settings → General.', 'foundhint-local-seo' );
 			case 'insecure_return':
-				return __( 'The connect service needs this site to be served over https before it can connect.', 'found-hint' );
+				return __( 'The connect service needs this site to be served over https before it can connect.', 'foundhint-local-seo' );
 		}
 
 		if ( isset( $decoded['message'] ) && '' !== $decoded['message'] ) {
 			return (string) $decoded['message'];
 		}
 
-		return __( 'FoundHint\'s connect service refused the request.', 'found-hint' );
+		return __( 'FoundHint\'s connect service refused the request.', 'foundhint-local-seo' );
 	}
 
 	/**

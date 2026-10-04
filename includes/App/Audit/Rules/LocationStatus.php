@@ -65,8 +65,8 @@ class LocationStatus extends Rule {
 		}
 
 		return Result::fail(
-			__( 'This location is not marked as open.', 'found-hint' ),
-			__( 'While it is closed or inactive, less of your information is published.', 'found-hint' ),
+			__( 'This location is not marked as open.', 'foundhint-local-seo' ),
+			__( 'While it is closed or inactive, less of your information is published.', 'foundhint-local-seo' ),
 			array( 'status' => $status )
 		)->about( 'location', $context->location_id() );
 	}

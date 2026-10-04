@@ -115,7 +115,7 @@ export default function BusinessPage() {
     try {
       await updateBusiness({ ...form, social_profiles: social }).unwrap();
       setDirty(false);
-      toast.success(__("Business details saved.", "found-hint"));
+      toast.success(__("Business details saved.", "foundhint-local-seo"));
     } catch {
       // The error is rendered inline by RequestError and per-field below;
       // a toast as well would say the same thing twice.
@@ -129,10 +129,10 @@ export default function BusinessPage() {
   return (
     <>
       <PageHeader
-        title={__("Business", "found-hint")}
+        title={__("Business", "foundhint-local-seo")}
         description={__(
           "The details customers and search engines see. Everything else in FoundHint reads from here, so it only needs entering once.",
-          "found-hint",
+          "foundhint-local-seo",
         )}
       />
 
@@ -144,13 +144,16 @@ export default function BusinessPage() {
 
         <SectionCard
           id="business-details"
-          title={__("Business details", "found-hint")}
-          description={__("How your business is identified.", "found-hint")}
+          title={__("Business details", "foundhint-local-seo")}
+          description={__(
+            "How your business is identified.",
+            "foundhint-local-seo",
+          )}
         >
           <FieldGroup className="fhint:grid fhint:grid-cols-1 fhint:gap-4 fhint:md:grid-cols-2">
             <Field data-invalid={errors.name ? true : undefined}>
               <FieldLabel htmlFor="fhint-name">
-                {__("Business name", "found-hint")}
+                {__("Business name", "foundhint-local-seo")}
               </FieldLabel>
               <Input
                 id="fhint-name"
@@ -163,14 +166,14 @@ export default function BusinessPage() {
                 <FieldError>{errors.name}</FieldError>
               ) : (
                 <FieldDescription>
-                  {__("The name customers know you by.", "found-hint")}
+                  {__("The name customers know you by.", "foundhint-local-seo")}
                 </FieldDescription>
               )}
             </Field>
 
             <Field data-invalid={errors.legal_name ? true : undefined}>
               <FieldLabel htmlFor="fhint-legal-name">
-                {__("Legal name", "found-hint")}
+                {__("Legal name", "foundhint-local-seo")}
               </FieldLabel>
               <Input
                 id="fhint-legal-name"
@@ -184,7 +187,7 @@ export default function BusinessPage() {
                 <FieldDescription>
                   {__(
                     "Only if it differs from the trading name.",
-                    "found-hint",
+                    "foundhint-local-seo",
                   )}
                 </FieldDescription>
               )}
@@ -192,7 +195,7 @@ export default function BusinessPage() {
 
             <Field data-invalid={errors.business_type ? true : undefined}>
               <FieldLabel htmlFor="fhint-business-type">
-                {__("Business type", "found-hint")}
+                {__("Business type", "foundhint-local-seo")}
               </FieldLabel>
               <Select
                 // `items` lets the trigger show the saved type's label
@@ -212,7 +215,7 @@ export default function BusinessPage() {
               >
                 <SelectTrigger id="fhint-business-type">
                   <SelectValue
-                    placeholder={__("Choose a type", "found-hint")}
+                    placeholder={__("Choose a type", "foundhint-local-seo")}
                   />
                 </SelectTrigger>
                 <SelectContent>
@@ -229,14 +232,14 @@ export default function BusinessPage() {
                 <FieldError>{errors.business_type}</FieldError>
               ) : (
                 <FieldDescription>
-                  {__("Used in your structured data.", "found-hint")}
+                  {__("Used in your structured data.", "foundhint-local-seo")}
                 </FieldDescription>
               )}
             </Field>
 
             <Field data-invalid={errors.primary_category ? true : undefined}>
               <FieldLabel htmlFor="fhint-category">
-                {__("Primary category", "found-hint")}
+                {__("Primary category", "foundhint-local-seo")}
               </FieldLabel>
               <Input
                 id="fhint-category"
@@ -248,7 +251,10 @@ export default function BusinessPage() {
                 <FieldError>{errors.primary_category}</FieldError>
               ) : (
                 <FieldDescription>
-                  {__("In your own words, e.g. Grocery Store.", "found-hint")}
+                  {__(
+                    "In your own words, e.g. Grocery Store.",
+                    "foundhint-local-seo",
+                  )}
                 </FieldDescription>
               )}
             </Field>
@@ -258,7 +264,7 @@ export default function BusinessPage() {
               data-invalid={errors.description ? true : undefined}
             >
               <FieldLabel htmlFor="fhint-description">
-                {__("Description", "found-hint")}
+                {__("Description", "foundhint-local-seo")}
               </FieldLabel>
               <Textarea
                 id="fhint-description"
@@ -269,7 +275,7 @@ export default function BusinessPage() {
               <FieldDescription>
                 {__(
                   "A short summary of what you do and who you serve.",
-                  "found-hint",
+                  "foundhint-local-seo",
                 )}
               </FieldDescription>
             </Field>
@@ -278,16 +284,16 @@ export default function BusinessPage() {
 
         <SectionCard
           id="business-contact"
-          title={__("Contact", "found-hint")}
+          title={__("Contact", "foundhint-local-seo")}
           description={__(
             "Locations can override these; leave a location's field empty to use the business value.",
-            "found-hint",
+            "foundhint-local-seo",
           )}
         >
           <FieldGroup className="fhint:grid fhint:grid-cols-1 fhint:gap-4 fhint:md:grid-cols-3">
             <Field data-invalid={errors.phone ? true : undefined}>
               <FieldLabel htmlFor="fhint-phone">
-                {__("Phone", "found-hint")}
+                {__("Phone", "foundhint-local-seo")}
               </FieldLabel>
               <Input
                 id="fhint-phone"
@@ -301,7 +307,7 @@ export default function BusinessPage() {
 
             <Field data-invalid={errors.email ? true : undefined}>
               <FieldLabel htmlFor="fhint-email">
-                {__("Email", "found-hint")}
+                {__("Email", "foundhint-local-seo")}
               </FieldLabel>
               <Input
                 id="fhint-email"
@@ -315,7 +321,7 @@ export default function BusinessPage() {
 
             <Field data-invalid={errors.website ? true : undefined}>
               <FieldLabel htmlFor="fhint-website">
-                {__("Website", "found-hint")}
+                {__("Website", "foundhint-local-seo")}
               </FieldLabel>
               <Input
                 id="fhint-website"
@@ -334,12 +340,12 @@ export default function BusinessPage() {
 
         <SectionCard
           id="business-presentation"
-          title={__("Presentation", "found-hint")}
+          title={__("Presentation", "foundhint-local-seo")}
         >
           <FieldGroup className="fhint:grid fhint:grid-cols-1 fhint:gap-4 fhint:md:grid-cols-3">
             <Field data-invalid={errors.logo_url ? true : undefined}>
               <FieldLabel htmlFor="fhint-logo">
-                {__("Logo URL", "found-hint")}
+                {__("Logo URL", "foundhint-local-seo")}
               </FieldLabel>
               <Input
                 id="fhint-logo"
@@ -356,7 +362,7 @@ export default function BusinessPage() {
 
             <Field data-invalid={errors.price_range ? true : undefined}>
               <FieldLabel htmlFor="fhint-price-range">
-                {__("Price range", "found-hint")}
+                {__("Price range", "foundhint-local-seo")}
               </FieldLabel>
               <Input
                 id="fhint-price-range"
@@ -372,7 +378,7 @@ export default function BusinessPage() {
 
             <Field data-invalid={errors.founding_date ? true : undefined}>
               <FieldLabel htmlFor="fhint-founding-date">
-                {__("Founded", "found-hint")}
+                {__("Founded", "foundhint-local-seo")}
               </FieldLabel>
               <Input
                 id="fhint-founding-date"
@@ -390,10 +396,10 @@ export default function BusinessPage() {
 
         <SectionCard
           id="business-social"
-          title={__("Social profiles", "found-hint")}
+          title={__("Social profiles", "foundhint-local-seo")}
           description={__(
             "Published as the profiles that belong to this business.",
-            "found-hint",
+            "foundhint-local-seo",
           )}
         >
           <FieldGroup className="fhint:grid fhint:grid-cols-1 fhint:gap-4 fhint:md:grid-cols-2">
@@ -428,11 +434,11 @@ export default function BusinessPage() {
         <div className="fhint:flex fhint:items-center fhint:gap-3">
           <Button type="submit" disabled={isSaving}>
             {isSaving ? <Spinner data-icon="inline-start" /> : null}
-            {__("Save changes", "found-hint")}
+            {__("Save changes", "foundhint-local-seo")}
           </Button>
           {dirty ? (
             <span className="fhint:text-sm fhint:text-muted-foreground">
-              {__("You have unsaved changes.", "found-hint")}
+              {__("You have unsaved changes.", "foundhint-local-seo")}
             </span>
           ) : null}
         </div>

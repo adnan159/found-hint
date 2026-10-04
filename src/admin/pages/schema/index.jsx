@@ -31,30 +31,33 @@ import {
  * search engines actually see.
  */
 const MODE_LABELS = {
-  auto: () => __("Automatic", "found-hint"),
-  plugin: () => __("FoundHint publishes it", "found-hint"),
-  seo_plugin: () => __("My SEO plugin publishes it", "found-hint"),
-  disabled: () => __("Nobody publishes it", "found-hint"),
+  auto: () => __("Automatic", "foundhint-local-seo"),
+  plugin: () => __("FoundHint publishes it", "foundhint-local-seo"),
+  seo_plugin: () => __("My SEO plugin publishes it", "foundhint-local-seo"),
+  disabled: () => __("Nobody publishes it", "foundhint-local-seo"),
 };
 
 const MODE_HINTS = {
   auto: () =>
     __(
       "FoundHint publishes the markup unless it finds another plugin already doing it.",
-      "found-hint",
+      "foundhint-local-seo",
     ),
   plugin: () =>
     __(
       "Always publish, even if something else might be publishing too.",
-      "found-hint",
+      "foundhint-local-seo",
     ),
   seo_plugin: () =>
     __(
       "Never publish. Use this when your SEO plugin already describes the business.",
-      "found-hint",
+      "foundhint-local-seo",
     ),
   disabled: () =>
-    __("No local business markup is published from this site.", "found-hint"),
+    __(
+      "No local business markup is published from this site.",
+      "foundhint-local-seo",
+    ),
 };
 
 function StatusBanner({ schema }) {
@@ -70,11 +73,11 @@ function StatusBanner({ schema }) {
         {ownership.deferring_to_plugin
           ? __(
               "FoundHint is not publishing this markup, because a plugin known to publish it is active.",
-              "found-hint",
+              "foundhint-local-seo",
             )
           : __(
               "FoundHint is not publishing this markup, because of the setting below.",
-              "found-hint",
+              "foundhint-local-seo",
             )}
       </NoticeBar>
     );
@@ -84,7 +87,7 @@ function StatusBanner({ schema }) {
     return (
       <Alert variant="destructive" role="alert">
         <AlertTitle>
-          {__("Nothing is being published", "found-hint")}
+          {__("Nothing is being published", "foundhint-local-seo")}
         </AlertTitle>
         <AlertDescription>
           <ul className="fhint:flex fhint:flex-col fhint:gap-1">
@@ -106,7 +109,7 @@ function StatusBanner({ schema }) {
         aria-hidden="true"
         className="fhint:size-4 fhint:text-success"
       />
-      {__("This markup is published on your site.", "found-hint")}
+      {__("This markup is published on your site.", "foundhint-local-seo")}
     </div>
   );
 }
@@ -119,7 +122,7 @@ export default function SchemaPage() {
   if (isLoading || !schema) {
     return (
       <>
-        <PageHeader title={__("Schema", "found-hint")} />
+        <PageHeader title={__("Schema", "foundhint-local-seo")} />
         <Skeleton className="fhint:h-[60vh] fhint:w-full" />
       </>
     );
@@ -135,7 +138,7 @@ export default function SchemaPage() {
 
     try {
       await updateSettings({ schema_mode: next }).unwrap();
-      toast.success(__("Saved.", "found-hint"));
+      toast.success(__("Saved.", "foundhint-local-seo"));
     } catch {
       // Shown inline.
     }
@@ -146,10 +149,10 @@ export default function SchemaPage() {
   return (
     <>
       <PageHeader
-        title={__("Schema", "found-hint")}
+        title={__("Schema", "foundhint-local-seo")}
         description={__(
           "The structured data that tells search engines what your business is, where it is, and when it is open.",
-          "found-hint",
+          "foundhint-local-seo",
         )}
       />
 
@@ -159,15 +162,15 @@ export default function SchemaPage() {
 
       <SectionCard
         id="schema-owner"
-        title={__("Who publishes it", "found-hint")}
+        title={__("Who publishes it", "foundhint-local-seo")}
         description={__(
           "Two descriptions of the same business on one page is worse than one — search engines pick one and ignore the other.",
-          "found-hint",
+          "foundhint-local-seo",
         )}
       >
         <Field>
           <FieldLabel htmlFor="schema-mode">
-            {__("Publishing", "found-hint")}
+            {__("Publishing", "foundhint-local-seo")}
           </FieldLabel>
           <Select value={mode} onValueChange={onModeChange} disabled={isSaving}>
             <SelectTrigger id="schema-mode">
@@ -194,7 +197,7 @@ export default function SchemaPage() {
         {ownership.detected?.length ? (
           <div className="fhint:mt-5 fhint:flex fhint:flex-col fhint:gap-2">
             <span className="fhint:text-[11px] fhint:font-extrabold fhint:tracking-[0.1em] fhint:text-muted-foreground fhint:uppercase">
-              {__("Also installed", "found-hint")}
+              {__("Also installed", "foundhint-local-seo")}
             </span>
             {ownership.detected.map((plugin) => (
               <div
@@ -218,16 +221,16 @@ export default function SchemaPage() {
                     {plugin.emits_local_business === true
                       ? __(
                           "— publishes local business markup of its own.",
-                          "found-hint",
+                          "foundhint-local-seo",
                         )
                       : plugin.emits_local_business === false
                         ? __(
                             "— does not publish local business markup.",
-                            "found-hint",
+                            "foundhint-local-seo",
                           )
                         : __(
                             "— may publish local business markup, depending on how it is set up. Check your page source if you are not sure.",
-                            "found-hint",
+                            "foundhint-local-seo",
                           )}
                   </span>
                 </span>
@@ -240,10 +243,10 @@ export default function SchemaPage() {
       {schema.recommendations?.length ? (
         <SectionCard
           id="schema-improve"
-          title={__("What would make this better", "found-hint")}
+          title={__("What would make this better", "foundhint-local-seo")}
           description={__(
             "None of these stop the markup being published. They just leave less for a search engine to work with.",
-            "found-hint",
+            "foundhint-local-seo",
           )}
         >
           <ul className="fhint:flex fhint:flex-col fhint:gap-1.5 fhint:text-[13px]">
@@ -258,10 +261,10 @@ export default function SchemaPage() {
 
       <SectionCard
         id="schema-preview"
-        title={__("What gets published", "found-hint")}
+        title={__("What gets published", "foundhint-local-seo")}
         description={__(
           "Exactly what appears in your pages' head, read from the same cache the front end uses.",
-          "found-hint",
+          "foundhint-local-seo",
         )}
         action={
           <Button
@@ -270,15 +273,18 @@ export default function SchemaPage() {
             onClick={async () => {
               try {
                 await navigator.clipboard.writeText(json);
-                toast.success(__("Copied.", "found-hint"));
+                toast.success(__("Copied.", "foundhint-local-seo"));
               } catch {
                 toast.error(
-                  __("Could not copy. Select the text instead.", "found-hint"),
+                  __(
+                    "Could not copy. Select the text instead.",
+                    "foundhint-local-seo",
+                  ),
                 );
               }
             }}
           >
-            {__("Copy", "found-hint")}
+            {__("Copy", "foundhint-local-seo")}
           </Button>
         }
       >

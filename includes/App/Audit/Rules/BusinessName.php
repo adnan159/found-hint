@@ -68,8 +68,8 @@ class BusinessName extends Rule {
 		}
 
 		return Result::fail(
-			__( 'Your business has no name.', 'found-hint' ),
-			__( 'Add the name customers know you by on the Business screen.', 'found-hint' )
+			__( 'Your business has no name.', 'foundhint-local-seo' ),
+			__( 'Add the name customers know you by on the Business screen.', 'foundhint-local-seo' )
 		)->about( 'business', $context->business_id() );
 	}
 }

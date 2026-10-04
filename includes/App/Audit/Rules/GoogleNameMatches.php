@@ -88,8 +88,8 @@ class GoogleNameMatches extends Rule {
 		}
 
 		return Result::fail(
-			__( 'Your business name does not match your Google profile.', 'found-hint' ),
-			__( 'Make them identical. The same business described two ways is what search engines treat as two businesses.', 'found-hint' ),
+			__( 'Your business name does not match your Google profile.', 'foundhint-local-seo' ),
+			__( 'Make them identical. The same business described two ways is what search engines treat as two businesses.', 'foundhint-local-seo' ),
 			array(
 				'found'    => $ours,
 				'expected' => $theirs,

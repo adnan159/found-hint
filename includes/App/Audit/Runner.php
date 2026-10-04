@@ -46,7 +46,7 @@ class Runner {
 		if ( ! $context->has_subject() ) {
 			return new WP_Error(
 				'fhint_audit_no_business',
-				__( 'Add your business details before running an audit.', 'found-hint' ),
+				__( 'Add your business details before running an audit.', 'foundhint-local-seo' ),
 				array( 'status' => 409 )
 			);
 		}
@@ -61,7 +61,7 @@ class Runner {
 		if ( ! $audit_id ) {
 			return new WP_Error(
 				'fhint_audit_start_failed',
-				__( 'The audit could not be started.', 'found-hint' ),
+				__( 'The audit could not be started.', 'foundhint-local-seo' ),
 				array( 'status' => 500 )
 			);
 		}
@@ -92,7 +92,7 @@ class Runner {
 				'audit.completed',
 				sprintf(
 					/* translators: 1: score, 2: number of findings. */
-					__( 'Audit scored %1$d with %2$d findings.', 'found-hint' ),
+					__( 'Audit scored %1$d with %2$d findings.', 'foundhint-local-seo' ),
 					$summary['score'],
 					$summary['issues_total']
 				)
@@ -108,7 +108,7 @@ class Runner {
 
 			return new WP_Error(
 				'fhint_audit_failed',
-				__( 'The audit did not finish.', 'found-hint' ),
+				__( 'The audit did not finish.', 'foundhint-local-seo' ),
 				array( 'status' => 500 )
 			);
 		}
@@ -134,10 +134,10 @@ class Runner {
 				$result = Result::fail(
 					sprintf(
 						/* translators: %s: rule identifier. */
-						__( 'The check "%s" could not run.', 'found-hint' ),
+						__( 'The check "%s" could not run.', 'foundhint-local-seo' ),
 						$rule->id()
 					),
-					__( 'This is a fault in the check itself, not in your business details.', 'found-hint' ),
+					__( 'This is a fault in the check itself, not in your business details.', 'foundhint-local-seo' ),
 					array( 'error' => $error->getMessage() )
 				);
 			}

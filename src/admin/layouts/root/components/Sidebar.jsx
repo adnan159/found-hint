@@ -29,79 +29,103 @@ import logoUrl from "@/assets/foundhint-icon.png";
  * Business and Settings screens, which carry matching ids.
  */
 const NAV_ITEMS = [
-  { to: "/", label: () => __("Dashboard", "found-hint"), end: true },
+  { to: "/", label: () => __("Dashboard", "foundhint-local-seo"), end: true },
   // Setup is hidden for now — the guided wizard is being reworked, and the
   // dashboard's own "get started" section covers a new site in the meantime.
   // The route still exists (see routes.jsx), so a bookmark keeps working;
   // put this row back when the wizard returns.
-  // { to: "/setup", label: () => __("Setup", "found-hint") },
+  // { to: "/setup", label: () => __("Setup", "foundhint-local-seo") },
   {
     to: "/business",
-    label: () => __("Business", "found-hint"),
+    label: () => __("Business", "foundhint-local-seo"),
     children: [
       {
         id: "business-details",
-        label: () => __("Business details", "found-hint"),
+        label: () => __("Business details", "foundhint-local-seo"),
       },
-      { id: "business-contact", label: () => __("Contact", "found-hint") },
+      {
+        id: "business-contact",
+        label: () => __("Contact", "foundhint-local-seo"),
+      },
       {
         id: "business-presentation",
-        label: () => __("Presentation", "found-hint"),
+        label: () => __("Presentation", "foundhint-local-seo"),
       },
       {
         id: "business-social",
-        label: () => __("Social profiles", "found-hint"),
+        label: () => __("Social profiles", "foundhint-local-seo"),
       },
     ],
   },
-  { to: "/locations", label: () => __("Locations", "found-hint") },
-  { to: "/services", label: () => __("Services", "found-hint") },
+  { to: "/locations", label: () => __("Locations", "foundhint-local-seo") },
+  { to: "/services", label: () => __("Services", "foundhint-local-seo") },
   {
     to: "/schema",
-    label: () => __("Schema", "found-hint"),
+    label: () => __("Schema", "foundhint-local-seo"),
     children: [
-      { id: "schema-owner", label: () => __("Who publishes it", "found-hint") },
+      {
+        id: "schema-owner",
+        label: () => __("Who publishes it", "foundhint-local-seo"),
+      },
       {
         id: "schema-preview",
-        label: () => __("What gets published", "found-hint"),
+        label: () => __("What gets published", "foundhint-local-seo"),
       },
     ],
   },
   {
     to: "/audit",
-    label: () => __("SEO audit", "found-hint"),
+    label: () => __("SEO audit", "foundhint-local-seo"),
     children: [
-      { id: "audit-score", label: () => __("Score", "found-hint") },
-      { id: "audit-findings", label: () => __("What to fix", "found-hint") },
+      { id: "audit-score", label: () => __("Score", "foundhint-local-seo") },
+      {
+        id: "audit-findings",
+        label: () => __("What to fix", "foundhint-local-seo"),
+      },
     ],
   },
   {
     to: "/google",
-    label: () => __("Google", "found-hint"),
+    label: () => __("Google", "foundhint-local-seo"),
     children: [
-      { id: "google-client", label: () => __("Google client", "found-hint") },
-      { id: "google-connection", label: () => __("Connection", "found-hint") },
+      {
+        id: "google-client",
+        label: () => __("Google client", "foundhint-local-seo"),
+      },
+      {
+        id: "google-connection",
+        label: () => __("Connection", "foundhint-local-seo"),
+      },
       {
         id: "google-profiles",
-        label: () => __("Business profiles", "found-hint"),
+        label: () => __("Business profiles", "foundhint-local-seo"),
       },
       {
         id: "google-mapping",
-        label: () => __("Location mapping", "found-hint"),
+        label: () => __("Location mapping", "foundhint-local-seo"),
       },
       {
         id: "google-import",
-        label: () => __("Import from Google", "found-hint"),
+        label: () => __("Import from Google", "foundhint-local-seo"),
       },
     ],
   },
   {
     to: "/settings",
-    label: () => __("Settings", "found-hint"),
+    label: () => __("Settings", "foundhint-local-seo"),
     children: [
-      { id: "settings-data", label: () => __("Your data", "found-hint") },
-      { id: "settings-log", label: () => __("Activity log", "found-hint") },
-      { id: "settings-system", label: () => __("System", "found-hint") },
+      {
+        id: "settings-data",
+        label: () => __("Your data", "foundhint-local-seo"),
+      },
+      {
+        id: "settings-log",
+        label: () => __("Activity log", "foundhint-local-seo"),
+      },
+      {
+        id: "settings-system",
+        label: () => __("System", "foundhint-local-seo"),
+      },
     ],
   },
 ];
@@ -261,8 +285,8 @@ function NavGroup({ item }) {
                 not say what the button does. */}
             <span className="fhint:sr-only">
               {open
-                ? __("Collapse section list", "found-hint")
-                : __("Expand section list", "found-hint")}
+                ? __("Collapse section list", "foundhint-local-seo")
+                : __("Expand section list", "foundhint-local-seo")}
             </span>
             <ChevronDownIcon
               aria-hidden="true"
@@ -300,7 +324,7 @@ function NavGroup({ item }) {
 export function Sidebar({ counts }) {
   return (
     <nav
-      aria-label={__("FoundHint", "found-hint")}
+      aria-label={__("FoundHint", "foundhint-local-seo")}
       className="fhint:flex fhint:w-[236px] fhint:shrink-0 fhint:flex-col fhint:self-stretch fhint:border-r-2 fhint:border-r-divider fhint:bg-sidebar fhint:text-sidebar-foreground"
     >
       <div className="fhint:flex fhint:items-center fhint:gap-2.5 fhint:border-b-2 fhint:border-b-divider fhint:px-3.5 fhint:pt-4 fhint:pb-3.5">
@@ -316,10 +340,10 @@ export function Sidebar({ counts }) {
         />
         <span className="fhint:flex fhint:flex-col fhint:leading-[1.05]">
           <strong className="fhint:font-heading fhint:text-[15px] fhint:font-extrabold fhint:tracking-[-0.02em] fhint:uppercase">
-            {__("FoundHint", "found-hint")}
+            {__("FoundHint", "foundhint-local-seo")}
           </strong>
           <span className="fhint:text-[10.5px] fhint:font-semibold fhint:tracking-[0.12em] fhint:text-muted-foreground fhint:uppercase">
-            {__("Local SEO", "found-hint")}
+            {__("Local SEO", "foundhint-local-seo")}
           </span>
         </span>
       </div>
@@ -349,7 +373,7 @@ export function Sidebar({ counts }) {
           figures ship without it. */}
       <div className="fhint:border-t-2 fhint:border-t-divider fhint:px-3.5 fhint:py-3">
         <div className="fhint:text-[11px] fhint:font-bold fhint:tracking-[0.1em] fhint:text-muted-foreground fhint:uppercase">
-          {__("FoundHint Free", "found-hint")}
+          {__("FoundHint Free", "foundhint-local-seo")}
         </div>
         <div className="fhint:mt-1 fhint:text-[12px] fhint:text-muted-strong">
           {counts}

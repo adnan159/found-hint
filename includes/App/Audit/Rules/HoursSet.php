@@ -76,8 +76,8 @@ class HoursSet extends Rule {
 		}
 
 		return Result::fail(
-			__( 'No opening hours set.', 'found-hint' ),
-			__( 'Fill in the week. "When are they open?" is the question a local search is usually answering.', 'found-hint' )
+			__( 'No opening hours set.', 'foundhint-local-seo' ),
+			__( 'Fill in the week. "When are they open?" is the question a local search is usually answering.', 'foundhint-local-seo' )
 		)->about( 'location', $context->location_id() );
 	}
 }

@@ -23,55 +23,58 @@ import WizardShell from "./components/WizardShell";
  */
 const STEP_COPY = {
   welcome: {
-    title: () => __("Make sure customers find you", "found-hint"),
+    title: () => __("Make sure customers find you", "foundhint-local-seo"),
     intro: () => "",
   },
   business: {
-    title: () => __("Tell us about your business", "found-hint"),
+    title: () => __("Tell us about your business", "foundhint-local-seo"),
     intro: () =>
       __(
         "This is what search engines read and what customers see. You only enter it once — everything else in FoundHint reads from here.",
-        "found-hint",
+        "foundhint-local-seo",
       ),
   },
   location: {
-    title: () => __("Where do customers find you?", "found-hint"),
+    title: () => __("Where do customers find you?", "foundhint-local-seo"),
     intro: () =>
       __(
         "The address people visit. It is what puts you on the map.",
-        "found-hint",
+        "foundhint-local-seo",
       ),
   },
   hours: {
-    title: () => __("When are you open?", "found-hint"),
+    title: () => __("When are you open?", "foundhint-local-seo"),
     intro: () =>
       __(
         "Leave a day as Not set if you would rather not say — that is different from being closed, and it publishes nothing.",
-        "found-hint",
+        "foundhint-local-seo",
       ),
   },
   services: {
-    title: () => __("What do you offer?", "found-hint"),
+    title: () => __("What do you offer?", "foundhint-local-seo"),
     intro: () =>
       __(
         "A short list is enough to start. You can add prices and details later.",
-        "found-hint",
+        "foundhint-local-seo",
       ),
   },
   done: {
-    title: () => __("You are set up", "found-hint"),
+    title: () => __("You are set up", "foundhint-local-seo"),
     intro: () =>
-      __("Here is what your site now knows about your business.", "found-hint"),
+      __(
+        "Here is what your site now knows about your business.",
+        "foundhint-local-seo",
+      ),
   },
 };
 
 const STEP_LABELS = {
-  welcome: () => __("Welcome", "found-hint"),
-  business: () => __("Business", "found-hint"),
-  location: () => __("Address", "found-hint"),
-  hours: () => __("Hours", "found-hint"),
-  services: () => __("Services", "found-hint"),
-  done: () => __("Finish", "found-hint"),
+  welcome: () => __("Welcome", "foundhint-local-seo"),
+  business: () => __("Business", "foundhint-local-seo"),
+  location: () => __("Address", "foundhint-local-seo"),
+  hours: () => __("Hours", "foundhint-local-seo"),
+  services: () => __("Services", "foundhint-local-seo"),
+  done: () => __("Finish", "foundhint-local-seo"),
 };
 
 export default function SetupPage() {

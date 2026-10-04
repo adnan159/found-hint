@@ -37,8 +37,8 @@ import {
 } from "@/store/api/servicesApi";
 
 const STATUS_LABELS = {
-  active: () => __("Active", "found-hint"),
-  inactive: () => __("Inactive", "found-hint"),
+  active: () => __("Active", "foundhint-local-seo"),
+  inactive: () => __("Inactive", "foundhint-local-seo"),
 };
 
 const statusItems = serviceStatuses.map((status) => ({
@@ -113,10 +113,10 @@ export function ServiceDialog({ open, onOpenChange, service }) {
     try {
       if (isEdit) {
         await updateService({ id: service.id, ...payload }).unwrap();
-        toast.success(__("Service updated.", "found-hint"));
+        toast.success(__("Service updated.", "foundhint-local-seo"));
       } else {
         await createService(payload).unwrap();
-        toast.success(__("Service added.", "found-hint"));
+        toast.success(__("Service added.", "foundhint-local-seo"));
       }
 
       onOpenChange(false);
@@ -135,13 +135,13 @@ export function ServiceDialog({ open, onOpenChange, service }) {
           <DialogHeader>
             <DialogTitle>
               {isEdit
-                ? __("Edit service", "found-hint")
-                : __("Add service", "found-hint")}
+                ? __("Edit service", "foundhint-local-seo")
+                : __("Add service", "foundhint-local-seo")}
             </DialogTitle>
             <DialogDescription>
               {__(
                 "Services appear in your structured data and on your location pages.",
-                "found-hint",
+                "foundhint-local-seo",
               )}
             </DialogDescription>
           </DialogHeader>
@@ -154,7 +154,7 @@ export function ServiceDialog({ open, onOpenChange, service }) {
               data-invalid={errors.name ? true : undefined}
             >
               <FieldLabel htmlFor="fhint-service-name">
-                {__("Name", "found-hint")}
+                {__("Name", "foundhint-local-seo")}
               </FieldLabel>
               <Input
                 id="fhint-service-name"
@@ -171,7 +171,7 @@ export function ServiceDialog({ open, onOpenChange, service }) {
               data-invalid={errors.description ? true : undefined}
             >
               <FieldLabel htmlFor="fhint-service-description">
-                {__("Description", "found-hint")}
+                {__("Description", "foundhint-local-seo")}
               </FieldLabel>
               <Textarea
                 id="fhint-service-description"
@@ -183,7 +183,7 @@ export function ServiceDialog({ open, onOpenChange, service }) {
 
             <Field data-invalid={errors.price ? true : undefined}>
               <FieldLabel htmlFor="fhint-service-price">
-                {__("Price", "found-hint")}
+                {__("Price", "foundhint-local-seo")}
               </FieldLabel>
               <Input
                 id="fhint-service-price"
@@ -196,14 +196,17 @@ export function ServiceDialog({ open, onOpenChange, service }) {
                 <FieldError>{errors.price}</FieldError>
               ) : (
                 <FieldDescription>
-                  {__("Leave empty to publish no price.", "found-hint")}
+                  {__(
+                    "Leave empty to publish no price.",
+                    "foundhint-local-seo",
+                  )}
                 </FieldDescription>
               )}
             </Field>
 
             <Field data-invalid={errors.currency ? true : undefined}>
               <FieldLabel htmlFor="fhint-service-currency">
-                {__("Currency", "found-hint")}
+                {__("Currency", "foundhint-local-seo")}
               </FieldLabel>
               <Input
                 id="fhint-service-currency"
@@ -217,14 +220,14 @@ export function ServiceDialog({ open, onOpenChange, service }) {
                 <FieldError>{errors.currency}</FieldError>
               ) : (
                 <FieldDescription>
-                  {__("Required when a price is set.", "found-hint")}
+                  {__("Required when a price is set.", "foundhint-local-seo")}
                 </FieldDescription>
               )}
             </Field>
 
             <Field data-invalid={errors.url ? true : undefined}>
               <FieldLabel htmlFor="fhint-service-url">
-                {__("Link", "found-hint")}
+                {__("Link", "foundhint-local-seo")}
               </FieldLabel>
               <Input
                 id="fhint-service-url"
@@ -239,7 +242,7 @@ export function ServiceDialog({ open, onOpenChange, service }) {
 
             <Field data-invalid={errors.status ? true : undefined}>
               <FieldLabel htmlFor="fhint-service-status">
-                {__("Status", "found-hint")}
+                {__("Status", "foundhint-local-seo")}
               </FieldLabel>
               <Select
                 items={statusItems}
@@ -271,7 +274,7 @@ export function ServiceDialog({ open, onOpenChange, service }) {
                 data-invalid={errors.slug ? true : undefined}
               >
                 <FieldLabel htmlFor="fhint-service-slug">
-                  {__("URL slug", "found-hint")}
+                  {__("URL slug", "foundhint-local-seo")}
                 </FieldLabel>
                 <Input
                   id="fhint-service-slug"
@@ -285,7 +288,7 @@ export function ServiceDialog({ open, onOpenChange, service }) {
                   <FieldDescription>
                     {__(
                       "Renaming the service does not change this, because it may already be in a published link.",
-                      "found-hint",
+                      "foundhint-local-seo",
                     )}
                   </FieldDescription>
                 )}
@@ -299,13 +302,13 @@ export function ServiceDialog({ open, onOpenChange, service }) {
               variant="outline"
               onClick={() => onOpenChange(false)}
             >
-              {__("Cancel", "found-hint")}
+              {__("Cancel", "foundhint-local-seo")}
             </Button>
             <Button type="submit" disabled={isSaving}>
               {isSaving ? <Spinner data-icon="inline-start" /> : null}
               {isEdit
-                ? __("Save service", "found-hint")
-                : __("Add service", "found-hint")}
+                ? __("Save service", "foundhint-local-seo")
+                : __("Add service", "foundhint-local-seo")}
             </Button>
           </DialogFooter>
         </form>

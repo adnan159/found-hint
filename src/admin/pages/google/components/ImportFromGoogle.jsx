@@ -43,25 +43,25 @@ import {
 function fieldLabel(key) {
   switch (key) {
     case "name":
-      return __("Business name", "found-hint");
+      return __("Business name", "foundhint-local-seo");
     case "address":
-      return __("Address", "found-hint");
+      return __("Address", "foundhint-local-seo");
     case "phone":
-      return __("Phone", "found-hint");
+      return __("Phone", "foundhint-local-seo");
     case "website":
-      return __("Website", "found-hint");
+      return __("Website", "foundhint-local-seo");
     case "description":
-      return __("Description", "found-hint");
+      return __("Description", "foundhint-local-seo");
     case "hours":
-      return __("Opening hours", "found-hint");
+      return __("Opening hours", "foundhint-local-seo");
     case "business_type":
-      return __("Business type", "found-hint");
+      return __("Business type", "foundhint-local-seo");
     case "social":
-      return __("Social profiles", "found-hint");
+      return __("Social profiles", "foundhint-local-seo");
     case "services":
-      return __("Services", "found-hint");
+      return __("Services", "foundhint-local-seo");
     case "coordinates":
-      return __("Map position", "found-hint");
+      return __("Map position", "foundhint-local-seo");
     default:
       return key;
   }
@@ -76,11 +76,11 @@ function fieldLabel(key) {
 function scopeLabel(scope) {
   switch (scope) {
     case "business":
-      return __("Shared by all locations", "found-hint");
+      return __("Shared by all locations", "foundhint-local-seo");
     case "services":
-      return __("Added to your services", "found-hint");
+      return __("Added to your services", "foundhint-local-seo");
     default:
-      return __("This location", "found-hint");
+      return __("This location", "foundhint-local-seo");
   }
 }
 
@@ -148,7 +148,7 @@ export function ImportFromGoogle({ isConnected }) {
             "Imported %d field from Google.",
             "Imported %d fields from Google.",
             count,
-            "found-hint",
+            "foundhint-local-seo",
           ),
           count,
         ),
@@ -167,10 +167,10 @@ export function ImportFromGoogle({ isConnected }) {
   return (
     <SectionCard
       id="google-import"
-      title={__("Import from Google", "found-hint")}
+      title={__("Import from Google", "foundhint-local-seo")}
       description={__(
         "Fill in your FoundHint details from the Google profile you have mapped to this location.",
-        "found-hint",
+        "foundhint-local-seo",
       )}
     >
       <RequestError error={readError ?? importError} />
@@ -178,16 +178,20 @@ export function ImportFromGoogle({ isConnected }) {
       {needsChoice ? (
         <div className="fhint:mb-4 fhint:flex fhint:flex-wrap fhint:items-center fhint:gap-2.5">
           <span className="fhint:text-[13px] fhint:font-bold">
-            {__("Which profile are you importing?", "found-hint")}
+            {__("Which profile are you importing?", "foundhint-local-seo")}
           </span>
           <Select value={profile} onValueChange={setProfile}>
             <SelectTrigger className="fhint:min-w-[260px]">
               <SelectValue
-                placeholder={__("Choose a Google profile", "found-hint")}
+                placeholder={__(
+                  "Choose a Google profile",
+                  "foundhint-local-seo",
+                )}
               >
                 {(value) =>
                   profiles.find((item) => item.location_name === value)
-                    ?.title ?? __("Choose a Google profile", "found-hint")
+                    ?.title ??
+                  __("Choose a Google profile", "foundhint-local-seo")
                 }
               </SelectValue>
             </SelectTrigger>
@@ -214,12 +218,12 @@ export function ImportFromGoogle({ isConnected }) {
             <DownloadIcon data-icon="inline-start" />
           )}
           {previewData
-            ? __("Read Google again", "found-hint")
-            : __("Read my Google profile", "found-hint")}
+            ? __("Read Google again", "foundhint-local-seo")
+            : __("Read my Google profile", "foundhint-local-seo")}
         </Button>
         {!previewData ? (
           <span className="fhint:text-[13px] fhint:text-muted-strong">
-            {__("Nothing is saved until you choose.", "found-hint")}
+            {__("Nothing is saved until you choose.", "foundhint-local-seo")}
           </span>
         ) : null}
       </div>
@@ -230,7 +234,7 @@ export function ImportFromGoogle({ isConnected }) {
             <p className="fhint:m-0 fhint:bg-notice fhint:px-3.5 fhint:py-2.5 fhint:text-[13px] fhint:text-notice-foreground">
               {__(
                 "This site has no business details yet, so importing will create them from this profile.",
-                "found-hint",
+                "foundhint-local-seo",
               )}
             </p>
           ) : null}
@@ -239,7 +243,7 @@ export function ImportFromGoogle({ isConnected }) {
             <p className="fhint:m-0 fhint:bg-notice fhint:px-3.5 fhint:py-2.5 fhint:text-[13px] fhint:text-notice-foreground">
               {__(
                 "Importing will create a location from this profile's address and link the two, so a later import updates it rather than adding another.",
-                "found-hint",
+                "foundhint-local-seo",
               )}
             </p>
           ) : null}
@@ -247,7 +251,7 @@ export function ImportFromGoogle({ isConnected }) {
           <p className="fhint:m-0 fhint:text-[13px] fhint:text-muted-strong">
             {__(
               "Fields you have not filled in are ticked. Fields you already hold are left for you to decide, because FoundHint cannot know which value is the newer one.",
-              "found-hint",
+              "foundhint-local-seo",
             )}
           </p>
 
@@ -256,11 +260,15 @@ export function ImportFromGoogle({ isConnected }) {
               <TableHeader>
                 <TableRow>
                   <TableHead className="fhint:w-[72px]">
-                    {__("Import", "found-hint")}
+                    {__("Import", "foundhint-local-seo")}
                   </TableHead>
-                  <TableHead>{__("Detail", "found-hint")}</TableHead>
-                  <TableHead>{__("In FoundHint", "found-hint")}</TableHead>
-                  <TableHead>{__("On Google", "found-hint")}</TableHead>
+                  <TableHead>{__("Detail", "foundhint-local-seo")}</TableHead>
+                  <TableHead>
+                    {__("In FoundHint", "foundhint-local-seo")}
+                  </TableHead>
+                  <TableHead>
+                    {__("On Google", "foundhint-local-seo")}
+                  </TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -296,7 +304,7 @@ export function ImportFromGoogle({ isConnected }) {
                         </span>
                         {field.differs ? (
                           <span className="fhint:mt-0.5 fhint:block fhint:text-[12px] fhint:font-bold fhint:text-notice-foreground">
-                            {__("Different here", "found-hint")}
+                            {__("Different here", "foundhint-local-seo")}
                           </span>
                         ) : null}
                       </TableCell>
@@ -308,7 +316,10 @@ export function ImportFromGoogle({ isConnected }) {
                           <Value>{field.theirs}</Value>
                         ) : (
                           <span className="fhint:text-muted-strong">
-                            {__("Google has nothing here", "found-hint")}
+                            {__(
+                              "Google has nothing here",
+                              "foundhint-local-seo",
+                            )}
                           </span>
                         )}
                       </TableCell>
@@ -327,14 +338,14 @@ export function ImportFromGoogle({ isConnected }) {
             >
               {isImporting ? <Spinner data-icon="inline-start" /> : null}
               {selected.length === 0
-                ? __("Choose what to import", "found-hint")
+                ? __("Choose what to import", "foundhint-local-seo")
                 : sprintf(
                     /* translators: %d: how many fields are ticked. */
                     _n(
                       "Import %d field",
                       "Import %d fields",
                       selected.length,
-                      "found-hint",
+                      "foundhint-local-seo",
                     ),
                     selected.length,
                   )}
@@ -342,7 +353,7 @@ export function ImportFromGoogle({ isConnected }) {
             <span className="fhint:text-[13px] fhint:text-muted-strong">
               {__(
                 "Imported values are saved as your own details and can be edited afterwards.",
-                "found-hint",
+                "foundhint-local-seo",
               )}
             </span>
           </div>

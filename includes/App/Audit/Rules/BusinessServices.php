@@ -59,8 +59,8 @@ class BusinessServices extends Rule {
 		}
 
 		return Result::fail(
-			__( 'No services listed.', 'found-hint' ),
-			__( 'Add the things people actually come to you for. They are published as part of your structured data.', 'found-hint' )
+			__( 'No services listed.', 'foundhint-local-seo' ),
+			__( 'Add the things people actually come to you for. They are published as part of your structured data.', 'foundhint-local-seo' )
 		)->about( 'business', $context->business_id() );
 	}
 }

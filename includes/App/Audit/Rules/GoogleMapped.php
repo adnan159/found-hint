@@ -70,8 +70,8 @@ class GoogleMapped extends Rule {
 		}
 
 		return Result::fail(
-			__( 'This location is not linked to a Google profile.', 'found-hint' ),
-			__( 'Link it on the Google screen so the two can be compared.', 'found-hint' )
+			__( 'This location is not linked to a Google profile.', 'foundhint-local-seo' ),
+			__( 'Link it on the Google screen so the two can be compared.', 'foundhint-local-seo' )
 		)->about( 'location', $context->location_id() );
 	}
 }

@@ -28,10 +28,10 @@ import { useGetBusinessQuery } from "@/store/api/businessApi";
 import { useGetLocationsQuery } from "@/store/api/locationsApi";
 
 const STATUS_LABELS = {
-  active: () => __("Active", "found-hint"),
-  inactive: () => __("Inactive", "found-hint"),
-  temporarily_closed: () => __("Temporarily closed", "found-hint"),
-  permanently_closed: () => __("Permanently closed", "found-hint"),
+  active: () => __("Active", "foundhint-local-seo"),
+  inactive: () => __("Inactive", "foundhint-local-seo"),
+  temporarily_closed: () => __("Temporarily closed", "foundhint-local-seo"),
+  permanently_closed: () => __("Permanently closed", "foundhint-local-seo"),
 };
 
 export default function LocationsPage() {
@@ -50,25 +50,25 @@ export default function LocationsPage() {
   if (!isLoading && !hasBusiness) {
     return (
       <>
-        <PageHeader title={__("Locations", "found-hint")} />
+        <PageHeader title={__("Locations", "foundhint-local-seo")} />
         <Empty>
           <EmptyHeader>
             <EmptyMedia variant="icon">
               <MapPinIcon />
             </EmptyMedia>
             <EmptyTitle>
-              {__("Add your business first", "found-hint")}
+              {__("Add your business first", "foundhint-local-seo")}
             </EmptyTitle>
             <EmptyDescription>
               {__(
                 "A location belongs to a business, so start with your business details.",
-                "found-hint",
+                "foundhint-local-seo",
               )}
             </EmptyDescription>
           </EmptyHeader>
           <EmptyContent>
             <Button render={<Link to="/business" />}>
-              {__("Go to Business", "found-hint")}
+              {__("Go to Business", "foundhint-local-seo")}
             </Button>
           </EmptyContent>
         </Empty>
@@ -79,22 +79,22 @@ export default function LocationsPage() {
   return (
     <>
       <PageHeader
-        title={__("Locations", "found-hint")}
+        title={__("Locations", "foundhint-local-seo")}
         description={__(
           "Where you trade from. Leave a contact field empty and the business value is used instead.",
-          "found-hint",
+          "foundhint-local-seo",
         )}
         actions={
           <Button onClick={() => navigate("/locations/new")} disabled={!canAdd}>
             <PlusIcon data-icon="inline-start" />
-            {__("Add location", "found-hint")}
+            {__("Add location", "foundhint-local-seo")}
           </Button>
         }
       />
 
       <RequestError
         error={error}
-        title={__("Could not load locations", "found-hint")}
+        title={__("Could not load locations", "foundhint-local-seo")}
       />
 
       {isLoading ? (
@@ -111,18 +111,20 @@ export default function LocationsPage() {
             <EmptyMedia variant="icon">
               <MapPinIcon />
             </EmptyMedia>
-            <EmptyTitle>{__("No locations yet", "found-hint")}</EmptyTitle>
+            <EmptyTitle>
+              {__("No locations yet", "foundhint-local-seo")}
+            </EmptyTitle>
             <EmptyDescription>
               {__(
                 "Add the address customers visit. It is what puts you on the map.",
-                "found-hint",
+                "foundhint-local-seo",
               )}
             </EmptyDescription>
           </EmptyHeader>
           <EmptyContent>
             <Button onClick={() => navigate("/locations/new")}>
               <PlusIcon data-icon="inline-start" />
-              {__("Add your first location", "found-hint")}
+              {__("Add your first location", "foundhint-local-seo")}
             </Button>
           </EmptyContent>
         </Empty>
@@ -131,12 +133,12 @@ export default function LocationsPage() {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>{__("Location", "found-hint")}</TableHead>
-                <TableHead>{__("Address", "found-hint")}</TableHead>
-                <TableHead>{__("Hours", "found-hint")}</TableHead>
-                <TableHead>{__("Status", "found-hint")}</TableHead>
+                <TableHead>{__("Location", "foundhint-local-seo")}</TableHead>
+                <TableHead>{__("Address", "foundhint-local-seo")}</TableHead>
+                <TableHead>{__("Hours", "foundhint-local-seo")}</TableHead>
+                <TableHead>{__("Status", "foundhint-local-seo")}</TableHead>
                 <TableHead className="fhint:text-right">
-                  {__("Actions", "found-hint")}
+                  {__("Actions", "foundhint-local-seo")}
                 </TableHead>
               </TableRow>
             </TableHeader>
@@ -147,7 +149,7 @@ export default function LocationsPage() {
                     <span className="fhint:font-bold">{location.name}</span>
                     {location.is_primary ? (
                       <span className="fhint:block fhint:text-xs fhint:text-muted-foreground">
-                        {__("Primary", "found-hint")}
+                        {__("Primary", "foundhint-local-seo")}
                       </span>
                     ) : null}
                   </TableCell>
@@ -158,10 +160,10 @@ export default function LocationsPage() {
                     {location.opening_hours?.has_any_hours
                       ? sprintf(
                           /* translators: %d: number of opening periods in the week. */
-                          __("%d periods", "found-hint"),
+                          __("%d periods", "foundhint-local-seo"),
                           location.opening_hours.period_count,
                         )
-                      : __("Not set", "found-hint")}
+                      : __("Not set", "foundhint-local-seo")}
                   </TableCell>
                   <TableCell>
                     <Badge
@@ -180,7 +182,7 @@ export default function LocationsPage() {
                       size="sm"
                       render={<Link to={`/locations/${location.id}`} />}
                     >
-                      {__("Manage", "found-hint")}
+                      {__("Manage", "foundhint-local-seo")}
                     </Button>
                   </TableCell>
                 </TableRow>
@@ -196,7 +198,7 @@ export default function LocationsPage() {
             /* translators: %d: number of locations included in the plan. */
             __(
               "Your plan includes %d location. Multi-location management is a Pro feature.",
-              "found-hint",
+              "foundhint-local-seo",
             ),
             limits.limit,
           )}

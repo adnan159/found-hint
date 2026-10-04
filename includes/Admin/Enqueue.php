@@ -83,7 +83,7 @@ class Enqueue {
 		if ( function_exists( 'wp_set_script_translations' ) ) {
 			wp_set_script_translations(
 				self::SCRIPT_HANDLE,
-				'found-hint',
+				'foundhint-local-seo',
 				FHINT_PATH . 'languages'
 			);
 		}

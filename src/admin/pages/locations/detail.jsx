@@ -50,10 +50,10 @@ import OpeningHoursEditor, {
 } from "./components/OpeningHoursEditor";
 
 const STATUS_LABELS = {
-  active: () => __("Active", "found-hint"),
-  inactive: () => __("Inactive", "found-hint"),
-  temporarily_closed: () => __("Temporarily closed", "found-hint"),
-  permanently_closed: () => __("Permanently closed", "found-hint"),
+  active: () => __("Active", "foundhint-local-seo"),
+  inactive: () => __("Inactive", "foundhint-local-seo"),
+  temporarily_closed: () => __("Temporarily closed", "foundhint-local-seo"),
+  permanently_closed: () => __("Permanently closed", "foundhint-local-seo"),
 };
 
 // Base UI resolves the trigger label from `items`; without it a stored
@@ -143,7 +143,7 @@ export default function LocationDetailPage() {
     try {
       if (isNew) {
         const created = await createLocation(payload).unwrap();
-        toast.success(__("Location added.", "found-hint"));
+        toast.success(__("Location added.", "foundhint-local-seo"));
         setDirty(false);
         navigate(`/locations/${created.id}`);
         return;
@@ -151,7 +151,7 @@ export default function LocationDetailPage() {
 
       await updateLocation({ id, ...payload }).unwrap();
       setDirty(false);
-      toast.success(__("Location saved.", "found-hint"));
+      toast.success(__("Location saved.", "foundhint-local-seo"));
     } catch {
       // Shown inline by RequestError and per field.
     }
@@ -160,17 +160,19 @@ export default function LocationDetailPage() {
   const onDelete = async () => {
     try {
       await deleteLocation(id).unwrap();
-      toast.success(__("Location deleted.", "found-hint"));
+      toast.success(__("Location deleted.", "foundhint-local-seo"));
       navigate("/locations");
     } catch {
-      toast.error(__("Could not delete the location.", "found-hint"));
+      toast.error(__("Could not delete the location.", "foundhint-local-seo"));
     } finally {
       setConfirmingDelete(false);
     }
   };
 
   if (!isNew && isLoading) {
-    return <PageHeader title={__("Loading location…", "found-hint")} />;
+    return (
+      <PageHeader title={__("Loading location…", "foundhint-local-seo")} />
+    );
   }
 
   return (
@@ -178,13 +180,13 @@ export default function LocationDetailPage() {
       <PageHeader
         title={
           isNew
-            ? __("Add location", "found-hint")
-            : form.name || __("Location", "found-hint")
+            ? __("Add location", "foundhint-local-seo")
+            : form.name || __("Location", "foundhint-local-seo")
         }
         actions={
           <Button variant="outline" render={<Link to="/locations" />}>
             <ArrowLeftIcon data-icon="inline-start" />
-            {__("All locations", "found-hint")}
+            {__("All locations", "foundhint-local-seo")}
           </Button>
         }
       />
@@ -195,14 +197,14 @@ export default function LocationDetailPage() {
       >
         <RequestError error={error} />
 
-        <SectionCard title={__("Address", "found-hint")}>
+        <SectionCard title={__("Address", "foundhint-local-seo")}>
           <FieldGroup className="fhint:grid fhint:grid-cols-1 fhint:gap-4 fhint:md:grid-cols-2">
             <Field
               className="fhint:md:col-span-2"
               data-invalid={errors.name ? true : undefined}
             >
               <FieldLabel htmlFor="fhint-loc-name">
-                {__("Location name", "found-hint")}
+                {__("Location name", "foundhint-local-seo")}
               </FieldLabel>
               <Input
                 id="fhint-loc-name"
@@ -215,14 +217,17 @@ export default function LocationDetailPage() {
                 <FieldError>{errors.name}</FieldError>
               ) : (
                 <FieldDescription>
-                  {__("For example Downtown, or Main Office.", "found-hint")}
+                  {__(
+                    "For example Downtown, or Main Office.",
+                    "foundhint-local-seo",
+                  )}
                 </FieldDescription>
               )}
             </Field>
 
             <Field data-invalid={errors.address_line_1 ? true : undefined}>
               <FieldLabel htmlFor="fhint-loc-address1">
-                {__("Street address", "found-hint")}
+                {__("Street address", "foundhint-local-seo")}
               </FieldLabel>
               <Input
                 id="fhint-loc-address1"
@@ -237,7 +242,7 @@ export default function LocationDetailPage() {
 
             <Field>
               <FieldLabel htmlFor="fhint-loc-address2">
-                {__("Suite, unit or floor", "found-hint")}
+                {__("Suite, unit or floor", "foundhint-local-seo")}
               </FieldLabel>
               <Input
                 id="fhint-loc-address2"
@@ -248,7 +253,7 @@ export default function LocationDetailPage() {
 
             <Field data-invalid={errors.city ? true : undefined}>
               <FieldLabel htmlFor="fhint-loc-city">
-                {__("City", "found-hint")}
+                {__("City", "foundhint-local-seo")}
               </FieldLabel>
               <Input
                 id="fhint-loc-city"
@@ -261,7 +266,7 @@ export default function LocationDetailPage() {
 
             <Field data-invalid={errors.region ? true : undefined}>
               <FieldLabel htmlFor="fhint-loc-region">
-                {__("State or region", "found-hint")}
+                {__("State or region", "foundhint-local-seo")}
               </FieldLabel>
               <Input
                 id="fhint-loc-region"
@@ -274,7 +279,7 @@ export default function LocationDetailPage() {
 
             <Field data-invalid={errors.postal_code ? true : undefined}>
               <FieldLabel htmlFor="fhint-loc-postal">
-                {__("Postal code", "found-hint")}
+                {__("Postal code", "foundhint-local-seo")}
               </FieldLabel>
               <Input
                 id="fhint-loc-postal"
@@ -285,7 +290,7 @@ export default function LocationDetailPage() {
 
             <Field data-invalid={errors.country ? true : undefined}>
               <FieldLabel htmlFor="fhint-loc-country">
-                {__("Country", "found-hint")}
+                {__("Country", "foundhint-local-seo")}
               </FieldLabel>
               <Input
                 id="fhint-loc-country"
@@ -299,14 +304,14 @@ export default function LocationDetailPage() {
                 <FieldError>{errors.country}</FieldError>
               ) : (
                 <FieldDescription>
-                  {__("Two-letter country code.", "found-hint")}
+                  {__("Two-letter country code.", "foundhint-local-seo")}
                 </FieldDescription>
               )}
             </Field>
 
             <Field data-invalid={errors.latitude ? true : undefined}>
               <FieldLabel htmlFor="fhint-loc-lat">
-                {__("Latitude", "found-hint")}
+                {__("Latitude", "foundhint-local-seo")}
               </FieldLabel>
               <Input
                 id="fhint-loc-lat"
@@ -319,14 +324,17 @@ export default function LocationDetailPage() {
                 <FieldError>{errors.latitude}</FieldError>
               ) : (
                 <FieldDescription>
-                  {__("Leave empty if you don't know it.", "found-hint")}
+                  {__(
+                    "Leave empty if you don't know it.",
+                    "foundhint-local-seo",
+                  )}
                 </FieldDescription>
               )}
             </Field>
 
             <Field data-invalid={errors.longitude ? true : undefined}>
               <FieldLabel htmlFor="fhint-loc-lng">
-                {__("Longitude", "found-hint")}
+                {__("Longitude", "foundhint-local-seo")}
               </FieldLabel>
               <Input
                 id="fhint-loc-lng"
@@ -343,16 +351,16 @@ export default function LocationDetailPage() {
         </SectionCard>
 
         <SectionCard
-          title={__("Contact", "found-hint")}
+          title={__("Contact", "foundhint-local-seo")}
           description={__(
             "Leave a field empty to use the business value.",
-            "found-hint",
+            "foundhint-local-seo",
           )}
         >
           <FieldGroup className="fhint:grid fhint:grid-cols-1 fhint:gap-4 fhint:md:grid-cols-3">
             <Field data-invalid={errors.phone ? true : undefined}>
               <FieldLabel htmlFor="fhint-loc-phone">
-                {__("Phone", "found-hint")}
+                {__("Phone", "foundhint-local-seo")}
               </FieldLabel>
               <Input
                 id="fhint-loc-phone"
@@ -366,7 +374,7 @@ export default function LocationDetailPage() {
 
             <Field data-invalid={errors.email ? true : undefined}>
               <FieldLabel htmlFor="fhint-loc-email">
-                {__("Email", "found-hint")}
+                {__("Email", "foundhint-local-seo")}
               </FieldLabel>
               <Input
                 id="fhint-loc-email"
@@ -380,7 +388,7 @@ export default function LocationDetailPage() {
 
             <Field data-invalid={errors.website ? true : undefined}>
               <FieldLabel htmlFor="fhint-loc-website">
-                {__("Website", "found-hint")}
+                {__("Website", "foundhint-local-seo")}
               </FieldLabel>
               <Input
                 id="fhint-loc-website"
@@ -398,10 +406,10 @@ export default function LocationDetailPage() {
         </SectionCard>
 
         <SectionCard
-          title={__("Opening hours", "found-hint")}
+          title={__("Opening hours", "foundhint-local-seo")}
           description={__(
             "A day left as Not set publishes nothing — which is different from being closed.",
-            "found-hint",
+            "foundhint-local-seo",
           )}
         >
           <OpeningHoursEditor
@@ -414,11 +422,11 @@ export default function LocationDetailPage() {
           />
         </SectionCard>
 
-        <SectionCard title={__("Status", "found-hint")}>
+        <SectionCard title={__("Status", "foundhint-local-seo")}>
           <FieldGroup className="fhint:grid fhint:grid-cols-1 fhint:gap-4 fhint:md:grid-cols-2">
             <Field data-invalid={errors.status ? true : undefined}>
               <FieldLabel htmlFor="fhint-loc-status">
-                {__("Status", "found-hint")}
+                {__("Status", "foundhint-local-seo")}
               </FieldLabel>
               <Select
                 items={statusItems}
@@ -448,7 +456,7 @@ export default function LocationDetailPage() {
 
             <Field data-invalid={errors.timezone ? true : undefined}>
               <FieldLabel htmlFor="fhint-loc-timezone">
-                {__("Time zone", "found-hint")}
+                {__("Time zone", "foundhint-local-seo")}
               </FieldLabel>
               <Input
                 id="fhint-loc-timezone"
@@ -479,12 +487,12 @@ export default function LocationDetailPage() {
               />
               <FieldContentWrapper>
                 <FieldLabel htmlFor="fhint-loc-primary">
-                  {__("Primary location", "found-hint")}
+                  {__("Primary location", "foundhint-local-seo")}
                 </FieldLabel>
                 <FieldDescription>
                   {__(
                     "Used wherever a single place is needed. Only one location can be primary.",
-                    "found-hint",
+                    "foundhint-local-seo",
                   )}
                 </FieldDescription>
               </FieldContentWrapper>
@@ -496,13 +504,13 @@ export default function LocationDetailPage() {
           <Button type="submit" disabled={isSaving}>
             {isSaving ? <Spinner data-icon="inline-start" /> : null}
             {isNew
-              ? __("Add location", "found-hint")
-              : __("Save changes", "found-hint")}
+              ? __("Add location", "foundhint-local-seo")
+              : __("Save changes", "foundhint-local-seo")}
           </Button>
 
           {dirty ? (
             <span className="fhint:text-sm fhint:text-muted-foreground">
-              {__("You have unsaved changes.", "found-hint")}
+              {__("You have unsaved changes.", "foundhint-local-seo")}
             </span>
           ) : null}
 
@@ -514,7 +522,7 @@ export default function LocationDetailPage() {
               onClick={() => setConfirmingDelete(true)}
             >
               <Trash2Icon data-icon="inline-start" />
-              {__("Delete location", "found-hint")}
+              {__("Delete location", "foundhint-local-seo")}
             </Button>
           ) : null}
         </div>
@@ -524,19 +532,21 @@ export default function LocationDetailPage() {
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>
-              {__("Delete this location?", "found-hint")}
+              {__("Delete this location?", "foundhint-local-seo")}
             </AlertDialogTitle>
             <AlertDialogDescription>
               {__(
                 "Its opening hours go with it. This cannot be undone.",
-                "found-hint",
+                "foundhint-local-seo",
               )}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>{__("Keep it", "found-hint")}</AlertDialogCancel>
+            <AlertDialogCancel>
+              {__("Keep it", "foundhint-local-seo")}
+            </AlertDialogCancel>
             <AlertDialogAction onClick={onDelete}>
-              {__("Delete location", "found-hint")}
+              {__("Delete location", "foundhint-local-seo")}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

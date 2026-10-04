@@ -192,7 +192,7 @@ class Import {
 			if ( ! $chosen ) {
 				return new WP_Error(
 					'fhint_import_unknown_profile',
-					__( 'That Google profile is not one this site has read. Read your profiles again.', 'found-hint' ),
+					__( 'That Google profile is not one this site has read. Read your profiles again.', 'foundhint-local-seo' ),
 					array( 'status' => 404 )
 				);
 			}
@@ -205,7 +205,7 @@ class Import {
 		if ( ! $profiles ) {
 			return new WP_Error(
 				'fhint_import_no_profiles',
-				__( 'Read your Google profiles first, under Business profiles.', 'found-hint' ),
+				__( 'Read your Google profiles first, under Business profiles.', 'foundhint-local-seo' ),
 				array( 'status' => 409 )
 			);
 		}
@@ -222,7 +222,7 @@ class Import {
 
 		return new WP_Error(
 			'fhint_import_choose_profile',
-			__( 'Choose which Google profile to import from.', 'found-hint' ),
+			__( 'Choose which Google profile to import from.', 'foundhint-local-seo' ),
 			array( 'status' => 409 )
 		);
 	}
@@ -273,7 +273,7 @@ class Import {
 		if ( empty( $fields['name']['available'] ) ) {
 			return new WP_Error(
 				'fhint_import_no_name',
-				__( 'Google holds no business name for this profile, so there is nothing to create a business from.', 'found-hint' ),
+				__( 'Google holds no business name for this profile, so there is nothing to create a business from.', 'foundhint-local-seo' ),
 				array( 'status' => 409 )
 			);
 		}
@@ -283,7 +283,7 @@ class Import {
 		if ( ! $created ) {
 			return new WP_Error(
 				'fhint_import_business_failed',
-				__( 'The business could not be created.', 'found-hint' ),
+				__( 'The business could not be created.', 'foundhint-local-seo' ),
 				array( 'status' => 500 )
 			);
 		}
@@ -312,7 +312,7 @@ class Import {
 		if ( empty( $fields['address']['available'] ) ) {
 			return new WP_Error(
 				'fhint_import_no_address',
-				__( 'Google holds no address for this profile, so there is nothing to create a location from.', 'found-hint' ),
+				__( 'Google holds no address for this profile, so there is nothing to create a location from.', 'foundhint-local-seo' ),
 				array( 'status' => 409 )
 			);
 		}
@@ -343,7 +343,7 @@ class Import {
 		if ( ! $location || empty( $location['id'] ) ) {
 			return new WP_Error(
 				'fhint_import_create_failed',
-				__( 'The location could not be created from Google\'s address.', 'found-hint' ),
+				__( 'The location could not be created from Google\'s address.', 'foundhint-local-seo' ),
 				array( 'status' => 500 )
 			);
 		}
@@ -579,7 +579,7 @@ class Import {
 			case 'hours':
 				$available  = ! empty( $theirs['hours'] );
 				$their_text = $available ? self::hours_summary( $theirs['hours'] ) : '';
-				$our_text   = ! empty( $nap['hours']['period_count'] ) ? __( 'Already set', 'found-hint' ) : '';
+				$our_text   = ! empty( $nap['hours']['period_count'] ) ? __( 'Already set', 'foundhint-local-seo' ) : '';
 				$differs    = $available && self::hours_signature( $theirs['hours'] ) !== self::stored_hours_signature( $nap );
 
 				return self::describe( $key, $our_text, $their_text, $theirs['hours'], $available, $differs );
@@ -610,7 +610,7 @@ class Import {
 				$their_text = $available
 					? sprintf(
 						/* translators: 1: number of services Google lists, 2: the first few names. */
-						__( '%1$d from Google: %2$s', 'found-hint' ),
+						__( '%1$d from Google: %2$s', 'foundhint-local-seo' ),
 						count( $names ),
 						implode( ', ', array_slice( $names, 0, 3 ) ) . ( count( $names ) > 3 ? '…' : '' )
 					)
@@ -620,7 +620,7 @@ class Import {
 				$our_text = $count
 					? sprintf(
 						/* translators: %d: how many services this site already has. */
-						_n( '%d service', '%d services', $count, 'found-hint' ),
+						_n( '%d service', '%d services', $count, 'foundhint-local-seo' ),
 						$count
 					)
 					: '';
@@ -646,7 +646,7 @@ class Import {
 				$their_text = $available
 					? sprintf(
 						/* translators: 1: Google's category name, 2: the schema.org type it maps to. */
-						__( '%1$s → %2$s', 'found-hint' ),
+						__( '%1$s → %2$s', 'foundhint-local-seo' ),
 						$theirs['category'],
 						$theirs['business_type']
 					)
@@ -823,7 +823,7 @@ class Import {
 
 		return sprintf(
 			/* translators: 1: number of days with opening times, 2: number of closed days. */
-			__( '%1$d days with hours, %2$d closed', 'found-hint' ),
+			__( '%1$d days with hours, %2$d closed', 'foundhint-local-seo' ),
 			$open,
 			$closed
 		);

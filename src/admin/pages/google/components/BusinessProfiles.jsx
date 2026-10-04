@@ -27,9 +27,9 @@ import { useSyncGoogleProfilesMutation } from "@/store/api/googleApi";
  * current one.
  */
 const VERIFICATION_LABELS = {
-  OK: () => __("Ready", "found-hint"),
-  PENDING_EDITS: () => __("Pending edits", "found-hint"),
-  LIMITED: () => __("Limited", "found-hint"),
+  OK: () => __("Ready", "foundhint-local-seo"),
+  PENDING_EDITS: () => __("Pending edits", "foundhint-local-seo"),
+  LIMITED: () => __("Limited", "foundhint-local-seo"),
 };
 
 /**
@@ -46,15 +46,15 @@ function summarise(counts) {
 
   return sprintf(
     /* translators: 1: e.g. "3 locations", 2: e.g. "1 account". */
-    __("Read %1$s across %2$s.", "found-hint"),
+    __("Read %1$s across %2$s.", "foundhint-local-seo"),
     sprintf(
       /* translators: %d: number of Google locations. */
-      _n("%d location", "%d locations", locations, "found-hint"),
+      _n("%d location", "%d locations", locations, "foundhint-local-seo"),
       locations,
     ),
     sprintf(
       /* translators: %d: number of Google accounts. */
-      _n("%d account", "%d accounts", accounts, "found-hint"),
+      _n("%d account", "%d accounts", accounts, "foundhint-local-seo"),
       accounts,
     ),
   );
@@ -90,7 +90,7 @@ export function BusinessProfiles({ overview, isConnected }) {
       toast.success(
         counts
           ? summarise(counts)
-          : __("Read your Google profiles.", "found-hint"),
+          : __("Read your Google profiles.", "foundhint-local-seo"),
       );
     } catch {
       // Shown inline by RequestError — Google's refusals are specific
@@ -101,15 +101,15 @@ export function BusinessProfiles({ overview, isConnected }) {
   return (
     <SectionCard
       id="google-profiles"
-      title={__("Business profiles", "found-hint")}
+      title={__("Business profiles", "foundhint-local-seo")}
       description={
         syncedAt
           ? sprintf(
               /* translators: %s: date and time Google was last read. */
-              __("What Google last told us, read %s.", "found-hint"),
+              __("What Google last told us, read %s.", "foundhint-local-seo"),
               syncedAt,
             )
-          : __("The places this Google account manages.", "found-hint")
+          : __("The places this Google account manages.", "foundhint-local-seo")
       }
       action={
         <Button
@@ -123,7 +123,7 @@ export function BusinessProfiles({ overview, isConnected }) {
           ) : (
             <RefreshCwIcon data-icon="inline-start" />
           )}
-          {__("Read from Google", "found-hint")}
+          {__("Read from Google", "foundhint-local-seo")}
         </Button>
       }
     >
@@ -131,14 +131,16 @@ export function BusinessProfiles({ overview, isConnected }) {
 
       {locations.length === 0 ? (
         <Empty>
-          <EmptyTitle>{__("Nothing read yet", "found-hint")}</EmptyTitle>
+          <EmptyTitle>
+            {__("Nothing read yet", "foundhint-local-seo")}
+          </EmptyTitle>
           <EmptyDescription>
             {isConnected
               ? __(
                   "Read from Google to list the places this account manages. Google has to have approved your Cloud project for the Business Profile APIs before anything comes back.",
-                  "found-hint",
+                  "foundhint-local-seo",
                 )
-              : __("Connect a Google account first.", "found-hint")}
+              : __("Connect a Google account first.", "foundhint-local-seo")}
           </EmptyDescription>
         </Empty>
       ) : (
@@ -146,11 +148,11 @@ export function BusinessProfiles({ overview, isConnected }) {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>{__("Profile", "found-hint")}</TableHead>
-                <TableHead>{__("Address", "found-hint")}</TableHead>
-                <TableHead>{__("Phone", "found-hint")}</TableHead>
-                <TableHead>{__("State", "found-hint")}</TableHead>
-                <TableHead>{__("Mapped to", "found-hint")}</TableHead>
+                <TableHead>{__("Profile", "foundhint-local-seo")}</TableHead>
+                <TableHead>{__("Address", "foundhint-local-seo")}</TableHead>
+                <TableHead>{__("Phone", "foundhint-local-seo")}</TableHead>
+                <TableHead>{__("State", "foundhint-local-seo")}</TableHead>
+                <TableHead>{__("Mapped to", "foundhint-local-seo")}</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -195,7 +197,9 @@ export function BusinessProfiles({ overview, isConnected }) {
                       )}
                     </TableCell>
                     <TableCell className="fhint:text-muted-strong">
-                      {mapped ? mapped.name : __("Not mapped", "found-hint")}
+                      {mapped
+                        ? mapped.name
+                        : __("Not mapped", "foundhint-local-seo")}
                     </TableCell>
                   </TableRow>
                 );

@@ -280,7 +280,7 @@ class Services extends AbstractController {
 		if ( ! $updated ) {
 			return new WP_Error(
 				'fhint_nothing_to_reorder',
-				__( 'None of those services belong to this business.', 'found-hint' ),
+				__( 'None of those services belong to this business.', 'foundhint-local-seo' ),
 				array( 'status' => 400 )
 			);
 		}

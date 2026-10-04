@@ -88,7 +88,7 @@ class OAuth {
 		if ( ! Credentials::configured() ) {
 			return new WP_Error(
 				'fhint_google_not_configured',
-				__( 'Add your Google client id and secret first.', 'found-hint' ),
+				__( 'Add your Google client id and secret first.', 'foundhint-local-seo' ),
 				array( 'status' => 409 )
 			);
 		}
@@ -144,7 +144,7 @@ class OAuth {
 		$state = (string) $state;
 
 		if ( '' === $state ) {
-			return new WP_Error( 'fhint_google_state_missing', __( 'That sign-in could not be verified.', 'found-hint' ) );
+			return new WP_Error( 'fhint_google_state_missing', __( 'That sign-in could not be verified.', 'foundhint-local-seo' ) );
 		}
 
 		$key    = self::HANDSHAKE_PREFIX . $state;
@@ -153,11 +153,11 @@ class OAuth {
 		delete_transient( $key );
 
 		if ( ! is_array( $record ) || empty( $record['verifier'] ) ) {
-			return new WP_Error( 'fhint_google_state_invalid', __( 'That sign-in could not be verified. Please try connecting again.', 'found-hint' ) );
+			return new WP_Error( 'fhint_google_state_invalid', __( 'That sign-in could not be verified. Please try connecting again.', 'foundhint-local-seo' ) );
 		}
 
 		if ( get_current_user_id() !== (int) $record['user_id'] ) {
-			return new WP_Error( 'fhint_google_state_mismatch', __( 'That sign-in was started by a different user.', 'found-hint' ) );
+			return new WP_Error( 'fhint_google_state_mismatch', __( 'That sign-in was started by a different user.', 'foundhint-local-seo' ) );
 		}
 
 		return $record;
@@ -225,7 +225,7 @@ class OAuth {
 		if ( $code < 200 || $code > 299 ) {
 			return new WP_Error(
 				'fhint_google_revoke_failed',
-				__( 'Google would not confirm the disconnection.', 'found-hint' )
+				__( 'Google would not confirm the disconnection.', 'foundhint-local-seo' )
 			);
 		}
 
@@ -278,7 +278,7 @@ class OAuth {
 		if ( is_wp_error( $response ) ) {
 			return new WP_Error(
 				'fhint_google_unreachable',
-				__( 'Google could not be reached. Please try again.', 'found-hint' ),
+				__( 'Google could not be reached. Please try again.', 'foundhint-local-seo' ),
 				array( 'status' => 502 )
 			);
 		}
@@ -305,7 +305,7 @@ class OAuth {
 		if ( empty( $decoded['access_token'] ) ) {
 			return new WP_Error(
 				'fhint_google_token_missing',
-				__( 'Google did not return an access token.', 'found-hint' ),
+				__( 'Google did not return an access token.', 'foundhint-local-seo' ),
 				array( 'status' => 502 )
 			);
 		}
@@ -322,15 +322,15 @@ class OAuth {
 	private static function describe_error( $error ) {
 		switch ( $error ) {
 			case 'invalid_client':
-				return __( 'Google did not recognise the client id or secret. Check both, then try again.', 'found-hint' );
+				return __( 'Google did not recognise the client id or secret. Check both, then try again.', 'foundhint-local-seo' );
 			case 'invalid_grant':
-				return __( 'Google has expired or withdrawn this connection. Connect again to restore it.', 'found-hint' );
+				return __( 'Google has expired or withdrawn this connection. Connect again to restore it.', 'foundhint-local-seo' );
 			case 'redirect_uri_mismatch':
-				return __( 'The redirect URI does not match the one registered in Google Cloud. Copy it from this screen exactly.', 'found-hint' );
+				return __( 'The redirect URI does not match the one registered in Google Cloud. Copy it from this screen exactly.', 'foundhint-local-seo' );
 			case 'access_denied':
-				return __( 'Access was declined on the Google consent screen.', 'found-hint' );
+				return __( 'Access was declined on the Google consent screen.', 'foundhint-local-seo' );
 			default:
-				return __( 'Google refused the request. Please try connecting again.', 'found-hint' );
+				return __( 'Google refused the request. Please try connecting again.', 'foundhint-local-seo' );
 		}
 	}
 

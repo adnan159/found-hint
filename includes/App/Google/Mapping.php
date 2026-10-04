@@ -80,7 +80,7 @@ class Mapping {
 		if ( ! LocationRepository::find( $fhint_location_id ) ) {
 			return new WP_Error(
 				'fhint_location_not_found',
-				__( 'That location could not be found.', 'found-hint' ),
+				__( 'That location could not be found.', 'foundhint-local-seo' ),
 				array( 'status' => 404 )
 			);
 		}
@@ -88,7 +88,7 @@ class Mapping {
 		if ( ! GoogleLocationRepository::find_by_location_name( $location_name ) ) {
 			return new WP_Error(
 				'fhint_google_location_not_found',
-				__( 'That Google location is not in the last read from Google. Refresh and try again.', 'found-hint' ),
+				__( 'That Google location is not in the last read from Google. Refresh and try again.', 'foundhint-local-seo' ),
 				array( 'status' => 404 )
 			);
 		}
@@ -103,7 +103,7 @@ class Mapping {
 			'google.location_mapped',
 			sprintf(
 				/* translators: 1: Google location resource name, 2: local location id. */
-				__( 'Mapped %1$s to location #%2$d.', 'found-hint' ),
+				__( 'Mapped %1$s to location #%2$d.', 'foundhint-local-seo' ),
 				(string) $location_name,
 				$fhint_location_id
 			),
@@ -128,7 +128,7 @@ class Mapping {
 			'google.location_unmapped',
 			sprintf(
 				/* translators: %s: Google location resource name. */
-				__( 'Unmapped %s.', 'found-hint' ),
+				__( 'Unmapped %s.', 'foundhint-local-seo' ),
 				(string) $location_name
 			)
 		);

@@ -67,9 +67,9 @@ class BusinessDescription extends Rule {
 
 		return Result::fail(
 			'' === $description
-				? __( 'No description.', 'found-hint' )
-				: __( 'Your description is very short.', 'found-hint' ),
-			__( 'Describe what you do in a sentence or two.', 'found-hint' ),
+				? __( 'No description.', 'foundhint-local-seo' )
+				: __( 'Your description is very short.', 'foundhint-local-seo' ),
+			__( 'Describe what you do in a sentence or two.', 'foundhint-local-seo' ),
 			array( 'length' => strlen( $description ) )
 		)->about( 'business', $context->business_id() );
 	}

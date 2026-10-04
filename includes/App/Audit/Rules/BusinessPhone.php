@@ -68,8 +68,8 @@ class BusinessPhone extends Rule {
 		}
 
 		return Result::fail(
-			__( 'No phone number.', 'found-hint' ),
-			__( 'Add a phone number — it is the first thing people look for on a local result.', 'found-hint' )
+			__( 'No phone number.', 'foundhint-local-seo' ),
+			__( 'Add a phone number — it is the first thing people look for on a local result.', 'foundhint-local-seo' )
 		)->about( 'business', $context->business_id() );
 	}
 }
