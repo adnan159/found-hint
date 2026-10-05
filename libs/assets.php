@@ -189,10 +189,19 @@ function inject_react_refresh_preamble_script( object $manifest ): void {
 	$script_position          = 'after';
 	// Built by concatenation rather than a heredoc: the plugin directory
 	// forbids heredoc syntax, and this string carries literal `$` tokens.
+	//
+	// The URL is escaped for the JavaScript context it lands in, which is not
+	// the same job as esc_url(): wp_json_encode() emits a complete, quoted JS
+	// string literal, so a quote in the path cannot close the string and run
+	// code, and JSON_HEX_TAG turns `<` and `>` into \u003C/\u003E so a
+	// `</script>` cannot break out of the inline script element.
 	$script = implode(
 		"\n",
 		array(
-			'import RefreshRuntime from "' . $react_refresh_script_src . '";',
+			'import RefreshRuntime from ' . wp_json_encode(
+				esc_url_raw( $react_refresh_script_src ),
+				JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT
+			) . ';',
 			'RefreshRuntime.injectIntoGlobalHook(window);',
 			'window.$RefreshReg$ = () => {};',
 			'window.$RefreshSig$ = () => (type) => type;',
