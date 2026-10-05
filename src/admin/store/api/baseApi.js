@@ -58,6 +58,7 @@ export const baseApi = createApi({
     "GoogleProfiles",
     "Schema",
     "Audit",
+    "Reviews",
   ],
   endpoints: () => ({}),
 });

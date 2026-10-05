@@ -26,6 +26,7 @@ class Tables {
 	const AUDIT_ISSUES     = 'audit_issues';
 	const LOGS             = 'logs';
 	const GOOGLE_LOCATIONS = 'google_locations';
+	const REVIEWS          = 'reviews';
 
 	/**
 	 * Every table this plugin owns, unprefixed.
@@ -42,6 +43,7 @@ class Tables {
 			self::AUDIT_ISSUES,
 			self::LOGS,
 			self::GOOGLE_LOCATIONS,
+			self::REVIEWS,
 		);
 	}
 

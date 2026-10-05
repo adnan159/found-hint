@@ -577,6 +577,69 @@ audit** so the score reflects the change — a fix that left a stale number
 on screen would look like it did nothing. `400 fhint_fix_unavailable` when
 the finding has no handler.
 
+## Reviews
+
+Reviews still live on Google's legacy v4 API, which is why they are read
+through a different host than the rest of the Google module. Everything this
+plugin shows comes from stored rows; only `POST /reviews/sync` contacts
+Google.
+
+### `GET /reviews`
+
+Stored reviews, newest first. `location_name` limits to one Google location,
+`unanswered=1` to those with no reply. `per_page` (0–100, default 20) and
+`offset` page through them; `total` ignores paging so a "showing x of y" line
+is honest.
+
+```json
+{
+  "data": [
+    {
+      "review_id": "abc123",
+      "location_name": "locations/42",
+      "location_title": "FoundHint",
+      "reviewer_name": "Asha Rahman",
+      "is_anonymous": false,
+      "star_rating": 5,
+      "comment": "Fixed my boiler the same afternoon.",
+      "reply_comment": "",
+      "needs_reply": true,
+      "reviewed_at": "2026-09-14 09:12:00",
+      "replied_at": null
+    }
+  ],
+  "meta": { "total": 1 }
+}
+```
+
+`star_rating` is **0 when Google sent `STAR_RATING_UNSPECIFIED`**, which is
+not one star. A rating of 0 is left out of the average rather than counted
+as zero stars, which would invent a bad review nobody wrote.
+
+An anonymous reviewer carries **no name and no photo**, even when Google
+sends them.
+
+### `GET /reviews/state`
+
+Counts, the average, the distribution across one to five stars, when Google
+last answered, and the locations reviews can be read for. This is what the
+screen and any dashboard card read; it never measures and never calls Google.
+
+### `POST /reviews/sync`
+
+Asks Google for fresh reviews, for one `location_name` or for every synced
+location. Upserts on Google's review id, so a re-read updates rows rather
+than multiplying them, and **removes reviews Google no longer returns** — a
+deleted review must not linger in a count the owner is judged on.
+
+`data` carries the counts (`locations`, `reviews`, `failed`) and `meta.state`
+the refreshed figures, so a screen does not need a second request after a sync.
+
+`409 fhint_no_google_locations` when no Google locations have been read yet.
+When every location refuses, the first error is returned rather than a
+cheerful "0 reviews": reporting nothing read as success would tell an owner
+nobody has reviewed them when in fact Google never answered.
+
 ## How the score works
 
 Each rule declares a **category** and a **weight within it**; categories

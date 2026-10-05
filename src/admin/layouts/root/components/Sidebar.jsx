@@ -85,6 +85,20 @@ const NAV_ITEMS = [
     ],
   },
   {
+    to: "/reviews",
+    label: () => __("Reviews", "foundhint-local-seo"),
+    children: [
+      {
+        id: "reviews-summary",
+        label: () => __("At a glance", "foundhint-local-seo"),
+      },
+      {
+        id: "reviews-list",
+        label: () => __("Every review", "foundhint-local-seo"),
+      },
+    ],
+  },
+  {
     to: "/google",
     label: () => __("Google", "foundhint-local-seo"),
     children: [

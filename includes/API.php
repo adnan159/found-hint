@@ -13,6 +13,7 @@ use FHINT\API\Dashboard;
 use FHINT\API\Google;
 use FHINT\API\Locations;
 use FHINT\API\Onboarding;
+use FHINT\API\Reviews;
 use FHINT\API\Schema;
 use FHINT\API\Services;
 use FHINT\API\Settings;
@@ -47,6 +48,7 @@ class API {
 		Google::init();
 		Locations::init();
 		Onboarding::init();
+		Reviews::init();
 		Schema::init();
 		Services::init();
 		Settings::init();

@@ -33,6 +33,8 @@ use FHINT\App\Location\Location;
 use FHINT\App\Location\LocationRepository;
 use FHINT\App\Location\OpeningHoursRepository;
 use FHINT\App\Nap\Nap;
+use FHINT\App\Review\ReviewRepository;
+use FHINT\App\Review\Reviews as ReviewService;
 use FHINT\App\Schema\Graph;
 use FHINT\App\Schema\SchemaCache;
 use FHINT\App\Service\ServiceRepository;
@@ -159,7 +161,7 @@ check( ! empty( $changes ), 'the first run creates tables' );
 $missing = Tables::missing();
 
 check_same( array(), $missing, 'every declared table exists after installation' );
-check_same( 8, count( Tables::all() ), 'all eight tables are declared' );
+check_same( 9, count( Tables::all() ), 'all nine tables are declared' );
 
 foreach ( array_keys( Tables::all() ) as $key ) {
 	check( Tables::exists( $key ), "table {$key} exists in MySQL" );
@@ -889,6 +891,104 @@ $before_prune = count( AuditRepository::issues( $audit['id'], '' ) );
 
 check( $before_prune > 0, 'the first run still has its rows' );
 
+// -- Reviews, stored -------------------------------------------------------
+
+/**
+ * One review ready for the repository, with overrides merged in.
+ *
+ * @param array $overrides Fields to replace.
+ * @return array
+ */
+function fhint_review_row( array $overrides = array() ) {
+	return array_merge(
+		array(
+			'review_id'         => 'rev-1',
+			'location_name'     => 'locations/1',
+			'account_name'      => 'accounts/1',
+			'reviewer_name'     => 'Asha Rahman',
+			'reviewer_photo'    => '',
+			'is_anonymous'      => false,
+			'star_rating'       => 5,
+			'comment'           => 'Same-day repair.',
+			'reply_comment'     => '',
+			'replied_at'        => null,
+			'reviewed_at'       => '2026-09-14 09:12:00',
+			'review_updated_at' => '2026-09-14 09:12:00',
+			'payload'           => array( 'reviewId' => 'rev-1' ),
+		),
+		$overrides
+	);
+}
+
+ReviewRepository::truncate();
+
+check( ReviewRepository::upsert( fhint_review_row() ), 'a review is stored' );
+check_same( 1, ReviewRepository::count(), 'and counted' );
+
+$stored = ReviewRepository::find( 'rev-1' );
+check_same( 5, $stored['star_rating'], 'the rating round-trips' );
+check_same( 'Same-day repair.', $stored['comment'], 'the comment round-trips' );
+check_same( '2026-09-14 09:12:00', $stored['reviewed_at'], 'the review date round-trips' );
+check( null === $stored['replied_at'], 'an unanswered review stores no reply date' );
+
+// Upserting on Google's id is what keeps a re-read from multiplying rows.
+ReviewRepository::upsert( fhint_review_row( array( 'reply_comment' => 'Thank you!' ) ) );
+check_same( 1, ReviewRepository::count(), 're-reading the same review updates rather than duplicates' );
+check_same( 'Thank you!', ReviewRepository::find( 'rev-1' )['reply_comment'], 'and the reply lands' );
+
+check( ! ReviewRepository::upsert( fhint_review_row( array( 'review_id' => '' ) ) ), 'a review with no id is refused' );
+check_same( 1, ReviewRepository::count(), 'and nothing was written' );
+
+ReviewRepository::upsert( fhint_review_row( array( 'review_id' => 'rev-2', 'star_rating' => 3, 'reviewed_at' => '2026-09-20 10:00:00' ) ) );
+ReviewRepository::upsert( fhint_review_row( array( 'review_id' => 'rev-3', 'star_rating' => 0, 'location_name' => 'locations/2', 'reviewed_at' => '2026-09-01 10:00:00' ) ) );
+
+check_same( 3, ReviewRepository::count(), 'three reviews are stored' );
+check_same( 1, ReviewRepository::count( array( 'location_name' => 'locations/2' ) ), 'filtering by location counts only that location' );
+check_same( 2, ReviewRepository::count( array( 'unanswered' => true ) ), 'the unanswered filter excludes the answered one' );
+
+// Newest first, so the screen opens on what just arrived.
+$ordered = ReviewRepository::all();
+check_same( 'rev-2', $ordered[0]['review_id'], 'reviews come back newest first' );
+
+$paged = ReviewRepository::all( array( 'per_page' => 1, 'offset' => 1 ) );
+check_same( 1, count( $paged ), 'paging limits the rows' );
+check_same( 'rev-1', $paged[0]['review_id'], 'and offsets into the same order' );
+
+// The summary is where a wrong answer is most visible: an unrated review
+// must not be averaged in as zero stars.
+$summary = ReviewRepository::summary();
+check_same( 2, $summary['count'], 'the summary counts only rated reviews' );
+check_same( 4.0, $summary['average'], 'five and three stars average to four, with the unrated one ignored' );
+check_same( 1, $summary['distribution'][5], 'the distribution holds the five-star review' );
+check_same( 1, $summary['distribution'][3], 'and the three-star one' );
+check_same( 2, $summary['unanswered'], 'the summary carries the unanswered count' );
+
+$one_location = ReviewRepository::summary( 'locations/1' );
+check_same( 2, $one_location['count'], 'a per-location summary counts only that location' );
+
+check( null !== ReviewRepository::last_synced_at(), 'a sync time is stamped' );
+
+// Pruning: a review Google stops returning must not linger in a count the
+// owner is judged on.
+$removed = ReviewRepository::delete_for_location( 'locations/1', array( 'rev-1' ) );
+check_same( 1, $removed, 'a review no longer returned is removed' );
+check_same( 2, ReviewRepository::count(), 'and the others stay' );
+check( null !== ReviewRepository::find( 'rev-1' ), 'including the one that was kept' );
+
+check_same( 1, ReviewRepository::delete_for_location( 'locations/1' ), 'passing no keep-list clears the location' );
+check_same( 1, ReviewRepository::count(), 'leaving the other location untouched' );
+
+// The rule the screens share, over real rows.
+ReviewRepository::truncate();
+ReviewRepository::upsert( fhint_review_row( array( 'review_id' => 'rev-9', 'reply_comment' => '' ) ) );
+$listing = ReviewService::listing();
+check_same( 1, count( $listing['items'] ), 'the listing returns the stored review' );
+check( $listing['items'][0]['needs_reply'], 'and marks it as needing a reply' );
+check_same( 1, $listing['total'], 'with a total that ignores paging' );
+
+ReviewRepository::truncate();
+check_same( 0, ReviewRepository::count(), 'truncate clears the table' );
+
 // -- Cascades --------------------------------------------------------------
 
 check_same( 4, count( OpeningHoursRepository::for_location( $location_id ) ), 'all four period rows are there before the delete' );
@@ -921,6 +1021,30 @@ if ( $admins ) {
 
 	$response = rest_do_request( new WP_REST_Request( 'GET', '/fhint/v1/business' ) );
 	check_same( 200, $response->get_status(), 'an administrator can read /business' );
+
+	// The documented envelope, asserted on a reviews route. Nothing checked
+	// this before, and the screen silently rendered "no locations" against a
+	// 200 that carried the data at the top level instead of under `data` —
+	// a controller that forgets the envelope breaks its screen and nothing
+	// else, which is exactly the kind of bug a test has to catch.
+	ReviewRepository::truncate();
+	ReviewRepository::upsert( fhint_review_row( array( 'review_id' => 'rest-1' ) ) );
+
+	$response = rest_do_request( new WP_REST_Request( 'GET', '/fhint/v1/reviews' ) );
+	$body     = $response->get_data();
+
+	check_same( 200, $response->get_status(), 'an administrator can read /reviews' );
+	check( isset( $body['data'] ), '/reviews wraps its payload in the documented envelope' );
+	check( is_array( $body['data'] ) && isset( $body['data'][0]['review_id'] ), 'and returns the collection as a list under data' );
+	check_same( 1, isset( $body['meta']['total'] ) ? $body['meta']['total'] : -1, 'with the total in meta, not in data' );
+
+	$response = rest_do_request( new WP_REST_Request( 'GET', '/fhint/v1/reviews/state' ) );
+	$body     = $response->get_data();
+
+	check( isset( $body['data']['count'] ), '/reviews/state answers under data as well' );
+	check( isset( $body['data']['locations'] ), 'and carries the locations a chooser needs' );
+
+	ReviewRepository::truncate();
 
 	$create = new WP_REST_Request( 'POST', '/fhint/v1/business' );
 	$create->set_body_params( array( 'name' => 'Created Over REST' ) );

@@ -1000,6 +1000,66 @@ files.
 in the SVN `assets/` directory, not in the zip), a wordpress.org account named
 as `Contributors`, and the plugin-directory submission itself.
 
+## Step 18 — Submission, and the reviews feature
+
+**The directory submission.** The slug is `foundhint-local-seo`, and because
+WordPress.org requires the text domain to equal the slug, `found-hint` was
+renamed across 143 occurrences in 40 PHP files and 653 in 33 JavaScript ones,
+with `languages/foundhint-local-seo.pot` regenerated (618 strings, none on
+another domain — the generator fails if there are). Plugin URI and Author URI
+were split (`/local-seo/` and `/about/`), the readme's policy links point at
+the live pages, and the Vite dev preamble's URL is escaped for its JavaScript
+context with `wp_json_encode( ..., JSON_HEX_TAG | ... )` after the review team
+flagged it. Verified with WordPress.org's own Plugin Check against the built
+zip: **0 errors**, 47 warnings, all either table names from `fhint_table()`
+or vite-for-wp's own hook names. Ownership was proved by TXT record on
+foundhint.com.
+
+**Reviews.** A new `wp_fhint_reviews` table (DB version 0.5.0, dbDelta
+idempotent), `App\Review\` holding the mapper, the repository, the sync and
+the one shared rule, three REST routes, and a screen.
+
+Reviews are read **on demand and never on a render path**; the screen, the
+figures and anything downstream read stored rows. They are shown in the admin
+and deliberately **not published to the front end** — review content belongs
+to its author and to Google, and republishing it as the site's own structured
+data is not a decision this plugin makes for an owner.
+
+Three things the tests pin down, each proved by breaking the code and
+watching them fail: `STAR_RATING_UNSPECIFIED` is 0 and is **left out of the
+average** rather than counted as zero stars; an anonymous reviewer keeps
+**no name and no photo**, even when Google sends them; and a whitespace-only
+reply still counts as unanswered. A sync **upserts on Google's review id**
+and prunes what Google no longer returns.
+
+One thing worth recording about the test pass: the "unrated is excluded"
+rule was first written twice — once in SQL, once in PHP — and *neither*
+mutation could make a test fail, because each guard covered for the other.
+The duplicate was removed so the rule lives in one place and can be proved.
+Two guards for one rule read as safety and are the opposite.
+
+**Verified live.** 13 real reviews across two locations. Reviews needed the
+**legacy My Business API** enabled on the project — a third service beyond
+Account Management and Business Information — which Google reported as
+`SERVICE_DISABLED` until it was switched on. The refusal surfaced as an
+error rather than "0 reviews read", which is the trap the profile sync fell
+into once; an owner shown a zero would conclude nobody had reviewed them.
+
+The strongest check is that our figures match Google's own: per location,
+Google reported `averageRating` of 5 and 4.5999999046326 against our 5 and
+4.6, over counts of 2 and 11. Dates, ratings and anonymity were clean across
+all 13 rows — no row missing a date or a rating, and no anonymous reviewer
+carrying a name.
+
+**One bug the tests did not catch, and now do.** The controller returned its
+payload at the top level instead of inside the documented `{data, meta}`
+envelope. Every route test passed — they assert registration, capabilities
+and argument validation — and the screen simply rendered "No Google
+locations yet" against a 200 that held the locations. It was found by
+opening the page in a browser, which is why that step is not optional. The
+integration suite now asserts the envelope on these routes, and dropping it
+again fails three checks.
+
 ## Pending
 
 Everything in the Free plan's first cut is built. What remains is the
@@ -1007,6 +1067,8 @@ prototype's work that has no engine yet:
 
 1. **Landing pages**, **ranking grid**, **performance** and
    **recommendations** — each needs its engine before any screen.
-2. **Google reviews, posts and performance** — built on the same connection,
-   needing only their APIs enabled on the approved project.
+2. **Replying to a review from the admin**, and **Google posts** — the first
+   writes back to a surface the public sees, so each needs a dry run and a
+   failure path before it ships.
+3. **Google performance** — the same connection, needing its API enabled.
 

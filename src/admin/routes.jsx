@@ -6,6 +6,7 @@ import Dashboard from "./pages/dashboard";
 import Google from "./pages/google";
 import LocationDetail from "./pages/locations/detail";
 import Locations from "./pages/locations";
+import Reviews from "./pages/reviews";
 import Schema from "./pages/schema";
 import NotFound from "./pages/not-found";
 import Services from "./pages/services";
@@ -34,6 +35,7 @@ export const router = createHashRouter([
       { path: "google", element: <Google /> },
       { path: "locations", element: <Locations /> },
       { path: "locations/:id", element: <LocationDetail /> },
+      { path: "reviews", element: <Reviews /> },
       { path: "schema", element: <Schema /> },
       { path: "services", element: <Services /> },
       { path: "settings", element: <Settings /> },
