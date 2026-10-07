@@ -104,6 +104,7 @@ class GoogleLocationRepository {
 			'phone'              => (string) $data['phone'],
 			'website'            => (string) $data['website'],
 			'verification_state' => (string) $data['verification_state'],
+			'cid'                => isset( $data['cid'] ) ? (string) $data['cid'] : '',
 			'payload'            => wp_json_encode( $data['payload'] ),
 			'synced_at'          => $now,
 			'updated_at'         => $now,
@@ -260,6 +261,7 @@ class GoogleLocationRepository {
 			'phone'             => isset( $row['phone'] ) ? (string) $row['phone'] : '',
 			'website'           => isset( $row['website'] ) ? (string) $row['website'] : '',
 			'verification_state' => isset( $row['verification_state'] ) ? (string) $row['verification_state'] : '',
+			'cid'                => isset( $row['cid'] ) ? (string) $row['cid'] : '',
 			'synced_at'         => isset( $row['synced_at'] ) ? (string) $row['synced_at'] : '',
 		);
 	}

@@ -221,6 +221,7 @@ class BusinessRepository {
 			'legal_name'         => (string) $record['legal_name'],
 			'business_type'      => (string) $record['business_type'],
 			'primary_category'   => (string) $record['primary_category'],
+			'primary_category_id' => (string) $record['primary_category_id'],
 			'description'        => (string) $record['description'],
 			'logo_attachment_id' => (int) $record['logo_attachment_id'],
 			'logo_url'           => (string) $record['logo_url'],

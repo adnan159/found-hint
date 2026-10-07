@@ -66,6 +66,13 @@ if ( ! $fhint_optin ) {
 	return;
 }
 
+/*
+ * Every table this plugin owns, spelled out because the autoloader is not
+ * available here. It must match `Tables::keys()` exactly: a name missing
+ * from this list is a table that survives an uninstall the operator asked
+ * for. `tests/Smoke/schema-format.php` compares the two and fails the build
+ * when they drift, which is how `reviews` was caught having been forgotten.
+ */
 $fhint_tables = array(
 	'business',
 	'locations',
@@ -75,6 +82,12 @@ $fhint_tables = array(
 	'audit_issues',
 	'logs',
 	'google_locations',
+	'reviews',
+	'special_hours',
+	'location_attributes',
+	'media',
+	'description_history',
+	'google_reference',
 );
 
 foreach ( $fhint_tables as $fhint_table ) {

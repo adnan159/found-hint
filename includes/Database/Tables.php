@@ -27,6 +27,11 @@ class Tables {
 	const LOGS             = 'logs';
 	const GOOGLE_LOCATIONS = 'google_locations';
 	const REVIEWS          = 'reviews';
+	const SPECIAL_HOURS       = 'special_hours';
+	const LOCATION_ATTRIBUTES = 'location_attributes';
+	const MEDIA               = 'media';
+	const DESCRIPTION_HISTORY = 'description_history';
+	const GOOGLE_REFERENCE    = 'google_reference';
 
 	/**
 	 * Every table this plugin owns, unprefixed.
@@ -44,6 +49,11 @@ class Tables {
 			self::LOGS,
 			self::GOOGLE_LOCATIONS,
 			self::REVIEWS,
+			self::SPECIAL_HOURS,
+			self::LOCATION_ATTRIBUTES,
+			self::MEDIA,
+			self::DESCRIPTION_HISTORY,
+			self::GOOGLE_REFERENCE,
 		);
 	}
 

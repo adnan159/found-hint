@@ -161,7 +161,7 @@ check( ! empty( $changes ), 'the first run creates tables' );
 $missing = Tables::missing();
 
 check_same( array(), $missing, 'every declared table exists after installation' );
-check_same( 9, count( Tables::all() ), 'all nine tables are declared' );
+check_same( 14, count( Tables::all() ), 'all fourteen tables are declared' );
 
 foreach ( array_keys( Tables::all() ) as $key ) {
 	check( Tables::exists( $key ), "table {$key} exists in MySQL" );
@@ -891,6 +891,64 @@ $before_prune = count( AuditRepository::issues( $audit['id'], '' ) );
 
 check( $before_prune > 0, 'the first run still has its rows' );
 
+// -- The Google push columns round-trip -------------------------------------
+
+// A column nothing can write is dead storage. These four were added for the
+// write-back, and each is whitelisted somewhere — the repository builds its
+// column list by hand, so a column missing from that list exists in MySQL
+// and can never hold a value.
+
+BusinessRepository::save(
+	array(
+		'name'                => 'Column Round Trip',
+		'primary_category'    => 'Dentist',
+		'primary_category_id' => 'gcid:dentist',
+	)
+);
+
+check_same( 'gcid:dentist', BusinessRepository::get()['primary_category_id'], 'the Google category id round-trips' );
+check_same( 'Dentist', BusinessRepository::get()['primary_category'], 'alongside the name a person reads' );
+
+$fhint_service = ServiceRepository::create(
+	array(
+		'name'                   => 'Teeth whitening',
+		'google_item_type'       => 'structured',
+		'google_service_type_id' => 'job_type_id:teeth_whitening',
+	)
+);
+
+check( is_array( $fhint_service ), 'the service was created' );
+
+// Read it back from the database rather than trusting what create() returned,
+// which would pass even if the columns were never written.
+$fhint_stored = ServiceRepository::find( (int) $fhint_service['id'] );
+
+check_same( 'structured', $fhint_stored['google_item_type'], 'a service remembers which shape Google wants' );
+check_same( 'job_type_id:teeth_whitening', $fhint_stored['google_service_type_id'], 'and the structured id' );
+
+ServiceRepository::delete( (int) $fhint_service['id'] );
+
+GoogleLocationRepository::upsert(
+	array(
+		'account_name'       => 'accounts/1',
+		'location_name'      => 'locations/cid-test',
+		'title'              => 'CID Test',
+		'store_code'         => '',
+		'address'            => '',
+		'phone'              => '',
+		'website'            => '',
+		'verification_state' => 'VERIFIED',
+		'cid'                => '9451387654872888532',
+		'payload'            => array(),
+	)
+);
+
+check_same(
+	'9451387654872888532',
+	GoogleLocationRepository::find_by_location_name( 'locations/cid-test' )['cid'],
+	'the Maps CID round-trips'
+);
+
 // -- Reviews, stored -------------------------------------------------------
 
 /**
@@ -1053,6 +1111,44 @@ if ( $admins ) {
 
 	check_same( 201, $response->get_status(), 'and create through it, answering 201' );
 	check_same( 'Created Over REST', BusinessRepository::get()['name'], 'which reaches the database' );
+
+	// Same whitelist, same trap, on the business side.
+	$fhint_cat = new WP_REST_Request( 'PATCH', '/fhint/v1/business' );
+	$fhint_cat->set_body_params(
+		array(
+			'primary_category'    => 'Dentist',
+			'primary_category_id' => 'gcid:dentist',
+		)
+	);
+
+	rest_do_request( $fhint_cat );
+
+	check_same(
+		'gcid:dentist',
+		BusinessRepository::get()['primary_category_id'],
+		'PATCH /business accepts the Google category id'
+	);
+
+	// The writable-field whitelist, which only the REST path goes through:
+	// create() merges defaults straight in, so a field missing from the
+	// whitelist is written by code and silently dropped by the API.
+	$fhint_create = new WP_REST_Request( 'POST', '/fhint/v1/services' );
+	$fhint_create->set_body_params(
+		array(
+			'name'                   => 'Whitelist Check',
+			'google_item_type'       => 'structured',
+			'google_service_type_id' => 'job_type_id:check',
+		)
+	);
+
+	$fhint_created = rest_do_request( $fhint_create )->get_data();
+	$fhint_back    = ServiceRepository::find( (int) $fhint_created['data']['id'] );
+
+	check_same( 'structured', $fhint_back['google_item_type'], 'POST /services accepts the Google item type' );
+	check_same( 'job_type_id:check', $fhint_back['google_service_type_id'], 'and the structured id' );
+
+	ServiceRepository::delete( (int) $fhint_created['data']['id'] );
+
 
 	// Validation is enforced server-side regardless of what a client sent.
 	$invalid = new WP_REST_Request( 'POST', '/fhint/v1/business' );

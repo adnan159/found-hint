@@ -154,6 +154,7 @@ class Business extends AbstractController {
 				'legal_name'           => array( 'type' => 'string' ),
 				'business_type'        => array( 'type' => 'string' ),
 				'primary_category'     => array( 'type' => 'string' ),
+				'primary_category_id'  => array( 'type' => 'string' ),
 				'secondary_categories' => array( 'type' => array( 'array', 'string' ) ),
 				'description'          => array( 'type' => 'string' ),
 				'logo_attachment_id'   => array(

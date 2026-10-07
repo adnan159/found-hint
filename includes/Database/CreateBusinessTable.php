@@ -33,6 +33,9 @@ defined( 'ABSPATH' ) || exit;
  *                              or a subtype such as 'Restaurant', 'Dentist', 'Store'.
  * @column primary_category     The main category the business trades under, in the
  *                              operator's own words (e.g. "Grocery Store").
+ * @column primary_category_id Google's id for that category, e.g. 'gcid:dentist'.
+ *                          Google accepts ids, not the names people read, so a
+ *                          push needs this and the display name both.
  * @column secondary_categories JSON array of additional categories.
  * @column description          Short description used for schema and location pages.
  * @column logo_attachment_id   WP media attachment id for the logo, 0 when a raw URL is used.
@@ -66,6 +69,7 @@ class CreateBusinessTable {
 	legal_name varchar(255) NOT NULL default '',
 	business_type varchar(100) NOT NULL default '',
 	primary_category varchar(150) NOT NULL default '',
+	primary_category_id varchar(100) NOT NULL default '',
 	secondary_categories longtext NULL,
 	description text NULL,
 	logo_attachment_id bigint(20) unsigned NOT NULL default 0,

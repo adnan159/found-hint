@@ -324,6 +324,11 @@ class Services extends AbstractController {
 					'enum' => ServiceEntity::statuses(),
 				),
 				'sort_order'          => array( 'type' => 'integer' ),
+				'google_item_type'    => array(
+					'type' => 'string',
+					'enum' => array( '', 'structured', 'free_form' ),
+				),
+				'google_service_type_id' => array( 'type' => 'string' ),
 			)
 		);
 	}

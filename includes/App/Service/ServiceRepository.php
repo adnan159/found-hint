@@ -408,6 +408,8 @@ class ServiceRepository {
 			'price'               => ( null === $record['price'] || '' === $record['price'] ) ? null : (float) $record['price'],
 			'currency'            => strtoupper( (string) $record['currency'] ),
 			'url'                 => (string) $record['url'],
+			'google_item_type'    => (string) $record['google_item_type'],
+			'google_service_type_id' => (string) $record['google_service_type_id'],
 			'status'              => (string) $record['status'],
 			'sort_order'          => (int) $record['sort_order'],
 		);

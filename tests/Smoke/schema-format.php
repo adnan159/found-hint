@@ -39,6 +39,11 @@ function fhint_capture_sql() {
 		Tables::LOGS             => 'CreateLogsTable',
 		Tables::GOOGLE_LOCATIONS => 'CreateGoogleLocationsTable',
 		Tables::REVIEWS          => 'CreateReviewsTable',
+		Tables::SPECIAL_HOURS       => 'CreateSpecialHoursTable',
+		Tables::LOCATION_ATTRIBUTES => 'CreateLocationAttributesTable',
+		Tables::MEDIA               => 'CreateMediaTable',
+		Tables::DESCRIPTION_HISTORY => 'CreateDescriptionHistoryTable',
+		Tables::GOOGLE_REFERENCE    => 'CreateGoogleReferenceTable',
 	);
 
 	foreach ( $classes as $key => $class ) {
@@ -63,7 +68,7 @@ function dbDelta( $sql ) { // phpcs:ignore WordPress.NamingConventions.ValidFunc
 
 $definitions = fhint_capture_sql();
 
-check_same( 9, count( $definitions ), 'every table has a definition' );
+check_same( 14, count( $definitions ), 'every table has a definition' );
 check_same( Tables::keys(), array_keys( $definitions ), 'definitions cover exactly the declared tables' );
 
 foreach ( $definitions as $key => $sql ) {
@@ -142,5 +147,29 @@ foreach ( $files as $file ) {
 }
 
 check_same( array(), $leaks, 'no table name is hardcoded outside Database/' );
+
+// -- Uninstall must know every table ---------------------------------------
+
+// uninstall.php runs without the autoloader, so it spells its table names
+// out. That literal list is the one place a new table gets forgotten — and
+// a forgotten name means the table survives an uninstall the operator
+// asked for. `reviews` was already missing when this check was written.
+$fhint_uninstall = file_get_contents( __DIR__ . '/../../uninstall.php' );
+
+preg_match( '/\$fhint_tables = array\((.*?)\);/s', $fhint_uninstall, $fhint_match );
+
+$fhint_listed = array();
+
+if ( isset( $fhint_match[1] ) ) {
+	preg_match_all( "/'([a-z_]+)'/", $fhint_match[1], $fhint_names );
+	$fhint_listed = $fhint_names[1];
+}
+
+sort( $fhint_listed );
+
+$fhint_declared = Tables::keys();
+sort( $fhint_declared );
+
+check_same( $fhint_declared, $fhint_listed, 'uninstall.php drops every table the registry declares' );
 
 finish( 'Schema formatting' );

@@ -37,6 +37,9 @@ defined( 'ABSPATH' ) || exit;
  * @column phone              Primary phone as Google holds it.
  * @column website            Website URI as Google holds it.
  * @column verification_state Google's verification state, e.g. 'VERIFIED'.
+ * @column cid                Google's customer id for the listing on Maps. Shown
+ *                            to the operator because directories and tools ask
+ *                            for it; never changed by this plugin.
  * @column payload            The raw location object, JSON, for fields no
  *                            column covers yet. Read-only to everything but
  *                            the sync.
@@ -68,6 +71,7 @@ class CreateGoogleLocationsTable {
 	phone varchar(50) NOT NULL default '',
 	website varchar(500) NOT NULL default '',
 	verification_state varchar(50) NOT NULL default '',
+	cid varchar(50) NOT NULL default '',
 	payload longtext NULL,
 	synced_at datetime NULL,
 	created_at datetime NULL,

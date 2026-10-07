@@ -60,6 +60,11 @@ class Database {
 		$changes = array_merge( $changes, Database\CreateLogsTable::up( $prefix, $cc ) );
 		$changes = array_merge( $changes, Database\CreateGoogleLocationsTable::up( $prefix, $cc ) );
 		$changes = array_merge( $changes, Database\CreateReviewsTable::up( $prefix, $cc ) );
+		$changes = array_merge( $changes, Database\CreateSpecialHoursTable::up( $prefix, $cc ) );
+		$changes = array_merge( $changes, Database\CreateLocationAttributesTable::up( $prefix, $cc ) );
+		$changes = array_merge( $changes, Database\CreateMediaTable::up( $prefix, $cc ) );
+		$changes = array_merge( $changes, Database\CreateDescriptionHistoryTable::up( $prefix, $cc ) );
+		$changes = array_merge( $changes, Database\CreateGoogleReferenceTable::up( $prefix, $cc ) );
 
 		// The Places lookup was removed in 0.4.0: its table and its scheduled
 		// event are cleared here rather than left behind on sites that ran an

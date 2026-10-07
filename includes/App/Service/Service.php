@@ -51,6 +51,8 @@ class Service {
 			'url',
 			'status',
 			'sort_order',
+			'google_item_type',
+			'google_service_type_id',
 		);
 	}
 
@@ -71,6 +73,8 @@ class Service {
 			'price'               => null,
 			'currency'            => '',
 			'url'                 => '',
+			'google_item_type'    => '',
+			'google_service_type_id' => '',
 			'status'              => self::STATUS_ACTIVE,
 			'sort_order'          => 0,
 			'created_at'          => '',

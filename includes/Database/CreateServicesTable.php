@@ -40,6 +40,12 @@ defined( 'ABSPATH' ) || exit;
  * @column url                 Link to a page describing this service.
  * @column status              active | inactive. Inactive services are kept but
  *                             excluded from schema and public output.
+ * @column google_item_type Which shape Google wants for this service:
+ *                          'structured' when it matches a service Google already
+ *                          publishes for the category, 'free_form' otherwise.
+ *                          Empty means it has never been offered to Google.
+ * @column google_service_type_id The structured id, e.g. 'job_type_id:teeth_whitening'.
+ *                          Only meaningful when google_item_type is 'structured'.
  * @column sort_order          Manual display order, resequenced as a block by the
  *                             reorder endpoint so two services can't share a position.
  * @column created_at          Row creation timestamp, UTC.
@@ -69,6 +75,8 @@ class CreateServicesTable {
 	price decimal(18,4) NULL,
 	currency char(3) NOT NULL default '',
 	url varchar(500) NOT NULL default '',
+	google_item_type varchar(32) NOT NULL default '',
+	google_service_type_id varchar(150) NOT NULL default '',
 	status varchar(32) NOT NULL default 'active',
 	sort_order int(11) NOT NULL default 0,
 	created_at datetime NULL,
