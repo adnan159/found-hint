@@ -479,10 +479,12 @@ class Import {
 
 			$created = ServiceRepository::create(
 				array(
-					'name'        => $service['name'],
-					'description' => $service['description'],
-					'price'       => $service['price'],
-					'currency'    => $service['currency'],
+					'name'                   => $service['name'],
+					'description'            => $service['description'],
+					'price'                  => $service['price'],
+					'currency'               => $service['currency'],
+					'google_item_type'       => isset( $service['google_item_type'] ) ? $service['google_item_type'] : '',
+					'google_service_type_id' => isset( $service['google_service_type_id'] ) ? $service['google_service_type_id'] : '',
 				)
 			);
 

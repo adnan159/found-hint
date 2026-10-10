@@ -295,7 +295,8 @@ class ImportMapper {
 	 * of identifiers like `job_type_id:it_consulting`.
 	 *
 	 * @param array $payload Decoded location.
-	 * @return array[] Each with name, description, price and currency.
+	 * @return array[] Each with name, description, price, currency, and how
+	 *                 Google holds it (google_item_type, google_service_type_id).
 	 */
 	private static function services( array $payload ) {
 		$items = isset( $payload['serviceItems'] ) && is_array( $payload['serviceItems'] ) ? $payload['serviceItems'] : array();
@@ -309,10 +310,14 @@ class ImportMapper {
 
 			$name        = '';
 			$description = '';
+			$item_type   = '';
+			$type_id     = '';
 
 			if ( isset( $item['structuredServiceItem']['serviceTypeId'] ) ) {
-				$id   = (string) $item['structuredServiceItem']['serviceTypeId'];
-				$name = isset( $names[ $id ] ) ? $names[ $id ] : '';
+				$id        = (string) $item['structuredServiceItem']['serviceTypeId'];
+				$name      = isset( $names[ $id ] ) ? $names[ $id ] : '';
+				$item_type = 'structured';
+				$type_id   = $id;
 
 				if ( isset( $item['structuredServiceItem']['description'] ) ) {
 					$description = (string) $item['structuredServiceItem']['description'];
@@ -323,6 +328,8 @@ class ImportMapper {
 				$label       = $item['freeFormServiceItem']['label'];
 				$name        = isset( $label['displayName'] ) ? (string) $label['displayName'] : $name;
 				$description = isset( $label['description'] ) ? (string) $label['description'] : $description;
+				$item_type   = 'free_form';
+				$type_id     = '';
 			}
 
 			// A service whose name could not be resolved is skipped: an
@@ -334,11 +341,18 @@ class ImportMapper {
 
 			$price = self::price( $item );
 
+			// How Google holds the service is kept with it. A structured item
+			// is one of Google's own service types, sent back by its id; lose
+			// that here and a later publish would replace it with a free-form
+			// service of the same name, which Google treats as a different
+			// thing.
 			$out[] = array(
-				'name'        => $name,
-				'description' => $description,
-				'price'       => $price['price'],
-				'currency'    => $price['currency'],
+				'name'                   => $name,
+				'description'            => $description,
+				'price'                  => $price['price'],
+				'currency'               => $price['currency'],
+				'google_item_type'       => $item_type,
+				'google_service_type_id' => $type_id,
 			);
 		}
 
@@ -389,8 +403,11 @@ class ImportMapper {
 	 * @return array{price: float|null, currency: string}
 	 */
 	private static function price( array $item ) {
+		// Google documents the price on the service item itself; the nested
+		// positions are read too, since that is where it was first seen.
 		$price = isset( $item['structuredServiceItem']['price'] ) ? $item['structuredServiceItem']['price'] : null;
 		$price = isset( $item['freeFormServiceItem']['price'] ) ? $item['freeFormServiceItem']['price'] : $price;
+		$price = isset( $item['price'] ) ? $item['price'] : $price;
 
 		if ( ! is_array( $price ) || empty( $price['currencyCode'] ) ) {
 			return array(

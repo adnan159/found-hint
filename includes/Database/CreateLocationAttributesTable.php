@@ -10,12 +10,13 @@ namespace FHINT\Database;
 defined( 'ABSPATH' ) || exit;
 
 /**
- * What is true about a location: the ticks, and the social links.
+ * What is true about a location: accessible, takes cards, has parking.
  *
- * On Google these are one thing. "Wheelchair accessible entrance" and the
- * Facebook URL are both attributes, read and written through the same
- * endpoint, which is why one table holds both rather than social links
- * living somewhere prettier.
+ * On Google the social links are attributes too, written through the same
+ * endpoint. They are **not** stored here: they live on the business
+ * (`social_profiles`), where the website's structured data already reads
+ * them, and are added to the attribute call when a push is built. Keeping a
+ * second copy in this table would give the same link two homes.
  *
  * **The value is stored as JSON, because an attribute's type is not ours to
  * decide.** Google defines each one as a boolean, an enum, a repeated enum

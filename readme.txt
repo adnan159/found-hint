@@ -65,6 +65,11 @@ It bundles one third-party resource, which is GPL-compatible:
 
 * **Archivo Variable** (webfont) — Omnibus-Type, SIL Open Font License 1.1. Source and licence: https://github.com/Omnibus-Type/Archivo
 
+The category search reads a list of Google Business Profile categories that ships
+with the plugin (`includes/App/Google/data/google-categories.json`). It was compiled
+by lobstr.io and is published at https://github.com/lobstrio/google-business-categories.
+The list is read from the plugin folder; it is never downloaded by your site.
+
 No script or stylesheet is loaded from a remote host; everything is served from
 the plugin folder.
 

@@ -8,6 +8,7 @@
 namespace FHINT\App\Business;
 
 use FHINT\App\Core\ValidationResult;
+use FHINT\App\Google\Categories;
 use FHINT\App\Core\Validator;
 
 defined( 'ABSPATH' ) || exit;
@@ -22,6 +23,15 @@ defined( 'ABSPATH' ) || exit;
  * feature is wrong.
  */
 class Business {
+
+	/**
+	 * The longest description Google accepts for a business.
+	 *
+	 * Enforced here, not only on the screen, because a longer one saves
+	 * happily and is then refused at the push — by which time the owner has
+	 * moved on and the profile is silently out of step with the listing.
+	 */
+	const DESCRIPTION_MAX = 750;
 
 	/**
 	 * Known schema.org business types. Filterable so a niche subtype can be
@@ -212,14 +222,63 @@ class Business {
 			}
 		}
 
+		return self::reconcile_primary_category( $clean );
+	}
+
+	/**
+	 * Keep the primary category's name and its Google id telling one story.
+	 *
+	 * Two clients write this pair. The category chooser sends an id, and the
+	 * name is then taken **from Google's list**, never from the request, so
+	 * what is stored always matches what will be submitted. The plain text
+	 * field sends only a name; that is tied back to an id when the wording is
+	 * one Google uses, and otherwise the id is cleared — a category typed
+	 * freehand is still worth keeping, but it must not carry the id of
+	 * whatever was chosen before it.
+	 *
+	 * @param array $clean Sanitised changes.
+	 * @return array
+	 */
+	private static function reconcile_primary_category( array $clean ) {
+		$has_id   = array_key_exists( 'primary_category_id', $clean );
+		$has_name = array_key_exists( 'primary_category', $clean );
+
+		if ( $has_id && '' !== $clean['primary_category_id'] ) {
+			$category = Categories::resolve( $clean['primary_category_id'] );
+
+			$clean['primary_category_id'] = $category['id'];
+
+			if ( Categories::exists( $category['id'] ) ) {
+				$clean['primary_category'] = $category['name'];
+			}
+
+			return $clean;
+		}
+
+		if ( $has_name && ! $has_id ) {
+			$category = Categories::resolve( $clean['primary_category'] );
+
+			$clean['primary_category_id'] = $category['id'];
+
+			if ( '' !== $category['id'] ) {
+				$clean['primary_category'] = $category['name'];
+			}
+		}
+
 		return $clean;
 	}
 
 	/**
-	 * Normalise a categories payload to a list of strings.
+	 * Additional categories, each as the `{ id, name }` pair Google's list holds.
+	 *
+	 * Accepts ids, names, or `{ id, name }` objects, in a list or a
+	 * comma-separated string, and stores every one the same way. Anything
+	 * that is not on the list is kept with an empty id rather than dropped,
+	 * so validation can refuse the write and say why — silently discarding
+	 * it would look like a save that worked.
 	 *
 	 * @param mixed $value Raw value.
-	 * @return string[]
+	 * @return array[] Each `{ id, name }`, without repeats.
 	 */
 	private static function sanitize_categories( $value ) {
 		if ( is_string( $value ) ) {
@@ -230,17 +289,41 @@ class Business {
 			return array();
 		}
 
-		$clean = array();
-
-		foreach ( $value as $item ) {
-			$item = sanitize_text_field( (string) $item );
-
-			if ( '' !== $item ) {
-				$clean[] = $item;
-			}
+		// One `{ id, name }` object rather than a list of them.
+		if ( isset( $value['id'] ) || isset( $value['name'] ) ) {
+			$value = array( $value );
 		}
 
-		return array_values( array_unique( $clean ) );
+		$clean = array();
+		$seen  = array();
+
+		foreach ( $value as $item ) {
+			if ( is_array( $item ) ) {
+				$item = array(
+					'id'   => sanitize_text_field( isset( $item['id'] ) ? (string) $item['id'] : '' ),
+					'name' => sanitize_text_field( isset( $item['name'] ) ? (string) $item['name'] : '' ),
+				);
+			} else {
+				$item = sanitize_text_field( (string) $item );
+			}
+
+			$category = Categories::resolve( $item );
+
+			if ( '' === $category['id'] && '' === $category['name'] ) {
+				continue;
+			}
+
+			$key = '' !== $category['id'] ? $category['id'] : 'name:' . strtolower( $category['name'] );
+
+			if ( isset( $seen[ $key ] ) ) {
+				continue;
+			}
+
+			$seen[ $key ] = true;
+			$clean[]      = $category;
+		}
+
+		return $clean;
 	}
 
 	/**
@@ -266,6 +349,77 @@ class Business {
 		}
 
 		return $clean;
+	}
+
+	/**
+	 * What is wrong with a list of additional categories, if anything.
+	 *
+	 * One code at most, the most fundamental first: too many, then one Google
+	 * does not have, then one repeating the primary category.
+	 *
+	 * Plain strings are skipped by the "unknown" check. They are names stored
+	 * before ids existed; refusing every later save because of them would
+	 * lock an existing business out of its own profile.
+	 *
+	 * @param array  $categories Stored or incoming additional categories.
+	 * @param string $primary_id The primary category's Google id, or ''.
+	 * @return string Error code, or '' when the list is acceptable.
+	 */
+	private static function additional_categories_error( array $categories, $primary_id ) {
+		if ( count( $categories ) > Categories::MAX_ADDITIONAL ) {
+			return 'business.categories.too_many';
+		}
+
+		foreach ( $categories as $category ) {
+			if ( ! is_array( $category ) ) {
+				continue;
+			}
+
+			$id = isset( $category['id'] ) ? (string) $category['id'] : '';
+
+			if ( '' === $id || ! Categories::exists( $id ) ) {
+				return 'business.categories.unknown';
+			}
+		}
+
+		foreach ( $categories as $category ) {
+			if ( is_array( $category ) && '' !== $primary_id && isset( $category['id'] ) && (string) $category['id'] === $primary_id ) {
+				return 'business.categories.includes_primary';
+			}
+		}
+
+		return '';
+	}
+
+	/**
+	 * Whether a piece of text contains a web address.
+	 *
+	 * Three forms count: a scheme (`https://…`), a `www.` prefix, and a bare
+	 * domain on a well-known ending (`example.com`). The list of endings is
+	 * short on purpose and leaves out two-letter country codes: a missing
+	 * space after a full stop — "open late.in an emergency" — would otherwise
+	 * read as a domain, and telling an owner their description has a link in
+	 * it when it does not is worse than missing an unusual one, which Google
+	 * will still catch.
+	 *
+	 * @param string $text Text to check.
+	 * @return bool
+	 */
+	public static function has_link( $text ) {
+		$text = (string) $text;
+
+		if ( '' === trim( $text ) ) {
+			return false;
+		}
+
+		if ( preg_match( '#(?:https?://|\bwww\.)\S#i', $text ) ) {
+			return true;
+		}
+
+		return (bool) preg_match(
+			'#\b[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.(?:com|net|org|info|biz|io|app|dev|shop|store|online|site|xyz)\b#i',
+			$text
+		);
 	}
 
 	/**
@@ -295,6 +449,34 @@ class Business {
 
 		if ( isset( $data['primary_category'] ) && mb_strlen( (string) $data['primary_category'] ) > 150 ) {
 			$result->add( 'primary_category', 'business.category.too_long' );
+		}
+
+		$description = isset( $data['description'] ) ? (string) $data['description'] : '';
+
+		if ( mb_strlen( $description ) > self::DESCRIPTION_MAX ) {
+			$result->add( 'description', 'business.description.too_long' );
+		}
+
+		// Google rejects a description that contains a web address.
+		if ( self::has_link( $description ) ) {
+			$result->add( 'description', 'business.description.has_link' );
+		}
+
+		// A category id is what gets sent to Google, so one that is not on
+		// Google's list is refused here rather than at the push.
+		$primary_id = isset( $data['primary_category_id'] ) ? (string) $data['primary_category_id'] : '';
+
+		if ( '' !== $primary_id && ! Categories::exists( $primary_id ) ) {
+			$result->add( 'primary_category_id', 'business.category_id.unknown' );
+		}
+
+		$extra_code = self::additional_categories_error(
+			isset( $data['secondary_categories'] ) && is_array( $data['secondary_categories'] ) ? $data['secondary_categories'] : array(),
+			$primary_id
+		);
+
+		if ( '' !== $extra_code ) {
+			$result->add( 'secondary_categories', $extra_code );
 		}
 
 		if ( ! empty( $data['email'] ) && ! Validator::is_email( (string) $data['email'] ) ) {

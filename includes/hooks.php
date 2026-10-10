@@ -37,3 +37,11 @@ add_action(
 		\FHINT\App\Core\Logger::purge_expired( $days );
 	}
 );
+
+/**
+ * A deleted location takes this site's records of its photos with it.
+ *
+ * Wired here rather than in the location repository, which must not have to
+ * know which modules hold a reference to a location.
+ */
+add_action( 'fhint_location_deleted', array( \FHINT\App\Media\MediaRepository::class, 'delete_for_location' ) );

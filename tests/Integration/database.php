@@ -32,6 +32,10 @@ use FHINT\App\Location\DayOfWeek;
 use FHINT\App\Location\Location;
 use FHINT\App\Location\LocationRepository;
 use FHINT\App\Location\OpeningHoursRepository;
+use FHINT\App\Location\SpecialHoursRepository;
+use FHINT\App\Business\DescriptionHistoryRepository;
+use FHINT\App\Location\LocationAttributeRepository;
+use FHINT\App\Media\MediaRepository;
 use FHINT\App\Nap\Nap;
 use FHINT\App\Review\ReviewRepository;
 use FHINT\App\Review\Reviews as ReviewService;
@@ -746,6 +750,318 @@ LocationRepository::delete( (int) $branch['location_id'] );
 // the one this suite set up.
 BusinessRepository::save( array( 'business_type' => 'Dentist' ) );
 
+// -- Planning a publish, with Google answered in-process --------------------
+
+// The import above wrote this site's hours from the listing: Monday open all
+// day, which Google spells as midnight to hour 24. A plan now has to turn the
+// stored row back into that spelling and find it unchanged — the round trip
+// that, done wrongly, tells every business its hours have changed.
+$fhint_reads_before = count( $import_requests );
+$fhint_plan         = FHINT\App\Google\Push\Publisher::plan();
+
+check( ! is_wp_error( $fhint_plan ), 'a publish can be planned' );
+check_same( 2, count( $import_requests ) - $fhint_reads_before, 'planning reads Google twice: the location and its attributes' );
+check( false !== strpos( $import_requests[ $fhint_reads_before ], 'readMask=' ), 'the location read carries a readMask' );
+check( false !== strpos( $import_requests[ $fhint_reads_before + 1 ], '/attributes' ), 'and the second read is the attributes' );
+$fhint_planned = array();
+
+foreach ( $fhint_plan['steps'] as $fhint_candidate ) {
+	foreach ( $fhint_candidate['fields'] as $fhint_field ) {
+		$fhint_planned[ $fhint_field['field'] ] = $fhint_field;
+	}
+}
+
+// This site's Saturday is stored as open all day. Read from MySQL and turned
+// into what Google takes, it must come out as midnight to hour 24.
+check( isset( $fhint_planned['hours'] ) && in_array( '6 00:00-24:00', $fhint_planned['hours']['to'], true ), 'a day stored as open all day is planned as midnight to hour 24' );
+check_same( array( '1 00:00-24:00' ), $fhint_planned['hours']['from'], 'against the hour-24 form Google sent' );
+
+// The service this suite imported from Google is one of Google's own types.
+// It must plan as unchanged, not as a free-form service to send in its place.
+check( in_array( 'services', $fhint_plan['unchanged'], true ), 'a structured service imported from Google plans as unchanged' );
+check( in_array( 'description', $fhint_plan['unchanged'], true ), 'and so does the imported description' );
+check_same( 'locations/import-me', $fhint_plan['listing']['location'], 'the plan names the listing it was made against' );
+
+$fhint_before_plan = BusinessRepository::get();
+
+BusinessRepository::save( array( 'description' => 'A new description, written here.' ) );
+
+$fhint_plan = FHINT\App\Google\Push\Publisher::plan();
+$fhint_step = null;
+
+foreach ( $fhint_plan['steps'] as $fhint_candidate ) {
+	if ( 'location' === $fhint_candidate['id'] ) {
+		$fhint_step = $fhint_candidate;
+	}
+}
+
+check( null !== $fhint_step && in_array( 'profile.description', $fhint_step['mask'], true ), 'a description edited here is planned as a change' );
+$fhint_described = null;
+
+foreach ( $fhint_step['fields'] as $fhint_field ) {
+	if ( 'description' === $fhint_field['field'] ) {
+		$fhint_described = $fhint_field;
+	}
+}
+
+check_same( 'Coffee by the water.', $fhint_described['from'], 'from what Google holds' );
+check_same( 'A new description, written here.', BusinessRepository::get()['description'], 'and planning leaves this site\'s data as it was' );
+
+BusinessRepository::save( array( 'description' => $fhint_before_plan['description'] ) );
+
+// Over REST, as the screen will call it.
+if ( $admins ?? get_users( array( 'role' => 'administrator', 'number' => 1 ) ) ) {
+	$fhint_admin = get_users( array( 'role' => 'administrator', 'number' => 1 ) );
+
+	wp_set_current_user( $fhint_admin[0]->ID );
+
+	$fhint_response = rest_do_request( new WP_REST_Request( 'POST', '/fhint/v1/profile/publish/plan' ) );
+	$fhint_body     = $fhint_response->get_data();
+
+	check_same( 200, $fhint_response->get_status(), 'POST /profile/publish/plan answers' );
+	check( isset( $fhint_body['data']['steps'], $fhint_body['data']['skipped'], $fhint_body['data']['unchanged'], $fhint_body['data']['requests'] ), 'with the plan under data' );
+	check_same( 'locations/import-me', $fhint_body['meta']['listing']['location'], 'and the listing in meta' );
+
+	// A plan needs a listing to compare against.
+	GoogleLocationRepository::unmap( 'locations/import-me' );
+
+	$fhint_response = rest_do_request( new WP_REST_Request( 'POST', '/fhint/v1/profile/publish/plan' ) );
+
+	check_same( 409, $fhint_response->get_status(), 'with no listing mapped, planning is refused' );
+	check_same( 'fhint_google_not_mapped', $fhint_response->get_data()['code'], 'with a code that says what is missing' );
+
+	GoogleLocationRepository::map( 'locations/import-me', $location_id );
+
+	wp_set_current_user( 0 );
+
+	check_same( 401, rest_do_request( new WP_REST_Request( 'POST', '/fhint/v1/profile/publish/plan' ) )->get_status(), 'and a logged-out request is refused' );
+}
+
+// -- Running a publish step, with Google answered in-process ----------------
+
+// Writes are answered here rather than by the read-only stand-in above, and
+// every one is recorded: the method, the address, and the body. What this plugin
+// sends to a listing the public reads is the thing to be sure of.
+$fhint_writes  = array();
+$fhint_refuse  = false;
+$fhint_fake_write = static function ( $pre, $args, $url ) use ( &$fhint_writes, &$fhint_refuse ) {
+	if ( ! isset( $args['method'] ) || 'PATCH' !== strtoupper( (string) $args['method'] ) ) {
+		return $pre;
+	}
+
+	$fhint_writes[] = array(
+		'url'  => rawurldecode( (string) $url ),
+		'body' => json_decode( (string) $args['body'], true ),
+	);
+
+	if ( $fhint_refuse ) {
+		return array(
+			'headers'  => array(),
+			'body'     => wp_json_encode(
+				array(
+					'error' => array(
+						'code'    => 400,
+						'message' => 'Request contains an invalid argument.',
+						'status'  => 'INVALID_ARGUMENT',
+						'details' => array(
+							array(
+								'@type'    => 'type.googleapis.com/google.rpc.ErrorInfo',
+								'reason'   => 'PROFILE_DESCRIPTION_CONTAINS_URL',
+								'metadata' => array( 'field_mask' => 'profile.description' ),
+							),
+						),
+					),
+				)
+			),
+			'response' => array(
+				'code'    => 400,
+				'message' => 'Bad Request',
+			),
+			'cookies'  => array(),
+		);
+	}
+
+	return array(
+		'headers'  => array(),
+		'body'     => '{}',
+		'response' => array(
+			'code'    => 200,
+			'message' => 'OK',
+		),
+		'cookies'  => array(),
+	);
+};
+
+// After the read-only stand-in, not before: it answers every request it is
+// handed and ignores what an earlier filter decided, so a refusal returned
+// ahead of it would be replaced by its 200.
+add_filter( 'pre_http_request', $fhint_fake_write, 11, 3 );
+
+/**
+ * The step with a given id from a fresh plan, or null.
+ *
+ * @param string $id Step id.
+ * @return array|null
+ */
+$fhint_planned_step = static function ( $id ) {
+	foreach ( FHINT\App\Google\Push\Publisher::plan()['steps'] as $candidate ) {
+		if ( $id === $candidate['id'] ) {
+			return $candidate;
+		}
+	}
+
+	return null;
+};
+
+$fhint_original = BusinessRepository::get();
+
+BusinessRepository::save( array( 'description' => 'Published from this site.' ) );
+
+$fhint_step = $fhint_planned_step( 'location' );
+
+// A fingerprint that is not this plan's is refused before anything is sent.
+$fhint_result = FHINT\App\Google\Push\Publisher::step( 'location', str_repeat( 'a', 32 ) );
+
+check( is_wp_error( $fhint_result ) && 'fhint_publish_stale' === $fhint_result->get_error_code(), 'a step with a fingerprint from another plan is refused' );
+check_same( array(), $fhint_writes, 'and nothing is sent to Google' );
+
+// Google checks the request and saves nothing.
+$fhint_result = FHINT\App\Google\Push\Publisher::step( 'location', $fhint_step['token'], true );
+
+check( ! is_wp_error( $fhint_result ) && true === $fhint_result['validate_only'], 'a step can be checked by Google without being saved' );
+check( false !== strpos( $fhint_writes[0]['url'], 'validateOnly=true' ), 'by asking Google to validate only' );
+check_same( '', GoogleLocationRepository::find_by_location_name( 'locations/import-me' )['pushed_at'], 'and it is not recorded as a publish' );
+
+// The real thing.
+$fhint_writes = array();
+$fhint_result = FHINT\App\Google\Push\Publisher::step( 'location', $fhint_step['token'] );
+
+check( ! is_wp_error( $fhint_result ) && true === $fhint_result['ok'], 'the step publishes' );
+check_same( 1, count( $fhint_writes ), 'with exactly one write' );
+check( false !== strpos( $fhint_writes[0]['url'], 'v1/locations/import-me?' ), 'to the mapped listing' );
+check( false !== strpos( $fhint_writes[0]['url'], 'updateMask=' . implode( ',', $fhint_step['mask'] ) ), 'naming exactly the fields the plan named' );
+check( false === strpos( $fhint_writes[0]['url'], 'validateOnly' ), 'and not as a dry run' );
+check_same( $fhint_step['payload'], $fhint_writes[0]['body'], 'carrying exactly the payload the plan showed' );
+check_same( 'Published from this site.', $fhint_writes[0]['body']['profile']['description'], 'which holds the description written here' );
+check( in_array( 'description', $fhint_result['fields'], true ), 'the answer lists the fields that were sent' );
+check( '' !== GoogleLocationRepository::find_by_location_name( 'locations/import-me' )['pushed_at'], 'and the publish is recorded on the listing' );
+
+// Edited after the plan was read: the fingerprint no longer matches.
+$fhint_writes = array();
+
+BusinessRepository::save( array( 'description' => 'Edited in another tab, after the plan was shown.' ) );
+
+$fhint_result = FHINT\App\Google\Push\Publisher::step( 'location', $fhint_step['token'] );
+
+check( is_wp_error( $fhint_result ) && 'fhint_publish_stale' === $fhint_result->get_error_code(), 'a profile edited since the plan was shown is not published from the old plan' );
+check_same( array(), $fhint_writes, 'so what reaches Google is only ever what somebody saw' );
+
+// Google refuses a value: the refusal names the field.
+$fhint_refuse = true;
+$fhint_step   = $fhint_planned_step( 'location' );
+
+$fhint_pushed_before = GoogleLocationRepository::find_by_location_name( 'locations/import-me' )['pushed_at'];
+$fhint_result        = FHINT\App\Google\Push\Publisher::step( 'location', $fhint_step['token'] );
+$fhint_refuse        = false;
+
+check( is_wp_error( $fhint_result ) && 'fhint_google_rejected' === $fhint_result->get_error_code(), 'a value Google refuses fails the step' );
+check_same(
+	array( 'description' => array( 'google.profile_description_contains_url' ) ),
+	is_wp_error( $fhint_result ) ? $fhint_result->get_error_data()['fields'] : array(),
+	'with Google\'s reason attached to the field at fault'
+);
+check_same( $fhint_pushed_before, GoogleLocationRepository::find_by_location_name( 'locations/import-me' )['pushed_at'], 'and a refused step is not recorded as a publish' );
+
+BusinessRepository::save( array( 'description' => $fhint_original['description'] ) );
+
+// Links and attributes: one request, and no dry run.
+$fhint_place_id = (int) LocationRepository::primary()['id'];
+$fhint_result   = FHINT\App\Google\Push\Publisher::step( 'attributes', str_repeat( 'a', 32 ), true );
+
+check( is_wp_error( $fhint_result ) && 'fhint_validate_only_unsupported' === $fhint_result->get_error_code(), 'attributes cannot be checked without saving, and the step says so' );
+
+BusinessRepository::save( array( 'social_profiles' => array( 'facebook' => 'https://facebook.com/changed-here' ) ) );
+LocationAttributeRepository::save(
+	$fhint_place_id,
+	array(
+		'has_wheelchair_accessible_entrance' => array(
+			'type'  => 'bool',
+			'value' => true,
+		),
+		// Google's stand-in already answers yes to this one, so it is not
+		// part of what gets sent.
+		'has_delivery'                       => array(
+			'type'  => 'bool',
+			'value' => true,
+		),
+	)
+);
+
+$fhint_writes = array();
+$fhint_step   = $fhint_planned_step( 'attributes' );
+$fhint_result = FHINT\App\Google\Push\Publisher::step( 'attributes', $fhint_step['token'] );
+
+check( ! is_wp_error( $fhint_result ) && true === $fhint_result['ok'], 'the attributes step publishes' );
+check( false !== strpos( $fhint_writes[0]['url'], 'v1/locations/import-me/attributes?attributeMask=' ), 'to the listing\'s attributes, with an attribute mask' );
+check( false !== strpos( $fhint_writes[0]['url'], 'attributes/url_facebook' ) && false !== strpos( $fhint_writes[0]['url'], 'attributes/has_wheelchair_accessible_entrance' ), 'naming the link and the answer that changed' );
+check_same( 'locations/import-me/attributes', $fhint_writes[0]['body']['name'], 'the body names the resource Google expects' );
+check_same( 'https://facebook.com/changed-here', $fhint_writes[0]['body']['attributes'][0]['uriValues'][0]['uri'], 'and carries the new link' );
+
+$fhint_answers = array();
+
+foreach ( LocationAttributeRepository::for_location( $fhint_place_id ) as $fhint_answer ) {
+	$fhint_answers[ $fhint_answer['attribute_id'] ] = $fhint_answer;
+}
+
+check( false === strpos( $fhint_writes[0]['url'], 'attributes/has_delivery' ), 'an answer Google already has is not named in the mask' );
+check( false === $fhint_answers['has_wheelchair_accessible_entrance']['is_dirty'] && null !== $fhint_answers['has_wheelchair_accessible_entrance']['synced_at'], 'an answer that reached Google is no longer marked as waiting to be sent' );
+check( true === $fhint_answers['has_delivery']['is_dirty'], 'and only the answers that were sent are marked — the one left out is untouched' );
+
+LocationAttributeRepository::delete_for_location( $fhint_place_id );
+BusinessRepository::save( array( 'social_profiles' => $fhint_original['social_profiles'] ) );
+
+// Over REST, as the screen will call it.
+$fhint_admin = get_users( array( 'role' => 'administrator', 'number' => 1 ) );
+
+if ( $fhint_admin ) {
+	wp_set_current_user( $fhint_admin[0]->ID );
+
+	$fhint_call = static function ( array $params ) {
+		$request = new WP_REST_Request( 'POST', '/fhint/v1/profile/publish/step' );
+		$request->set_header( 'content-type', 'application/json' );
+		$request->set_body( wp_json_encode( $params ) );
+
+		return rest_do_request( $request );
+	};
+
+	$fhint_step     = $fhint_planned_step( 'location' );
+	$fhint_response = $fhint_call(
+		array(
+			'step'          => 'location',
+			'token'         => $fhint_step['token'],
+			'validate_only' => true,
+		)
+	);
+
+	check_same( 200, $fhint_response->get_status(), 'POST /profile/publish/step answers' );
+	check_same( 'location', $fhint_response->get_data()['data']['step'], 'with the step it ran, under data' );
+
+	check_same( 400, $fhint_call( array( 'step' => 'location', 'token' => 'not-a-fingerprint' ) )->get_status(), 'a token that could not be a fingerprint is refused before the step runs' );
+	check_same( 400, $fhint_call( array( 'step' => 'photos', 'token' => str_repeat( 'a', 32 ) ) )->get_status(), 'and so is a step that does not exist' );
+	check_same( 409, $fhint_call( array( 'step' => 'location', 'token' => str_repeat( 'a', 32 ) ) )->get_status(), 'a well-formed but wrong fingerprint is a conflict' );
+
+	$fhint_response = $fhint_call( array( 'step' => 'attributes', 'token' => str_repeat( 'a', 32 ) ) );
+
+	check_same( 409, $fhint_response->get_status(), 'a step with nothing to send is refused' );
+	check_same( 'fhint_publish_nothing_to_send', $fhint_response->get_data()['code'], 'saying Google already has it' );
+
+	wp_set_current_user( 0 );
+
+	check_same( 401, $fhint_call( array( 'step' => 'location', 'token' => $fhint_step['token'] ) )->get_status(), 'and a logged-out publish is refused' );
+}
+
+remove_filter( 'pre_http_request', $fhint_fake_write, 11 );
+
 remove_filter( 'pre_http_request', $fake_business_information, 10 );
 
 // Put the hours back as the sections after this one expect them, including
@@ -1051,7 +1367,49 @@ check_same( 0, ReviewRepository::count(), 'truncate clears the table' );
 
 check_same( 4, count( OpeningHoursRepository::for_location( $location_id ) ), 'all four period rows are there before the delete' );
 
+// The location's other rows: dated exceptions, attribute answers, photo
+// records. There are no foreign keys, so each must be let go explicitly.
+SpecialHoursRepository::replace(
+	$location_id,
+	array(
+		array(
+			'date'         => '2026-12-25',
+			'period_index' => 0,
+			'open_time'    => null,
+			'close_time'   => null,
+			'is_closed'    => true,
+			'is_24h'       => false,
+			'note'         => 'Christmas Day',
+		),
+	)
+);
+LocationAttributeRepository::save(
+	$location_id,
+	array(
+		'has_wifi' => array(
+			'type'  => 'bool',
+			'value' => true,
+		),
+	)
+);
+$wpdb->insert(
+	Tables::name( Tables::MEDIA ),
+	array(
+		'location_id' => $location_id,
+		'role'        => 'logo',
+		'url'         => 'https://example.com/logo.png',
+	)
+);
+
+check_same( 1, count( SpecialHoursRepository::for_location( $location_id ) ), 'a special day is stored before the delete' );
+check_same( 1, count( LocationAttributeRepository::for_location( $location_id ) ), 'and an attribute answer' );
+check_same( 1, count( MediaRepository::for_location( $location_id ) ), 'and a photo record' );
+
 LocationRepository::delete( $location_id );
+
+check_same( array(), SpecialHoursRepository::for_location( $location_id ), 'deleting the location removes its special hours' );
+check_same( array(), LocationAttributeRepository::for_location( $location_id ), 'and its attribute answers' );
+check_same( array(), MediaRepository::for_location( $location_id ), 'and its photo records, through the fhint_location_deleted hook' );
 
 check_same( 0, LocationRepository::count(), 'the location is gone' );
 check_same( array(), OpeningHoursRepository::for_location( $location_id ), 'and its hours went with it' );
@@ -1065,8 +1423,41 @@ check_same(
 // than fixed: the import section above adds one of its own.
 check( ServiceRepository::count() > 0, 'services exist before the business is deleted' );
 
+$fhint_doomed_business = (int) BusinessRepository::get()['id'];
+$fhint_doomed_location = LocationRepository::create( array( 'name' => 'Doomed branch' ) );
+
+DescriptionHistoryRepository::record( $fhint_doomed_business, 'A description that will not outlive its business.' );
+SpecialHoursRepository::replace(
+	(int) $fhint_doomed_location['id'],
+	array(
+		array(
+			'date'         => '2026-12-26',
+			'period_index' => 0,
+			'open_time'    => null,
+			'close_time'   => null,
+			'is_closed'    => true,
+			'is_24h'       => false,
+			'note'         => '',
+		),
+	)
+);
+LocationAttributeRepository::save(
+	(int) $fhint_doomed_location['id'],
+	array(
+		'has_wifi' => array(
+			'type'  => 'bool',
+			'value' => true,
+		),
+	)
+);
+
+check_same( 1, count( DescriptionHistoryRepository::latest( $fhint_doomed_business ) ), 'a description version exists before the business is deleted' );
+
 BusinessRepository::delete();
 
+check_same( array(), DescriptionHistoryRepository::latest( $fhint_doomed_business ), 'deleting the business removes its description history' );
+check_same( array(), SpecialHoursRepository::for_location( (int) $fhint_doomed_location['id'] ), 'and the special hours of its locations' );
+check_same( array(), LocationAttributeRepository::for_location( (int) $fhint_doomed_location['id'] ), 'and their attribute answers' );
 check_same( 0, ServiceRepository::count(), 'deleting the business cascades to its services' );
 check_same( null, BusinessRepository::get(), 'and the business is gone' );
 
@@ -1129,6 +1520,87 @@ if ( $admins ) {
 		'PATCH /business accepts the Google category id'
 	);
 
+	// -- Google categories: searched from the bundled list, saved as ids ----
+
+	$fhint_search = new WP_REST_Request( 'GET', '/fhint/v1/google/categories' );
+	$fhint_search->set_query_params(
+		array(
+			'search'   => 'dentist',
+			'per_page' => 5,
+		)
+	);
+
+	$fhint_found = rest_do_request( $fhint_search );
+	$fhint_body  = $fhint_found->get_data();
+
+	check_same( 200, $fhint_found->get_status(), 'an administrator can search Google categories' );
+	check_same( 'gcid:dentist', isset( $fhint_body['data'][0]['id'] ) ? $fhint_body['data'][0]['id'] : '', 'the best match leads, under data' );
+	check( isset( $fhint_body['meta']['total'] ) && $fhint_body['meta']['total'] >= 1, 'with the total in meta' );
+
+	$fhint_greedy = new WP_REST_Request( 'GET', '/fhint/v1/google/categories' );
+	$fhint_greedy->set_query_params( array( 'per_page' => 500 ) );
+
+	check_same( 400, rest_do_request( $fhint_greedy )->get_status(), 'asking for more than the cap is refused before the search runs' );
+
+	// The chosen categories reach the database as Google's ids, with
+	// Google's names — whatever name the request claimed.
+	$fhint_choose = new WP_REST_Request( 'PATCH', '/fhint/v1/business' );
+	$fhint_choose->set_body_params(
+		array(
+			'primary_category_id'  => 'gcid:dentist',
+			'primary_category'     => 'Best dentist in town',
+			'secondary_categories' => array( 'gcid:dental_clinic', 'Cosmetic dentist' ),
+		)
+	);
+
+	check_same( 200, rest_do_request( $fhint_choose )->get_status(), 'choosing categories saves' );
+
+	$fhint_saved = BusinessRepository::get();
+
+	check_same( 'gcid:dentist', $fhint_saved['primary_category_id'], 'the primary category is stored as Google\'s id' );
+	check_same( 'Dentist', $fhint_saved['primary_category'], 'beside Google\'s name for it, not the request\'s' );
+	check_same(
+		array(
+			array(
+				'id'   => 'gcid:dental_clinic',
+				'name' => 'Dental clinic',
+			),
+			array(
+				'id'   => 'gcid:cosmetic_dentist',
+				'name' => 'Cosmetic dentist',
+			),
+		),
+		$fhint_saved['secondary_categories'],
+		'and the additional ones round-trip through MySQL as { id, name } pairs'
+	);
+
+	// A category Google does not have is refused, and nothing is written.
+	$fhint_bogus = new WP_REST_Request( 'PATCH', '/fhint/v1/business' );
+	$fhint_bogus->set_body_params( array( 'primary_category_id' => 'gcid:not_a_real_category' ) );
+
+	check_same( 400, rest_do_request( $fhint_bogus )->get_status(), 'an id Google does not have is refused with a 400' );
+	check_same( 'gcid:dentist', BusinessRepository::get()['primary_category_id'], 'leaving the stored category untouched' );
+
+	// The legacy text field: a name alone, tied back to its id on the way in.
+	$fhint_typed = new WP_REST_Request( 'PATCH', '/fhint/v1/business' );
+	$fhint_typed->set_body_params( array( 'primary_category' => 'orthodontist' ) );
+
+	rest_do_request( $fhint_typed );
+
+	check_same( 'gcid:orthodontist', BusinessRepository::get()['primary_category_id'], 'a typed name Google uses replaces the id to match' );
+
+	$fhint_typed->set_body_params( array( 'primary_category' => 'Tooth wizard' ) );
+
+	rest_do_request( $fhint_typed );
+
+	check_same( '', BusinessRepository::get()['primary_category_id'], 'and a freehand one clears it, rather than keeping a stale id' );
+
+	wp_set_current_user( 0 );
+
+	check_same( 401, rest_do_request( new WP_REST_Request( 'GET', '/fhint/v1/google/categories' ) )->get_status(), 'the category search refuses a logged-out request' );
+
+	wp_set_current_user( $admins[0]->ID );
+
 	// The writable-field whitelist, which only the REST path goes through:
 	// create() merges defaults straight in, so a field missing from the
 	// whitelist is written by code and silently dropped by the API.
@@ -1148,6 +1620,321 @@ if ( $admins ) {
 	check_same( 'job_type_id:check', $fhint_back['google_service_type_id'], 'and the structured id' );
 
 	ServiceRepository::delete( (int) $fhint_created['data']['id'] );
+
+	// -- The profile: read whole, saved a section at a time ----------------
+
+	/**
+	 * Save one profile section over REST.
+	 *
+	 * @param string $section Section id.
+	 * @param array  $fields  The section's fields.
+	 * @return WP_REST_Response
+	 */
+	$fhint_profile_save = static function ( $section, array $fields ) {
+		$request = new WP_REST_Request( 'PATCH', '/fhint/v1/profile' );
+		$request->set_header( 'content-type', 'application/json' );
+		$request->set_body(
+			wp_json_encode(
+				array(
+					'section' => $section,
+					'fields'  => $fields,
+				)
+			)
+		);
+
+		return rest_do_request( $request );
+	};
+
+	$fhint_profile = rest_do_request( new WP_REST_Request( 'GET', '/fhint/v1/profile' ) )->get_data();
+
+	check_same(
+		array( 'info', 'address', 'hours', 'social', 'attributes', 'services', 'media' ),
+		array_keys( $fhint_profile['data'] ),
+		'GET /profile returns every section, under data'
+	);
+	check( isset( $fhint_profile['meta']['google']['connected'] ) && is_bool( $fhint_profile['meta']['google']['connected'] ), 'and says whether Google is connected' );
+	check_same( 750, $fhint_profile['meta']['limits']['description'], 'with the limits a form needs' );
+
+	// Info.
+	$fhint_logo_before = BusinessRepository::get()['logo_url'];
+
+	$fhint_response = $fhint_profile_save(
+		'info',
+		array(
+			'name'                => 'Profile Dental',
+			'description'         => 'First wording.',
+			'primary_category_id' => 'gcid:dentist',
+			'website'             => 'https://profile.example',
+			'logo_url'            => 'https://elsewhere.example/logo.png',
+		)
+	);
+	$fhint_body     = $fhint_response->get_data();
+
+	check_same( 200, $fhint_response->get_status(), 'saving the info section succeeds' );
+	check_same( 'info', $fhint_body['meta']['section'], 'the answer names the section saved' );
+	check_same( 'Profile Dental', $fhint_body['data']['name'], 'and carries the section as it now reads' );
+	check_same( 'Profile Dental', BusinessRepository::get()['name'], 'which is what reached the database' );
+	check_same( 'Dentist', BusinessRepository::get()['primary_category'], 'through the same category rules as /business' );
+	check_same( $fhint_logo_before, BusinessRepository::get()['logo_url'], 'a field this section does not own is ignored, not written' );
+
+	check_same( 1, count( $fhint_body['data']['history'] ), 'a new description becomes a version' );
+
+	$fhint_profile_save( 'info', array( 'description' => 'First wording.' ) );
+
+	check_same( 1, count( rest_do_request( new WP_REST_Request( 'GET', '/fhint/v1/profile' ) )->get_data()['data']['info']['history'] ), 'saving the same words again does not' );
+
+	$fhint_history = $fhint_profile_save( 'info', array( 'description' => 'Second wording.' ) )->get_data()['data']['history'];
+
+	check_same( array( 'Second wording.', 'First wording.' ), array_column( $fhint_history, 'description' ), 'versions come back newest first' );
+
+	$fhint_response = $fhint_profile_save( 'info', array( 'description' => 'Book at https://profile.example' ) );
+
+	check_same( 400, $fhint_response->get_status(), 'a description with a link is refused' );
+	check_same( array( 'business.description.has_link' ), $fhint_response->get_data()['data']['fields']['description'], 'with the code keyed to the description' );
+	check_same( 'Second wording.', BusinessRepository::get()['description'], 'and the stored description is untouched' );
+
+	// Address.
+	$fhint_response = $fhint_profile_save(
+		'address',
+		array(
+			'address_line_1' => '410 Congress Ave',
+			'city'           => 'Austin',
+			'region'         => 'TX',
+			'postal_code'    => '78701',
+			'country'        => 'US',
+		)
+	);
+	$fhint_place    = LocationRepository::primary();
+
+	check_same( 200, $fhint_response->get_status(), 'saving the address succeeds' );
+	check( is_array( $fhint_place ), 'creating the location when the business had none' );
+	check_same( '410 Congress Ave', $fhint_place['address_line_1'], 'and storing the address on it' );
+	check_same( false, $fhint_response->get_data()['data']['locked'], 'an address with no Google listing behind it is editable' );
+
+	GoogleLocationRepository::upsert(
+		array(
+			'account_name'       => 'accounts/1',
+			'location_name'      => 'locations/profile-lock',
+			'title'              => 'Profile Dental',
+			'store_code'         => '',
+			'address'            => '',
+			'phone'              => '',
+			'website'            => '',
+			'verification_state' => 'VERIFIED',
+			'cid'                => '9451387654872888532',
+			'payload'            => array(),
+		)
+	);
+	GoogleLocationRepository::map( 'locations/profile-lock', (int) $fhint_place['id'] );
+
+	$fhint_response = $fhint_profile_save( 'address', array( 'city' => 'Dallas' ) );
+
+	check_same( 409, $fhint_response->get_status(), 'once mapped to a Google listing, the address is refused' );
+	check_same( 'fhint_address_locked', $fhint_response->get_data()['code'], 'with a code that says why' );
+	check_same( 'Austin', LocationRepository::primary()['city'], 'and is not changed' );
+
+	$fhint_profile = rest_do_request( new WP_REST_Request( 'GET', '/fhint/v1/profile' ) )->get_data();
+
+	check_same( true, $fhint_profile['data']['address']['locked'], 'the screen is told the address is locked' );
+	check_same( '9451387654872888532', $fhint_profile['data']['info']['cid'], 'and shown the listing\'s CID' );
+	check_same( true, $fhint_profile['meta']['google']['verified'], 'and that the listing is verified' );
+
+	GoogleLocationRepository::unmap( 'locations/profile-lock' );
+
+	// Hours.
+	update_option( 'fhint_data_changed_at', 1, false );
+
+	$fhint_response = $fhint_profile_save(
+		'hours',
+		array(
+			'opening_hours' => array(
+				'1' => array(
+					'open_time'  => '09:00',
+					'close_time' => '17:00',
+				),
+			),
+			'special_hours' => array(
+				array(
+					'date'      => '2026-12-25',
+					'is_closed' => true,
+					'note'      => 'Christmas Day',
+				),
+				array(
+					'date'    => '2026-12-24',
+					'periods' => array(
+						array(
+							'open_time'  => '09:00',
+							'close_time' => '12:00',
+						),
+						array(
+							'open_time'  => '13:00',
+							'close_time' => '15:00',
+						),
+					),
+				),
+			),
+		)
+	);
+	$fhint_hours    = $fhint_response->get_data()['data'];
+
+	check_same( 200, $fhint_response->get_status(), 'saving hours succeeds' );
+	check_same( array( '2026-12-24', '2026-12-25' ), array_column( $fhint_hours['special_hours'], 'date' ), 'special days round-trip through MySQL, oldest first' );
+	check_same( 2, count( $fhint_hours['special_hours'][0]['periods'] ), 'a special day keeps its break' );
+	check_same( 'Christmas Day', $fhint_hours['special_hours'][1]['note'], 'and a closed one its label' );
+	check_same( 1, count( OpeningHoursRepository::for_location( (int) $fhint_place['id'] ) ), 'the week is stored beside them' );
+	check( (int) get_option( 'fhint_data_changed_at' ) > 1, 'and the data is marked changed, so cached schema is rebuilt' );
+
+	// Each key is saved on its own: a week sent alone must not be read as
+	// "and no special days".
+	$fhint_profile_save(
+		'hours',
+		array(
+			'opening_hours' => array(
+				'1' => array(
+					'open_time'  => '08:00',
+					'close_time' => '16:00',
+				),
+			),
+		)
+	);
+
+	check_same( 3, count( SpecialHoursRepository::for_location( (int) $fhint_place['id'] ) ), 'saving only the week leaves the special days alone' );
+	check_same( '08:00:00', OpeningHoursRepository::for_location( (int) $fhint_place['id'] )[0]['open_time'], 'while the week itself is replaced' );
+
+	$fhint_response = $fhint_profile_save( 'hours', array( 'special_hours' => array( array( 'date' => '2026-02-30', 'is_closed' => true ) ) ) );
+
+	check_same( 400, $fhint_response->get_status(), 'a special day on a date that does not exist is refused' );
+	check_same( array( 'special_hours.date.invalid' ), $fhint_response->get_data()['data']['fields']['special_hours.day_0.date'], 'keyed to the row and field at fault' );
+	check_same( 3, count( SpecialHoursRepository::for_location( (int) $fhint_place['id'] ) ), 'leaving the stored days as they were' );
+
+	$fhint_profile_save( 'hours', array( 'special_hours' => array() ) );
+
+	check_same( 0, count( SpecialHoursRepository::for_location( (int) $fhint_place['id'] ) ), 'an empty list clears the special days' );
+	check_same( 1, count( OpeningHoursRepository::for_location( (int) $fhint_place['id'] ) ), 'without touching the week, which was not sent' );
+
+	// Social.
+	$fhint_social = $fhint_profile_save( 'social', array( 'social_profiles' => array( 'facebook' => 'https://facebook.com/profiledental' ) ) )->get_data()['data'];
+
+	check_same( array( 'https://facebook.com/profiledental' ), $fhint_social['same_as'], 'a social link is saved and listed for the markup' );
+	check_same( 400, $fhint_profile_save( 'social', array( 'social_profiles' => array( 'facebook' => 'not a link' ) ) )->get_status(), 'and one that is not a link is refused' );
+
+	// Attributes.
+	$fhint_values = $fhint_profile_save(
+		'attributes',
+		array(
+			'values' => array(
+				'has_wheelchair_accessible_entrance' => true,
+				'pay_credit_card_types_accepted'     => array( 'visa', 'mastercard' ),
+			),
+		)
+	)->get_data()['data']['values'];
+
+	check_same( 2, count( $fhint_values ), 'attribute values are stored' );
+	check_same( array( 'visa', 'mastercard' ), $fhint_values[1]['value'], 'a list survives MySQL as a list' );
+	check( $fhint_values[0]['is_dirty'] && $fhint_values[1]['is_dirty'], 'each marked as changed since the last push' );
+
+	$fhint_values = $fhint_profile_save( 'attributes', array( 'values' => array( 'has_wheelchair_accessible_entrance' => null ) ) )->get_data()['data']['values'];
+
+	check_same( array( 'pay_credit_card_types_accepted' ), array_column( $fhint_values, 'attribute_id' ), 'null withdraws one answer and leaves the others' );
+
+	// Services: the whole list, in order.
+	$fhint_items = $fhint_profile_save(
+		'services',
+		array(
+			'items' => array(
+				array(
+					'name'     => 'Teeth whitening',
+					'price'    => 320,
+					'currency' => 'USD',
+				),
+				array( 'name' => 'Check-up' ),
+			),
+		)
+	)->get_data()['data']['items'];
+
+	check_same( array( 'Teeth whitening', 'Check-up' ), array_column( $fhint_items, 'name' ), 'a list of services is created in the order sent' );
+
+	$fhint_items = $fhint_profile_save(
+		'services',
+		array(
+			'items' => array(
+				array(
+					'id'   => $fhint_items[1]['id'],
+					'name' => 'Check-up and clean',
+				),
+				array( 'name' => 'Dental implants' ),
+			),
+		)
+	)->get_data()['data']['items'];
+
+	check_same( array( 'Check-up and clean', 'Dental implants' ), array_column( $fhint_items, 'name' ), 'an entry with an id is updated, one without is created, and one left out is removed' );
+	check_same( 2, ServiceRepository::count(), 'so the stored list is exactly the list sent' );
+
+	$fhint_response = $fhint_profile_save( 'services', array( 'items' => array( array( 'name' => '' ), array( 'name' => 'Fine' ) ) ) );
+
+	check_same( 400, $fhint_response->get_status(), 'a list with one bad entry is refused whole' );
+	check( isset( $fhint_response->get_data()['data']['fields']['items.0.name'] ), 'keyed to the entry and field at fault' );
+	check_same( array( 'Check-up and clean', 'Dental implants' ), array_column( ServiceRepository::all(), 'name' ), 'and nothing is half-applied' );
+
+	$fhint_cap = static function ( $limits ) {
+		$limits['services'] = 2;
+
+		return $limits;
+	};
+
+	add_filter( 'fhint_limits', $fhint_cap );
+
+	$fhint_ids      = array_column( ServiceRepository::all(), 'id' );
+	$fhint_response = $fhint_profile_save(
+		'services',
+		array(
+			'items' => array(
+				array( 'id' => $fhint_ids[0] ),
+				array( 'id' => $fhint_ids[1] ),
+				array( 'name' => 'One too many' ),
+			),
+		)
+	);
+
+	check_same( 403, $fhint_response->get_status(), 'growing the list past the plan limit is refused' );
+	check_same( 'fhint_service_limit_reached', $fhint_response->get_data()['code'], 'with the same code /services uses' );
+	check_same(
+		200,
+		$fhint_profile_save(
+			'services',
+			array(
+				'items' => array(
+					array(
+						'id'   => $fhint_ids[0],
+						'name' => 'Check-up, clean and polish',
+					),
+					array( 'id' => $fhint_ids[1] ),
+				),
+			)
+		)->get_status(),
+		'while editing a list already at the limit is allowed'
+	);
+
+	remove_filter( 'fhint_limits', $fhint_cap );
+
+	// Photos are not a section save, and an unknown section is not a section.
+	check_same( 400, $fhint_profile_save( 'media', array( 'logo' => 'x' ) )->get_status(), 'the media section refuses a save' );
+	check_same( 400, $fhint_profile_save( 'payments', array() )->get_status(), 'a section that does not exist is refused' );
+
+	// Put things back as this block found them: the checks further down
+	// count locations and services from zero.
+	foreach ( ServiceRepository::all() as $fhint_leftover ) {
+		ServiceRepository::delete( (int) $fhint_leftover['id'] );
+	}
+
+	LocationRepository::delete( (int) $fhint_place['id'] );
+
+	wp_set_current_user( 0 );
+
+	check_same( 401, rest_do_request( new WP_REST_Request( 'GET', '/fhint/v1/profile' ) )->get_status(), 'the profile refuses a logged-out read' );
+	check_same( 401, $fhint_profile_save( 'info', array( 'name' => 'Intruder' ) )->get_status(), 'and a logged-out save' );
+
+	wp_set_current_user( $admins[0]->ID );
 
 
 	// Validation is enforced server-side regardless of what a client sent.

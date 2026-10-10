@@ -409,4 +409,47 @@ $nonsense = mapped(
 
 check_same( array(), $nonsense, 'an unknown day name leaves hours unset' );
 
+// ── how Google holds a service travels with it ──────────────────────────
+
+// A publish sends services back. A structured one must go back as the same
+// structured one, or Google would be handed a free-form service with the
+// same name and treat it as something new.
+$held = ImportMapper::from_google(
+	array(
+		'categories'   => array(
+			'primaryCategory' => array(
+				'displayName'  => 'Dentist',
+				'serviceTypes' => array(
+					array(
+						'serviceTypeId' => 'job_type_id:teeth_whitening',
+						'displayName'   => 'Teeth whitening',
+					),
+				),
+			),
+		),
+		'serviceItems' => array(
+			array(
+				'structuredServiceItem' => array( 'serviceTypeId' => 'job_type_id:teeth_whitening' ),
+				'price'                 => array(
+					'currencyCode' => 'USD',
+					'units'        => '320',
+				),
+			),
+			array(
+				'freeFormServiceItem' => array(
+					'category' => 'categories/gcid:dentist',
+					'label'    => array( 'displayName' => 'Emergency callout' ),
+				),
+			),
+		),
+	),
+	array()
+)['services'];
+
+check_same( 'structured', $held[0]['google_item_type'], 'a service Google publishes for the category is remembered as structured' );
+check_same( 'job_type_id:teeth_whitening', $held[0]['google_service_type_id'], 'with the id a publish must send back' );
+check_same( 320.0, $held[0]['price'], 'and its price, read from the service item where Google documents it' );
+check_same( 'free_form', $held[1]['google_item_type'], 'a service the owner wrote is remembered as free-form' );
+check_same( '', $held[1]['google_service_type_id'], 'and has no type id' );
+
 finish( 'Google import' );

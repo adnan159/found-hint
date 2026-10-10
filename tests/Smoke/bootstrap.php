@@ -211,6 +211,9 @@ function wp_remote_post( $url, $args = array() ) {
 function wp_remote_get( $url, $args = array() ) {
 	return __http( 'GET', $url, $args );
 }
+function wp_remote_request( $url, $args = array() ) {
+	return __http( isset( $args['method'] ) ? strtoupper( (string) $args['method'] ) : 'GET', $url, $args );
+}
 function __http( $method, $url, $args ) {
 	$GLOBALS['__http_requests'][] = array(
 		'method' => $method,

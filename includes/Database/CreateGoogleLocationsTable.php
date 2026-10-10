@@ -44,6 +44,9 @@ defined( 'ABSPATH' ) || exit;
  *                            column covers yet. Read-only to everything but
  *                            the sync.
  * @column synced_at          When Google last answered, UTC.
+ * @column pushed_at          When this site last changed the listing, UTC. Not
+ *                            the same claim as synced_at: one is "we read
+ *                            Google", the other "your changes reached it".
  * @column created_at         Row creation timestamp, UTC.
  * @column updated_at         Last write timestamp, UTC.
  */
@@ -74,6 +77,7 @@ class CreateGoogleLocationsTable {
 	cid varchar(50) NOT NULL default '',
 	payload longtext NULL,
 	synced_at datetime NULL,
+	pushed_at datetime NULL,
 	created_at datetime NULL,
 	updated_at datetime NULL,
 	PRIMARY KEY  (id),

@@ -123,6 +123,23 @@ class GoogleLocationRepository {
 	}
 
 	/**
+	 * Record that this site has just changed the listing.
+	 *
+	 * @param string $location_name Google location resource name.
+	 * @return bool
+	 */
+	public static function mark_pushed( $location_name ) {
+		global $wpdb;
+
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+		return false !== $wpdb->update(
+			Tables::name( Tables::GOOGLE_LOCATIONS ),
+			array( 'pushed_at' => current_time( 'mysql', true ) ),
+			array( 'location_name' => (string) $location_name )
+		);
+	}
+
+	/**
 	 * Point one of our locations at a Google location.
 	 *
 	 * One-to-one in both directions: any previous claim on either side is
@@ -262,6 +279,7 @@ class GoogleLocationRepository {
 			'website'           => isset( $row['website'] ) ? (string) $row['website'] : '',
 			'verification_state' => isset( $row['verification_state'] ) ? (string) $row['verification_state'] : '',
 			'cid'                => isset( $row['cid'] ) ? (string) $row['cid'] : '',
+			'pushed_at'          => isset( $row['pushed_at'] ) && $row['pushed_at'] ? (string) $row['pushed_at'] : '',
 			'synced_at'         => isset( $row['synced_at'] ) ? (string) $row['synced_at'] : '',
 		);
 	}

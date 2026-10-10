@@ -60,6 +60,44 @@ class Client {
 	}
 
 	/**
+	 * PATCH a Google API URL with a JSON body, as the connected account.
+	 *
+	 * The one way this plugin changes anything on Google. It takes the same
+	 * single retry as a read when Google rejects the token — an access token
+	 * that expired between two steps of a publish should not fail the second.
+	 * Nothing else is retried: a write that Google refused is refused, and
+	 * sending it again would not be asking a different question.
+	 *
+	 * @param string $url   Absolute URL.
+	 * @param array  $query Query parameters, e.g. the update mask.
+	 * @param array  $body  Request body, sent as JSON.
+	 * @return array|WP_Error Decoded response body.
+	 */
+	public static function patch( $url, array $query, array $body ) {
+		$token = Connection::access_token();
+
+		if ( is_wp_error( $token ) ) {
+			return $token;
+		}
+
+		$result = self::request( $url, $query, $token, 'PATCH', $body );
+
+		if ( ! self::is_unauthorized( $result ) ) {
+			return $result;
+		}
+
+		Tokens::expire();
+
+		$token = Connection::access_token();
+
+		if ( is_wp_error( $token ) ) {
+			return $token;
+		}
+
+		return self::request( $url, $query, $token, 'PATCH', $body );
+	}
+
+	/**
 	 * Whether a result is an authorisation failure worth one retry.
 	 *
 	 * @param array|WP_Error $result Result of a request.
@@ -76,28 +114,37 @@ class Client {
 	}
 
 	/**
-	 * One GET.
+	 * One request.
 	 *
-	 * @param string $url   Absolute URL.
-	 * @param array  $query Query parameters.
-	 * @param string $token Access token.
+	 * @param string     $url    Absolute URL.
+	 * @param array      $query  Query parameters.
+	 * @param string     $token  Access token.
+	 * @param string     $method GET or PATCH.
+	 * @param array|null $body   Body for a write, sent as JSON.
 	 * @return array|WP_Error
 	 */
-	private static function request( $url, array $query, $token ) {
+	private static function request( $url, array $query, $token, $method = 'GET', $body = null ) {
 		if ( $query ) {
 			$url .= ( false === strpos( $url, '?' ) ? '?' : '&' ) . http_build_query( $query );
 		}
 
-		$response = wp_remote_get(
-			$url,
-			array(
-				'timeout' => 20,
-				'headers' => array(
-					'Authorization' => 'Bearer ' . $token,
-					'Accept'        => 'application/json',
-				),
-			)
+		$args = array(
+			'timeout' => 20,
+			'headers' => array(
+				'Authorization' => 'Bearer ' . $token,
+				'Accept'        => 'application/json',
+			),
 		);
+
+		if ( 'GET' === $method ) {
+			$response = wp_remote_get( $url, $args );
+		} else {
+			$args['method']                  = $method;
+			$args['headers']['Content-Type'] = 'application/json';
+			$args['body']                    = wp_json_encode( null === $body ? array() : $body );
+
+			$response = wp_remote_request( $url, $args );
+		}
 
 		if ( is_wp_error( $response ) ) {
 			return new WP_Error(
@@ -119,9 +166,14 @@ class Client {
 			'fhint_google_request_failed',
 			self::describe( $status, $decoded ),
 			array(
-				'status'      => 502,
-				'http_status' => $status,
-				'reason'      => isset( $decoded['error']['status'] ) ? (string) $decoded['error']['status'] : '',
+				'status'         => 502,
+				'http_status'    => $status,
+				'reason'         => isset( $decoded['error']['status'] ) ? (string) $decoded['error']['status'] : '',
+				// What Google itself said, kept for a refused write: "the
+				// description is too long" is something an owner can act on,
+				// and a general "Google refused the request" is not.
+				'google_message' => isset( $decoded['error']['message'] ) ? (string) $decoded['error']['message'] : '',
+				'google_details' => isset( $decoded['error']['details'] ) && is_array( $decoded['error']['details'] ) ? $decoded['error']['details'] : array(),
 			)
 		);
 	}

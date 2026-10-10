@@ -29,6 +29,72 @@ const MESSAGES = {
       "That category is too long — 150 characters at most.",
       "foundhint-local-seo",
     ),
+  "business.description.too_long": () =>
+    __(
+      "That description is too long. Google allows 750 characters.",
+      "foundhint-local-seo",
+    ),
+  "business.description.has_link": () =>
+    __(
+      "Your description has a web link in it. Google does not allow links here, so please remove it.",
+      "foundhint-local-seo",
+    ),
+  "special_hours.date.invalid": () =>
+    __("Choose a real date for this day.", "foundhint-local-seo"),
+  "special_hours.date.duplicate": () =>
+    __(
+      "That date is already in the list. Edit the existing entry instead.",
+      "foundhint-local-seo",
+    ),
+  "attributes.value.invalid": () =>
+    __("That is not a value Google accepts here.", "foundhint-local-seo"),
+  "service.not_found": () =>
+    __(
+      "That service no longer exists. Reload the page and try again.",
+      "foundhint-local-seo",
+    ),
+  "service.duplicate": () =>
+    __("That service is in the list twice.", "foundhint-local-seo"),
+  "service.invalid": () =>
+    __("That service could not be read.", "foundhint-local-seo"),
+  "services.items.invalid": () =>
+    __("The list of services could not be read.", "foundhint-local-seo"),
+  "google.profile_description_contains_url": () =>
+    __(
+      "Google does not allow a web link in the description.",
+      "foundhint-local-seo",
+    ),
+  "google.string_too_long": () =>
+    __("Google says this is too long.", "foundhint-local-seo"),
+  "google.invalid_category": () =>
+    __("Google does not recognise that category.", "foundhint-local-seo"),
+  "google.invalid_url": () =>
+    __(
+      "Google could not accept that web address. Check it opens in a browser.",
+      "foundhint-local-seo",
+    ),
+  "google.invalid_value": () =>
+    __("Google did not accept this value.", "foundhint-local-seo"),
+  "business.category_id.unknown": () =>
+    __(
+      "Google does not have that category. Choose one from the list.",
+      "foundhint-local-seo",
+    ),
+  "business.categories.unknown": () =>
+    __(
+      "One of those categories is not on Google's list. Choose each one from the suggestions.",
+      "foundhint-local-seo",
+    ),
+  "business.categories.too_many": () =>
+    __(
+      "Google allows 9 extra categories at most. Remove one to add another.",
+      "foundhint-local-seo",
+    ),
+  "business.categories.includes_primary": () =>
+    __(
+      "Your main category is already counted. Remove it from the extra categories.",
+      "foundhint-local-seo",
+    ),
   "business.email.invalid": () =>
     __("That does not look like an email address.", "foundhint-local-seo"),
   "business.phone.invalid": () =>

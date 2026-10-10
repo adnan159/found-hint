@@ -364,24 +364,49 @@ function parse_options( array $options ): array {
  * @author Justin Slamka <jslamka5685@gmail.com>
  * @since 0.4.0
  * @since 0.6.1 Normalize paths so they work on Windows as well.
+ * @since 0.6.2 Resolved through plugin_dir_url() instead of rewriting a path
+ *              by hand, which assumed a fixed name for the content directory.
  *
  * @param string $dir Asset directory.
  *
- * @return string
+ * @return string Asset directory URL, without a trailing slash.
  */
 function prepare_asset_url( string $dir ) {
-	$content_dir         = wp_normalize_path( WP_CONTENT_DIR );
-	$manifest_dir        = wp_normalize_path( $dir );
-	$url                 = content_url( str_replace( $content_dir, '', $manifest_dir ) );
-	$url_matches_pattern = preg_match( '/(?<address>http(?:s?):\/\/.*\/)(?<fullPath>wp-content(?<removablePath>\/.*)\/(?:plugins|themes)\/.*)/', $url, $url_parts );
+	$dir = wp_normalize_path( $dir );
 
-	if ( $url_matches_pattern === 0 ) {
-		return $url;
+	/*
+	 * This library ships inside a plugin, so the plugin's own directory is
+	 * the only anchor needed — and `plugin_dir_url()` is the one thing that
+	 * answers correctly for every layout WordPress supports: a renamed
+	 * content directory, a relocated plugins directory, symlinked plugins,
+	 * multisite.
+	 *
+	 * The previous implementation turned the filesystem path into a URL by
+	 * hand and then matched a fixed directory name with a regular expression.
+	 * On a site whose content directory is called anything else, that match
+	 * failed and the asset URL came out wrong — which is a blank admin
+	 * screen, not a cosmetic problem.
+	 */
+	$plugin_path = wp_normalize_path( dirname( __DIR__ ) );
+	$plugin_url  = untrailingslashit( dirname( untrailingslashit( plugin_dir_url( __FILE__ ) ) ) );
+
+	if ( 0 === strpos( $dir . '/', $plugin_path . '/' ) ) {
+		$relative = trim( substr( $dir, strlen( $plugin_path ) ), '/' );
+
+		return '' === $relative ? $plugin_url : $plugin_url . '/' . $relative;
 	}
 
-	['address' => $address, 'fullPath' => $full_path, 'removablePath' => $removable_path] = $url_parts;
+	/*
+	 * Nothing in this plugin asks for a directory outside itself. Guessing a
+	 * URL for one would mean reintroducing exactly the assumption above, so
+	 * it says so loudly while developing and stays quiet in production
+	 * rather than enqueueing a URL that resolves to nothing.
+	 */
+	if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
+		wp_die( esc_html( sprintf( '[Vite] Asset directory %s is outside the plugin.', $dir ) ) );
+	}
 
-	return sprintf( '%s%s', $address, str_replace( $removable_path, '', $full_path ) );
+	return '';
 }
 
 /**

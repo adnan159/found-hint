@@ -10,7 +10,8 @@
     "plugin:prepare": "npm run build && npm run i18n && node scripts/build.cjs && npm run plugin:vendor",
     "plugin:publish": "npm run plugin:prepare && node scripts/zip.cjs",
     "plugin:vendor": "composer install --no-dev --optimize-autoloader --classmap-authoritative --working-dir=build --quiet",
-    "i18n": "node scripts/make-pot.cjs"
+    "i18n": "node scripts/make-pot.cjs",
+    "categories:update": "node scripts/update-google-categories.cjs"
   },
   "buildExclude": [
     "node_modules",

@@ -21,7 +21,7 @@ msgstr ""
 msgid "Some of the submitted values are not valid."
 msgstr ""
 
-#: includes/API/AbstractController.php:113
+#: includes/API/AbstractController.php:113 includes/App/Profile/Profile.php:188
 msgid "Create the business profile first."
 msgstr ""
 
@@ -29,11 +29,11 @@ msgstr ""
 msgid "That item could not be found."
 msgstr ""
 
-#: includes/API/AbstractController.php:140
+#: includes/API/AbstractController.php:140 includes/App/Profile/Profile.php:201
 msgid "The changes could not be saved."
 msgstr ""
 
-#: includes/API/AbstractController.php:157
+#: includes/API/AbstractController.php:157 includes/App/Profile/Sections/Services.php:154
 msgid "This plan allows up to %d of these."
 msgstr ""
 
@@ -49,11 +49,11 @@ msgstr ""
 msgid "None of those services belong to this business."
 msgstr ""
 
-#: includes/Admin/Menu.php:55 includes/Admin/Menu.php:56 src/admin/components/PageHeader.jsx:27 src/admin/layouts/root/components/Sidebar.jsx:327 src/admin/layouts/root/components/Sidebar.jsx:343 src/admin/pages/setup/components/WizardShell.jsx:44
+#: includes/Admin/Menu.php:55 includes/Admin/Menu.php:56 src/admin/components/PageHeader.jsx:27 src/admin/layouts/root/components/Sidebar.jsx:341 src/admin/layouts/root/components/Sidebar.jsx:357 src/admin/pages/setup/components/WizardShell.jsx:44
 msgid "FoundHint"
 msgstr ""
 
-#: includes/Admin.php:42 src/admin/layouts/root/components/Sidebar.jsx:115 src/admin/pages/settings/index.jsx:87 src/admin/pages/settings/index.jsx:96
+#: includes/Admin.php:42 src/admin/layouts/root/components/Sidebar.jsx:129 src/admin/pages/settings/index.jsx:87 src/admin/pages/settings/index.jsx:96
 msgid "Settings"
 msgstr ""
 
@@ -85,7 +85,7 @@ msgstr ""
 msgid "Several locations exist and none is marked as the main one. Choose which represents the business."
 msgstr ""
 
-#: includes/App/Audit/Rules/BusinessDescription.php:70 src/admin/lib/errors.js:162
+#: includes/App/Audit/Rules/BusinessDescription.php:70 src/admin/lib/errors.js:228
 msgid "No description."
 msgstr ""
 
@@ -97,7 +97,7 @@ msgstr ""
 msgid "Describe what you do in a sentence or two."
 msgstr ""
 
-#: includes/App/Audit/Rules/BusinessLogo.php:62 src/admin/lib/errors.js:160
+#: includes/App/Audit/Rules/BusinessLogo.php:62 src/admin/lib/errors.js:226
 msgid "No logo."
 msgstr ""
 
@@ -113,7 +113,7 @@ msgstr ""
 msgid "Add the name customers know you by on the Business screen."
 msgstr ""
 
-#: includes/App/Audit/Rules/BusinessPhone.php:71 src/admin/lib/errors.js:157
+#: includes/App/Audit/Rules/BusinessPhone.php:71 src/admin/lib/errors.js:223
 msgid "No phone number."
 msgstr ""
 
@@ -187,7 +187,7 @@ msgid_plural "%d days have no answer."
 msgstr[0] ""
 msgstr[1] ""
 
-#: includes/App/Audit/Rules/HoursSet.php:79 src/admin/lib/errors.js:165
+#: includes/App/Audit/Rules/HoursSet.php:79 src/admin/lib/errors.js:231
 msgid "No opening hours set."
 msgstr ""
 
@@ -211,7 +211,7 @@ msgstr ""
 msgid "A street, a city and a country are the minimum a search engine needs."
 msgstr ""
 
-#: includes/App/Audit/Rules/LocationCoordinates.php:66 src/admin/lib/errors.js:163
+#: includes/App/Audit/Rules/LocationCoordinates.php:66 src/admin/lib/errors.js:229
 msgid "No map coordinates."
 msgstr ""
 
@@ -271,7 +271,7 @@ msgstr ""
 msgid "Add at least one. They are published as corroborating links for the same business."
 msgstr ""
 
-#: includes/App/Audit/Rules/WebsiteAddress.php:70 src/admin/lib/errors.js:159
+#: includes/App/Audit/Rules/WebsiteAddress.php:70 src/admin/lib/errors.js:225
 msgid "No website address."
 msgstr ""
 
@@ -311,31 +311,31 @@ msgstr ""
 msgid "This is a fault in the check itself, not in your business details."
 msgstr ""
 
-#: includes/App/Google/Client.php:105 includes/App/Google/OAuth.php:281
+#: includes/App/Google/Client.php:152 includes/App/Google/OAuth.php:281
 msgid "Google could not be reached. Please try again."
 msgstr ""
 
-#: includes/App/Google/Client.php:146
+#: includes/App/Google/Client.php:198
 msgid "Google refused the request. The Business Profile APIs have to be enabled for your Google Cloud project, and Google has to approve your project for them before they return anything."
 msgstr ""
 
-#: includes/App/Google/Client.php:154
+#: includes/App/Google/Client.php:206
 msgid "Google rejected the sign-in. Connect again."
 msgstr ""
 
-#: includes/App/Google/Client.php:161
+#: includes/App/Google/Client.php:213
 msgid "Google refused the request."
 msgstr ""
 
-#: includes/App/Google/Client.php:186
+#: includes/App/Google/Client.php:238
 msgid "Google has granted this project no quota for the Business Profile APIs, which means it has not been approved for them yet. Approval is a separate request to Google — waiting will not change this."
 msgstr ""
 
-#: includes/App/Google/Client.php:190
+#: includes/App/Google/Client.php:242
 msgid "Google is rate limiting this project. Wait a few minutes and try again."
 msgstr ""
 
-#: includes/App/Google/Client.php:193
+#: includes/App/Google/Client.php:245
 msgid "Google refused the request as over quota. On a new project this normally means Google has not approved it for the Business Profile APIs yet; on an approved one it means too many requests just now."
 msgstr ""
 
@@ -459,23 +459,23 @@ msgstr ""
 msgid "The location could not be created from Google\\'s address."
 msgstr ""
 
-#: includes/App/Google/Import.php:582
+#: includes/App/Google/Import.php:584
 msgid "Already set"
 msgstr ""
 
-#: includes/App/Google/Import.php:613
+#: includes/App/Google/Import.php:615
 msgid "%1$d from Google: %2$s"
 msgstr ""
 
-#: includes/App/Google/Import.php:649
+#: includes/App/Google/Import.php:651
 msgid "%1$s → %2$s"
 msgstr ""
 
-#: includes/App/Google/Import.php:826
+#: includes/App/Google/Import.php:828
 msgid "%1$d days with hours, %2$d closed"
 msgstr ""
 
-#: includes/App/Google/Import.php:623 src/admin/layouts/root/index.jsx:38
+#: includes/App/Google/Import.php:625 src/admin/layouts/root/index.jsx:38
 msgid "%d service"
 msgid_plural "%d services"
 msgstr[0] ""
@@ -541,11 +541,11 @@ msgstr ""
 msgid "Google refused the request. Please try connecting again."
 msgstr ""
 
-#: includes/App/Google/Profiles.php:97 src/admin/pages/google/components/BusinessProfiles.jsx:49
+#: includes/App/Google/Profiles.php:97 includes/App/Review/ReviewSync.php:91 src/admin/pages/google/components/BusinessProfiles.jsx:49
 msgid "Read %1$s across %2$s."
 msgstr ""
 
-#: includes/App/Google/Profiles.php:100 src/admin/layouts/root/index.jsx:33 src/admin/pages/google/components/BusinessProfiles.jsx:52
+#: includes/App/Google/Profiles.php:100 includes/App/Review/ReviewSync.php:99 src/admin/layouts/root/index.jsx:33 src/admin/pages/google/components/BusinessProfiles.jsx:52
 msgid "%d location"
 msgid_plural "%d locations"
 msgstr[0] ""
@@ -557,9 +557,67 @@ msgid_plural "%d accounts"
 msgstr[0] ""
 msgstr[1] ""
 
+#: includes/App/Google/Push/Publisher.php:86
+msgid "Planned a publish: %1$d steps, %2$d fields left alone."
+msgstr ""
+
+#: includes/App/Google/Push/Publisher.php:120
+msgid "That is not a step of a publish."
+msgstr ""
+
+#: includes/App/Google/Push/Publisher.php:128
+msgid "Google cannot check links and attributes without saving them."
+msgstr ""
+
+#: includes/App/Google/Push/Publisher.php:172
+msgid "There is nothing left to send for this step. Google already has it."
+msgstr ""
+
+#: includes/App/Google/Push/Publisher.php:180
+msgid "Your profile or your Google listing has changed since this was prepared. Review the changes again before publishing."
+msgstr ""
+
+#: includes/App/Google/Push/Publisher.php:248
+msgid "Published changes to the Google Business Profile."
+msgstr ""
+
+#: includes/App/Google/Push/Publisher.php:325
+msgid "Google did not accept some of these values. Nothing was changed on your listing."
+msgstr ""
+
+#: includes/App/Google/Push/Publisher.php:418
+msgid "Connect your Google account before publishing."
+msgstr ""
+
+#: includes/App/Google/Push/Publisher.php:432
+msgid "Choose which Google Business Profile this location is before publishing."
+msgstr ""
+
 #: includes/App/Google/Tokens.php:184
 msgid "This server has no libsodium, so Google tokens are stored without encryption."
 msgstr ""
+
+#: includes/App/Profile/Profile.php:85
+msgid "That is not a section of the profile."
+msgstr ""
+
+#: includes/App/Profile/Sections/Address.php:74
+msgid "This address comes from your Google Business Profile. Change it on Google and it will be picked up here."
+msgstr ""
+
+#: includes/App/Profile/Sections/Media.php:73
+msgid "Photos are added by uploading them, not by saving this section."
+msgstr ""
+
+#: includes/App/Review/ReviewSync.php:65
+msgid "There are no Google locations to read reviews for yet. Read your Google profile first."
+msgstr ""
+
+#: includes/App/Review/ReviewSync.php:94
+msgid "%d review"
+msgid_plural "%d reviews"
+msgstr[0] ""
+msgstr[1] ""
 
 #: src/admin/components/GoogleSignInButton.jsx:47 src/admin/pages/google/index.jsx:600
 msgid "Continue with Google"
@@ -629,55 +687,67 @@ msgstr ""
 msgid "What to fix"
 msgstr ""
 
-#: src/admin/layouts/root/components/Sidebar.jsx:89
+#: src/admin/layouts/root/components/Sidebar.jsx:89 src/admin/pages/reviews/index.jsx:202 src/admin/pages/reviews/index.jsx:231 src/admin/pages/reviews/index.jsx:277
+msgid "Reviews"
+msgstr ""
+
+#: src/admin/layouts/root/components/Sidebar.jsx:93 src/admin/pages/reviews/index.jsx:249
+msgid "At a glance"
+msgstr ""
+
+#: src/admin/layouts/root/components/Sidebar.jsx:97 src/admin/pages/reviews/index.jsx:296
+msgid "Every review"
+msgstr ""
+
+#: src/admin/layouts/root/components/Sidebar.jsx:103
 msgid "Google"
 msgstr ""
 
-#: src/admin/layouts/root/components/Sidebar.jsx:93 src/admin/pages/google/index.jsx:428
+#: src/admin/layouts/root/components/Sidebar.jsx:107 src/admin/pages/google/index.jsx:428
 msgid "Google client"
 msgstr ""
 
-#: src/admin/layouts/root/components/Sidebar.jsx:97 src/admin/pages/google/index.jsx:544
+#: src/admin/layouts/root/components/Sidebar.jsx:111 src/admin/pages/google/index.jsx:544
 msgid "Connection"
 msgstr ""
 
-#: src/admin/layouts/root/components/Sidebar.jsx:101 src/admin/pages/google/components/BusinessProfiles.jsx:104
+#: src/admin/layouts/root/components/Sidebar.jsx:115 src/admin/pages/google/components/BusinessProfiles.jsx:104
 msgid "Business profiles"
 msgstr ""
 
-#: src/admin/layouts/root/components/Sidebar.jsx:105 src/admin/pages/google/components/LocationMapping.jsx:173
+#: src/admin/layouts/root/components/Sidebar.jsx:119 src/admin/pages/google/components/LocationMapping.jsx:173
 msgid "Location mapping"
 msgstr ""
 
-#: src/admin/layouts/root/components/Sidebar.jsx:109 src/admin/pages/google/components/ImportFromGoogle.jsx:170
+#: src/admin/layouts/root/components/Sidebar.jsx:123 src/admin/pages/google/components/ImportFromGoogle.jsx:170
 msgid "Import from Google"
 msgstr ""
 
-#: src/admin/layouts/root/components/Sidebar.jsx:119 src/admin/pages/settings/index.jsx:111
+#: src/admin/layouts/root/components/Sidebar.jsx:133 src/admin/pages/settings/index.jsx:111
 msgid "Your data"
 msgstr ""
 
-#: src/admin/layouts/root/components/Sidebar.jsx:123 src/admin/pages/settings/index.jsx:148
+#: src/admin/layouts/root/components/Sidebar.jsx:137 src/admin/pages/settings/index.jsx:148
 msgid "Activity log"
 msgstr ""
 
-#: src/admin/layouts/root/components/Sidebar.jsx:127 src/admin/pages/settings/index.jsx:231
+#: src/admin/layouts/root/components/Sidebar.jsx:141 src/admin/pages/settings/index.jsx:231
 msgid "System"
 msgstr ""
 
-#: src/admin/layouts/root/components/Sidebar.jsx:288
+#: src/admin/layouts/root/components/Sidebar.jsx:302
 msgid "Collapse section list"
 msgstr ""
 
-#: src/admin/layouts/root/components/Sidebar.jsx:289
+#: src/admin/layouts/root/components/Sidebar.jsx:303
 msgid "Expand section list"
 msgstr ""
 
-#: src/admin/layouts/root/components/Sidebar.jsx:346
+#: src/admin/layouts/root/components/Sidebar.jsx:360
 msgid "Local SEO"
 msgstr ""
 
-#: src/admin/layouts/root/components/Sidebar.jsx:376
+#: src/admin/layouts/root/components/Sidebar.jsx:390
 msgid "FoundHint Free"
 msgstr ""
 
@@ -691,7 +761,7 @@ msgstr[1] ""
 msgid "Enter the name customers know you by."
 msgstr ""
 
-#: src/admin/lib/errors.js:16 src/admin/lib/errors.js:60 src/admin/lib/errors.js:105
+#: src/admin/lib/errors.js:16 src/admin/lib/errors.js:126 src/admin/lib/errors.js:171
 msgid "That name is too long — 255 characters at most."
 msgstr ""
 
@@ -707,171 +777,243 @@ msgstr ""
 msgid "That category is too long — 150 characters at most."
 msgstr ""
 
-#: src/admin/lib/errors.js:33 src/admin/lib/errors.js:76
-msgid "That does not look like an email address."
+#: src/admin/lib/errors.js:33
+msgid "That description is too long. Google allows 750 characters."
 msgstr ""
 
-#: src/admin/lib/errors.js:35 src/admin/lib/errors.js:78
-msgid "That does not look like a phone number."
+#: src/admin/lib/errors.js:38
+msgid "Your description has a web link in it. Google does not allow links here, so please remove it."
 msgstr ""
 
-#: src/admin/lib/errors.js:37 src/admin/lib/errors.js:80 src/admin/lib/errors.js:124
-msgid "Enter a full web address, starting with https://"
+#: src/admin/lib/errors.js:43
+msgid "Choose a real date for this day."
 msgstr ""
 
-#: src/admin/lib/errors.js:42 src/admin/lib/errors.js:129
-msgid "Enter a full image address, starting with https://"
+#: src/admin/lib/errors.js:45
+msgid "That date is already in the list. Edit the existing entry instead."
 msgstr ""
 
-#: src/admin/lib/errors.js:47
-msgid "Keep the price range short, like $$."
+#: src/admin/lib/errors.js:50
+msgid "That is not a value Google accepts here."
 msgstr ""
 
-#: src/admin/lib/errors.js:49
-msgid "Enter a real date in YYYY-MM-DD form."
+#: src/admin/lib/errors.js:52
+msgid "That service no longer exists. Reload the page and try again."
 msgstr ""
 
-#: src/admin/lib/errors.js:51
-msgid "Enter the full profile address, starting with https://"
+#: src/admin/lib/errors.js:57
+msgid "That service is in the list twice."
 msgstr ""
 
-#: src/admin/lib/errors.js:58
-msgid "Give this location a name, such as Downtown."
+#: src/admin/lib/errors.js:59
+msgid "That service could not be read."
 msgstr ""
 
-#: src/admin/lib/errors.js:65
-msgid "That is too long — 255 characters at most."
+#: src/admin/lib/errors.js:61
+msgid "The list of services could not be read."
 msgstr ""
 
-#: src/admin/lib/errors.js:67
-msgid "Use a two-letter country code, such as US or BD."
+#: src/admin/lib/errors.js:63
+msgid "Google does not allow a web link in the description."
+msgstr ""
+
+#: src/admin/lib/errors.js:68
+msgid "Google says this is too long."
+msgstr ""
+
+#: src/admin/lib/errors.js:70
+msgid "Google does not recognise that category."
 msgstr ""
 
 #: src/admin/lib/errors.js:72
+msgid "Google could not accept that web address. Check it opens in a browser."
+msgstr ""
+
+#: src/admin/lib/errors.js:77
+msgid "Google did not accept this value."
+msgstr ""
+
+#: src/admin/lib/errors.js:79
+msgid "Google does not have that category. Choose one from the list."
+msgstr ""
+
+#: src/admin/lib/errors.js:84
+msgid "One of those categories is not on Google's list. Choose each one from the suggestions."
+msgstr ""
+
+#: src/admin/lib/errors.js:89
+msgid "Google allows 9 extra categories at most. Remove one to add another."
+msgstr ""
+
+#: src/admin/lib/errors.js:94
+msgid "Your main category is already counted. Remove it from the extra categories."
+msgstr ""
+
+#: src/admin/lib/errors.js:99 src/admin/lib/errors.js:142
+msgid "That does not look like an email address."
+msgstr ""
+
+#: src/admin/lib/errors.js:101 src/admin/lib/errors.js:144
+msgid "That does not look like a phone number."
+msgstr ""
+
+#: src/admin/lib/errors.js:103 src/admin/lib/errors.js:146 src/admin/lib/errors.js:190
+msgid "Enter a full web address, starting with https://"
+msgstr ""
+
+#: src/admin/lib/errors.js:108 src/admin/lib/errors.js:195
+msgid "Enter a full image address, starting with https://"
+msgstr ""
+
+#: src/admin/lib/errors.js:113
+msgid "Keep the price range short, like $$."
+msgstr ""
+
+#: src/admin/lib/errors.js:115
+msgid "Enter a real date in YYYY-MM-DD form."
+msgstr ""
+
+#: src/admin/lib/errors.js:117
+msgid "Enter the full profile address, starting with https://"
+msgstr ""
+
+#: src/admin/lib/errors.js:124
+msgid "Give this location a name, such as Downtown."
+msgstr ""
+
+#: src/admin/lib/errors.js:131
+msgid "That is too long — 255 characters at most."
+msgstr ""
+
+#: src/admin/lib/errors.js:133
+msgid "Use a two-letter country code, such as US or BD."
+msgstr ""
+
+#: src/admin/lib/errors.js:138
 msgid "Latitude must be between -90 and 90."
 msgstr ""
 
-#: src/admin/lib/errors.js:74
+#: src/admin/lib/errors.js:140
 msgid "Longitude must be between -180 and 180."
 msgstr ""
 
-#: src/admin/lib/errors.js:85
+#: src/admin/lib/errors.js:151
 msgid "Choose a time zone from the list."
 msgstr ""
 
-#: src/admin/lib/errors.js:87 src/admin/lib/errors.js:134
+#: src/admin/lib/errors.js:153 src/admin/lib/errors.js:200
 msgid "Choose a status from the list."
 msgstr ""
 
-#: src/admin/lib/errors.js:91
+#: src/admin/lib/errors.js:157
 msgid "That is not a valid day."
 msgstr ""
 
-#: src/admin/lib/errors.js:93
+#: src/admin/lib/errors.js:159
 msgid "Add an opening time, or mark the day closed."
 msgstr ""
 
-#: src/admin/lib/errors.js:95
+#: src/admin/lib/errors.js:161
 msgid "Add a closing time, or mark the day closed."
 msgstr ""
 
-#: src/admin/lib/errors.js:97
+#: src/admin/lib/errors.js:163
 msgid "Opening and closing time cannot be the same."
 msgstr ""
 
-#: src/admin/lib/errors.js:99
+#: src/admin/lib/errors.js:165
 msgid "These times overlap each other."
 msgstr ""
 
-#: src/admin/lib/errors.js:103
+#: src/admin/lib/errors.js:169
 msgid "Give this service a name."
 msgstr ""
 
-#: src/admin/lib/errors.js:110
+#: src/admin/lib/errors.js:176
 msgid "A service needs a URL slug."
 msgstr ""
 
-#: src/admin/lib/errors.js:112
+#: src/admin/lib/errors.js:178
 msgid "That slug is too long — 200 characters at most."
 msgstr ""
 
-#: src/admin/lib/errors.js:116
+#: src/admin/lib/errors.js:182
 msgid "Enter a number."
 msgstr ""
 
-#: src/admin/lib/errors.js:118
+#: src/admin/lib/errors.js:184
 msgid "A price cannot be negative."
 msgstr ""
 
-#: src/admin/lib/errors.js:120
+#: src/admin/lib/errors.js:186
 msgid "Choose a currency for this price."
 msgstr ""
 
-#: src/admin/lib/errors.js:122
+#: src/admin/lib/errors.js:188
 msgid "Use a three-letter currency code, such as USD."
 msgstr ""
 
-#: src/admin/lib/errors.js:139
+#: src/admin/lib/errors.js:205
 msgid "Add your business details before publishing markup."
 msgstr ""
 
-#: src/admin/lib/errors.js:144
+#: src/admin/lib/errors.js:210
 msgid "Add a location before publishing markup."
 msgstr ""
 
-#: src/admin/lib/errors.js:146
+#: src/admin/lib/errors.js:212
 msgid "A business name is required."
 msgstr ""
 
-#: src/admin/lib/errors.js:148
+#: src/admin/lib/errors.js:214
 msgid "The address needs a street, a city and a country at least."
 msgstr ""
 
-#: src/admin/lib/errors.js:153
+#: src/admin/lib/errors.js:219
 msgid "This location is marked permanently closed, so nothing is published for it."
 msgstr ""
 
-#: src/admin/lib/errors.js:230
+#: src/admin/lib/errors.js:296
 msgid "Your session has expired. Reload the page and sign in."
 msgstr ""
 
-#: src/admin/lib/errors.js:235
+#: src/admin/lib/errors.js:301
 msgid "You do not have permission to change this."
 msgstr ""
 
-#: src/admin/lib/errors.js:237
+#: src/admin/lib/errors.js:303
 msgid "Add your business details first."
 msgstr ""
 
-#: src/admin/lib/errors.js:239
+#: src/admin/lib/errors.js:305
 msgid "That location no longer exists."
 msgstr ""
 
-#: src/admin/lib/errors.js:241
+#: src/admin/lib/errors.js:307
 msgid "That service no longer exists."
 msgstr ""
 
-#: src/admin/lib/errors.js:243
+#: src/admin/lib/errors.js:309
 msgid "The changes could not be saved. Try again."
 msgstr ""
 
-#: src/admin/lib/errors.js:245
+#: src/admin/lib/errors.js:311
 msgid "Nothing to reorder."
 msgstr ""
 
-#: src/admin/lib/errors.js:247
+#: src/admin/lib/errors.js:313
 msgid "Check the highlighted fields and try again."
 msgstr ""
 
-#: src/admin/lib/errors.js:257
+#: src/admin/lib/errors.js:323
 msgid "Your plan includes %d location."
 msgstr ""
 
-#: src/admin/lib/errors.js:265
+#: src/admin/lib/errors.js:331
 msgid "Your plan includes %d services."
 msgstr ""
 
-#: src/admin/lib/errors.js:272
+#: src/admin/lib/errors.js:338
 msgid "Something went wrong. Try again."
 msgstr ""
 
@@ -1293,7 +1435,7 @@ msgstr ""
 msgid "Reconnect with Google"
 msgstr ""
 
-#: src/admin/pages/dashboard/components/GoogleCard.jsx:138 src/admin/pages/google/components/BusinessProfiles.jsx:126
+#: src/admin/pages/dashboard/components/GoogleCard.jsx:138 src/admin/pages/google/components/BusinessProfiles.jsx:126 src/admin/pages/reviews/index.jsx:221
 msgid "Read from Google"
 msgstr ""
 
@@ -1869,7 +2011,7 @@ msgstr ""
 msgid "Add location"
 msgstr ""
 
-#: src/admin/pages/locations/detail.jsx:189
+#: src/admin/pages/locations/detail.jsx:189 src/admin/pages/reviews/index.jsx:310 src/admin/pages/reviews/index.jsx:314 src/admin/pages/reviews/index.jsx:320
 msgid "All locations"
 msgstr ""
 
@@ -2008,6 +2150,98 @@ msgstr ""
 #: src/admin/pages/not-found/index.jsx:7
 msgid "Page not found"
 msgstr ""
+
+#: src/admin/pages/reviews/index.jsx:71
+msgid "No rating"
+msgstr ""
+
+#: src/admin/pages/reviews/index.jsx:111
+msgid "Anonymous"
+msgstr ""
+
+#: src/admin/pages/reviews/index.jsx:126
+msgid "Needs a reply"
+msgstr ""
+
+#: src/admin/pages/reviews/index.jsx:135
+msgid "A rating with no comment."
+msgstr ""
+
+#: src/admin/pages/reviews/index.jsx:142
+msgid "Your reply"
+msgstr ""
+
+#: src/admin/pages/reviews/index.jsx:203
+msgid "What people are saying on your Google Business Profile, and which reviews are still waiting on you."
+msgstr ""
+
+#: src/admin/pages/reviews/index.jsx:216
+msgid "Reading…"
+msgstr ""
+
+#: src/admin/pages/reviews/index.jsx:234
+msgid "No Google locations yet"
+msgstr ""
+
+#: src/admin/pages/reviews/index.jsx:237
+msgid "Connect your Google account and read your profile first — reviews are read for the locations Google reports."
+msgstr ""
+
+#: src/admin/pages/reviews/index.jsx:254
+msgid "Last read from Google on %s."
+msgstr ""
+
+#: src/admin/pages/reviews/index.jsx:257
+msgid "Not read from Google yet."
+msgstr ""
+
+#: src/admin/pages/reviews/index.jsx:269
+msgid "Average rating"
+msgstr ""
+
+#: src/admin/pages/reviews/index.jsx:285
+msgid "Waiting on a reply"
+msgstr ""
+
+#: src/admin/pages/reviews/index.jsx:341
+msgid "Only those needing a reply"
+msgstr ""
+
+#: src/admin/pages/reviews/index.jsx:355
+msgid "Nothing waiting on you"
+msgstr ""
+
+#: src/admin/pages/reviews/index.jsx:356
+msgid "No reviews stored yet"
+msgstr ""
+
+#: src/admin/pages/reviews/index.jsx:360
+msgid "Every review you have has an answer."
+msgstr ""
+
+#: src/admin/pages/reviews/index.jsx:364
+msgid "Press Read from Google to fetch the reviews on your profile."
+msgstr ""
+
+#: src/admin/pages/reviews/index.jsx:386
+msgid "Showing %1$d of %2$d."
+msgstr ""
+
+#: src/admin/pages/reviews/index.jsx:401
+msgid "Show more"
+msgstr ""
+
+#: src/admin/pages/reviews/index.jsx:96
+msgid "%d star"
+msgid_plural "%d stars"
+msgstr[0] ""
+msgstr[1] ""
+
+#: src/admin/pages/reviews/index.jsx:184
+msgid "Read %d review from Google."
+msgid_plural "Read %d reviews from Google."
+msgstr[0] ""
+msgstr[1] ""
 
 #: src/admin/pages/schema/index.jsx:34
 msgid "Automatic"

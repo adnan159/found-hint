@@ -249,6 +249,8 @@ class LocationRepository {
 		$wpdb->query( 'START TRANSACTION' );
 
 		OpeningHoursRepository::delete_for_location( $id );
+		SpecialHoursRepository::delete_for_location( $id );
+		LocationAttributeRepository::delete_for_location( $id );
 
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 		$deleted = $wpdb->query( $wpdb->prepare( "DELETE FROM {$table} WHERE id = %d", $id ) );

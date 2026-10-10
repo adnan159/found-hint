@@ -96,7 +96,10 @@ Returned under `data.fields`, keyed by field name.
 
 **Business** — `business.name.required`, `business.name.too_long`,
 `business.legal_name.too_long`, `business.type.invalid`,
-`business.category.too_long`, `business.email.invalid`,
+`business.category.too_long`, `business.category_id.unknown`,
+`business.categories.unknown`, `business.categories.too_many`,
+`business.categories.includes_primary`, `business.description.too_long`,
+`business.description.has_link`, `business.email.invalid`,
 `business.phone.invalid`, `business.website.invalid`,
 `business.logo_url.invalid`, `business.price_range.too_long`,
 `business.founding_date.invalid`, `social.url.invalid` (keyed
@@ -192,6 +195,46 @@ Writable: `name`, `legal_name`, `business_type`, `primary_category`,
 `business_type` must be one of the schema.org types in
 `FHINT\App\Business\Business::types()` (filterable via
 `fhint_business_types`). `founding_date` is `YYYY-MM-DD`.
+
+### Categories on a business
+
+A category is stored as **Google's id with Google's name beside it**, because
+the id is what a push to Google sends. Pick ids from
+[`GET /google/categories`](#get-googlecategories).
+
+```json
+{
+  "primary_category_id": "gcid:dentist",
+  "secondary_categories": ["gcid:dental_clinic", "gcid:cosmetic_dentist"]
+}
+```
+
+is stored, and returned, as:
+
+```json
+{
+  "primary_category_id": "gcid:dentist",
+  "primary_category": "Dentist",
+  "secondary_categories": [
+    { "id": "gcid:dental_clinic", "name": "Dental clinic" },
+    { "id": "gcid:cosmetic_dentist", "name": "Cosmetic dentist" }
+  ]
+}
+```
+
+- **The name always comes from the list, never from the request.** Sending
+  `primary_category` alongside an id is ignored in favour of Google's wording.
+- `secondary_categories` accepts ids, exact names, or `{ id, name }` objects,
+  as a list or a comma-separated string. Repeats are removed.
+- Sending **only** `primary_category` (the plain text field) still works: a
+  name Google uses is tied to its id, and a freehand one is kept with
+  `primary_category_id` cleared, so a stale id never survives a rename.
+- Refused with `400`: an id Google does not have
+  (`business.category_id.unknown` on `primary_category_id`); on
+  `secondary_categories`, an entry not on the list
+  (`business.categories.unknown`), more than 9
+  (`business.categories.too_many`), or the primary category repeated
+  (`business.categories.includes_primary`).
 
 ---
 
@@ -576,6 +619,268 @@ Applies the finding's fix handler, marks it resolved, and **re-runs the
 audit** so the score reflects the change — a fix that left a stale number
 on screen would look like it did nothing. `400 fhint_fix_unavailable` when
 the finding has no handler.
+
+## Profile
+
+The Business Profile screen as one document: **read whole, saved a section
+at a time**. It owns no rules of its own — each section delegates to the
+entity that already validates and stores that data, so a value saved here and
+the same value saved through `/business`, `/locations` or `/services` pass
+through one set of rules.
+
+**Saving stores to this site only.** Nothing on this route contacts Google.
+
+### `GET /profile`
+
+Seven sections under `data`, in screen order: `info`, `address`, `hours`,
+`social`, `attributes`, `services`, `media`.
+
+```json
+{
+  "data": {
+    "info": {
+      "name": "Northside Dental Care",
+      "primary_category": "Dentist",
+      "primary_category_id": "gcid:dentist",
+      "secondary_categories": [{ "id": "gcid:dental_clinic", "name": "Dental clinic" }],
+      "description": "…",
+      "website": "https://…",
+      "phone": "+1 512 555 0134",
+      "cid": "",
+      "history": [{ "id": 2, "description": "…", "source": "user", "created_at": "2026-10-11 09:00:00" }]
+    },
+    "address": {
+      "location_id": 1, "address_line_1": "410 Congress Ave", "address_line_2": "",
+      "city": "Austin", "region": "TX", "postal_code": "78701", "country": "US",
+      "latitude": 30.2849, "longitude": -97.7341,
+      "formatted": "…", "locked": false
+    },
+    "hours": {
+      "location_id": 1, "timezone": "America/Chicago",
+      "opening_hours": { "days": [], "has_any_hours": true, "period_count": 6 },
+      "special_hours": [
+        { "date": "2026-12-25", "is_closed": true, "is_24h": false, "note": "Christmas Day", "periods": [] }
+      ]
+    },
+    "social": {
+      "social_profiles": { "facebook": "https://facebook.com/…", "instagram": "" },
+      "networks": ["facebook", "instagram", "x", "linkedin", "youtube", "tiktok", "pinterest", "yelp"],
+      "same_as": ["https://facebook.com/…"]
+    },
+    "attributes": { "location_id": 1, "values": [], "definitions": [] },
+    "services": { "items": [], "limits": {}, "google_types": [] },
+    "media": { "logo": null, "cover": null, "gallery": [], "pending": [], "location_id": 1, "count": 0 }
+  },
+  "meta": {
+    "exists": true,
+    "google": {
+      "status": "disconnected", "connected": false, "mapped": false,
+      "location": "", "account": "", "title": "", "verified": false, "synced_at": null
+    },
+    "limits": { "description": 750, "additional_categories": 9 }
+  }
+}
+```
+
+- `hours.opening_hours` is the same shape `/locations` returns.
+- `info.cid` and `address.locked` depend on the location being mapped to a
+  Google listing (`meta.google.mapped`).
+- `attributes.definitions`, `services.google_types` are empty until Google's
+  reference lists are fetched; `media` is empty until photos are built.
+
+### `POST | PUT | PATCH /profile`
+
+```json
+{ "section": "info", "fields": { "description": "New wording." } }
+```
+
+`section` is required and must be one of the seven. `fields` is that
+section's fields; **a key that is absent is left alone**. The response is the
+section as it now reads, with the same `meta` as the `GET` plus
+`meta.section`, so the screen does not need to refetch.
+
+Errors: `400 fhint_validation_failed` with `data.fields` keyed per field;
+`409 fhint_business_required` when a section needs a business that does not
+exist yet; `401`/`403` as everywhere.
+
+| Section | Fields | Notes |
+|---|---|---|
+| `info` | `name`, `primary_category_id`, `primary_category`, `secondary_categories`, `description`, `website`, `phone` | The `/business` rules, including [categories](#categories-on-a-business). Any other key is ignored. A changed description is added to `history`; saving the same words again is not. Optional `description_source`: `user` (default), `ai`, `google`. |
+| `address` | `address_line_1`, `address_line_2`, `city`, `region`, `postal_code`, `country`, `latitude`, `longitude` | Creates the primary location if the business has none. **`409 fhint_address_locked` once the location is mapped to a Google listing** — the address is then Google's. |
+| `hours` | `opening_hours`, `special_hours` | Each key is saved on its own and **replaces the whole of what it names**. `opening_hours` takes what `/locations` takes. Error keys are prefixed: `opening_hours.day_1.period_0.close_time`, `special_hours.day_0.date`. |
+| `social` | `social_profiles` | An object of network → URL; the `/business` rules. |
+| `attributes` | `values` | `{ attribute_id: value }`. `true`/`false`, one string, a list of strings, or a list of URLs. **`null` withdraws an answer**, which is not the same as `false`. Only the attributes named are touched. |
+| `services` | `items` | **The whole list, in order.** An entry with an `id` is updated, one without is created, a stored service left out is **removed**. Every entry is validated before any is written; error keys are `items.0.name`. `403 fhint_service_limit_reached` only when the list grows past the plan limit. |
+| `media` | — | `400 fhint_section_read_only`. Photos arrive by upload, not by a section save. |
+
+#### Description rules
+
+At most **750 characters** (`business.description.too_long`) and **no web
+address** (`business.description.has_link`) — Google refuses both. These are
+enforced on `/business` as well. A link is a scheme (`https://`), a `www.`
+prefix, or a bare domain on a common ending; two-letter country endings are
+left out so a missing space after a full stop is not mistaken for one.
+
+#### Special hours
+
+```json
+{ "section": "hours", "fields": { "special_hours": [
+  { "date": "2026-12-25", "is_closed": true, "note": "Christmas Day" },
+  { "date": "2026-12-24", "periods": [ { "open_time": "09:00", "close_time": "13:00" } ] },
+  { "date": "2026-12-31", "is_24h": true }
+] } }
+```
+
+A day is closed, open all day, or open for one or more periods; the period
+rules are the weekly ones. Also refused: a date that does not exist
+(`special_hours.date.invalid`) and the same date twice
+(`special_hours.date.duplicate`), each keyed by the day's position in the list
+sent. `note` is the owner's own label and is never sent to Google.
+
+### `POST /profile/publish/plan`
+
+Works out what publishing the profile to Google would send, **and sends
+nothing**. It reads the mapped listing twice — the location and its attribute
+values — and compares them with what is stored here. It is a `POST` because
+it calls Google, which draws on a quota every site using this plugin shares.
+
+`409 fhint_google_not_connected`, `409 fhint_business_required` or
+`409 fhint_google_not_mapped` when there is nothing to plan against.
+
+```json
+{
+  "data": {
+    "steps": [
+      {
+        "id": "location",
+        "fields": [
+          { "field": "description", "from": "What Google has.", "to": "What this site has." },
+          { "field": "hours", "from": ["1 09:00-17:00"], "to": ["1 09:00-17:00", "6 10:00-14:00"] }
+        ],
+        "mask": ["profile.description", "regularHours"],
+        "payload": { "profile": { "description": "What this site has." }, "regularHours": { "periods": [] } },
+        "token": "97e86571c847cb64d4c72ed5c65e58a2"
+      },
+      {
+        "id": "attributes",
+        "fields": [{ "field": "social.facebook", "from": "", "to": "https://facebook.com/example" }],
+        "mask": ["attributes/url_facebook"],
+        "payload": { "attributes": [] },
+        "token": "2dd52dc12bc2470ad8af50909b718935"
+      }
+    ],
+    "skipped": [
+      { "field": "categories", "reason": "empty_here", "google": { "primary": "Corporate office", "additional": [] } }
+    ],
+    "unchanged": ["name", "website", "phone", "special_hours", "services"],
+    "requests": 2
+  },
+  "meta": {
+    "listing": {
+      "location": "locations/7390686751421120583",
+      "title": "AsCode",
+      "maps_url": "https://maps.google.com/maps?cid=3455100975346056492",
+      "read_at": "2026-10-10 22:26:38"
+    }
+  }
+}
+```
+
+**`steps`** — one per request a publish would make, in the order to run them.
+A step with nothing to send is left out, so an up-to-date profile has no steps
+and `requests` is 0.
+
+| Step | Fields it can carry |
+|---|---|
+| `location` | `name`, `description`, `website`, `phone`, `categories`, `hours`, `special_hours`, `services` |
+| `attributes` | `social.<network>`, `attribute.<id>` |
+
+`from` is what Google has, `to` what would be sent: a string for text; for
+`hours`, `special_hours` and `services` a sorted list of lines
+(`"6 10:00-14:00"` is Saturday — day numbers, Sunday is 0); for `categories`
+`{ primary, additional }`. `token` is a fingerprint of the step's mask and
+payload, for the step request to send back so a stale plan is refused.
+
+**`skipped`** — fields that will *not* be sent, and why:
+
+| `reason` | Meaning |
+|---|---|
+| `empty_here` | This site has nothing for it and Google does. **A plan never clears a field**: Google erases any field named with no value, and "never typed here" cannot be told from "removed on purpose". `google` carries what Google shows. |
+| `no_google_id` | The category was typed freehand and has no Google id. |
+| `not_allowed` | Google does not let this listing's service list be changed. |
+| `not_on_google` | Google has no attribute for it (a Yelp link). |
+
+**What a plan protects, beyond not clearing:**
+
+- A weekday nobody has filled in here keeps Google's hours for that day; only
+  days this site has an answer for are replaced.
+- With no additional categories chosen here, Google's are kept when the main
+  one changes.
+- Changing the main phone number sends Google's extra numbers back with it.
+- Only attribute answers changed here since the last push are named.
+- Services switched off here are left out of the list.
+
+A phone number is the same number with or without its country code, and a link
+the same with or without `www`, a scheme or a trailing slash — neither is
+reported as a change.
+
+### `POST /profile/publish/step`
+
+Runs one step of a plan. **This is the only route in the plugin that changes
+anything on Google.**
+
+```json
+{ "step": "location", "token": "97e86571c847cb64d4c72ed5c65e58a2", "validate_only": false }
+```
+
+| Param | |
+|---|---|
+| `step` | **Required.** `location` or `attributes`. |
+| `token` | **Required.** The step's `token` from the plan — 32 hex characters. |
+| `validate_only` | Default `false`. When `true`, Google checks the request and saves nothing. `location` only. |
+
+Run the plan's steps in order, one request each, and show each answer as it
+arrives:
+
+```json
+{ "data": { "step": "location", "ok": true, "validate_only": false,
+            "fields": ["description", "hours"], "pushed_at": "2026-10-10 22:41:08" } }
+```
+
+**The step is planned again before it is sent**, from a fresh read of the one
+thing it touches, and `token` must match that fresh plan. So what reaches
+Google is only ever what the plan showed:
+
+| Status | Code | When |
+|---|---|---|
+| `409` | `fhint_publish_stale` | The profile or the listing changed since the plan. Plan again. |
+| `409` | `fhint_publish_nothing_to_send` | Google already has everything in this step. |
+| `400` | `fhint_validate_only_unsupported` | `validate_only` on `attributes`; Google has no dry run for them. |
+| `400` | `fhint_google_rejected` | Google refused a value. Nothing was changed. |
+| `409` | `fhint_google_not_connected` / `fhint_google_not_mapped` | As for the plan. |
+| `502` | `fhint_google_request_failed` / `fhint_google_unreachable` | No permission, over quota, or Google unreachable. |
+
+A refused value comes back in the usual validation shape, so the message
+attaches to the field at fault:
+
+```json
+{ "code": "fhint_google_rejected",
+  "data": { "status": 400, "step": "location",
+            "fields": { "description": ["google.profile_description_contains_url"] } } }
+```
+
+The code is `google.` plus Google's own reason in lower case —
+`google.string_too_long`, `google.invalid_category`, `google.invalid_url` — or
+`google.invalid_value` where Google names only the field. Keys are the plan's
+field ids; `step` is used when Google blames no particular field.
+
+After a real step, `meta.google.pushed_at` on `GET /profile` carries the time,
+and attribute answers that were sent are no longer marked as changed. A
+validate-only step records nothing.
+
+Google throttles edits made in quick succession, so leave the steps
+sequential rather than firing them together.
+
 
 ## Reviews
 
@@ -966,6 +1271,56 @@ is not in the last read cannot be mapped, and the message says to refresh.
 Takes `location_name` and releases the link. Deleting one of *our*
 locations releases its mapping too, through the `fhint_location_deleted`
 action.
+
+### `GET /google/categories`
+
+Searches Google's Business Profile categories. **It never contacts Google and
+needs no connection**: the list ships with the plugin
+(`includes/App/Google/data/google-categories.json`, rebuilt with
+`npm run categories:update`), so it works on a site that has not connected an
+account yet.
+
+| Param | Default | |
+|---|---|---|
+| `search` | `''` | What was typed, up to 100 characters. Empty lists alphabetically. |
+| `per_page` | `20` | 1–50. |
+| `offset` | `0` | For paging. |
+
+```json
+{
+  "data": [
+    {
+      "id": "gcid:dentist",
+      "name": "Dentist",
+      "bucket": "Health & Medical",
+      "in_us": true,
+      "variants": []
+    }
+  ],
+  "meta": {
+    "total": 3,
+    "max_additional": 9,
+    "list": { "count": 4053, "updated": "2026-10-10" }
+  }
+}
+```
+
+**Ranking**, best first: the exact name; names starting with the search; names
+where a later word starts with it; names containing it; then categories found
+only through another wording Google uses. Those last ones carry
+`"matched": "Physician"` so a screen can say why "Doctor" appeared. Every
+word typed must be present, in any order. Searching for an id (`gcid:dentist`
+or `categories/gcid:dentist`) returns exactly that category.
+
+**Show `bucket`, and key on `id`, never on `name`.** Two different categories
+can share a name — there are two "Swimming pool" entries with different ids.
+
+`meta.total` ignores paging. `meta.max_additional` is how many extra
+categories Google allows beside the primary one.
+
+There is no write route here. A chosen category is saved through
+[`/business`](#categories-on-a-business), which validates it against this
+same list.
 
 ### `admin-post.php?action=fhint_google_callback`
 

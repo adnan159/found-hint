@@ -1060,6 +1060,207 @@ opening the page in a browser, which is why that step is not optional. The
 integration suite now asserts the envelope on these routes, and dropping it
 again fails three checks.
 
+## Step 19 — Google category search
+
+`GET /fhint/v1/google/categories` searches Google's Business Profile
+categories, and a business now stores a category as **Google's id with
+Google's name beside it** — the id is what a push sends.
+
+**The list ships with the plugin** rather than being fetched:
+`includes/App/Google/data/google-categories.json`, 4,053 categories, built by
+`npm run categories:update` from
+github.com/lobstrio/google-business-categories. Choosing a category is one of
+the first things a new site does, usually before Google is connected, and a
+search box that needs an approved API connection to show its first suggestion
+does not work. Nothing is downloaded by the site at runtime.
+
+Searching is in memory (about 2 ms): an exact name, then a prefix, then a
+later word starting with it, then anything containing it, then a match found
+only through another wording, which says so in `matched`.
+
+**Saving is validated on the server against the same list**, in
+`Business::sanitize()` and `Business::validate()`: the name is taken from the
+list and never from the request; an unknown id is refused; additional
+categories are stored as `{ id, name }` pairs, capped at Google's 9, without
+repeats and without the primary one. The plain text field on the current
+Business screen keeps working — a name Google uses is tied to its id, and a
+freehand one clears the id so a stale one cannot survive a rename.
+
+Proved by `tests/Smoke/google-categories.php` (60 checks, 11 deliberate
+defects, all caught) and through REST and MySQL in the integration suite.
+
+**Three things about the data, found by looking rather than by reading its
+README.** It claims 1,196 categories with more than one name; 1,187 of those
+"variants" merely repeat the main name, so only 9 carry a real alternative
+("Physician" for Doctor). Two different categories are both called "Swimming
+pool", which is why a client must key on `id` and show `bucket`. And the
+repository has **no licence file** — its README says "Free to use", which is
+not a licence. It is credited in `readme.txt`; before a release, either get
+that in writing or replace the file with Google's own `categories.list`,
+which the approved project can call and `fhint_google_reference` was built
+to cache.
+
+**Not built:** the chooser on the Business screen still is a plain text
+field, and the Google import does not yet set `primary_category_id`.
+
+## Step 20 — The profile: read whole, saved a section at a time
+
+`GET /fhint/v1/profile` returns the Business Profile screen as one document —
+`info`, `address`, `hours`, `social`, `attributes`, `services`, `media` — and
+`PATCH /fhint/v1/profile` saves one section, `{ section, fields }`, answering
+with that section as it now reads. Saving stores to this site only; nothing
+on the route contacts Google.
+
+**It owns no rules.** `App\Profile\Profile` dispatches to one class per
+section, and each delegates to the entity that already validates that data —
+`Business`, `Location`, `OpeningHours`, `Service`. A value saved here and the
+same value saved through `/business` or the setup wizard pass through one set
+of rules.
+
+What is new underneath it:
+
+- **Description rules**, in `Business::validate()` so every route gets them:
+  750 characters at most, and no web address. Both are things Google refuses
+  at the push, long after the owner has moved on. The link check leaves out
+  two-letter country endings on purpose — "open late.in an emergency" is a
+  missing space, not a domain.
+- **Special hours** (`SpecialHours`, `SpecialHoursRepository`). The period
+  rules are the weekly ones, reached by lending each date a weekday and
+  calling `OpeningHours::validate()`, rather than written a second time.
+- **Attribute values** (`LocationAttributes`, `LocationAttributeRepository`).
+  `null` withdraws an answer, which is not `false`; every value written is
+  marked dirty for the push to come.
+- **Description history**, appended when the wording changes and not when it
+  is merely saved.
+- **Services as one ordered list**: an entry with an id is updated, one
+  without is created, one left out is removed — the same contract Google's own
+  service list has. Everything is validated before anything is written.
+- **The address locks** once the location is mapped to a Google listing.
+
+**Three things found by testing rather than by reading.**
+
+Saving hours through the new route did not mark the data as changed. On
+`/locations` the location update beside the hours does that; here there is no
+such update, so the cached schema would have gone on publishing the old
+opening hours. `Hours::save()` stamps it, and a check proves it.
+
+Deleting a location left its special hours, attribute answers and photo
+records behind, and deleting the business left its description history. There
+are no foreign keys, so nothing would ever have removed them. The cascades
+now cover all four, with a check each.
+
+One deliberate defect survived the first run: sending only the week wiped the
+special days, and no check noticed, because only the reverse had been tested.
+There is now a check for each direction.
+
+Proved by `tests/Smoke/profile.php` (52 checks) and 67 more through REST and
+MySQL; 19 deliberate defects, all caught.
+
+**Decided for the push, not built:** one click, but not one request. A
+streamed response is held back by too many hosts and proxies to be relied on,
+so publishing will be a *plan* request that returns the steps, then one
+request per step, each answering with its own result. Recorded in
+`docs/PROFILE-DATA-MODEL.md`.
+
+**Not built:** the screen itself, the push, photos, and Google's reference
+lists — so `attributes.definitions` and `services.google_types` are empty and
+attribute ids are checked for shape only.
+
+## Step 21 — Planning a publish to Google
+
+`POST /fhint/v1/profile/publish/plan` compares this site's profile with the
+mapped Google listing and answers with the **steps** a publish would take —
+each naming its fields, from what, to what — without sending anything.
+`App\Google\Push\GoogleFormat` converts stored data into Google's shapes,
+`Plan` compares, `Publisher` reads Google and gathers both sides.
+
+**A plan never clears.** Google erases a field named in the update mask with
+no value, and this site cannot tell "never typed here" from "removed on
+purpose", so a field it has nothing for goes under `skipped` with the value
+Google shows, never into the mask. The same caution runs through the rest: an
+unfilled weekday keeps Google's hours, extra categories and extra phone
+numbers Google holds are sent back rather than dropped, and only attribute
+answers changed here are named.
+
+**Every comparison is made on Google's shape, by one function, on both
+sides** — the stored value is first converted into what it would send. That is
+what stops a plan reporting a change where there is none; hour 24 today and
+hour 0 tomorrow, a number with and without its country code, a link with and
+without `www`, all compare equal.
+
+**Checked against a real listing**, read-only. The shapes it returned are the
+fixtures: times as objects, categories as `categories/gcid:…`, service types
+listed under the category, `metadata.canModifyServiceList`, and the CID inside
+`metadata.mapsUri`. Its attribute list has `url_twitter` and no `url_x`, and
+**no Yelp attribute** — so X maps to twitter and a Yelp link stays on this
+site, both corrections to what had been assumed. A site freshly imported from
+that listing plans zero steps.
+
+**A defect in the import, found by the plan.** A service imported from Google
+kept its name and lost how Google holds it, so a publish would have replaced
+one of Google's own structured services with a free-form copy of the same
+name. `ImportMapper` now records `google_item_type` and
+`google_service_type_id`, and reads the price from the service item, where
+Google documents it.
+
+**A mistake worth recording.** To show a plan with real steps, trial edits
+were made on the development site inside a database transaction, to be rolled
+back. They were not rolled back: the hours and attribute repositories open
+their own transactions, and in MySQL starting a transaction commits the one
+already open. The data was restored from the listing and verified by planning
+again. An outer transaction is not a sandbox for code that manages its own.
+
+Proved by `tests/Smoke/publish-plan.php` (71 checks), five more in the import
+suite and 14 through REST against a stand-in for Google; 22 deliberate
+defects, all caught — one only after a check was added for the form actually
+sent, since two spellings of midnight compared equal by design.
+
+**Not built:** the step request that performs a publish; photos; attribute
+definitions (fetched, shape known, not yet stored).
+
+## Step 22 — Running a publish step
+
+`POST /fhint/v1/profile/publish/step` runs one step of a plan: the only route
+in the plugin that changes anything on Google. `Client::patch()` is the one
+write the HTTP client knows.
+
+**What reaches Google is only ever what the plan showed.** The step is planned
+again before it is sent, from a fresh read of the one resource it touches, and
+the fingerprint the caller brings must match. An edit in another tab, or in
+Google's own dashboard, between reading the plan and pressing publish makes the
+fingerprints differ, and nothing is sent.
+
+**A refused value points at its field.** Google's message for a bad value is
+"Request contains an invalid argument"; its error details carry the reason and
+the field (`PROFILE_DESCRIPTION_CONTAINS_URL` on `profile.description`). Those
+become the usual `fields` shape with `google.*` codes, so the message lands on
+the input exactly as a local validation error would.
+
+A real step records `pushed_at` on the listing (database version 0.8.0) and
+clears the changed flag on exactly the attribute answers it sent. A
+validate-only step records nothing.
+
+**Checked against the real listing in Google's validate-only mode**, which
+checks a request and saves nothing — confirmed by reading the listing back
+after every batch and finding it identical. Every shape the plugin builds was
+accepted: hour 24 for midnight, a shift past midnight, an all-day day, special
+hours, a category as a resource name, both phone formats, and services with
+the price on the item. A seven-field step built by the plan's own code was
+accepted in one request. Google's refusals confirmed two rules already
+enforced here — no link in a description, and exactly 750 characters.
+
+Three things learned from it: Google refuses a website on a domain that does
+not exist (`INVALID_URL`), which no local check can know; a quick run of
+edits is refused without detail, so steps must stay sequential; and a
+stand-in for Google that answers every request will silently replace a
+refusal returned by a filter that ran before it — the first version of the
+refusal check passed for that reason and proved nothing.
+
+**No real write has been made to a live listing.** The step is proved against
+a stand-in (36 checks, 13 deliberate defects, all caught) and by validate-only
+calls; the first real publish is still to be done, on a listing the owner
+names.
+
 ## Pending
 
 Everything in the Free plan's first cut is built. What remains is the
