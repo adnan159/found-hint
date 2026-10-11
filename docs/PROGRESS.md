@@ -1376,3 +1376,17 @@ six steps — `Import::STEPS`, `POST /google/import/step`, one request each —
 then opens the Business Profile. The first step reads Google and the rest
 reuse that read from a two-minute transient. "I'll do this later" goes to the
 Business Profile without importing.
+
+## Step 30 — Front-end guide for the import and the profile
+
+`docs/frontend/`: every route the guided import and the
+Business Profile screen use, with real request and response shapes, the
+per-section save rules, error codes, and the rules that are easy to get wrong.
+
+## Step 31 — `docs/frontend/`
+
+Two front-end guides, each standalone: `docs/frontend/setup-widget.md` (the
+Google sign-in and six-step import) and `docs/frontend/business-profile.md`
+(the profile screen). Every endpoint is given with its method, a request
+sample, a response sample and its errors. `docs/SETUP-WIZARD-API.md` was
+folded into the first.
