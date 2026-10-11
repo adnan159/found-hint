@@ -15,6 +15,7 @@ use FHINT\API\GoogleCategories;
 use FHINT\API\Locations;
 use FHINT\API\Onboarding;
 use FHINT\API\Profile;
+use FHINT\API\ProfileGoogle;
 use FHINT\API\ProfilePublish;
 use FHINT\API\Reviews;
 use FHINT\API\Schema;
@@ -53,6 +54,7 @@ class API {
 		Locations::init();
 		Onboarding::init();
 		Profile::init();
+		ProfileGoogle::init();
 		ProfilePublish::init();
 		Reviews::init();
 		Schema::init();

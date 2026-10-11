@@ -63,7 +63,12 @@ class Installer {
 		// one that matters most: a plugin updated by file replacement never
 		// fires activation, and a half-restored backup can lose a table
 		// without changing the version option. Both self-repair here.
-		if ( get_option( 'fhint_version' ) !== FHINT_VERSION || Tables::missing() ) {
+		//
+		// The schema has a version of its own because it changes more often
+		// than the plugin's: a column added between releases has to reach a
+		// site that is already on this plugin version, and comparing only the
+		// plugin version would never run dbDelta for it.
+		if ( get_option( 'fhint_version' ) !== FHINT_VERSION || get_option( 'fhint_db_version' ) !== FHINT_DB_VERSION || Tables::missing() ) {
 			self::init();
 		}
 
@@ -125,6 +130,8 @@ class Installer {
 		} else {
 			update_option( 'fhint_version', FHINT_VERSION );
 		}
+
+		update_option( 'fhint_db_version', FHINT_DB_VERSION );
 
 		if ( ! get_option( 'fhint_first_install_time' ) ) {
 			add_option( 'fhint_first_install_time', time() );

@@ -67,6 +67,7 @@ class ImportMapper {
 			'website'       => isset( $payload['websiteUri'] ) ? (string) $payload['websiteUri'] : '',
 			'business_type' => self::business_type( $payload ),
 			'category'      => self::category_name( $payload ),
+			'categories'    => self::categories( $payload ),
 			'social'        => self::social( $attributes ),
 			'address'       => self::address( $payload ),
 			'coordinates'   => self::coordinates( $payload ),
@@ -134,6 +135,122 @@ class ImportMapper {
 			'latitude'  => $lat,
 			'longitude' => $lng,
 			'has_both'  => null !== $lat && null !== $lng,
+		);
+	}
+
+	/**
+	 * The ready-made services Google offers a listing, from its categories.
+	 *
+	 * Google keeps a list of services per category — "Cat grooming" under
+	 * Pet groomer — and a service chosen from it is sent as that id rather
+	 * than as words, which is what lets Google match it to searches. A
+	 * category can have none; the main category is listed first.
+	 *
+	 * @param array $payload Decoded location, read with `categories`.
+	 * @return array[] Each `{ id, label, category }`, without repeats.
+	 */
+	public static function service_type_list( array $payload ) {
+		$categories = isset( $payload['categories'] ) && is_array( $payload['categories'] ) ? $payload['categories'] : array();
+		$ordered    = array();
+
+		if ( isset( $categories['primaryCategory'] ) ) {
+			$ordered[] = $categories['primaryCategory'];
+		}
+
+		if ( isset( $categories['additionalCategories'] ) && is_array( $categories['additionalCategories'] ) ) {
+			$ordered = array_merge( $ordered, $categories['additionalCategories'] );
+		}
+
+		$types = array();
+		$seen  = array();
+
+		foreach ( $ordered as $category ) {
+			if ( ! is_array( $category ) || empty( $category['serviceTypes'] ) || ! is_array( $category['serviceTypes'] ) ) {
+				continue;
+			}
+
+			foreach ( $category['serviceTypes'] as $type ) {
+				$id = is_array( $type ) && isset( $type['serviceTypeId'] ) ? (string) $type['serviceTypeId'] : '';
+
+				if ( '' === $id || isset( $seen[ $id ] ) ) {
+					continue;
+				}
+
+				$seen[ $id ] = true;
+				$types[]     = array(
+					'id'       => $id,
+					'label'    => isset( $type['displayName'] ) && '' !== (string) $type['displayName'] ? (string) $type['displayName'] : $id,
+					'category' => isset( $category['displayName'] ) ? (string) $category['displayName'] : '',
+				);
+			}
+		}
+
+		return $types;
+	}
+
+	/**
+	 * The listing's categories as the `{ id, name }` pairs this plugin stores.
+	 *
+	 * Google names a category `categories/gcid:pet_store`; the id kept here is
+	 * the part after the slash, which is also what a publish sends back. The
+	 * id is taken as Google gave it rather than checked against the bundled
+	 * list: Google is the authority on its own categories, and a category
+	 * newer than that list is still the listing's category.
+	 *
+	 * @param array $payload Decoded location.
+	 * @return array{primary:array|null, additional:array[]}
+	 */
+	public static function categories( array $payload ) {
+		$categories = isset( $payload['categories'] ) && is_array( $payload['categories'] ) ? $payload['categories'] : array();
+		$primary    = isset( $categories['primaryCategory'] ) ? self::category_pair( $categories['primaryCategory'] ) : null;
+		$additional = array();
+		$seen       = array();
+
+		if ( $primary ) {
+			$seen[ $primary['id'] ] = true;
+		}
+
+		foreach ( isset( $categories['additionalCategories'] ) && is_array( $categories['additionalCategories'] ) ? $categories['additionalCategories'] : array() as $category ) {
+			$pair = self::category_pair( $category );
+
+			if ( ! $pair || isset( $seen[ $pair['id'] ] ) ) {
+				continue;
+			}
+
+			$seen[ $pair['id'] ] = true;
+			$additional[]        = $pair;
+		}
+
+		return array(
+			'primary'    => $primary,
+			'additional' => $additional,
+		);
+	}
+
+	/**
+	 * One Google category as `{ id, name }`, or null when it carries no id.
+	 *
+	 * @param mixed $category Google category object.
+	 * @return array|null
+	 */
+	private static function category_pair( $category ) {
+		if ( ! is_array( $category ) || empty( $category['name'] ) ) {
+			return null;
+		}
+
+		$id = (string) $category['name'];
+
+		if ( 0 === strpos( $id, 'categories/' ) ) {
+			$id = substr( $id, strlen( 'categories/' ) );
+		}
+
+		if ( '' === $id ) {
+			return null;
+		}
+
+		return array(
+			'id'   => $id,
+			'name' => isset( $category['displayName'] ) ? (string) $category['displayName'] : $id,
 		);
 	}
 

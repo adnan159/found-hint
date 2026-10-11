@@ -54,6 +54,8 @@ function fieldLabel(key) {
       return __("Description", "foundhint-local-seo");
     case "hours":
       return __("Opening hours", "foundhint-local-seo");
+    case "categories":
+      return __("Google categories", "foundhint-local-seo");
     case "business_type":
       return __("Business type", "foundhint-local-seo");
     case "social":

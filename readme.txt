@@ -31,14 +31,14 @@ Small businesses with a shop, a clinic, a studio or a van — and the agencies l
 
 == External services ==
 
-This plugin connects to two external services. Neither is contacted until you choose to connect Google.
+This plugin connects to three external services. Google and FoundHint Connect are not contacted until you choose to connect Google; OpenStreetMap is contacted only when the Business Profile screen shows a map.
 
 **1. Google Business Profile APIs** (Google LLC)
 
-When you connect your Google account, your site talks directly to Google to read the business profiles your account manages: account and location lists, business details, opening hours, categories, services, attributes (which carry your social links) and map coordinates.
+When you connect your Google account, your site talks directly to Google to read the business profiles your account manages: account and location lists, business details, opening hours, categories, services, attributes (which carry your social links) and map coordinates. It also reads the photos on your listing, which are then shown in your admin directly from Google's image servers. When you press *Send to Google* or *Upload to Google*, your site sends the details or photos you chose to your listing.
 
-* What is sent: your Google access token, and the identifier of the profile being read.
-* When: when you press *Continue with Google*, *Read from Google*, or *Import*. Never on a visitor-facing page.
+* What is sent: your Google access token, and the identifier of the profile being read. When you choose to send them: your business details, attribute answers and photo files.
+* When: when you press *Continue with Google*, *Read from Google*, *Refresh from Google*, *Import*, *Send to Google* or *Upload to Google*, and once when you first open the Business Profile screen for a connected listing. Never on a visitor-facing page.
 * Terms of service: https://policies.google.com/terms
 * Privacy policy: https://policies.google.com/privacy
 
@@ -52,6 +52,15 @@ Google requires an OAuth client, and an OAuth client requires one fixed web addr
 * Terms of service: https://foundhint.com/terms-and-conditions/
 * Privacy policy: https://foundhint.com/privacy-policy/
 
+**3. OpenStreetMap map tiles** (OpenStreetMap Foundation)
+
+The Business Profile screen shows your location on a small map. The map images are loaded by your browser from OpenStreetMap's tile servers.
+
+* What is sent: your browser's IP address and which squares of the map are being shown, as with any image request. Your business details are not sent.
+* When: when an administrator opens the Business Profile screen for a location that has map coordinates. Never on a visitor-facing page.
+* Terms of use: https://wiki.osmfoundation.org/wiki/Terms_of_Use
+* Privacy policy: https://osmfoundation.org/wiki/Privacy_Policy
+
 If you would rather not use that service, open **Google → Advanced: use your own Google client** and enter a client ID and secret from your own Google Cloud project. The plugin then talks only to Google.
 
 == Bundled resources ==
@@ -61,8 +70,9 @@ JavaScript in `src/admin/`, which ships with the plugin. To reproduce it:
 
 `npm install --legacy-peer-deps && npm run build`
 
-It bundles one third-party resource, which is GPL-compatible:
+It bundles two third-party resources, which are GPL-compatible:
 
+* **Leaflet** (map library) — Volodymyr Agafonkin and contributors, BSD 2-Clause License. Source and licence: https://github.com/Leaflet/Leaflet
 * **Archivo Variable** (webfont) — Omnibus-Type, SIL Open Font License 1.1. Source and licence: https://github.com/Omnibus-Type/Archivo
 
 The category search reads a list of Google Business Profile categories that ships

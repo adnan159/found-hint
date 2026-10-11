@@ -35,27 +35,11 @@ const NAV_ITEMS = [
   // The route still exists (see routes.jsx), so a bookmark keeps working;
   // put this row back when the wizard returns.
   // { to: "/setup", label: () => __("Setup", "foundhint-local-seo") },
+  // The business profile is one screen of collapsible sections, each a
+  // click away once it is open, so it has no sub-items here.
   {
     to: "/business",
     label: () => __("Business", "foundhint-local-seo"),
-    children: [
-      {
-        id: "business-details",
-        label: () => __("Business details", "foundhint-local-seo"),
-      },
-      {
-        id: "business-contact",
-        label: () => __("Contact", "foundhint-local-seo"),
-      },
-      {
-        id: "business-presentation",
-        label: () => __("Presentation", "foundhint-local-seo"),
-      },
-      {
-        id: "business-social",
-        label: () => __("Social profiles", "foundhint-local-seo"),
-      },
-    ],
   },
   { to: "/locations", label: () => __("Locations", "foundhint-local-seo") },
   { to: "/services", label: () => __("Services", "foundhint-local-seo") },

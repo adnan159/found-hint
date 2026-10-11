@@ -11,6 +11,8 @@ use FHINT\App\Business\Business;
 use FHINT\App\Business\BusinessRepository;
 use FHINT\App\Business\DescriptionHistoryRepository;
 use FHINT\App\Core\ValidationResult;
+use FHINT\App\Location\LocationCategories;
+use FHINT\App\Location\LocationRepository;
 use FHINT\App\Profile\Profile;
 use WP_Error;
 
@@ -48,12 +50,14 @@ class Info {
 		$business = BusinessRepository::get();
 		$business = $business ? $business : Business::blank();
 		$google   = Profile::google_location();
+		// The selected location's own when it has them, the business's otherwise.
+		$category = LocationCategories::resolve( Profile::location(), $business );
 
 		return array(
 			'name'                 => (string) $business['name'],
-			'primary_category'     => (string) $business['primary_category'],
-			'primary_category_id'  => (string) $business['primary_category_id'],
-			'secondary_categories' => array_values( (array) $business['secondary_categories'] ),
+			'primary_category'     => $category['primary_category'],
+			'primary_category_id'  => $category['primary_category_id'],
+			'secondary_categories' => $category['secondary_categories'],
 			'description'          => (string) $business['description'],
 			'website'              => (string) $business['website'],
 			'phone'                => (string) $business['phone'],
@@ -71,14 +75,40 @@ class Info {
 	 * @return true|ValidationResult|WP_Error
 	 */
 	public static function save( array $fields ) {
-		$current = BusinessRepository::get();
-		$changes = Business::sanitize( array_intersect_key( $fields, array_flip( self::FIELDS ) ) );
-		$merged  = array_merge( $current ? $current : Business::blank(), $changes );
+		$current  = BusinessRepository::get();
+		$location = Profile::location();
+		$changes  = Business::sanitize( array_intersect_key( $fields, array_flip( self::FIELDS ) ) );
+
+		// Checked against the categories this location shows, so "that is
+		// already your main category" means the one on screen.
+		$merged = array_merge(
+			$current ? $current : Business::blank(),
+			LocationCategories::resolve( $location, $current ),
+			$changes
+		);
 
 		$validation = Business::validate( $merged );
 
 		if ( ! $validation->is_valid() ) {
 			return $validation;
+		}
+
+		// A location that is not the primary one keeps its categories to
+		// itself. All three are written together even when one was sent: a
+		// location with extra categories and no main one would fall back to
+		// the business's and the edit would vanish.
+		if ( LocationCategories::kept_on_location( $location ) && array_intersect_key( $changes, array_flip( LocationCategories::FIELDS ) ) ) {
+			$own = array_intersect_key( $merged, array_flip( LocationCategories::FIELDS ) );
+
+			if ( ! LocationRepository::update( (int) $location['id'], $own ) ) {
+				return Profile::save_failed();
+			}
+
+			$changes = array_diff_key( $changes, array_flip( LocationCategories::FIELDS ) );
+
+			if ( ! $changes ) {
+				return true;
+			}
 		}
 
 		$saved = BusinessRepository::save( $changes );

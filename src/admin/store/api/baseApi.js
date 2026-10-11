@@ -44,7 +44,9 @@ export const baseApi = createApi({
       if (rest_nonce) {
         headers.set("X-WP-Nonce", rest_nonce);
       }
-      headers.set("Content-Type", "application/json");
+      // No Content-Type here. fetchBaseQuery sets JSON for an object body
+      // on its own, and a file upload needs the browser to write the
+      // multipart boundary — a header forced here would break it.
       return headers;
     },
   }),
@@ -59,6 +61,8 @@ export const baseApi = createApi({
     "Schema",
     "Audit",
     "Reviews",
+    "Profile",
+    "Dashboard",
   ],
   endpoints: () => ({}),
 });

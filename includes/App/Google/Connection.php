@@ -257,7 +257,7 @@ class Connection {
 			__( 'Connected to Google Business Profile.', 'foundhint-local-seo' )
 		);
 
-		self::redirect_to_screen();
+		self::redirect_to_screen( true );
 	}
 
 	/**
@@ -394,7 +394,7 @@ class Connection {
 			__( 'Connected to Google Business Profile.', 'foundhint-local-seo' )
 		);
 
-		self::redirect_to_screen();
+		self::redirect_to_screen( true );
 	}
 
 	/**
@@ -444,12 +444,36 @@ class Connection {
 	}
 
 	/**
-	 * Send the browser back to the Google screen.
+	 * Where a successful sign-in lands.
 	 *
+	 * The first time — no listing belongs to any location here yet — that is
+	 * the guided import, because bringing the details across is the whole
+	 * reason somebody just connected, and sending them to hunt for it under
+	 * a menu would lose most of them. Once a listing is in use, connecting
+	 * again is maintenance and returns to the Google screen it started from.
+	 *
+	 * @return string A hash route.
+	 */
+	public static function landing_route() {
+		foreach ( GoogleLocationRepository::all() as $listing ) {
+			if ( (int) $listing['fhint_location_id'] > 0 ) {
+				return '#/google';
+			}
+		}
+
+		return '#/setup/google';
+	}
+
+	/**
+	 * Send the browser back into the plugin.
+	 *
+	 * @param bool $connected Whether the sign-in succeeded. A failure always
+	 *                        returns to the Google screen, which is where
+	 *                        its explanation is shown.
 	 * @return void
 	 */
-	private static function redirect_to_screen() {
-		wp_safe_redirect( admin_url( 'admin.php?page=' . FHINT_PLUGIN_SLUG . '#/google' ) );
+	private static function redirect_to_screen( $connected = false ) {
+		wp_safe_redirect( admin_url( 'admin.php?page=' . FHINT_PLUGIN_SLUG . ( $connected ? self::landing_route() : '#/google' ) ) );
 		exit;
 	}
 }

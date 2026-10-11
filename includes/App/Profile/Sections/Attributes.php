@@ -8,6 +8,7 @@
 namespace FHINT\App\Profile\Sections;
 
 use FHINT\App\Core\ValidationResult;
+use FHINT\App\Google\AttributeCatalog;
 use FHINT\App\Location\LocationAttributeRepository;
 use FHINT\App\Location\LocationAttributes;
 use FHINT\App\Profile\Profile;
@@ -22,9 +23,9 @@ defined( 'ABSPATH' ) || exit;
  * are touched, and `null` withdraws an answer — which is not the same as
  * answering "no".
  *
- * `definitions` is the list of attributes Google offers this kind of
- * business. It is empty until that list has been fetched from Google, so for
- * now a client can store values but has no menu to offer them from.
+ * `definitions` is the list of attributes Google offers this listing. It is
+ * read from Google by `POST /profile/google/refresh` and is empty until then,
+ * or for a location with no Google listing.
  */
 class Attributes {
 
@@ -35,11 +36,12 @@ class Attributes {
 	 */
 	public static function read() {
 		$location = Profile::location();
+		$google   = Profile::google_location();
 
 		return array(
 			'location_id' => $location ? (int) $location['id'] : 0,
 			'values'      => $location ? LocationAttributeRepository::for_location( (int) $location['id'] ) : array(),
-			'definitions' => array(),
+			'definitions' => $google ? AttributeCatalog::definitions( (string) $google['location_name'] ) : array(),
 		);
 	}
 

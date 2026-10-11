@@ -318,6 +318,9 @@ class LocationRepository {
 		$record['latitude']          = ( null === $row['latitude'] || '' === $row['latitude'] ) ? null : (float) $row['latitude'];
 		$record['longitude']         = ( null === $row['longitude'] || '' === $row['longitude'] ) ? null : (float) $row['longitude'];
 
+		$categories                     = isset( $row['secondary_categories'] ) ? json_decode( (string) $row['secondary_categories'], true ) : null;
+		$record['secondary_categories'] = is_array( $categories ) ? $categories : array();
+
 		return $record;
 	}
 
@@ -344,6 +347,9 @@ class LocationRepository {
 			'timezone'       => (string) $record['timezone'],
 			'status'         => (string) $record['status'],
 			'is_primary'     => ! empty( $record['is_primary'] ) ? 1 : 0,
+			'primary_category'     => isset( $record['primary_category'] ) ? (string) $record['primary_category'] : '',
+			'primary_category_id'  => isset( $record['primary_category_id'] ) ? (string) $record['primary_category_id'] : '',
+			'secondary_categories' => wp_json_encode( isset( $record['secondary_categories'] ) && is_array( $record['secondary_categories'] ) ? array_values( $record['secondary_categories'] ) : array() ),
 		);
 	}
 }

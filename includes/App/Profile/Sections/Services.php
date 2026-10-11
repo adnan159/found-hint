@@ -10,6 +10,7 @@ namespace FHINT\App\Profile\Sections;
 use FHINT\App\Business\BusinessRepository;
 use FHINT\App\Core\Limits;
 use FHINT\App\Core\ValidationResult;
+use FHINT\App\Google\ReferenceRepository;
 use FHINT\App\Profile\Profile;
 use FHINT\App\Service\Service;
 use FHINT\App\Service\ServiceRepository;
@@ -58,10 +59,37 @@ class Services {
 		return array(
 			'items'        => $items,
 			'limits'       => Limits::report( Limits::SERVICES, count( $items ) ),
-			// The services Google already knows for this category. Empty until
-			// that list has been fetched from Google.
-			'google_types' => array(),
+			// The services Google already knows for this listing's categories,
+			// each `{ id, label, category }`. Read from Google by
+			// `POST /profile/google/refresh`; empty until then, for a location
+			// with no listing, and for a category Google has none for.
+			'google_types' => self::google_types(),
 		);
+	}
+
+	/**
+	 * The ready-made services stored for the selected location's listing.
+	 *
+	 * @return array[]
+	 */
+	private static function google_types() {
+		$google = Profile::google_location();
+
+		if ( ! $google ) {
+			return array();
+		}
+
+		$types = array();
+
+		foreach ( ReferenceRepository::for_parent( ReferenceRepository::KIND_SERVICE_TYPE, (string) $google['location_name'] ) as $entry ) {
+			$types[] = array(
+				'id'       => $entry['item_id'],
+				'label'    => $entry['display_name'],
+				'category' => isset( $entry['payload']['category'] ) ? (string) $entry['payload']['category'] : '',
+			);
+		}
+
+		return $types;
 	}
 
 	/**

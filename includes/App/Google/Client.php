@@ -74,13 +74,69 @@ class Client {
 	 * @return array|WP_Error Decoded response body.
 	 */
 	public static function patch( $url, array $query, array $body ) {
+		return self::write( 'PATCH', $url, $query, $body );
+	}
+
+	/**
+	 * POST a JSON body to a Google API URL, as the connected account.
+	 *
+	 * Used where Google creates something — a photo on a listing — rather
+	 * than changing a field. The same single retry on a rejected token as
+	 * every other call here, and nothing more.
+	 *
+	 * @param string $url   Absolute URL.
+	 * @param array  $query Query parameters.
+	 * @param array  $body  Request body, sent as JSON.
+	 * @return array|WP_Error Decoded response body.
+	 */
+	public static function post( $url, array $query, array $body ) {
+		return self::write( 'POST', $url, $query, $body );
+	}
+
+	/**
+	 * POST a file's bytes to a Google upload URL.
+	 *
+	 * The body is the file itself, not JSON, and a photo can take longer to
+	 * send than a field does to save — so this is the one call with a longer
+	 * timeout.
+	 *
+	 * @param string $url          Absolute upload URL.
+	 * @param array  $query        Query parameters.
+	 * @param string $bytes        The file's contents.
+	 * @param string $content_type The file's MIME type.
+	 * @return array|WP_Error Decoded response body.
+	 */
+	public static function upload( $url, array $query, $bytes, $content_type ) {
+		return self::write(
+			'POST',
+			$url,
+			$query,
+			null,
+			array(
+				'body' => (string) $bytes,
+				'type' => (string) $content_type,
+			)
+		);
+	}
+
+	/**
+	 * A write, with one retry when Google rejects the token.
+	 *
+	 * @param string     $method PATCH or POST.
+	 * @param string     $url    Absolute URL.
+	 * @param array      $query  Query parameters.
+	 * @param array|null $body   Body sent as JSON.
+	 * @param array|null $raw    `{ body, type }` to send bytes instead.
+	 * @return array|WP_Error
+	 */
+	private static function write( $method, $url, array $query, $body, $raw = null ) {
 		$token = Connection::access_token();
 
 		if ( is_wp_error( $token ) ) {
 			return $token;
 		}
 
-		$result = self::request( $url, $query, $token, 'PATCH', $body );
+		$result = self::request( $url, $query, $token, $method, $body, $raw );
 
 		if ( ! self::is_unauthorized( $result ) ) {
 			return $result;
@@ -94,7 +150,7 @@ class Client {
 			return $token;
 		}
 
-		return self::request( $url, $query, $token, 'PATCH', $body );
+		return self::request( $url, $query, $token, $method, $body, $raw );
 	}
 
 	/**
@@ -119,11 +175,12 @@ class Client {
 	 * @param string     $url    Absolute URL.
 	 * @param array      $query  Query parameters.
 	 * @param string     $token  Access token.
-	 * @param string     $method GET or PATCH.
+	 * @param string     $method GET, PATCH or POST.
 	 * @param array|null $body   Body for a write, sent as JSON.
+	 * @param array|null $raw    `{ body, type }` to send bytes instead of JSON.
 	 * @return array|WP_Error
 	 */
-	private static function request( $url, array $query, $token, $method = 'GET', $body = null ) {
+	private static function request( $url, array $query, $token, $method = 'GET', $body = null, $raw = null ) {
 		if ( $query ) {
 			$url .= ( false === strpos( $url, '?' ) ? '?' : '&' ) . http_build_query( $query );
 		}
@@ -138,6 +195,13 @@ class Client {
 
 		if ( 'GET' === $method ) {
 			$response = wp_remote_get( $url, $args );
+		} elseif ( is_array( $raw ) ) {
+			$args['method']                  = $method;
+			$args['timeout']                 = 60;
+			$args['headers']['Content-Type'] = $raw['type'];
+			$args['body']                    = $raw['body'];
+
+			$response = wp_remote_request( $url, $args );
 		} else {
 			$args['method']                  = $method;
 			$args['headers']['Content-Type'] = 'application/json';

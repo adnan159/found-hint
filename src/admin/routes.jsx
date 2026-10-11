@@ -9,8 +9,10 @@ import Locations from "./pages/locations";
 import Reviews from "./pages/reviews";
 import Schema from "./pages/schema";
 import NotFound from "./pages/not-found";
+import Profile from "./pages/profile";
 import Services from "./pages/services";
 import Setup from "./pages/setup";
+import SetupGoogle from "./pages/setup/google";
 import Settings from "./pages/settings";
 
 /**
@@ -31,7 +33,10 @@ export const router = createHashRouter([
     children: [
       { index: true, element: <Dashboard /> },
       { path: "audit", element: <Audit /> },
-      { path: "business", element: <Business /> },
+      // The profile is the Business screen. The older form keeps the fields
+      // that only the site's own markup uses, one level down.
+      { path: "business", element: <Profile /> },
+      { path: "business/details", element: <Business /> },
       { path: "google", element: <Google /> },
       { path: "locations", element: <Locations /> },
       { path: "locations/:id", element: <LocationDetail /> },
@@ -40,6 +45,8 @@ export const router = createHashRouter([
       { path: "services", element: <Services /> },
       { path: "settings", element: <Settings /> },
       { path: "setup", element: <Setup /> },
+      // Where a first Google sign-in lands: the guided import.
+      { path: "setup/google", element: <SetupGoogle /> },
       { path: "*", element: <NotFound /> },
     ],
   },

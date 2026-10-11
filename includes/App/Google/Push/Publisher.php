@@ -13,6 +13,7 @@ use FHINT\App\Google\Client;
 use FHINT\App\Google\Connection;
 use FHINT\App\Google\GoogleLocationRepository;
 use FHINT\App\Location\LocationAttributeRepository;
+use FHINT\App\Location\LocationCategories;
 use FHINT\App\Location\SpecialHoursRepository;
 use FHINT\App\Nap\Nap;
 use FHINT\App\Profile\Profile;
@@ -387,17 +388,22 @@ class Publisher {
 	public static function local() {
 		$business = BusinessRepository::get();
 		$business = $business ? $business : array();
-		$nap      = Nap::resolve();
+		// The location the request chose, so a second branch is compared with
+		// its own hours and attributes and not with the primary one's.
+		$selected = Profile::location();
+		$nap      = Nap::resolve( $selected ? (int) $selected['id'] : 0 );
 		$location = (int) $nap['location_id'];
+		// A listing is sent the categories of its own location.
+		$categories = LocationCategories::resolve( $selected, $business );
 
 		return array(
 			'name'                 => isset( $business['name'] ) ? (string) $business['name'] : '',
 			'description'          => isset( $business['description'] ) ? (string) $business['description'] : '',
 			'website'              => (string) $nap['website'],
 			'phone'                => (string) $nap['phone'],
-			'primary_category'     => isset( $business['primary_category'] ) ? (string) $business['primary_category'] : '',
-			'primary_category_id'  => isset( $business['primary_category_id'] ) ? (string) $business['primary_category_id'] : '',
-			'secondary_categories' => isset( $business['secondary_categories'] ) && is_array( $business['secondary_categories'] ) ? $business['secondary_categories'] : array(),
+			'primary_category'     => $categories['primary_category'],
+			'primary_category_id'  => $categories['primary_category_id'],
+			'secondary_categories' => $categories['secondary_categories'],
 			'days'                 => isset( $nap['hours']['days'] ) && is_array( $nap['hours']['days'] ) ? $nap['hours']['days'] : array(),
 			'special_rows'         => SpecialHoursRepository::for_location( $location ),
 			'services'             => ServiceRepository::all(),

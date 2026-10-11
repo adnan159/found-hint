@@ -236,11 +236,15 @@
 /*
  * WordPress's admin stylesheet styles bare inputs, tables and buttons, and
  * it loads after ours. These re-assert the few properties it overrides
- * inside our own screen only.
+ * inside our own screen only — and inside dialogs, which are portalled to
+ * the end of `body` and so sit outside `#fhint-app`.
  */
 #fhint-app input:not([type="checkbox"]):not([type="radio"]),
 #fhint-app textarea,
-#fhint-app select {
+#fhint-app select,
+[data-slot="dialog-content"] input:not([type="checkbox"]):not([type="radio"]),
+[data-slot="dialog-content"] textarea,
+[data-slot="dialog-content"] select {
   box-shadow: none;
   border-radius: 0;
   min-height: 0;

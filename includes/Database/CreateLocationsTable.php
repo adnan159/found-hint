@@ -50,6 +50,16 @@ defined( 'ABSPATH' ) || exit;
  *                           Mirrors what Google lets an operator publish.
  * @column is_primary        1 for the location used when a single place is needed
  *                           (schema output, the dashboard). Exactly one row should hold it.
+ * @column primary_category  This location's own main category, when it differs
+ *                           from the business's. Empty means "use the business
+ *                           value" — the same rule as the contact columns. Only
+ *                           a location that is not the primary one keeps its
+ *                           own: two Google listings under one account can be
+ *                           two kinds of business.
+ * @column primary_category_id Google's id for that category, e.g. 'gcid:pet_store'.
+ * @column secondary_categories JSON array of this location's own additional
+ *                           categories, each `{ id, name }`. Read only when
+ *                           primary_category is set.
  * @column created_at        Row creation timestamp, UTC.
  * @column updated_at        Last write timestamp, UTC.
  */
@@ -85,6 +95,9 @@ class CreateLocationsTable {
 	timezone varchar(64) NOT NULL default '',
 	status varchar(32) NOT NULL default 'active',
 	is_primary tinyint(1) NOT NULL default 0,
+	primary_category varchar(150) NOT NULL default '',
+	primary_category_id varchar(100) NOT NULL default '',
+	secondary_categories longtext NULL,
 	created_at datetime NULL,
 	updated_at datetime NULL,
 	PRIMARY KEY  (id),

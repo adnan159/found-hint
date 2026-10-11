@@ -8,6 +8,7 @@
 namespace FHINT\App\Google;
 
 use FHINT\App\Business\BusinessRepository;
+use FHINT\App\Location\LocationCategories;
 use FHINT\App\Location\LocationRepository;
 use FHINT\App\Location\OpeningHours;
 use FHINT\App\Location\OpeningHoursRepository;
@@ -57,6 +58,7 @@ class Import {
 		'name',
 		'description',
 		'business_type',
+		'categories',
 		'phone',
 		'website',
 		'social',
@@ -67,10 +69,127 @@ class Import {
 	);
 
 	/** Fields belonging to the business rather than to one of its locations. */
-	const BUSINESS_FIELDS = array( 'name', 'description', 'business_type', 'phone', 'website', 'social' );
+	const BUSINESS_FIELDS = array( 'name', 'description', 'business_type', 'categories', 'phone', 'website', 'social' );
 
 	/** Fields that are the location's own. */
 	const LOCATION_FIELDS = array( 'address', 'coordinates', 'hours' );
+
+	/**
+	 * The guided import, as the steps a person watches go by.
+	 *
+	 * Each step is one request, so the screen can tick them off as they
+	 * land instead of showing a spinner over all six. A step is a group of
+	 * the fields above that mean one thing to an owner: "address and map
+	 * pin" is two fields here and one line there.
+	 */
+	const STEPS = array(
+		'identity' => array( 'name', 'description' ),
+		'category' => array( 'categories', 'business_type' ),
+		'address'  => array( 'address', 'coordinates' ),
+		'contact'  => array( 'phone', 'website', 'social' ),
+		'hours'    => array( 'hours' ),
+		'services' => array( 'services' ),
+	);
+
+	/** How long one read of Google may serve the steps of one import. */
+	const READ_TTL = 120;
+
+	/**
+	 * Whether read() may answer from the copy an earlier step stored.
+	 *
+	 * @var bool
+	 */
+	private static $reuse_read = false;
+
+	/**
+	 * Run one step of the guided import.
+	 *
+	 * Six steps would be six reads of the same listing, two requests each,
+	 * against a quota every site shares. So the first step reads Google and
+	 * keeps the answer for two minutes, and the steps after it use that.
+	 * The copy is held on the server, never taken from the browser — which
+	 * is the property an import must keep: what is written is what Google
+	 * said, not what a client sent.
+	 *
+	 * @param string $step          One of the STEPS keys.
+	 * @param string $location_name Google profile to import from.
+	 * @return array|WP_Error The step's outcome.
+	 */
+	public static function step( $step, $location_name = '' ) {
+		$step = (string) $step;
+
+		if ( ! isset( self::STEPS[ $step ] ) ) {
+			return new WP_Error(
+				'fhint_import_unknown_step',
+				__( 'That is not a step of the import.', 'foundhint-local-seo' ),
+				array( 'status' => 400 )
+			);
+		}
+
+		$steps = array_keys( self::STEPS );
+
+		// The first step always asks Google afresh, so an import started
+		// now never runs on what an import started earlier was told.
+		self::$reuse_read = $steps[0] !== $step;
+
+		$result = self::apply( self::STEPS[ $step ], $location_name );
+
+		self::$reuse_read = false;
+
+		if ( is_wp_error( $result ) ) {
+			return $result;
+		}
+
+		if ( $result['applied'] ) {
+			$status = 'imported';
+		} elseif ( count( $result['skipped'] ) === count( self::STEPS[ $step ] ) ) {
+			// Google holds nothing for this step. Not a failure, and worth
+			// saying differently from "done".
+			$status = 'empty';
+		} else {
+			$status = 'unchanged';
+		}
+
+		return array(
+			'step'        => $step,
+			'status'      => $status,
+			'applied'     => $result['applied'],
+			'skipped'     => $result['skipped'],
+			'location_id' => $result['location_id'],
+			'next'        => self::next_step( $step ),
+		);
+	}
+
+	/**
+	 * The steps in order, for a screen to list before any has run.
+	 *
+	 * @return array[] Each `{ id, fields }`.
+	 */
+	public static function steps() {
+		$steps = array();
+
+		foreach ( self::STEPS as $id => $fields ) {
+			$steps[] = array(
+				'id'     => $id,
+				'fields' => $fields,
+			);
+		}
+
+		return $steps;
+	}
+
+	/**
+	 * The step after a given one, or '' at the end.
+	 *
+	 * @param string $step Step id.
+	 * @return string
+	 */
+	private static function next_step( $step ) {
+		$steps    = array_keys( self::STEPS );
+		$position = array_search( $step, $steps, true );
+
+		return false !== $position && isset( $steps[ $position + 1 ] ) ? $steps[ $position + 1 ] : '';
+	}
 
 	/**
 	 * Read Google and show both sides.
@@ -158,7 +277,7 @@ class Import {
 
 		$applied = array_merge(
 			self::write_business( $fields, $chosen, (bool) $location['is_primary'] ),
-			self::write_location( $fields, $chosen, (int) $location['id'] ),
+			self::write_location( $fields, $chosen, (int) $location['id'], (bool) $location['is_primary'] ),
 			self::write_services( $fields, $chosen )
 		);
 
@@ -370,12 +489,24 @@ class Import {
 		foreach ( array_intersect( self::BUSINESS_FIELDS, $chosen ) as $key ) {
 			// A branch's phone and website are its own. Writing them to the
 			// business as well would make the second shop's number answer
-			// for the first.
-			if ( ! $is_primary && in_array( $key, array( 'phone', 'website' ), true ) ) {
+			// for the first. Its categories are too, and are written to the
+			// branch itself in write_location().
+			if ( ! $is_primary && in_array( $key, array( 'phone', 'website', 'categories' ), true ) ) {
 				continue;
 			}
 
 			$value = $fields[ $key ]['theirs_raw'];
+
+			if ( 'categories' === $key ) {
+				// Stored as Google named them, id and all: the id is what a
+				// later publish sends back, and a category picked here from
+				// the search is stored in exactly this shape.
+				$changes['primary_category']     = $value['primary']['name'];
+				$changes['primary_category_id']  = $value['primary']['id'];
+				$changes['secondary_categories'] = $value['additional'];
+				$written[]                       = $key;
+				continue;
+			}
 
 			if ( 'social' === $key ) {
 				$business = BusinessRepository::get();
@@ -409,11 +540,22 @@ class Import {
 	 * @param array $fields      Compared fields, keyed.
 	 * @param array $chosen      Field keys being imported.
 	 * @param int   $location_id Location to write to.
+	 * @param bool  $is_primary  Whether that location is the primary one.
 	 * @return array Keys written.
 	 */
-	private static function write_location( array $fields, array $chosen, $location_id ) {
+	private static function write_location( array $fields, array $chosen, $location_id, $is_primary = true ) {
 		$changes = array();
 		$written = array();
+
+		// A branch's listing has its own categories, and they are kept on
+		// the branch. The primary location's are the business's and were
+		// written there.
+		if ( ! $is_primary && in_array( 'categories', $chosen, true ) ) {
+			$changes['primary_category']     = $fields['categories']['theirs_raw']['primary']['name'];
+			$changes['primary_category_id']  = $fields['categories']['theirs_raw']['primary']['id'];
+			$changes['secondary_categories'] = $fields['categories']['theirs_raw']['additional'];
+			$written[]                       = 'categories';
+		}
 
 		if ( in_array( 'address', $chosen, true ) ) {
 			$changes   = array_merge( $changes, $fields['address']['theirs_raw'] );
@@ -503,6 +645,32 @@ class Import {
 	 * @return array|WP_Error Normalised values.
 	 */
 	private static function read( $location_name ) {
+		$cache_key = 'fhint_import_read_' . md5( (string) $location_name );
+
+		if ( self::$reuse_read ) {
+			$cached = get_transient( $cache_key );
+
+			if ( is_array( $cached ) ) {
+				return $cached;
+			}
+		}
+
+		$theirs = self::read_fresh( $location_name );
+
+		if ( ! is_wp_error( $theirs ) ) {
+			set_transient( $cache_key, $theirs, self::READ_TTL );
+		}
+
+		return $theirs;
+	}
+
+	/**
+	 * Ask Google for one location and its attributes.
+	 *
+	 * @param string $location_name Google resource name, e.g. `locations/123`.
+	 * @return array|WP_Error Normalised values.
+	 */
+	private static function read_fresh( $location_name ) {
 		// The resource name carries its own slash and must reach Google
 		// unencoded — it is a path, not a parameter.
 		$response = Client::get(
@@ -643,6 +811,33 @@ class Import {
 
 				return self::describe( $key, $our_text, $their_text, $theirs['services'], $available, $missing > 0 );
 
+			case 'categories':
+				$their_categories = $theirs['categories'];
+				$available        = null !== $their_categories['primary'];
+				// Compared with what this listing's own location shows.
+				$ours             = LocationCategories::resolve(
+					! empty( $nap['location_id'] ) ? LocationRepository::find( (int) $nap['location_id'] ) : null,
+					BusinessRepository::get()
+				);
+				$our_categories   = array(
+					'primary'    => '' !== $ours['primary_category']
+						? array(
+							'id'   => $ours['primary_category_id'],
+							'name' => $ours['primary_category'],
+						)
+						: null,
+					'additional' => $ours['secondary_categories'],
+				);
+
+				return self::describe(
+					$key,
+					self::categories_text( $our_categories ),
+					$available ? self::categories_text( $their_categories ) : '',
+					$their_categories,
+					$available,
+					$available && self::categories_signature( $their_categories ) !== self::categories_signature( $our_categories )
+				);
+
 			case 'business_type':
 				$available  = '' !== $theirs['business_type'];
 				$their_text = $available
@@ -666,6 +861,63 @@ class Import {
 		$available   = '' !== trim( $their_value );
 
 		return self::describe( $key, $our_value, $their_value, $their_value, $available );
+	}
+
+	/**
+	 * Categories as one readable line: the main one, then the rest.
+	 *
+	 * @param array $categories `{ primary, additional }`.
+	 * @return string
+	 */
+	private static function categories_text( array $categories ) {
+		if ( empty( $categories['primary'] ) ) {
+			return '';
+		}
+
+		$names = array();
+
+		foreach ( $categories['additional'] as $category ) {
+			if ( is_array( $category ) && isset( $category['name'] ) ) {
+				$names[] = (string) $category['name'];
+			}
+		}
+
+		if ( ! $names ) {
+			return (string) $categories['primary']['name'];
+		}
+
+		return sprintf(
+			/* translators: 1: the main category, 2: a list of the additional categories. */
+			__( '%1$s, plus %2$s', 'foundhint-local-seo' ),
+			(string) $categories['primary']['name'],
+			implode( ', ', $names )
+		);
+	}
+
+	/**
+	 * Categories reduced to something two sides can be compared by.
+	 *
+	 * By id where there is one, since the same category is worded differently
+	 * from one language to the next; the additional ones are sorted, because
+	 * their order means nothing.
+	 *
+	 * @param array $categories `{ primary, additional }`.
+	 * @return string
+	 */
+	private static function categories_signature( array $categories ) {
+		$key = static function ( $category ) {
+			if ( ! is_array( $category ) ) {
+				return '';
+			}
+
+			return ! empty( $category['id'] ) ? (string) $category['id'] : 'name:' . strtolower( isset( $category['name'] ) ? (string) $category['name'] : '' );
+		};
+
+		$additional = array_map( $key, $categories['additional'] );
+
+		sort( $additional );
+
+		return $key( $categories['primary'] ) . '|' . implode( ',', $additional );
 	}
 
 	/**

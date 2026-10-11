@@ -81,6 +81,31 @@ export const googleApi = baseApi.injectEndpoints({
       invalidatesTags: ["Business", "Location", "Schema", "Audit"],
     }),
 
+    // The guided import. The list of steps costs nothing; each step is one
+    // request so the screen can tick them off as they land.
+    getGoogleImportSteps: builder.query({
+      query: () => "/google/import/steps",
+      transformResponse: (response) => response?.data ?? [],
+    }),
+
+    runGoogleImportStep: builder.mutation({
+      query: ({ step, locationName = "" }) => ({
+        url: "/google/import/step",
+        method: "POST",
+        body: { step, location_name: locationName },
+      }),
+      transformResponse: (response) => response?.data ?? null,
+      invalidatesTags: [
+        "Business",
+        "Location",
+        "Service",
+        "Schema",
+        "Audit",
+        "Dashboard",
+        "GoogleProfiles",
+      ],
+    }),
+
     disconnectGoogle: builder.mutation({
       query: () => ({ url: "/google", method: "DELETE" }),
       // Whether Google confirmed the revocation travels in `meta`, not in
@@ -106,4 +131,6 @@ export const {
   useDisconnectGoogleMutation,
   useImportFromGoogleMutation,
   usePreviewGoogleImportMutation,
+  useGetGoogleImportStepsQuery,
+  useRunGoogleImportStepMutation,
 } = googleApi;

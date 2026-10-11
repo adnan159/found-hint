@@ -737,6 +737,93 @@ rules are the weekly ones. Also refused: a date that does not exist
 (`special_hours.date.duplicate`), each keyed by the day's position in the list
 sent. `note` is the owner's own label and is never sent to Google.
 
+### Choosing a location
+
+Every profile route — `GET /profile`, the section save, and both publish
+routes — takes an optional `location_id`. Left out or `0`, it means the
+primary location, which is all a single-location site ever needs. Any other
+id reads, saves or publishes that location: its address, hours, attributes,
+photos and its own Google listing. The business-level sections (`info`,
+`social`, `services`) are the same whichever location is named — **except the
+categories in `info`**, which follow the location: the primary location's are
+the business's, and any other location keeps its own once it has a main
+category, showing the business's until then. Saving categories for a
+non-primary location writes them to that location and leaves the business's
+alone.
+`404 fhint_location_not_found` for an id that does not exist.
+
+`meta` on `GET /profile` carries what a header and a switcher need:
+
+```json
+{
+  "location":  { "id": 2, "name": "Harbour branch", "address": "2 Harbour Road, Chittagong, BD", "is_primary": false },
+  "locations": [ { "id": 1, "name": "Head office", "address": "…", "is_primary": true }, { "id": 2, "name": "Harbour branch", "address": "…", "is_primary": false } ],
+  "reviews":   { "average": 4.6, "count": 184 }
+}
+```
+
+`reviews` is the rating of this location's own Google listing, from stored
+reviews; `null` when the location has no listing or no review has been read.
+
+### `POST /profile/google/refresh`
+
+Reads what only Google can supply for the profile, **and changes nothing on
+Google**: the attributes Google offers this listing, the answers it holds, its
+photos and its Maps id. Takes `location_id`. `409` with the publish routes'
+codes when Google is not connected or the location has no listing.
+
+Answers with the whole profile, as `GET /profile` does, plus what arrived:
+
+```json
+{ "meta": { "refresh": { "categories": false, "attributes": 42, "answers": 26, "photos": 15, "failed": [] } } }
+```
+
+`failed` names any part Google refused (`attributes`, `answers`, `photos`);
+the others are still stored. The request fails only when nothing arrived.
+
+- **Categories are filled in, never replaced.** A location with no category
+  of its own is given the ones its listing has on Google, and `categories` is
+  `true`. One that has a category keeps it.
+- **Ready-made services.** `data.services.google_types` lists the services
+  Google already has for this listing's categories, as `{ id, label,
+  category }`; `refresh.service_types` is how many. Save a service with
+  `google_item_type: "structured"` and that `id` as `google_service_type_id`
+  to send it as Google's own entry rather than as free text.
+- **Attributes are per listing.** `data.attributes.definitions` is Google's
+  own list for this listing — it depends on the category and country — as
+  `{ id, label, group, type, options, allows_false }`. `type` is `bool`,
+  `enum` or `repeated_enum`; link attributes are left to the Social section.
+  `allows_false` says whether a yes/no attribute can be answered "no": where
+  it cannot, send `null` to withdraw the answer instead of `false`.
+- **An answer edited here is kept.** Google's answers are stored as clean
+  copies; one changed on this site and not yet sent is not overwritten.
+- **Photos are not downloaded.** Each is a row pointing at Google's own copy.
+  Videos are skipped, and so are photos customers added.
+- `meta.google.refreshed_at` is when this last ran, `null` if it never has.
+
+### Photos
+
+| Route | |
+|---|---|
+| `POST /profile/media` | Multipart: `file`, `role` (`logo`, `cover`, `gallery`), `location_id`. Keeps the photo in the media library as **waiting**. Sends nothing to Google. |
+| `POST /profile/media/{id}/publish` | Sends one waiting photo to Google. One request per photo, so each reports for itself. |
+| `DELETE /profile/media/{id}` | Forgets a photo that has not been sent, and deletes its file. `409 fhint_media_on_google` for one that has. |
+
+All three answer with the whole profile. Waiting photos are under
+`data.media.pending` with `state` `pending`, `uploading` or `failed` (and
+`error`, Google's own words, when failed).
+
+A file is checked before it is kept — `400 fhint_validation_failed` with
+`fields.file`: `media.type.unsupported` (JPG and PNG only),
+`media.size.too_large` (over 5 MB), `media.size.too_small`,
+`media.dimensions.too_small` (under 250 px on a side). Choosing a second logo
+or cover replaces the one that was waiting.
+
+Publishing sends the file's bytes rather than a link to them, so it works on
+a site Google cannot reach. `404 fhint_media_not_found` when the photo is not
+this location's; `409 fhint_media_already_sent`; `502` when Google refuses,
+with the photo left as `failed`.
+
 ### `POST /profile/publish/plan`
 
 Works out what publishing the profile to Google would send, **and sends
@@ -880,6 +967,58 @@ validate-only step records nothing.
 
 Google throttles edits made in quick succession, so leave the steps
 sequential rather than firing them together.
+
+
+### The guided import: `GET /google/import/steps`, `POST /google/import/step`
+
+The import as six steps, **one request each**, so a screen can tick them off
+as they land. This is what the setup screen at `#/setup/google` runs after a
+first Google sign-in.
+
+`GET /google/import/steps` lists them in order and calls nothing:
+
+```json
+{ "data": [
+  { "id": "identity", "fields": ["name", "description"] },
+  { "id": "category", "fields": ["categories", "business_type"] },
+  { "id": "address",  "fields": ["address", "coordinates"] },
+  { "id": "contact",  "fields": ["phone", "website", "social"] },
+  { "id": "hours",    "fields": ["hours"] },
+  { "id": "services", "fields": ["services"] }
+] }
+```
+
+`POST /google/import/step` runs one:
+
+```json
+{ "step": "address", "location_name": "locations/123" }
+```
+
+```json
+{ "data": { "step": "address", "status": "imported",
+            "applied": ["address", "coordinates"], "skipped": [],
+            "location_id": 1, "next": "contact" } }
+```
+
+| `status` | Meaning |
+|---|---|
+| `imported` | Something was written. |
+| `empty` | Google holds nothing for this step. Not a failure. |
+| `unchanged` | Google has it, and nothing new needed writing. |
+
+`next` is the step that follows, `""` after the last. Run them in order: the
+first step (`identity`) reads Google and creates the business and location if
+there are none; the others reuse that read for two minutes, so six steps cost
+one read of Google, not six. A step run with no stored read asks Google
+itself. The read is kept on the server and never taken from the request.
+
+Errors are those of `POST /google/import`, plus `400` for a step that does
+not exist.
+
+**Where a sign-in lands.** After a successful Google sign-in the browser is
+sent to `#/setup/google` when no Google listing belongs to a location yet (a
+first connection), and to `#/google` otherwise. A failed sign-in always
+returns to `#/google`, where its explanation is shown.
 
 
 ## Reviews

@@ -46,6 +46,20 @@ const MESSAGES = {
       "That date is already in the list. Edit the existing entry instead.",
       "foundhint-local-seo",
     ),
+  "media.type.unsupported": () =>
+    __("Google accepts JPG and PNG photos only.", "foundhint-local-seo"),
+  "media.size.too_large": () =>
+    __("That photo is over 5 MB. Choose a smaller one.", "foundhint-local-seo"),
+  "media.size.too_small": () =>
+    __(
+      "That file is too small to be a photo Google will accept.",
+      "foundhint-local-seo",
+    ),
+  "media.dimensions.too_small": () =>
+    __(
+      "That photo is too small. Google needs at least 250 pixels on each side.",
+      "foundhint-local-seo",
+    ),
   "attributes.value.invalid": () =>
     __("That is not a value Google accepts here.", "foundhint-local-seo"),
   "service.not_found": () =>
@@ -311,6 +325,30 @@ export function errorMessage(error) {
       __("Nothing to reorder.", "foundhint-local-seo"),
     fhint_validation_failed: () =>
       __("Check the highlighted fields and try again.", "foundhint-local-seo"),
+    fhint_address_locked: () =>
+      __(
+        "This address comes from your Google Business Profile. Change it on Google and it will be picked up here.",
+        "foundhint-local-seo",
+      ),
+    fhint_google_not_connected: () =>
+      __("Connect Google before sending your profile.", "foundhint-local-seo"),
+    fhint_google_not_mapped: () =>
+      __(
+        "Choose which Google listing belongs to this business first.",
+        "foundhint-local-seo",
+      ),
+    fhint_publish_stale: () =>
+      __(
+        "Something changed since this was checked. Check again before sending.",
+        "foundhint-local-seo",
+      ),
+    fhint_publish_nothing_to_send: () =>
+      __("Google already has everything in this step.", "foundhint-local-seo"),
+    fhint_google_rejected: () =>
+      __(
+        "Google did not accept this. Nothing was changed.",
+        "foundhint-local-seo",
+      ),
   };
 
   if (known[code]) {

@@ -100,6 +100,7 @@ foreach ( $fhint_tables as $fhint_table ) {
 $fhint_options = array(
 	'fhint_settings',
 	'fhint_version',
+	'fhint_db_version',
 	'fhint_first_install_time',
 	'fhint_data_changed_at',
 	'fhint_onboarding',

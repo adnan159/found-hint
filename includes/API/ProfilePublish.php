@@ -9,6 +9,7 @@ namespace FHINT\API;
 
 use FHINT\App\Google\Push\Plan;
 use FHINT\App\Google\Push\Publisher;
+use FHINT\App\Profile\Profile as ProfileService;
 use WP_REST_Server;
 
 defined( 'ABSPATH' ) || exit;
@@ -52,6 +53,7 @@ class ProfilePublish extends AbstractController {
 					'methods'             => WP_REST_Server::CREATABLE,
 					'callback'            => array( $this, 'plan' ),
 					'permission_callback' => array( $this, 'permissions_check' ),
+					'args'                => $this->args( array( 'location_id' => Profile::location_arg() ) ),
 				),
 			)
 		);
@@ -80,6 +82,7 @@ class ProfilePublish extends AbstractController {
 								'type'    => 'boolean',
 								'default' => false,
 							),
+							'location_id'   => Profile::location_arg(),
 						)
 					),
 				),
@@ -94,6 +97,12 @@ class ProfilePublish extends AbstractController {
 	 * @return \WP_REST_Response|\WP_Error
 	 */
 	public function step( $request ) {
+		$selected = ProfileService::select( (int) $request->get_param( 'location_id' ) );
+
+		if ( is_wp_error( $selected ) ) {
+			return $selected;
+		}
+
 		$result = Publisher::step(
 			(string) $request->get_param( 'step' ),
 			(string) $request->get_param( 'token' ),
@@ -110,6 +119,12 @@ class ProfilePublish extends AbstractController {
 	 * @return \WP_REST_Response|\WP_Error
 	 */
 	public function plan( $request ) {
+		$selected = ProfileService::select( (int) $request->get_param( 'location_id' ) );
+
+		if ( is_wp_error( $selected ) ) {
+			return $selected;
+		}
+
 		$plan = Publisher::plan();
 
 		if ( is_wp_error( $plan ) ) {

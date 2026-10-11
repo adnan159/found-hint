@@ -1273,3 +1273,106 @@ prototype's work that has no engine yet:
    failure path before it ships.
 3. **Google performance** — the same connection, needing its API enabled.
 
+
+## Step 23 — Business profile screen
+
+`src/admin/pages/profile/` is the Business screen now (`#/business`): seven
+collapsible sections over `GET /profile`, saved with one `PATCH /profile` per
+changed section from a single save bar at the foot of the page. No section has
+its own Save button; each header carries its state instead. The Business
+sidebar entry has no sub-items. The older form survives at
+`#/business/details` for the fields only the site's markup uses (legal name,
+business type, email, logo, price range, founding date).
+
+"Send to Google" opens a dialog that plans first (sends nothing), then runs
+one step request at a time and reports each.
+
+Drawn in the design but not built, because nothing stands behind them yet:
+the AI description writer, category suggestions, the live map, booking /
+ordering / texting / WhatsApp links and the wider directory list, Google's
+attribute menu (`definitions` is still empty), structured service types, CSV
+import, and photo upload.
+
+## Step 24 — Profile header and location switching
+
+Every profile route takes `location_id` (0 or absent = the primary location);
+`Profile::select()` is called first by each route, so the choice never carries
+from one request to the next. `GET /profile` `meta` gained `location`,
+`locations` and `reviews`. A publish now compares the chosen location with
+its own listing.
+
+The screen's header (`pages/profile/components/ProfileHeader.jsx`) shows the
+business and location, the listing's rating, "Switch location" when there is
+more than one, and "View on Google"; the choice lives in the address as
+`#/business?location=ID`. Not drawn: the notification bell, the account
+avatar, and "Upgrade to Pro" (there is no Pro page to send anyone to yet).
+
+## Step 25 — What only Google can supply
+
+- **Categories import.** `categories` is a field on the Google import: the
+  main and extra categories arrive with Google's ids. From the main
+  location's listing only — a branch does not re-categorise the business.
+- **The listing's Maps id** is read from `metadata.mapsUri` on a profile sync
+  and on a refresh; it was never being filled in.
+- **`POST /profile/google/refresh`** (`App\Profile\GoogleRefresh`) reads the
+  attributes Google offers the listing (`App\Google\AttributeCatalog`, stored
+  in `fhint_google_reference` under the listing's name), the answers it
+  holds, and its photos (`App\Media\MediaSync`). The screen runs it once on
+  first opening a mapped listing, then on request.
+- **Photos** can be chosen (`POST /profile/media`), sent one at a time
+  (`…/{id}/publish`: start upload, bytes, create) and taken back while still
+  waiting. `Client` gained `post()` and `upload()`.
+- **The Attributes section** is drawn from Google's list: tick boxes, single
+  and multiple choices. Attribute answers already went to Google as step two
+  of "Send to Google".
+- **The address map** is Leaflet (bundled) over OpenStreetMap tiles, declared
+  in `readme.txt`.
+
+Not built: removing a photo from Google, customer photos, videos. No photo
+has been sent to a real listing from here — the upload is proved against a
+stand-in for Google in `tests/Integration/database.php`.
+
+## Step 26 — Categories follow the location
+
+Two Google listings under one account can be two kinds of business, and with
+categories kept only on the business, saving either overwrote the other.
+`fhint_locations` gained `primary_category`, `primary_category_id` and
+`secondary_categories` (DB 0.9.0); `App\Location\LocationCategories` resolves
+location first, business second, the way contact details already do. The
+primary location's categories remain the business's. The profile, the Google
+import and the publish plan all read through it.
+
+`Installer::check_update()` now also re-runs dbDelta when the stored
+`fhint_db_version` differs from `FHINT_DB_VERSION`. Before this a column added
+without a plugin version bump never reached an existing install.
+
+## Step 27 — Switching location reads Google
+
+Switching location on the profile now runs `POST /profile/google/refresh` for
+the location arrived at, as well as on first opening a mapped listing. The
+refresh also **fills in categories where a location has none** (never
+replaces one), so a second listing shows its own category instead of the
+first one's. `meta.refresh.categories` says whether it did.
+
+## Step 28 — Service popup and Google's ready-made services
+
+The service form (`pages/profile/components/ServiceDialog.jsx`) follows the
+design: a Custom name / Google service switch, joined currency and price,
+counters, a "Show on Google" switch and a fixed footer. The Google service
+list is the listing's own — `categories.*.serviceTypes`, stored by the refresh
+as `service_type` rows in `fhint_google_reference` and returned as
+`data.services.google_types` (`{ id, label, category }`). A service saved from
+that list is `google_item_type: structured` with its `google_service_type_id`,
+which is what a publish already sends as a `structuredServiceItem`.
+
+Not built: "Write it for me" (no text generation behind it).
+
+## Step 29 — Guided import after connecting Google
+
+A first successful Google sign-in now lands on `#/setup/google`
+(`Connection::landing_route()`), not the Google screen. That screen
+(`src/admin/pages/setup/google.jsx`) picks the listing and runs the import in
+six steps — `Import::STEPS`, `POST /google/import/step`, one request each —
+then opens the Business Profile. The first step reads Google and the rest
+reuse that read from a two-minute transient. "I'll do this later" goes to the
+Business Profile without importing.

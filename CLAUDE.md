@@ -44,6 +44,7 @@ php tests/Smoke/google-profiles.php    # profile sync and mapping rules
 php tests/Smoke/schema-graph.php       # the JSON-LD graph and who publishes it
 php tests/Smoke/audit.php              # the rule set, scoring and the registry
 php tests/Smoke/dashboard.php          # the score trend and what the card may claim
+php tests/Smoke/google-refresh.php     # categories, attributes and photos read from a listing
 ```
 
 The smoke suites run on plain PHP against stubbed WordPress

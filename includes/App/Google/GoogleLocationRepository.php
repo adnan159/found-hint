@@ -123,6 +123,33 @@ class GoogleLocationRepository {
 	}
 
 	/**
+	 * Record Google's Maps id for a listing.
+	 *
+	 * @param string $location_name Google location resource name.
+	 * @param string $cid           The id, digits only.
+	 * @return bool
+	 */
+	public static function set_cid( $location_name, $cid ) {
+		global $wpdb;
+
+		$cid = preg_replace( '/\D+/', '', (string) $cid );
+
+		if ( '' === $cid || '' === (string) $location_name ) {
+			return false;
+		}
+
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+		return false !== $wpdb->update(
+			Tables::name( Tables::GOOGLE_LOCATIONS ),
+			array(
+				'cid'        => $cid,
+				'updated_at' => current_time( 'mysql', true ),
+			),
+			array( 'location_name' => (string) $location_name )
+		);
+	}
+
+	/**
 	 * Record that this site has just changed the listing.
 	 *
 	 * @param string $location_name Google location resource name.

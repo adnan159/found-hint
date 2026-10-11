@@ -49,6 +49,7 @@ class Profile extends AbstractController {
 					'methods'             => WP_REST_Server::READABLE,
 					'callback'            => array( $this, 'get_item' ),
 					'permission_callback' => array( $this, 'permissions_check' ),
+					'args'                => $this->args( array( 'location_id' => self::location_arg() ) ),
 				),
 				array(
 					'methods'             => 'POST, PUT, PATCH',
@@ -56,15 +57,16 @@ class Profile extends AbstractController {
 					'permission_callback' => array( $this, 'permissions_check' ),
 					'args'                => $this->args(
 						array(
-							'section' => array(
+							'section'     => array(
 								'type'     => 'string',
 								'required' => true,
 								'enum'     => array_keys( ProfileService::SECTIONS ),
 							),
-							'fields'  => array(
+							'fields'      => array(
 								'type'     => 'object',
 								'required' => true,
 							),
+							'location_id' => self::location_arg(),
 						)
 					),
 				),
@@ -73,12 +75,31 @@ class Profile extends AbstractController {
 	}
 
 	/**
+	 * The `location_id` every profile route accepts.
+	 *
+	 * @return array
+	 */
+	public static function location_arg() {
+		return array(
+			'type'    => 'integer',
+			'default' => 0,
+			'minimum' => 0,
+		);
+	}
+
+	/**
 	 * The whole profile.
 	 *
 	 * @param \WP_REST_Request $request Request.
-	 * @return \WP_REST_Response
+	 * @return \WP_REST_Response|\WP_Error
 	 */
 	public function get_item( $request ) {
+		$selected = ProfileService::select( (int) $request->get_param( 'location_id' ) );
+
+		if ( is_wp_error( $selected ) ) {
+			return $selected;
+		}
+
 		$profile = ProfileService::read();
 
 		return $this->envelope( $profile['sections'], $profile['meta'] );
@@ -91,6 +112,12 @@ class Profile extends AbstractController {
 	 * @return \WP_REST_Response|\WP_Error
 	 */
 	public function update_item( $request ) {
+		$selected = ProfileService::select( (int) $request->get_param( 'location_id' ) );
+
+		if ( is_wp_error( $selected ) ) {
+			return $selected;
+		}
+
 		$fields = $request->get_param( 'fields' );
 		$result = ProfileService::save( (string) $request->get_param( 'section' ), is_array( $fields ) ? $fields : array() );
 

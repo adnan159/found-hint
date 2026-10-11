@@ -205,6 +205,44 @@ class Google extends AbstractController {
 
 		register_rest_route(
 			$this->namespace,
+			'/google/import/steps',
+			array(
+				array(
+					'methods'             => WP_REST_Server::READABLE,
+					'callback'            => array( $this, 'import_steps' ),
+					'permission_callback' => array( $this, 'permissions_check' ),
+				),
+			)
+		);
+
+		register_rest_route(
+			$this->namespace,
+			'/google/import/step',
+			array(
+				array(
+					'methods'             => WP_REST_Server::CREATABLE,
+					'callback'            => array( $this, 'import_step' ),
+					'permission_callback' => array( $this, 'permissions_check' ),
+					'args'                => $this->args(
+						array(
+							'step'          => array(
+								'type'        => 'string',
+								'required'    => true,
+								'enum'        => array_keys( Import::STEPS ),
+								'description' => 'Which step of the guided import to run.',
+							),
+							'location_name' => array(
+								'type'    => 'string',
+								'default' => '',
+							),
+						)
+					),
+				),
+			)
+		);
+
+		register_rest_route(
+			$this->namespace,
 			'/google/connect',
 			array(
 				array(
@@ -243,6 +281,35 @@ class Google extends AbstractController {
 	public function import( $request ) {
 		$result = Import::apply(
 			(array) $request->get_param( 'fields' ),
+			(string) $request->get_param( 'location_name' )
+		);
+
+		if ( is_wp_error( $result ) ) {
+			return $result;
+		}
+
+		return $this->envelope( $result );
+	}
+
+	/**
+	 * The steps of the guided import, in order. Calls nothing.
+	 *
+	 * @param \WP_REST_Request $request Request.
+	 * @return \WP_REST_Response
+	 */
+	public function import_steps( $request ) {
+		return $this->envelope( Import::steps() );
+	}
+
+	/**
+	 * Run one step of the guided import.
+	 *
+	 * @param \WP_REST_Request $request Request.
+	 * @return \WP_REST_Response|WP_Error
+	 */
+	public function import_step( $request ) {
+		$result = Import::step(
+			(string) $request->get_param( 'step' ),
 			(string) $request->get_param( 'location_name' )
 		);
 

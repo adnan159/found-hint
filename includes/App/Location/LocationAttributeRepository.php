@@ -124,6 +124,96 @@ class LocationAttributeRepository {
 	}
 
 	/**
+	 * Store the answers Google holds, as answers that need no sending.
+	 *
+	 * This is a read of the listing, so it must not look like an edit: the
+	 * rows are written clean. **An answer changed here and not yet sent is
+	 * left alone** — it is newer than what Google has, and overwriting it
+	 * would undo the owner's edit behind their back. A clean answer Google no
+	 * longer holds is forgotten, for the same reason it is stored: this side
+	 * of a clean row is a copy.
+	 *
+	 * @param int   $location_id Row id in wp_fhint_locations.
+	 * @param array $set         `attribute_id => { type, value }`, as Google holds them.
+	 * @return int|false How many answers were stored, false when nothing could be written.
+	 */
+	public static function store_synced( $location_id, array $set ) {
+		global $wpdb;
+
+		$location_id = (int) $location_id;
+
+		if ( ! $location_id || ! Tables::exists( Tables::LOCATION_ATTRIBUTES ) ) {
+			return false;
+		}
+
+		$table  = Tables::name( Tables::LOCATION_ATTRIBUTES );
+		$now    = Validator::now();
+		$stored = 0;
+		$dirty  = array();
+		$clean  = array();
+
+		foreach ( self::for_location( $location_id ) as $existing ) {
+			if ( $existing['is_dirty'] ) {
+				$dirty[ $existing['attribute_id'] ] = true;
+			} else {
+				$clean[ $existing['attribute_id'] ] = true;
+			}
+		}
+
+		foreach ( $set as $attribute_id => $typed ) {
+			$attribute_id = (string) $attribute_id;
+
+			if ( isset( $dirty[ $attribute_id ] ) ) {
+				continue;
+			}
+
+			$row = array(
+				'value_type' => (string) $typed['type'],
+				'value'      => wp_json_encode( $typed['value'] ),
+				'is_dirty'   => 0,
+				'synced_at'  => $now,
+				'updated_at' => $now,
+			);
+
+			if ( isset( $clean[ $attribute_id ] ) ) {
+				// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+				$written = $wpdb->update(
+					$table,
+					$row,
+					array(
+						'location_id'  => $location_id,
+						'attribute_id' => $attribute_id,
+					)
+				);
+
+				unset( $clean[ $attribute_id ] );
+			} else {
+				$row['location_id']  = $location_id;
+				$row['attribute_id'] = $attribute_id;
+				$row['created_at']   = $now;
+
+				// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+				$written = $wpdb->insert( $table, $row );
+			}
+
+			if ( false !== $written ) {
+				++$stored;
+			}
+		}
+
+		// What is left in $clean is a copy of something Google no longer has.
+		foreach ( array_keys( $clean ) as $attribute_id ) {
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+			$wpdb->query(
+				// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+				$wpdb->prepare( "DELETE FROM {$table} WHERE location_id = %d AND attribute_id = %s AND is_dirty = 0", $location_id, (string) $attribute_id )
+			);
+		}
+
+		return $stored;
+	}
+
+	/**
 	 * Mark answers as having reached Google.
 	 *
 	 * Clears the dirty flag on exactly the attributes a push named, so the

@@ -229,3 +229,28 @@ the end.
 - **Every string goes through `__()`** with the `foundhint-local-seo` text domain.
 - **Routing is hash-based** under a single WordPress admin page
   (`admin.php?page=fhint`). There is no server-side route for `/setup`.
+
+
+---
+
+## The Google route: `#/setup/google`
+
+Somebody who answers "Yes, I have a Google Business Profile" presses
+**Continue with Google**. When that sign-in succeeds on a site where no
+listing is in use yet, the browser lands on `#/setup/google` instead of the
+Google screen, and the import happens there:
+
+1. The screen reads which listings the account manages (`POST /google/profiles`)
+   and asks which one, when there is more than one.
+2. **Import from Google** runs `POST /google/import/step` six times, in the
+   order `GET /google/import/steps` gives, showing each as *Waiting*,
+   *Importing…*, then *Imported* / *Nothing on Google* / *Already up to date*.
+   A failed step stops the run and offers *Try again*, which resumes there.
+3. **Review imported details** marks the wizard finished (`PUT /onboarding`
+   `{ "action": "finish" }`) and opens the Business Profile.
+
+**I'll do this later** dismisses the wizard and opens the Business Profile
+without importing anything.
+
+Full request and response shapes: `includes/API/README.md`, under the guided
+import.

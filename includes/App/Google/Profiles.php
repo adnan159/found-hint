@@ -247,6 +247,7 @@ class Profiles {
 				: '',
 			'website'            => isset( $location['websiteUri'] ) ? (string) $location['websiteUri'] : '',
 			'verification_state' => self::verification_state( $location ),
+			'cid'                => self::cid( $location ),
 			'payload'            => $location,
 		);
 	}
@@ -278,6 +279,21 @@ class Profiles {
 		}
 
 		return implode( ', ', array_filter( $parts ) );
+	}
+
+	/**
+	 * Google's Maps id for the listing, read out of its Maps link.
+	 *
+	 * Google does not return the CID as a field. It is the `cid` parameter of
+	 * `metadata.mapsUri`, and that link is the only place it appears.
+	 *
+	 * @param array $location Raw location object.
+	 * @return string Digits, or '' when the listing has no Maps link.
+	 */
+	public static function cid( array $location ) {
+		$uri = isset( $location['metadata']['mapsUri'] ) ? (string) $location['metadata']['mapsUri'] : '';
+
+		return preg_match( '/[?&]cid=(\d+)/', $uri, $matches ) ? $matches[1] : '';
 	}
 
 	/**

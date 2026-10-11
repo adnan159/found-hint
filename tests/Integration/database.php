@@ -629,6 +629,77 @@ check(
 	'marked primary, being the first'
 );
 
+// -- The guided import: one request per step ---------------------------------
+//
+// Run against the business the import above just created, which is about to
+// be removed anyway.
+$fhint_reads_before = count( $import_requests );
+$fhint_step_results = array();
+
+foreach ( array_keys( Import::STEPS ) as $fhint_step_id ) {
+	$fhint_step_results[ $fhint_step_id ] = Import::step( $fhint_step_id, 'locations/import-me' );
+}
+
+check_same(
+	array( 'identity', 'category', 'address', 'contact', 'hours', 'services' ),
+	array_keys( $fhint_step_results ),
+	'the guided import has six steps, in the order a person is shown them'
+);
+check_same(
+	array(
+		'identity' => 'imported',
+		'category' => 'imported',
+		'address'  => 'imported',
+		'contact'  => 'imported',
+		'hours'    => 'imported',
+		'services' => 'imported',
+	),
+	array_map(
+		static function ( $result ) {
+			return is_wp_error( $result ) ? $result->get_error_code() : $result['status'];
+		},
+		$fhint_step_results
+	),
+	'each step imports its own part'
+);
+check_same( array( 'name', 'description' ), $fhint_step_results['identity']['applied'], 'a step writes only the fields that are its own' );
+check_same( array( 'phone', 'website', 'social' ), $fhint_step_results['contact']['applied'], 'the contact step carries the phone, the website and the social links' );
+check_same( array( 'business_type' ), $fhint_step_results['category']['applied'], 'a step imports what Google has and leaves out what it does not' );
+check_same( array( 'category', '' ), array( $fhint_step_results['identity']['next'], $fhint_step_results['services']['next'] ), 'and says which step follows, or that none does' );
+check_same( 2, count( $import_requests ) - $fhint_reads_before, 'six steps cost one read of Google — the location and its attributes — not six' );
+check_same( 'CafeOrCoffeeShop', BusinessRepository::get()['business_type'], 'what a step imports is saved' );
+check( in_array( 'Espresso bar', array_column( ServiceRepository::all(), 'name' ), true ), 'down to the services' );
+
+$fhint_reads_before = count( $import_requests );
+
+Import::step( 'identity', 'locations/import-me' );
+
+check_same( 2, count( $import_requests ) - $fhint_reads_before, 'starting again reads Google again rather than trusting the earlier answer' );
+
+delete_transient( 'fhint_import_read_' . md5( 'locations/import-me' ) );
+
+$fhint_reads_before = count( $import_requests );
+
+Import::step( 'hours', 'locations/import-me' );
+
+check_same( 2, count( $import_requests ) - $fhint_reads_before, 'and a later step with no stored answer to use asks Google itself' );
+check( is_wp_error( Import::step( 'everything', 'locations/import-me' ) ), 'a step that does not exist is refused' );
+check_same( 'unchanged', Import::step( 'services', 'locations/import-me' )['status'], 'a step with nothing new to add says so instead of claiming an import' );
+
+// Where a sign-in lands: the guided import the first time, the Google screen
+// once a listing is in use.
+check_same( '#/google', FHINT\App\Google\Connection::landing_route(), 'connecting again with a listing in use returns to the Google screen' );
+
+GoogleLocationRepository::map( 'locations/import-me', 0 );
+
+check_same( '#/setup/google', FHINT\App\Google\Connection::landing_route(), 'a first connection lands on the guided import' );
+
+GoogleLocationRepository::map( 'locations/import-me', (int) $from_nothing['location_id'] );
+
+foreach ( ServiceRepository::all() as $fhint_leftover ) {
+	ServiceRepository::delete( (int) $fhint_leftover['id'] );
+}
+
 // Put the suite's own business and location back for the sections below.
 LocationRepository::delete( (int) $from_nothing['location_id'] );
 BusinessRepository::delete();
@@ -1920,6 +1991,706 @@ if ( $admins ) {
 	// Photos are not a section save, and an unknown section is not a section.
 	check_same( 400, $fhint_profile_save( 'media', array( 'logo' => 'x' ) )->get_status(), 'the media section refuses a save' );
 	check_same( 400, $fhint_profile_save( 'payments', array() )->get_status(), 'a section that does not exist is refused' );
+
+	// A second branch: every profile route can be pointed at one location.
+	$fhint_branch = LocationRepository::create(
+		array(
+			'name'           => 'Harbour branch',
+			'address_line_1' => '2 Harbour Road',
+			'city'           => 'Chittagong',
+			'country'        => 'BD',
+			'phone'          => '+8801000000002',
+		)
+	);
+
+	$fhint_profile_at = static function ( $location_id ) {
+		$request = new WP_REST_Request( 'GET', '/fhint/v1/profile' );
+
+		if ( null !== $location_id ) {
+			$request->set_query_params( array( 'location_id' => $location_id ) );
+		}
+
+		return rest_do_request( $request );
+	};
+
+	$fhint_branch_profile = $fhint_profile_at( (int) $fhint_branch['id'] )->get_data();
+
+	check_same( (int) $fhint_branch['id'], $fhint_branch_profile['data']['address']['location_id'], 'GET /profile?location_id reads the named location' );
+	check_same( 'Chittagong', $fhint_branch_profile['data']['address']['city'], 'with its own address' );
+	check_same( (int) $fhint_branch['id'], $fhint_branch_profile['meta']['location']['id'], 'and says which location it is describing' );
+	check_same(
+		array( (int) $fhint_place['id'], (int) $fhint_branch['id'] ),
+		array_column( $fhint_branch_profile['meta']['locations'], 'id' ),
+		'alongside every location there is to switch to, primary first'
+	);
+	check( null === $fhint_branch_profile['meta']['reviews'], 'a location with no Google listing is given no rating' );
+	check_same( (int) $fhint_place['id'], $fhint_profile_at( null )->get_data()['data']['address']['location_id'], 'a read naming no location is the primary one, even straight after one that did' );
+	check_same( 404, $fhint_profile_at( 999999 )->get_status(), 'a location that does not exist is a 404' );
+
+	$fhint_request = new WP_REST_Request( 'PATCH', '/fhint/v1/profile' );
+	$fhint_request->set_header( 'content-type', 'application/json' );
+	$fhint_request->set_body(
+		wp_json_encode(
+			array(
+				'section'     => 'address',
+				'location_id' => (int) $fhint_branch['id'],
+				'fields'      => array( 'city' => 'Cox\'s Bazar' ),
+			)
+		)
+	);
+
+	$fhint_primary_city = LocationRepository::find( (int) $fhint_place['id'] )['city'];
+	$fhint_response     = rest_do_request( $fhint_request );
+
+	check_same( 200, $fhint_response->get_status(), 'a section can be saved for a named location' );
+	check_same( 'Cox\'s Bazar', LocationRepository::find( (int) $fhint_branch['id'] )['city'], 'which is the one that changes' );
+	check_same( $fhint_primary_city, LocationRepository::find( (int) $fhint_place['id'] )['city'], 'while the primary location is left alone' );
+	check_same( 'Cox\'s Bazar', $fhint_response->get_data()['data']['city'], 'and the answer is that location as it now reads' );
+
+	FHINT\App\Profile\Profile::select( (int) $fhint_branch['id'] );
+	check_same( '+8801000000002', FHINT\App\Google\Push\Publisher::local()['phone'], 'a publish compares the chosen location, not the primary one' );
+	FHINT\App\Profile\Profile::select( 0 );
+
+	// Categories follow the location. Two listings under one account can be
+	// two kinds of business, and saving one must not re-categorise the other.
+	$fhint_info_at = static function ( $location_id, array $fields ) {
+		$request = new WP_REST_Request( 'PATCH', '/fhint/v1/profile' );
+		$request->set_header( 'content-type', 'application/json' );
+		$request->set_body(
+			wp_json_encode(
+				array(
+					'section'     => 'info',
+					'location_id' => (int) $location_id,
+					'fields'      => $fields,
+				)
+			)
+		);
+
+		return rest_do_request( $request );
+	};
+
+	$fhint_info_at( (int) $fhint_place['id'], array( 'primary_category_id' => 'gcid:dentist', 'secondary_categories' => array( 'gcid:orthodontist' ) ) );
+
+	check_same( 'gcid:dentist', BusinessRepository::get()['primary_category_id'], 'the main location\'s category is the business\'s' );
+	check_same( 'gcid:dentist', $fhint_profile_at( (int) $fhint_branch['id'] )->get_data()['data']['info']['primary_category_id'], 'and a branch with none of its own shows it too' );
+
+	$fhint_response = $fhint_info_at( (int) $fhint_branch['id'], array( 'secondary_categories' => array( 'gcid:pet_groomer' ) ) );
+	$fhint_own      = $fhint_profile_at( (int) $fhint_branch['id'] )->get_data()['data']['info'];
+
+	check_same( 200, $fhint_response->get_status(), 'a branch can be given categories of its own' );
+	check_same( array( 'gcid:dentist', array( 'gcid:pet_groomer' ) ), array( $fhint_own['primary_category_id'], array_column( $fhint_own['secondary_categories'], 'id' ) ), 'an extra category alone is kept, with the main one it was shown beside' );
+
+	$fhint_info_at( (int) $fhint_branch['id'], array( 'primary_category_id' => 'gcid:pet_store', 'name' => BusinessRepository::get()['name'] ) );
+
+	$fhint_own = $fhint_profile_at( (int) $fhint_branch['id'] )->get_data()['data']['info'];
+
+	check_same( array( 'gcid:pet_store', 'Pet store' ), array( $fhint_own['primary_category_id'], $fhint_own['primary_category'] ), 'and its main category is its own' );
+	check_same( array( 'gcid:dentist', array( 'gcid:orthodontist' ) ), array( BusinessRepository::get()['primary_category_id'], array_column( BusinessRepository::get()['secondary_categories'], 'id' ) ), 'while the business keeps the categories it had' );
+	check_same( 'gcid:dentist', $fhint_profile_at( null )->get_data()['data']['info']['primary_category_id'], 'so switching back to the main location shows its category unchanged' );
+	check_same( 400, $fhint_info_at( (int) $fhint_branch['id'], array( 'secondary_categories' => array( 'gcid:pet_store' ) ) )->get_status(), 'a branch\'s extra category is checked against its own main one' );
+
+	FHINT\App\Profile\Profile::select( (int) $fhint_branch['id'] );
+	check_same( 'gcid:pet_store', FHINT\App\Google\Push\Publisher::local()['primary_category_id'], 'and a publish sends each listing its own location\'s category' );
+	FHINT\App\Profile\Profile::select( 0 );
+	check_same( 'gcid:dentist', FHINT\App\Google\Push\Publisher::local()['primary_category_id'], 'the main listing the business\'s' );
+
+	// The rating in the header is the chosen listing's own, from stored
+	// reviews. Borrow a listing already in the table, then hand it back.
+	$fhint_listings = GoogleLocationRepository::all();
+
+	if ( $fhint_listings ) {
+		$fhint_listing = $fhint_listings[0];
+		$fhint_review  = static function ( $id, $listing, $stars ) {
+			return array(
+				'review_id'         => $id,
+				'location_name'     => $listing,
+				'account_name'      => 'accounts/1',
+				'reviewer_name'     => 'A customer',
+				'reviewer_photo'    => '',
+				'is_anonymous'      => false,
+				'star_rating'       => $stars,
+				'comment'           => '',
+				'reply_comment'     => '',
+				'replied_at'        => null,
+				'reviewed_at'       => null,
+				'review_updated_at' => null,
+				'payload'           => array(),
+			);
+		};
+
+		GoogleLocationRepository::map( $fhint_listing['location_name'], (int) $fhint_branch['id'] );
+		FHINT\App\Review\ReviewRepository::upsert( $fhint_review( 'fhint-rating-1', $fhint_listing['location_name'], 5 ) );
+		FHINT\App\Review\ReviewRepository::upsert( $fhint_review( 'fhint-rating-2', $fhint_listing['location_name'], 4 ) );
+		FHINT\App\Review\ReviewRepository::upsert( $fhint_review( 'fhint-rating-3', 'locations/somewhere-else', 1 ) );
+
+		check_same(
+			array(
+				'average' => 4.5,
+				'count'   => 2,
+			),
+			$fhint_profile_at( (int) $fhint_branch['id'] )->get_data()['meta']['reviews'],
+			'a mapped location carries the rating of its own listing, and no other listing\'s reviews'
+		);
+
+		FHINT\App\Review\ReviewRepository::delete_for_location( $fhint_listing['location_name'] );
+		FHINT\App\Review\ReviewRepository::delete_for_location( 'locations/somewhere-else' );
+		GoogleLocationRepository::map( $fhint_listing['location_name'], (int) $fhint_listing['fhint_location_id'] );
+	} else {
+		check( false, 'a Google listing exists to test the rating against' );
+	}
+
+	// -- What only Google can supply: attributes, photos, categories --------
+	//
+	// A listing of its own, answered in-process, so nothing here depends on
+	// what the import section above left behind.
+	GoogleLocationRepository::upsert(
+		array(
+			'account_name'       => 'accounts/999',
+			'location_name'      => 'locations/refresh-me',
+			'store_code'         => '',
+			'title'              => 'Harbour Pets',
+			'address'            => '2 Harbour Road, Chittagong',
+			'phone'              => '',
+			'website'            => '',
+			'verification_state' => 'VERIFIED',
+			'payload'            => array(),
+		)
+	);
+	GoogleLocationRepository::map( 'locations/refresh-me', (int) $fhint_branch['id'] );
+
+	$fhint_google = array(
+		'calls'         => array(),
+		'fewer'         => false,
+		'refuse_create' => false,
+	);
+
+	$fhint_answer = static function ( $body, $code = 200 ) {
+		return array(
+			'headers'  => array(),
+			'body'     => wp_json_encode( $body ),
+			'response' => array(
+				'code'    => $code,
+				'message' => 200 === $code ? 'OK' : 'Bad Request',
+			),
+			'cookies'  => array(),
+		);
+	};
+
+	$fhint_fake_listing = static function ( $pre, $args, $url ) use ( &$fhint_google, $fhint_answer ) {
+		$url = rawurldecode( (string) $url );
+
+		if ( false === strpos( $url, 'refresh-me' ) && false === strpos( $url, 'upload-ref-1' ) ) {
+			return $pre;
+		}
+
+		$method = isset( $args['method'] ) ? strtoupper( (string) $args['method'] ) : 'GET';
+
+		$fhint_google['calls'][] = array(
+			'method' => $method,
+			'url'    => $url,
+			'body'   => isset( $args['body'] ) ? $args['body'] : null,
+			'type'   => isset( $args['headers']['Content-Type'] ) ? $args['headers']['Content-Type'] : '',
+		);
+
+		if ( 'POST' === $method ) {
+			if ( false !== strpos( $url, 'media:startUpload' ) ) {
+				return $fhint_answer( array( 'resourceName' => 'upload-ref-1' ) );
+			}
+
+			if ( false !== strpos( $url, '/upload/v1/media/upload-ref-1' ) ) {
+				return $fhint_answer( array() );
+			}
+
+			if ( $fhint_google['refuse_create'] ) {
+				return $fhint_answer(
+					array(
+						'error' => array(
+							'code'    => 400,
+							'message' => 'Photo is too blurry.',
+							'status'  => 'INVALID_ARGUMENT',
+						),
+					),
+					400
+				);
+			}
+
+			return $fhint_answer(
+				array(
+					'name'                => 'accounts/999/locations/refresh-me/media/sent-1',
+					'mediaFormat'         => 'PHOTO',
+					'locationAssociation' => array( 'category' => 'ADDITIONAL' ),
+					'googleUrl'           => 'https://lh3.googleusercontent.com/sent-1',
+				)
+			);
+		}
+
+		if ( false !== strpos( $url, '/media' ) ) {
+			$items = array(
+				array(
+					'name'                => 'accounts/999/locations/refresh-me/media/cover-1',
+					'mediaFormat'         => 'PHOTO',
+					'locationAssociation' => array( 'category' => 'COVER' ),
+					'googleUrl'           => 'https://lh3.googleusercontent.com/cover-1',
+					'dimensions'          => array(
+						'widthPixels'  => 1600,
+						'heightPixels' => 900,
+					),
+				),
+				array(
+					'name'                => 'accounts/999/locations/refresh-me/media/shop-1',
+					'mediaFormat'         => 'PHOTO',
+					'locationAssociation' => array( 'category' => 'ADDITIONAL' ),
+					'googleUrl'           => 'https://lh3.googleusercontent.com/shop-1',
+				),
+				array(
+					'name'        => 'accounts/999/locations/refresh-me/media/film-1',
+					'mediaFormat' => 'VIDEO',
+					'googleUrl'   => 'https://lh3.googleusercontent.com/film-1',
+				),
+			);
+
+			return $fhint_answer( array( 'mediaItems' => $fhint_google['fewer'] ? array_slice( $items, 0, 1 ) : $items ) );
+		}
+
+		if ( false !== strpos( $url, 'v1/attributes?' ) ) {
+			return $fhint_answer(
+				array(
+					'attributeMetadata' => array(
+						array(
+							'parent'           => 'attributes/has_delivery',
+							'valueType'        => 'BOOL',
+							'displayName'      => 'Delivery',
+							'groupDisplayName' => 'Service options',
+							'valueMetadata'    => array(
+								array(
+									'value'       => true,
+									'displayName' => 'Delivery',
+								),
+								array(
+									'value'       => false,
+									'displayName' => 'No delivery',
+								),
+							),
+						),
+						array(
+							'parent'           => 'attributes/is_owned_by_women',
+							'valueType'        => 'BOOL',
+							'displayName'      => 'Identifies as women-owned',
+							'groupDisplayName' => 'From the business',
+							'valueMetadata'    => array(
+								array(
+									'value'       => true,
+									'displayName' => 'Identifies as women-owned',
+								),
+							),
+						),
+						array(
+							'parent'           => 'attributes/wi_fi',
+							'valueType'        => 'ENUM',
+							'displayName'      => 'Wi-Fi',
+							'groupDisplayName' => 'Amenities',
+							'valueMetadata'    => array(
+								array(
+									'value'       => 'free_wi_fi',
+									'displayName' => 'Free',
+								),
+							),
+						),
+						array(
+							'parent'      => 'attributes/url_facebook',
+							'valueType'   => 'URL',
+							'displayName' => 'Facebook',
+						),
+					),
+				)
+			);
+		}
+
+		if ( false !== strpos( $url, 'refresh-me/attributes' ) ) {
+			$values = array(
+				array(
+					'name'      => 'attributes/has_delivery',
+					'valueType' => 'BOOL',
+					'values'    => array( true ),
+				),
+				array(
+					'name'      => 'attributes/wi_fi',
+					'valueType' => 'ENUM',
+					'values'    => array( 'free_wi_fi' ),
+				),
+			);
+
+			return $fhint_answer( array( 'attributes' => $fhint_google['fewer'] ? array_slice( $values, 0, 1 ) : $values ) );
+		}
+
+		return $fhint_answer(
+			array(
+				'name'       => 'locations/refresh-me',
+				'title'      => 'Harbour Pets',
+				'metadata'   => array( 'mapsUri' => 'https://maps.google.com/maps?cid=777000111' ),
+				'categories' => array(
+					'primaryCategory'      => array(
+						'name'        => 'categories/gcid:pet_store',
+						'displayName' => 'Pet store',
+					),
+					'additionalCategories' => array(
+						array(
+							'name'         => 'categories/gcid:pet_groomer',
+							'displayName'  => 'Pet groomer',
+							'serviceTypes' => array(
+								array(
+									'serviceTypeId' => 'job_type_id:cat_bathing',
+									'displayName'   => 'Cat bathing',
+								),
+								array(
+									'serviceTypeId' => 'job_type_id:dog_grooming',
+									'displayName'   => 'Dog grooming',
+								),
+							),
+						),
+					),
+				),
+			)
+		);
+	};
+
+	// After both stand-ins above, which answer everything they are handed.
+	add_filter( 'pre_http_request', $fhint_fake_listing, 12, 3 );
+
+	$fhint_branch_post = static function ( $path, array $params = array(), array $files = array(), $method = 'POST' ) use ( $fhint_branch ) {
+		$request = new WP_REST_Request( $method, '/fhint/v1' . $path );
+		$request->set_body_params( array_merge( array( 'location_id' => (int) $fhint_branch['id'] ), $params ) );
+
+		if ( $files ) {
+			$request->set_file_params( $files );
+		}
+
+		return rest_do_request( $request );
+	};
+
+	// The branch was given a category of its own above. A refresh fills in
+	// categories only where there are none, so this one must survive it.
+	$fhint_response = $fhint_branch_post( '/profile/google/refresh' );
+	$fhint_read     = $fhint_response->get_data();
+
+	check_same( 200, $fhint_response->get_status(), 'POST /profile/google/refresh answers' );
+	check_same(
+		array(
+			'categories'    => false,
+			'service_types' => 2,
+			'attributes'    => 4,
+			'answers'    => 2,
+			'photos'     => 2,
+			'failed'     => array(),
+		),
+		$fhint_read['meta']['refresh'],
+		'and says what arrived: the attributes offered, the answers held, the photos'
+	);
+	check_same( 'gcid:pet_store', $fhint_read['data']['info']['primary_category_id'], 'a location that has a category keeps it through a refresh' );
+	check_same(
+		array(
+			array(
+				'id'       => 'job_type_id:cat_bathing',
+				'label'    => 'Cat bathing',
+				'category' => 'Pet groomer',
+			),
+			array(
+				'id'       => 'job_type_id:dog_grooming',
+				'label'    => 'Dog grooming',
+				'category' => 'Pet groomer',
+			),
+		),
+		$fhint_read['data']['services']['google_types'],
+		'the Services section offers the ready-made services Google has for the listing\'s categories'
+	);
+	check_same( array(), $fhint_profile_at( (int) $fhint_place['id'] )->get_data()['data']['services']['google_types'], 'and a location with no listing is offered none' );
+	check_same( array( 'has_delivery', 'is_owned_by_women', 'wi_fi' ), array_column( $fhint_read['data']['attributes']['definitions'], 'id' ), 'the Attributes section now offers what Google offers this listing, links left out' );
+	check_same( array( true, false, false ), array_column( $fhint_read['data']['attributes']['definitions'], 'allows_false' ), 'and knows which yes/no attributes can be answered "no"' );
+
+	$fhint_stored_answers = array();
+
+	foreach ( $fhint_read['data']['attributes']['values'] as $fhint_value ) {
+		$fhint_stored_answers[ $fhint_value['attribute_id'] ] = $fhint_value;
+	}
+
+	check_same( array( 'has_delivery', 'wi_fi' ), array_keys( $fhint_stored_answers ), 'the answers Google holds are stored' );
+	check( false === $fhint_stored_answers['has_delivery']['is_dirty'], 'as copies, not as edits waiting to be sent' );
+	check_same( 'https://lh3.googleusercontent.com/cover-1', $fhint_read['data']['media']['cover']['url'], 'the cover photo is the listing\'s' );
+	check_same( array( 'https://lh3.googleusercontent.com/shop-1' ), array_column( $fhint_read['data']['media']['gallery'], 'url' ), 'the gallery holds its photos, and no video' );
+	check_same( '777000111', $fhint_read['data']['info']['cid'], 'and the listing\'s Maps id is known' );
+	check( ! empty( $fhint_read['meta']['google']['refreshed_at'] ), 'with a record of when Google was last read' );
+	check_same( array(), array_values( array_filter( array_column( $fhint_google['calls'], 'method' ), static function ( $method ) { return 'GET' !== $method; } ) ), 'reading changes nothing on Google' );
+
+	// An answer changed here is newer than Google's and survives a re-read;
+	// a copy of something Google no longer holds does not.
+	$fhint_request = new WP_REST_Request( 'PATCH', '/fhint/v1/profile' );
+	$fhint_request->set_header( 'content-type', 'application/json' );
+	$fhint_request->set_body(
+		wp_json_encode(
+			array(
+				'section'     => 'attributes',
+				'location_id' => (int) $fhint_branch['id'],
+				'fields'      => array( 'values' => array( 'has_delivery' => false ) ),
+			)
+		)
+	);
+	rest_do_request( $fhint_request );
+
+	$fhint_google['fewer'] = true;
+	$fhint_read            = $fhint_branch_post( '/profile/google/refresh' )->get_data();
+	$fhint_google['fewer'] = false;
+
+	check_same(
+		array(
+			array(
+				'attribute_id' => 'has_delivery',
+				'value'        => false,
+				'is_dirty'     => true,
+			),
+		),
+		array_map(
+			static function ( $value ) {
+				return array(
+					'attribute_id' => $value['attribute_id'],
+					'value'        => $value['value'],
+					'is_dirty'     => $value['is_dirty'],
+				);
+			},
+			$fhint_read['data']['attributes']['values']
+		),
+		'a re-read keeps an answer edited here and forgets one Google no longer holds'
+	);
+	check_same( array(), $fhint_read['data']['media']['gallery'], 'and a photo no longer on the listing is forgotten too' );
+
+	// Categories are the business's: a branch's listing does not set them,
+	// the main location's does.
+	$fhint_categories_before = BusinessRepository::get();
+
+	// A location with no category of its own is given the listing's by a
+	// refresh — and one that has a category is not given a different one.
+	LocationRepository::update(
+		(int) $fhint_branch['id'],
+		array(
+			'primary_category'     => 'Dentist',
+			'primary_category_id'  => 'gcid:dentist',
+			'secondary_categories' => array(),
+		)
+	);
+
+	$fhint_kept = $fhint_branch_post( '/profile/google/refresh' )->get_data();
+
+	check_same( array( false, 'gcid:dentist' ), array( $fhint_kept['meta']['refresh']['categories'], $fhint_kept['data']['info']['primary_category_id'] ), 'a refresh does not replace a category chosen here with Google\'s' );
+
+	LocationRepository::update(
+		(int) $fhint_branch['id'],
+		array(
+			'primary_category'     => '',
+			'primary_category_id'  => '',
+			'secondary_categories' => array(),
+		)
+	);
+
+	$fhint_filled = $fhint_branch_post( '/profile/google/refresh' )->get_data();
+
+	check_same(
+		array( true, 'gcid:pet_store', 'Pet store', array( 'gcid:pet_groomer' ) ),
+		array(
+			$fhint_filled['meta']['refresh']['categories'],
+			$fhint_filled['data']['info']['primary_category_id'],
+			$fhint_filled['data']['info']['primary_category'],
+			array_column( $fhint_filled['data']['info']['secondary_categories'], 'id' ),
+		),
+		'but a location with none is given the ones its listing has on Google'
+	);
+	check_same( $fhint_categories_before['primary_category_id'], BusinessRepository::get()['primary_category_id'], 'without touching the business\'s' );
+
+	// Emptied first, so what the branch ends up with can only have come
+	// from the import.
+	LocationRepository::update(
+		(int) $fhint_branch['id'],
+		array(
+			'primary_category'     => '',
+			'primary_category_id'  => '',
+			'secondary_categories' => array(),
+		)
+	);
+
+	Import::apply( array( 'categories' ), 'locations/refresh-me' );
+
+	check_same( $fhint_categories_before['primary_category_id'], BusinessRepository::get()['primary_category_id'], 'importing categories from a branch leaves the business\'s categories alone' );
+	check_same(
+		array( 'gcid:pet_store', array( 'gcid:pet_groomer' ) ),
+		array(
+			LocationRepository::find( (int) $fhint_branch['id'] )['primary_category_id'],
+			array_column( LocationRepository::find( (int) $fhint_branch['id'] )['secondary_categories'], 'id' ),
+		),
+		'and gives them to the branch itself'
+	);
+
+	$fhint_main_listing = GoogleLocationRepository::find_by_fhint_location( (int) $fhint_place['id'] );
+
+	GoogleLocationRepository::map( 'locations/refresh-me', (int) $fhint_place['id'] );
+
+	$fhint_imported = Import::apply( array( 'categories' ), 'locations/refresh-me' );
+
+	check( ! is_wp_error( $fhint_imported ) && in_array( 'categories', $fhint_imported['applied'], true ), 'categories can be imported from the main location\'s listing' );
+	check_same( array( 'gcid:pet_store', 'Pet store' ), array( BusinessRepository::get()['primary_category_id'], BusinessRepository::get()['primary_category'] ), 'the main category arrives with Google\'s id' );
+	check_same(
+		array(
+			array(
+				'id'   => 'gcid:pet_groomer',
+				'name' => 'Pet groomer',
+			),
+		),
+		BusinessRepository::get()['secondary_categories'],
+		'and so do the extra ones'
+	);
+
+	BusinessRepository::save(
+		array(
+			'primary_category'     => $fhint_categories_before['primary_category'],
+			'primary_category_id'  => $fhint_categories_before['primary_category_id'],
+			'secondary_categories' => $fhint_categories_before['secondary_categories'],
+		)
+	);
+	GoogleLocationRepository::map( 'locations/refresh-me', (int) $fhint_branch['id'] );
+
+	if ( $fhint_main_listing ) {
+		GoogleLocationRepository::map( $fhint_main_listing['location_name'], (int) $fhint_place['id'] );
+	}
+
+	// A photo: chosen first, sent only when asked.
+	$fhint_make_image = static function ( $side, $format = 'jpeg' ) {
+		$image = imagecreatetruecolor( $side, $side );
+
+		// Noise, so the file is a realistic size and not a few hundred bytes.
+		for ( $x = 0; $x < $side; $x += 2 ) {
+			for ( $y = 0; $y < $side; $y += 2 ) {
+				imagesetpixel( $image, $x, $y, imagecolorallocate( $image, ( $x * 7 ) % 255, ( $y * 13 ) % 255, ( $x * $y ) % 255 ) );
+			}
+		}
+
+		$path = wp_tempnam( 'fhint-photo' );
+
+		if ( 'gif' === $format ) {
+			imagegif( $image, $path );
+		} else {
+			imagejpeg( $image, $path, 95 );
+		}
+
+		return $path;
+	};
+
+	$fhint_file = static function ( $path, $name ) {
+		return array(
+			'file' => array(
+				'name'     => $name,
+				'tmp_name' => $path,
+				'error'    => 0,
+				'size'     => filesize( $path ),
+			),
+		);
+	};
+
+	$fhint_google['calls'] = array();
+	$fhint_photo_path      = $fhint_make_image( 400 );
+	$fhint_photo_bytes     = filesize( $fhint_photo_path );
+	$fhint_response        = $fhint_branch_post( '/profile/media', array( 'role' => 'gallery' ), $fhint_file( $fhint_photo_path, 'shopfront.jpg' ) );
+	$fhint_pending         = $fhint_response->get_data()['data']['media']['pending'];
+
+	check_same( 200, $fhint_response->get_status(), 'POST /profile/media keeps a chosen photo' );
+	check_same( array( 'pending' ), array_column( $fhint_pending, 'state' ), 'as one waiting to be sent' );
+	check( $fhint_pending[0]['attachment_id'] > 0 && false !== get_attached_file( $fhint_pending[0]['attachment_id'] ), 'with its file in the media library' );
+	check_same( array(), $fhint_google['calls'], 'and choosing it sends nothing to Google' );
+
+	$fhint_response = $fhint_branch_post( '/profile/media', array(), $fhint_file( $fhint_make_image( 400, 'gif' ), 'animated.gif' ) );
+
+	check_same( 400, $fhint_response->get_status(), 'a file that is not a JPEG or PNG is refused' );
+	check_same( array( 'media.type.unsupported' ), $fhint_response->get_data()['data']['fields']['file'], 'with the reason against the file' );
+
+	$fhint_response = $fhint_branch_post( '/profile/media', array(), $fhint_file( $fhint_make_image( 120 ), 'tiny.jpg' ) );
+
+	check_same( 400, $fhint_response->get_status(), 'and so is one too small for Google' );
+	check_same( 1, count( $fhint_branch_post( '/profile/google/refresh' )->get_data()['data']['media']['pending'] ), 'a refused file is not kept, and a re-read of Google leaves the waiting photo alone' );
+
+	// Asking for another location's photo is asking for one that is not there.
+	$fhint_request = new WP_REST_Request( 'DELETE', '/fhint/v1/profile/media/' . $fhint_pending[0]['id'] );
+	$fhint_request->set_body_params( array( 'location_id' => (int) $fhint_place['id'] ) );
+
+	check_same( 404, rest_do_request( $fhint_request )->get_status(), 'a photo cannot be reached through a location it does not belong to' );
+	check_same( 'pending', FHINT\App\Media\MediaRepository::find( $fhint_pending[0]['id'] )['state'], 'and it is left waiting' );
+
+	// Google refuses it: the photo stays here, with the reason.
+	$fhint_google['calls']         = array();
+	$fhint_google['refuse_create'] = true;
+	$fhint_response                = $fhint_branch_post( '/profile/media/' . $fhint_pending[0]['id'] . '/publish' );
+	$fhint_google['refuse_create'] = false;
+	$fhint_failed                  = FHINT\App\Media\MediaRepository::find( $fhint_pending[0]['id'] );
+
+	check_same( 502, $fhint_response->get_status(), 'a photo Google refuses is reported as refused' );
+	check_same( array( 'failed', 'Photo is too blurry.' ), array( $fhint_failed['state'], $fhint_failed['error'] ), 'and is kept, marked failed, with what Google said' );
+
+	// And accepts it.
+	$fhint_google['calls'] = array();
+	$fhint_response        = $fhint_branch_post( '/profile/media/' . $fhint_pending[0]['id'] . '/publish' );
+	$fhint_sent            = FHINT\App\Media\MediaRepository::find( $fhint_pending[0]['id'] );
+	$fhint_posts           = array_values(
+		array_filter(
+			$fhint_google['calls'],
+			static function ( $call ) {
+				return 'POST' === $call['method'];
+			}
+		)
+	);
+
+	check_same( 200, $fhint_response->get_status(), 'POST /profile/media/{id}/publish sends a waiting photo' );
+	check_same( 3, count( $fhint_posts ), 'in three requests' );
+	check( false !== strpos( $fhint_posts[0]['url'], 'accounts/999/locations/refresh-me/media:startUpload' ), 'first asking the listing for somewhere to put it' );
+	check( false !== strpos( $fhint_posts[1]['url'], '/upload/v1/media/upload-ref-1' ) && false !== strpos( $fhint_posts[1]['url'], 'upload_type=media' ), 'then sending the bytes there' );
+	check_same( array( $fhint_photo_bytes, 'image/jpeg' ), array( strlen( (string) $fhint_posts[1]['body'] ), $fhint_posts[1]['type'] ), 'the whole file, as the kind of image it is' );
+	check_same(
+		array(
+			'mediaFormat'         => 'PHOTO',
+			'locationAssociation' => array( 'category' => 'ADDITIONAL' ),
+			'dataRef'             => array( 'resourceName' => 'upload-ref-1' ),
+		),
+		json_decode( (string) $fhint_posts[2]['body'], true ),
+		'and last making those bytes a gallery photo on the listing'
+	);
+	check_same( array( 'synced', 'accounts/999/locations/refresh-me/media/sent-1', '' ), array( $fhint_sent['state'], $fhint_sent['google_name'], $fhint_sent['error'] ), 'the photo is then recorded as on Google, under Google\'s name for it' );
+	check_same( 409, $fhint_branch_post( '/profile/media/' . $fhint_pending[0]['id'] . '/publish' )->get_status(), 'and cannot be sent twice' );
+	check_same( 409, $fhint_branch_post( '/profile/media/' . $fhint_pending[0]['id'], array(), array(), 'DELETE' )->get_status(), 'nor removed from here, being Google\'s now' );
+
+	// One still waiting can be taken back, file and all.
+	$fhint_waiting    = $fhint_branch_post( '/profile/media', array( 'role' => 'logo' ), $fhint_file( $fhint_make_image( 400 ), 'logo.jpg' ) )->get_data()['data']['media']['pending'];
+	$fhint_attachment = $fhint_waiting[0]['attachment_id'];
+
+	check_same( array( 'logo' ), array_column( $fhint_waiting, 'role' ), 'a photo can be chosen as the logo' );
+
+	$fhint_replaced = $fhint_branch_post( '/profile/media', array( 'role' => 'logo' ), $fhint_file( $fhint_make_image( 420 ), 'logo-2.jpg' ) )->get_data()['data']['media']['pending'];
+
+	check_same( 1, count( $fhint_replaced ), 'choosing another logo replaces the one that was waiting' );
+	check( null === get_post( $fhint_attachment ), 'and discards its file' );
+	check_same( 200, $fhint_branch_post( '/profile/media/' . $fhint_replaced[0]['id'], array(), array(), 'DELETE' )->get_status(), 'DELETE /profile/media/{id} removes a waiting photo' );
+	check( null === FHINT\App\Media\MediaRepository::find( $fhint_replaced[0]['id'] ) && null === get_post( $fhint_replaced[0]['attachment_id'] ), 'together with the file kept for it' );
+
+	wp_set_current_user( 0 );
+	check_same( 401, $fhint_branch_post( '/profile/google/refresh' )->get_status(), 'a logged-out request cannot read Google' );
+	check_same( 401, $fhint_branch_post( '/profile/media/' . $fhint_pending[0]['id'] . '/publish' )->get_status(), 'or send a photo' );
+	wp_set_current_user( $admins[0]->ID );
+
+	// Leave nothing behind: the file, the listing, and what was read for it.
+	if ( $fhint_sent['attachment_id'] ) {
+		wp_delete_attachment( $fhint_sent['attachment_id'], true );
+	}
+
+	remove_filter( 'pre_http_request', $fhint_fake_listing, 12 );
+	FHINT\App\Google\ReferenceRepository::replace( 'attribute', 'locations/refresh-me', array() );
+	FHINT\App\Google\ReferenceRepository::replace( 'service_type', 'locations/refresh-me', array() );
+	// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+	$wpdb->delete( fhint_table( 'google_locations' ), array( 'location_name' => 'locations/refresh-me' ) );
+
+	LocationRepository::delete( (int) $fhint_branch['id'] );
 
 	// Put things back as this block found them: the checks further down
 	// count locations and services from zero.
