@@ -1,4 +1,5 @@
 import { useId } from "react";
+import Hint from "@/components/Hint";
 import { cn } from "cn";
 import {
   errorText,
@@ -8,7 +9,11 @@ import {
 } from "../styles";
 
 /**
- * A labelled text input with its help and its error.
+ * A labelled text input with its hint and its error.
+ *
+ * `hint` is the field's standing advice and rides beside the label in a
+ * tooltip; `help` is text that has to stay on screen, so it sits under the
+ * input as before.
  *
  * The error, when there is one, replaces nothing: it is added under the
  * field and tied to the input with `aria-describedby`, so a screen reader
@@ -19,6 +24,7 @@ export function TextField({
   label,
   value,
   onChange,
+  hint,
   help,
   error,
   className,
@@ -33,9 +39,12 @@ export function TextField({
     <div
       className={cn("fhint:grid fhint:content-start fhint:gap-1.5", className)}
     >
-      <label htmlFor={id} className={labelClass}>
-        {label}
-      </label>
+      <div className="fhint:flex fhint:items-center fhint:gap-1.5">
+        <label htmlFor={id} className={labelClass}>
+          {label}
+        </label>
+        {hint ? <Hint about={label} text={hint} /> : null}
+      </div>
       <input
         id={id}
         value={value}

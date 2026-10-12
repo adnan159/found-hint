@@ -1,14 +1,4 @@
-import { useEffect, useRef } from "react";
-import { __, _n, sprintf } from "@wordpress/i18n";
-import {
-  ArrowLeftRightIcon,
-  ExternalLinkIcon,
-  LinkIcon,
-  SendIcon,
-  StarIcon,
-} from "lucide-react";
-import { Link } from "react-router";
-import { cn } from "cn";
+import logoUrl from "@/assets/foundhint-icon.png";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -18,7 +8,18 @@ import {
   DropdownMenuRadioItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import logoUrl from "@/assets/foundhint-icon.png";
+import { __, _n, sprintf } from "@wordpress/i18n";
+import Hint from "@/components/Hint";
+import { cn } from "cn";
+import {
+  ArrowLeftRightIcon,
+  ExternalLinkIcon,
+  LinkIcon,
+  SendIcon,
+  StarIcon,
+} from "lucide-react";
+import { useEffect, useRef } from "react";
+import { Link } from "react-router";
 import { focus } from "../styles";
 
 // The header's pill buttons. Rounded, unlike the square controls inside the
@@ -204,17 +205,28 @@ export function ProfileHeader({
       ) : null}
 
       <div className="fhint:flex fhint:flex-wrap fhint:items-center fhint:gap-x-4 fhint:gap-y-3 fhint:border-b fhint:border-b-border fhint:px-6 fhint:py-3.5">
-        <div className="fhint:min-w-[180px] fhint:flex-1">
+        <div className="fhint:min-w-45 fhint:flex-1">
           <p className="fhint:m-0 fhint:text-[12.5px] fhint:font-semibold fhint:text-muted-strong">
             {__("FoundHint / Business Profile", "foundhint-local-seo")}
           </p>
-          <h1
-            ref={headingRef}
-            tabIndex={-1}
-            className="fhint:m-0 fhint:p-0 fhint:font-heading fhint:text-[21px] fhint:leading-tight fhint:font-extrabold fhint:tracking-[-0.02em] fhint:outline-none"
-          >
-            {__("Business Profile", "foundhint-local-seo")}
-          </h1>
+          <div className="fhint:flex fhint:items-center fhint:gap-1.5">
+            <h1
+              ref={headingRef}
+              tabIndex={-1}
+              className="fhint:m-0 fhint:p-0 fhint:font-heading fhint:text-[21px] fhint:leading-tight fhint:font-extrabold fhint:tracking-[-0.02em] fhint:outline-none"
+            >
+              {__("Business Profile", "foundhint-local-seo")}
+            </h1>
+            <Hint
+              about={__("Business Profile", "foundhint-local-seo")}
+              side="bottom"
+              align="start"
+              text={__(
+                "Your business name, address, hours, links, attributes, services and photos, all in one place. FoundHint uses these details for your website markup and your location pages.",
+                "foundhint-local-seo",
+              )}
+            />
+          </div>
         </div>
 
         {meta ? (

@@ -2,6 +2,7 @@ import { useId, useState } from "react";
 import { __, _n, sprintf } from "@wordpress/i18n";
 import { CircleAlertIcon, ExternalLinkIcon, HistoryIcon } from "lucide-react";
 import { Link } from "react-router";
+import Hint from "@/components/Hint";
 import { cn } from "cn";
 import { DESCRIPTION_MAX, hasLink } from "../model";
 import {
@@ -82,16 +83,25 @@ export function InfoSection({ model, onChange, errors, info, google, limits }) {
           value={model.name}
           onChange={set("name")}
           error={errors?.name}
-          help={__(
+          hint={__(
             "Exactly as it appears on your sign. Adding extra words like “best dentist” can get your listing suspended.",
             "foundhint-local-seo",
           )}
         />
 
         <div className="fhint:grid fhint:content-start fhint:gap-1.5">
-          <span id={mainLabelId} className={label}>
-            {__("Main category", "foundhint-local-seo")}
-          </span>
+          <div className="fhint:flex fhint:items-center fhint:gap-1.5">
+            <span id={mainLabelId} className={label}>
+              {__("Main category", "foundhint-local-seo")}
+            </span>
+            <Hint
+              about={__("Main category", "foundhint-local-seo")}
+              text={__(
+                "The single thing you are best known for. It affects which searches you show up in more than anything else here.",
+                "foundhint-local-seo",
+              )}
+            />
+          </div>
           <CategorySearch
             labelledBy={mainLabelId}
             value={model.primary_category}
@@ -130,22 +140,24 @@ export function InfoSection({ model, onChange, errors, info, google, limits }) {
                 "foundhint-local-seo",
               )}
             </span>
-          ) : (
-            <span className={help}>
-              {__(
-                "The single thing you are best known for. It affects which searches you show up in more than anything else here.",
-                "foundhint-local-seo",
-              )}
-            </span>
-          )}
+          ) : null}
         </div>
       </div>
 
       <div className="fhint:grid fhint:gap-2">
         <div className="fhint:flex fhint:items-baseline fhint:gap-2.5">
-          <span id={extraLabelId} className={label}>
-            {__("Extra categories", "foundhint-local-seo")}
-          </span>
+          <div className="fhint:flex fhint:items-center fhint:gap-1.5">
+            <span id={extraLabelId} className={label}>
+              {__("Extra categories", "foundhint-local-seo")}
+            </span>
+            <Hint
+              about={__("Extra categories", "foundhint-local-seo")}
+              text={__(
+                "Add other things you genuinely do. Only pick categories that are true, because unrelated ones can hurt you.",
+                "foundhint-local-seo",
+              )}
+            />
+          </div>
           <span className="fhint:ml-auto fhint:text-[12.5px] fhint:font-bold fhint:text-muted-strong">
             {sprintf(
               /* translators: 1: how many extra categories are chosen, 2: how many Google allows. */
@@ -224,19 +236,22 @@ export function InfoSection({ model, onChange, errors, info, google, limits }) {
             {errors.secondary_categories}
           </span>
         ) : null}
-        <span className={help}>
-          {__(
-            "Add other things you genuinely do. Only pick categories that are true, because unrelated ones can hurt you.",
-            "foundhint-local-seo",
-          )}
-        </span>
       </div>
 
       <div className="fhint:grid fhint:gap-[7px]">
         <div className="fhint:flex fhint:flex-wrap fhint:items-center fhint:gap-2">
-          <label htmlFor={descriptionId} className={label}>
-            {__("Business description", "foundhint-local-seo")}
-          </label>
+          <div className="fhint:flex fhint:items-center fhint:gap-1.5">
+            <label htmlFor={descriptionId} className={label}>
+              {__("Business description", "foundhint-local-seo")}
+            </label>
+            <Hint
+              about={__("Business description", "foundhint-local-seo")}
+              text={__(
+                "Say what you do and where, in plain words. Please do not add web links, because Google rejects descriptions that have them.",
+                "foundhint-local-seo",
+              )}
+            />
+          </div>
           <span className="fhint:ml-auto fhint:flex fhint:flex-wrap fhint:items-center fhint:gap-[7px]">
             {history.length ? (
               <button
@@ -311,14 +326,6 @@ export function InfoSection({ model, onChange, errors, info, google, limits }) {
           {errors?.description && !linked ? (
             <span role="alert" className={errorText}>
               {errors.description}
-            </span>
-          ) : null}
-          {!linked && !errors?.description ? (
-            <span className={help}>
-              {__(
-                "Say what you do and where, in plain words. Please do not add web links, because Google rejects descriptions that have them.",
-                "foundhint-local-seo",
-              )}
             </span>
           ) : null}
         </div>

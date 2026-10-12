@@ -1,6 +1,7 @@
 import { sprintf, _n } from "@wordpress/i18n";
 import { Outlet } from "react-router";
 import { Toaster } from "@/components/ui/sonner";
+import { TooltipProvider } from "@/components/ui/tooltip";
 import { useGetBusinessQuery } from "@/store/api/businessApi";
 import { useGetLocationsQuery } from "@/store/api/locationsApi";
 import { useGetServicesQuery } from "@/store/api/servicesApi";
@@ -41,15 +42,19 @@ export const RootLayout = () => {
   ].join(" · ");
 
   return (
-    <div className="fhint:flex fhint:min-h-[calc(100vh-32px)] fhint:bg-background fhint:font-sans fhint:text-foreground">
-      <Sidebar counts={counts} />
-      <main className="fhint:min-w-0 fhint:flex-1 fhint:p-6">
-        <div className="fhint:mx-auto fhint:flex fhint:max-w-5xl fhint:flex-col fhint:gap-6">
-          <Outlet />
-        </div>
-      </main>
-      <Toaster position="bottom-right" richColors />
-    </div>
+    // One tooltip provider for the whole shell: the delay is a property of
+    // the app, not of each hint, and Base UI only reads it here.
+    <TooltipProvider delay={100}>
+      <div className="fhint:flex fhint:min-h-[calc(100vh-32px)] fhint:bg-background fhint:font-sans fhint:text-foreground">
+        <Sidebar counts={counts} />
+        <main className="fhint:min-w-0 fhint:flex-1 fhint:p-6">
+          <div className="fhint:mx-auto fhint:flex fhint:max-w-5xl fhint:flex-col fhint:gap-6">
+            <Outlet />
+          </div>
+        </main>
+        <Toaster position="bottom-right" richColors />
+      </div>
+    </TooltipProvider>
   );
 };
 

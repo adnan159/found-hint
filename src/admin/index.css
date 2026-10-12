@@ -4,14 +4,14 @@
 @import "tailwindcss/utilities.css";
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
-@import "@fontsource-variable/archivo";
+@import "@fontsource-variable/dm-sans";
 
 @custom-variant dark (&:is(.dark *));
 @source "./**/*.{js,jsx,ts,tsx}";
 
 @theme inline {
   --font-heading: var(--font-sans);
-  --font-sans: "Archivo Variable", system-ui, sans-serif;
+  --font-sans: "DM Sans Variable", system-ui, sans-serif;
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
@@ -68,93 +68,39 @@
   --radius-4xl: calc(var(--radius) * 2.6);
 }
 
-/*
- * Design tokens, taken from the FoundHint prototype's own stylesheet rather
- * than eyeballed from a screenshot. Three of them define the look and should
- * not drift:
- *
- * - `--radius: 0` — the design is square-cornered throughout. shadcn ships
- *   rounded by default, so this is what makes the primitives look like the
- *   prototype instead of like stock shadcn.
- * - `--primary: #ff6b35` — the accent actually rendered on every screen. The
- *   prototype's token file also carries an unused `#ec3013`; ignore it.
- * - Warm neutrals. The greys are warm (#201e1d, #7d7979, #d7d3d3), not the
- *   blue-grey shadcn defaults, which is most of why the design reads as it
- *   does.
- */
 :root {
-  --background: #f3f2f2;
-  --foreground: #201e1d;
-  --card: #ffffff;
-  --card-foreground: #201e1d;
-  --popover: #ffffff;
-  --popover-foreground: #201e1d;
-  --primary: #ff6b35;
-  --primary-foreground: #ffffff;
-  --secondary: #f8f4f4;
-  --secondary-foreground: #201e1d;
-  --muted: #f8f4f4;
-  --muted-foreground: #7d7979;
-  --accent: #f8f4f4;
-  --accent-foreground: #201e1d;
-  --destructive: #ae1800;
-  --border: #d7d3d3;
-  --input: #bab6b6;
-  --ring: #ff6b35;
-  --chart-1: #ff6b35;
-  --chart-2: #7d7979;
-  --chart-3: #605d5d;
-  --chart-4: #444141;
-  --chart-5: #2d2b2b;
-  --radius: 0px;
-  /* The sidebar is white, not dark. Its active row is the same peach/rust
-     pair used for notices, measured from the prototype: #fff1eb behind
-     #8a3b12, with a 3px accent bar on the leading edge. */
-  --sidebar: #ffffff;
-  --sidebar-foreground: #201e1d;
-  --sidebar-primary: #ff6b35;
-  --sidebar-primary-foreground: #ffffff;
-  --sidebar-accent: #fff1eb;
-  --sidebar-accent-foreground: #8a3b12;
-  --sidebar-border: #eae7e7;
-  --sidebar-ring: #ff6b35;
-  /* Sub-items sit a step quieter than a top-level row, and the disclosure
-     chevron quieter still — both measured from the prototype. */
-  --sidebar-sub-foreground: #444141;
-  --sidebar-chevron: #9b9797;
-
-  /* Muted body copy and the "Do this" links on the setup checklist. */
-  --muted-strong: #605d5d;
-  /* Body copy on the welcome and decision cards, measured from the
-     prototype: a step darker than --muted-strong. */
-  --foreground-soft: #444141;
-  --link-accent: #d8521f;
-
-  /* Completed work is green, not the brand orange — orange is for things
-     that still want attention, so using it for a tick would make a finished
-     checklist look like an unfinished one. */
-  --success: #157f4b;
-  --success-foreground: #ffffff;
-  /* The health score's band colours, measured from the prototype's score
-     card. Excellent reuses the good green: the prototype only shows the
-     bands a score has reached, so there was no colour to measure for the
-     top one, and a fourth hue would suggest a meaning nobody defined. */
-  --band-needs-work: #c02718;
-  --band-fair: #b26a00;
-  --band-good: #157f4b;
-  --band-excellent: #157f4b;
-  --band-empty: #eae7e7;
-
-  /* Plan-limit and "heads up" notices — an accent-tinted band, not an
-     error. Defined as tokens so components use `bg-notice` rather than
-     hardcoding the hex in three places. */
-  --notice: #fff1eb;
-  --notice-border: #ffc9af;
-  --notice-foreground: #8a3b12;
-
-  /* The prototype's section-header rule: heavier than a normal border, and
-     the single most recognisable detail of the card style. */
-  --divider: rgb(32 30 29 / 40%);
+  --background: oklch(1 0 0);
+  --foreground: oklch(0.145 0 0);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.145 0 0);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.145 0 0);
+  --primary: oklch(70.45% 0.19257 39.216);
+  --primary-foreground: oklch(0.98 0.016 73.684);
+  --secondary: oklch(0.967 0.001 286.375);
+  --secondary-foreground: oklch(0.21 0.006 285.885);
+  --muted: oklch(0.97 0 0);
+  --muted-foreground: oklch(0.556 0 0);
+  --accent: oklch(0.97 0 0);
+  --accent-foreground: oklch(0.205 0 0);
+  --destructive: oklch(0.577 0.245 27.325);
+  --border: oklch(0.922 0 0);
+  --input: oklch(0.922 0 0);
+  --ring: oklch(0.708 0 0);
+  --chart-1: oklch(0.87 0 0);
+  --chart-2: oklch(0.556 0 0);
+  --chart-3: oklch(0.439 0 0);
+  --chart-4: oklch(0.371 0 0);
+  --chart-5: oklch(0.269 0 0);
+  --radius: 0;
+  --sidebar: oklch(0.985 0 0);
+  --sidebar-foreground: oklch(0.145 0 0);
+  --sidebar-primary: oklch(70.45% 0.19257 39.216);
+  --sidebar-primary-foreground: oklch(0.98 0.016 73.684);
+  --sidebar-accent: oklch(0.97 0 0);
+  --sidebar-accent-foreground: oklch(0.205 0 0);
+  --sidebar-border: oklch(0.922 0 0);
+  --sidebar-ring: oklch(0.708 0 0);
 }
 
 .dark {
@@ -164,8 +110,8 @@
   --card-foreground: oklch(0.985 0 0);
   --popover: oklch(0.205 0 0);
   --popover-foreground: oklch(0.985 0 0);
-  --primary: #ff6b35;
-  --primary-foreground: oklch(0.985 0 0);
+  --primary: oklch(70.45% 0.19257 39.216);
+  --primary-foreground: oklch(0.98 0.016 73.684);
   --secondary: oklch(0.274 0.006 286.033);
   --secondary-foreground: oklch(0.985 0 0);
   --muted: oklch(0.269 0 0);
@@ -175,22 +121,20 @@
   --destructive: oklch(0.704 0.191 22.216);
   --border: oklch(1 0 0 / 10%);
   --input: oklch(1 0 0 / 15%);
-  --ring: #ff6b35;
+  --ring: oklch(0.556 0 0);
   --chart-1: oklch(0.87 0 0);
   --chart-2: oklch(0.556 0 0);
   --chart-3: oklch(0.439 0 0);
   --chart-4: oklch(0.371 0 0);
   --chart-5: oklch(0.269 0 0);
-  --sidebar: oklch(0.145 0 0);
+  --sidebar: oklch(0.205 0 0);
   --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: #ff6b35;
-  --sidebar-primary-foreground: oklch(0.985 0 0);
+  --sidebar-primary: oklch(70.45% 0.19257 39.216) sss;
+  --sidebar-primary-foreground: oklch(0.98 0.016 73.684);
   --sidebar-accent: oklch(0.269 0 0);
   --sidebar-accent-foreground: oklch(0.985 0 0);
   --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: #ff6b35;
-  --sidebar-sub-foreground: oklch(0.708 0 0);
-  --sidebar-chevron: oklch(0.708 0 0);
+  --sidebar-ring: oklch(0.556 0 0);
 }
 
 @layer base {

@@ -1,5 +1,13 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import RequestError from "@/components/RequestError";
+import { Skeleton } from "@/components/ui/skeleton";
+import { errorMessage, fieldErrors } from "@/lib/errors";
+import {
+  useGetProfileQuery,
+  useRefreshFromGoogleMutation,
+  useSaveProfileSectionMutation,
+} from "@/store/api/profileApi";
 import { __, _n, sprintf } from "@wordpress/i18n";
+import { cn } from "cn";
 import {
   Building2Icon,
   ClockIcon,
@@ -10,16 +18,8 @@ import {
   Share2Icon,
   WrenchIcon,
 } from "lucide-react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Link, useSearchParams } from "react-router";
-import { cn } from "cn";
-import { Skeleton } from "@/components/ui/skeleton";
-import RequestError from "@/components/RequestError";
-import { errorMessage, fieldErrors } from "@/lib/errors";
-import {
-  useGetProfileQuery,
-  useRefreshFromGoogleMutation,
-  useSaveProfileSectionMutation,
-} from "@/store/api/profileApi";
 import AddressSection from "./components/AddressSection";
 import AttributesSection from "./components/AttributesSection";
 import HoursSection from "./components/HoursSection";
@@ -464,12 +464,6 @@ export function Profile() {
         aria-busy={isFetching}
         className="fhint:grid fhint:gap-1 fhint:text-[13.5px] fhint:text-muted-strong"
       >
-        <p className="fhint:m-0 fhint:max-w-[76ch]">
-          {__(
-            "Your business name, address, hours, links, attributes, services and photos, all in one place. FoundHint uses these details for your website markup and your location pages.",
-            "foundhint-local-seo",
-          )}
-        </p>
         <p className="fhint:m-0 fhint:flex fhint:flex-wrap fhint:items-center fhint:gap-x-3 fhint:gap-y-1 fhint:text-[13px]">
           <span>{syncLine(google)}</span>
           {google.mapped ? (

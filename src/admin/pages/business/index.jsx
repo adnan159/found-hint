@@ -1,6 +1,6 @@
-import { useEffect, useState } from "react";
-import { __ } from "@wordpress/i18n";
-import { toast } from "sonner";
+import PageHeader from "@/components/PageHeader";
+import RequestError from "@/components/RequestError";
+import SectionCard from "@/components/SectionCard";
 import { Button } from "@/components/ui/button";
 import {
   Field,
@@ -20,15 +20,15 @@ import {
 } from "@/components/ui/select";
 import { Spinner } from "@/components/ui/spinner";
 import { Textarea } from "@/components/ui/textarea";
-import PageHeader from "@/components/PageHeader";
-import RequestError from "@/components/RequestError";
-import SectionCard from "@/components/SectionCard";
 import { businessTypes } from "@/lib/bootstrap";
 import { fieldErrors } from "@/lib/errors";
 import {
   useGetBusinessQuery,
   useUpdateBusinessMutation,
 } from "@/store/api/businessApi";
+import { __ } from "@wordpress/i18n";
+import { useEffect, useState } from "react";
+import { toast } from "sonner";
 import BusinessSkeleton from "./components/BusinessSkeleton";
 
 const SOCIAL_NETWORKS = [
@@ -135,7 +135,6 @@ export default function BusinessPage() {
           "foundhint-local-seo",
         )}
       />
-
       <form
         onSubmit={onSubmit}
         className="fhint:flex fhint:flex-col fhint:gap-5"
