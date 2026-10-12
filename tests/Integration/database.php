@@ -2646,6 +2646,7 @@ if ( $admins ) {
 	check_same( 200, $fhint_response->get_status(), 'POST /profile/media/{id}/publish sends a waiting photo' );
 	check_same( 3, count( $fhint_posts ), 'in three requests' );
 	check( false !== strpos( $fhint_posts[0]['url'], 'accounts/999/locations/refresh-me/media:startUpload' ), 'first asking the listing for somewhere to put it' );
+	check_same( '{}', (string) $fhint_posts[0]['body'], 'with an empty object for a body, which is the only empty body Google accepts' );
 	check( false !== strpos( $fhint_posts[1]['url'], '/upload/v1/media/upload-ref-1' ) && false !== strpos( $fhint_posts[1]['url'], 'upload_type=media' ), 'then sending the bytes there' );
 	check_same( array( $fhint_photo_bytes, 'image/jpeg' ), array( strlen( (string) $fhint_posts[1]['body'] ), $fhint_posts[1]['type'] ), 'the whole file, as the kind of image it is' );
 	check_same(
