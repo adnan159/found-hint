@@ -52,7 +52,7 @@ export function AddressSection({ model, onChange, errors, address }) {
         </div>
       ) : null}
 
-      <div className="fhint:grid fhint:grid-cols-[repeat(auto-fit,minmax(min(100%,260px),1fr))] fhint:gap-[18px]">
+      <div className="fhint:grid fhint:grid-cols-1 fhint:gap-[18px] fhint:md:grid-cols-3">
         {field("address_line_1", __("Street address", "foundhint-local-seo"))}
         {field(
           "address_line_2",
@@ -63,7 +63,7 @@ export function AddressSection({ model, onChange, errors, address }) {
         {field("postal_code", __("Postal code", "foundhint-local-seo"))}
         {field("country", __("Country", "foundhint-local-seo"), {
           maxLength: 2,
-          help: locked
+          hint: locked
             ? undefined
             : __("Two letters, such as US or BD.", "foundhint-local-seo"),
         })}

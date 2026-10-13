@@ -101,6 +101,10 @@
   --sidebar-accent-foreground: oklch(0.205 0 0);
   --sidebar-border: oklch(0.922 0 0);
   --sidebar-ring: oklch(0.708 0 0);
+  /* The heavier rule that closes the sidebar and a card's heading: set apart
+     by its 2px weight, not by a darker colour. Left undefined, it falls back
+     to the text colour and every such rule turns near-black. */
+  --divider: var(--border);
 }
 
 .dark {
@@ -193,6 +197,33 @@
   border-radius: 0;
   min-height: 0;
   line-height: inherit;
+  /* WordPress gives typed inputs (url, tel, time, date, number…) a darker
+     border than an input with no `type` gets, with a selector a utility
+     class cannot outrank — so two fields side by side would not match. */
+  border-color: var(--input);
+}
+
+/* The two border colours a utility class would otherwise have set, restated
+   because the rule above now outranks them. Invalid comes last: a refused
+   field stays red while it has focus. */
+#fhint-app input:not([type="checkbox"]):not([type="radio"]):focus-visible,
+#fhint-app textarea:focus-visible,
+#fhint-app select:focus-visible,
+[data-slot="dialog-content"]
+  input:not([type="checkbox"]):not([type="radio"]):focus-visible,
+[data-slot="dialog-content"] textarea:focus-visible,
+[data-slot="dialog-content"] select:focus-visible {
+  border-color: var(--ring);
+}
+
+#fhint-app input:not([type="checkbox"]):not([type="radio"])[aria-invalid="true"],
+#fhint-app textarea[aria-invalid="true"],
+#fhint-app select[aria-invalid="true"],
+[data-slot="dialog-content"]
+  input:not([type="checkbox"]):not([type="radio"])[aria-invalid="true"],
+[data-slot="dialog-content"] textarea[aria-invalid="true"],
+[data-slot="dialog-content"] select[aria-invalid="true"] {
+  border-color: var(--destructive);
 }
 
 #fhint-app input:focus,
@@ -200,6 +231,33 @@
 #fhint-app select:focus {
   box-shadow: none;
   outline-offset: 1px;
+}
+
+/*
+ * WordPress turns every admin link blue on hover, press and focus, and draws
+ * a blue glow round a focused one — with selectors (`a:focus`) a utility
+ * class cannot outrank. A sidebar row keeps its own colours instead, and
+ * shows keyboard focus with the app's ring rather than the glow. The ring is
+ * `:focus-visible` only, so a mouse click does not leave one behind.
+ */
+[data-slot="sidebar-nav"] a:hover,
+[data-slot="sidebar-nav"] a:active,
+[data-slot="sidebar-nav"] a:focus {
+  color: var(--sidebar-foreground);
+  box-shadow: none;
+  outline: none;
+  border-radius: 0;
+}
+
+[data-slot="sidebar-nav"] a[aria-current="page"]:hover,
+[data-slot="sidebar-nav"] a[aria-current="page"]:active,
+[data-slot="sidebar-nav"] a[aria-current="page"]:focus {
+  color: var(--sidebar-accent-foreground);
+}
+
+[data-slot="sidebar-nav"] a:focus-visible {
+  outline: 2px solid var(--sidebar-ring);
+  outline-offset: -2px;
 }
 
 .modern-scroll::-webkit-scrollbar {

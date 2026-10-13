@@ -77,9 +77,9 @@ export function ProfileHeader({
     .join("  ·  ");
 
   return (
-    <header className="fhint:-mx-6 fhint:-mt-6 fhint:flex fhint:flex-col">
+    <header className="fhint:-mx-4 fhint:-mt-6 fhint:flex fhint:flex-col">
       {meta ? (
-        <div className="fhint:flex fhint:flex-wrap fhint:items-center fhint:gap-x-4 fhint:gap-y-3 fhint:border-b fhint:border-b-border fhint:bg-card fhint:px-6 fhint:py-3.5">
+        <div className="fhint:box-border fhint:flex fhint:min-h-[68px] fhint:flex-wrap fhint:items-center fhint:gap-x-4 fhint:gap-y-3 fhint:border-b fhint:border-b-divider fhint:bg-card fhint:px-4 fhint:py-2.5">
           <span
             aria-hidden="true"
             className="fhint:grid fhint:size-11 fhint:flex-none fhint:place-items-center fhint:rounded-xl fhint:border fhint:border-border fhint:bg-card"
@@ -204,7 +204,16 @@ export function ProfileHeader({
         </div>
       ) : null}
 
-      <div className="fhint:flex fhint:flex-wrap fhint:items-center fhint:gap-x-4 fhint:gap-y-3 fhint:border-b fhint:border-b-border fhint:px-6 fhint:py-3.5">
+      <div
+        className={cn(
+          "fhint:box-border fhint:flex fhint:min-h-[68px] fhint:flex-wrap fhint:items-center fhint:gap-x-4 fhint:gap-y-3 fhint:px-4 fhint:py-2.5",
+          // Whichever row is on top carries the heavy rule that meets the
+          // sidebar's; the business bar above takes it once it has loaded.
+          meta
+            ? "fhint:border-b fhint:border-b-border"
+            : "fhint:border-b fhint:border-b-divider",
+        )}
+      >
         <div className="fhint:min-w-45 fhint:flex-1">
           <p className="fhint:m-0 fhint:text-[12.5px] fhint:font-semibold fhint:text-muted-strong">
             {__("FoundHint / Business Profile", "foundhint-local-seo")}

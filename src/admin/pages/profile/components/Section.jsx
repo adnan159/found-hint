@@ -1,36 +1,35 @@
-import { ChevronDownIcon } from "lucide-react";
 import { __ } from "@wordpress/i18n";
 import { cn } from "cn";
-import { chip, focus, tagTones } from "../styles";
+import { chip, primaryButton, quietButton, tagTones } from "../styles";
 
 /**
- * One collapsible card of the profile.
+ * The card inside one tab of the profile.
  *
- * The header is a real button with `aria-expanded`, so the whole row opens
- * and closes the section from the keyboard, and the heavy rule under it
- * appears only while the section is open — the design's way of saying "this
- * is the part you are in".
+ * A heading with the section's count beside it, the fields, and — for a
+ * section that is saved — a footer with its own Save button. The footer says
+ * where the section stands in words as well as colour: changed, saving,
+ * saved, or refused.
  *
- * `state` is how a section reports on the page-level save without a Save
- * button of its own: changed, saved, or refused. It is always words as well
- * as colour.
+ * A section with no `onSave` (photos, which are stored as they are added)
+ * has no footer at all.
  */
 const STATES = {
   dirty: {
-    tone: tagTones.accent,
-    label: () => __("Unsaved changes", "foundhint-local-seo"),
+    tone: "fhint:text-foreground",
+    label: () => __("Unsaved changes.", "foundhint-local-seo"),
   },
   saving: {
-    tone: tagTones.quiet,
+    tone: "fhint:text-muted-strong",
     label: () => __("Saving…", "foundhint-local-seo"),
   },
   saved: {
-    tone: tagTones.ok,
-    label: () => __("Saved", "foundhint-local-seo"),
+    tone: "fhint:text-success",
+    label: () => __("Saved.", "foundhint-local-seo"),
   },
   error: {
-    tone: tagTones.bad,
-    label: () => __("Not saved", "foundhint-local-seo"),
+    tone: "fhint:text-destructive",
+    label: () =>
+      __("Not saved. Check the highlighted fields.", "foundhint-local-seo"),
   },
 };
 
@@ -41,61 +40,75 @@ export function Section({
   badge,
   badgeTone = "accent",
   state,
-  open,
-  onToggle,
+  saveLabel,
+  onSave,
+  onDiscard,
+  disabled,
   children,
 }) {
   const status = state ? STATES[state] : null;
+  const saving = state === "saving";
+  const changed = state === "dirty" || state === "error";
 
   return (
     <section
       id={`profile-${id}`}
-      className="fhint:scroll-mt-6 fhint:border fhint:border-border fhint:bg-card"
+      aria-labelledby={`profile-${id}-title`}
+      className="fhint:border fhint:border-border fhint:bg-card"
     >
-      <h2 className="fhint:m-0">
-        <button
-          type="button"
-          onClick={onToggle}
-          aria-expanded={open}
-          aria-controls={`profile-${id}-body`}
-          className={cn(
-            "fhint:flex fhint:w-full fhint:cursor-pointer fhint:flex-wrap fhint:items-center fhint:gap-3 fhint:border-0 fhint:bg-transparent fhint:px-[22px] fhint:py-[18px] fhint:text-left fhint:text-foreground",
-            open && "fhint:border-b-2 fhint:border-b-divider",
-            focus,
-          )}
+      <div className="fhint:flex fhint:flex-wrap fhint:items-center fhint:gap-3 fhint:border-b-2 fhint:border-b-border fhint:px-[22px] fhint:py-[18px] fhint:text-foreground">
+        <span
+          aria-hidden="true"
+          className="fhint:grid fhint:size-[22px] fhint:flex-none fhint:place-items-center fhint:text-muted-strong"
         >
+          <Icon className="fhint:size-4" />
+        </span>
+        <h2
+          id={`profile-${id}-title`}
+          className="fhint:m-0 fhint:text-base fhint:font-bold fhint:tracking-[-0.01em]"
+        >
+          {title}
+        </h2>
+        {badge ? (
+          <span className={cn(chip, tagTones[badgeTone])}>{badge}</span>
+        ) : null}
+      </div>
+      <div className="fhint:grid fhint:gap-5 fhint:p-5">{children}</div>
+      {onSave ? (
+        <div className="fhint:flex fhint:flex-wrap fhint:items-center fhint:gap-3 fhint:border-t fhint:border-border fhint:px-[22px] fhint:py-3.5">
           <span
-            aria-hidden="true"
-            className="fhint:grid fhint:size-[22px] fhint:flex-none fhint:place-items-center fhint:text-muted-strong"
-          >
-            <Icon className="fhint:size-4" />
-          </span>
-          <span className="fhint:text-base fhint:font-bold fhint:tracking-[-0.01em]">
-            {title}
-          </span>
-          {badge ? (
-            <span className={cn(chip, tagTones[badgeTone])}>{badge}</span>
-          ) : null}
-          {status ? (
-            <span role="status" className={cn(chip, status.tone)}>
-              {status.label()}
-            </span>
-          ) : null}
-          <ChevronDownIcon
-            aria-hidden="true"
+            aria-live="polite"
             className={cn(
-              "fhint:ml-auto fhint:size-4 fhint:flex-none fhint:text-muted-foreground fhint:transition-transform",
-              !open && "fhint:-rotate-90",
+              "fhint:min-w-0 fhint:flex-1 fhint:text-[13px] fhint:font-bold",
+              status?.tone,
             )}
-          />
-        </button>
-      </h2>
-      {open ? (
-        <div
-          id={`profile-${id}-body`}
-          className="fhint:grid fhint:gap-5 fhint:p-5"
-        >
-          {children}
+          >
+            {status ? status.label() : ""}
+          </span>
+          {changed ? (
+            <button
+              type="button"
+              onClick={onDiscard}
+              disabled={disabled}
+              className={cn(
+                quietButton,
+                "fhint:px-4 fhint:py-[9px] fhint:text-[13px]",
+              )}
+            >
+              {__("Discard", "foundhint-local-seo")}
+            </button>
+          ) : null}
+          <button
+            type="button"
+            onClick={onSave}
+            disabled={disabled || saving || !changed}
+            className={cn(
+              primaryButton,
+              "fhint:px-4 fhint:py-[9px] fhint:text-[13px]",
+            )}
+          >
+            {saveLabel}
+          </button>
         </div>
       ) : null}
     </section>

@@ -1,5 +1,6 @@
 import RequestError from "@/components/RequestError";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { errorMessage, fieldErrors } from "@/lib/errors";
 import {
   useGetProfileQuery,
@@ -38,9 +39,24 @@ import {
   same,
   selectedAttributes,
 } from "./model";
-import { errorText, primaryButton, quietButton } from "./styles";
+import { errorText, quietButton } from "./styles";
 
-const ALL_OPEN = Object.fromEntries(SECTIONS.map((id) => [id, true]));
+// How a tab says its section needs attention while another tab is open: a
+// dot, with the words behind it for a screen reader.
+const MARKS = {
+  dirty: {
+    tone: "fhint:bg-primary",
+    label: () => __("Unsaved changes", "foundhint-local-seo"),
+  },
+  saving: {
+    tone: "fhint:bg-primary",
+    label: () => __("Saving…", "foundhint-local-seo"),
+  },
+  error: {
+    tone: "fhint:bg-destructive",
+    label: () => __("Not saved", "foundhint-local-seo"),
+  },
+};
 
 /**
  * "2 hours ago", from a UTC timestamp as the server stores it.
@@ -90,11 +106,9 @@ function ago(value) {
 }
 
 function syncLine(google) {
+  // Nothing to report until Google is connected, so the line is left out.
   if (!google?.connected) {
-    return __(
-      "Connect Google to keep your listing and your website saying the same thing.",
-      "foundhint-local-seo",
-    );
+    return "";
   }
 
   if (!google.mapped) {
@@ -139,13 +153,13 @@ function syncLine(google) {
 }
 
 /**
- * The business profile: seven sections on one screen.
+ * The business profile: seven sections, one tab each.
  *
- * No section has a Save button of its own. Edits collect across the whole
- * page and one bar at the bottom saves them, one section per request, so a
- * refusal in one section never costs the changes made in another. Each
- * section's header says where it stands — changed, saving, saved, or not
- * saved — and a refused field carries its own message.
+ * Every section that is saved has its own Save button, and saving one sends
+ * only that section — so a refusal in one never costs the changes made in
+ * another. Edits survive a change of tab: a tab with unsaved changes is
+ * marked, and its footer says where it stands — changed, saving, saved, or
+ * not saved — while a refused field carries its own message.
  *
  * What the screen edits is `drafts`: only the sections that have been
  * touched. Everything else is read straight from the server's copy, so a
@@ -170,14 +184,13 @@ export function Profile() {
   const [saveSection] = useSaveProfileSectionMutation();
   const [refreshFromGoogle, refreshState] = useRefreshFromGoogleMutation();
 
-  const [open, setOpen] = useState(ALL_OPEN);
+  const [tab, setTab] = useState(SECTIONS[0]);
   const [drafts, setDrafts] = useState({});
   const [status, setStatus] = useState({});
   const [errors, setErrors] = useState({});
-  const [saving, setSaving] = useState(false);
   const [publishing, setPublishing] = useState(false);
-  // What the last save came to. Said in the bar itself rather than in a
-  // toast: a toast lands on top of the very buttons it is talking about.
+  // What the last read from Google came to, said beside the button that
+  // asked for it.
   const [notice, setNotice] = useState(null);
   const noticeTimer = useRef(null);
 
@@ -194,6 +207,7 @@ export function Profile() {
     (id) => id in drafts && !same(drafts[id], base[id]),
   );
   const isDirty = dirty.length > 0;
+  const saving = Object.values(status).includes("saving");
 
   const refresh = async () => {
     setNotice(null);
@@ -273,7 +287,6 @@ export function Profile() {
   const change = (id) => (next) => {
     setDrafts((current) => ({ ...current, [id]: next }));
     setStatus((current) => ({ ...current, [id]: undefined }));
-    setNotice(null);
   };
 
   const stateOf = (id) => {
@@ -288,81 +301,50 @@ export function Profile() {
     return status[id];
   };
 
-  const discard = () => {
+  const without = (id) => (current) => {
+    const next = { ...current };
+
+    delete next[id];
+
+    return next;
+  };
+
+  const discard = (id) => {
+    setDrafts(without(id));
+    setErrors(without(id));
+    setStatus(without(id));
+  };
+
+  const discardAll = () => {
     setDrafts({});
     setErrors({});
     setStatus({});
     setNotice(null);
   };
 
-  const save = async () => {
-    setSaving(true);
+  // One section, one request: only the tab whose button was pressed is sent.
+  const save = async (id) => {
+    setStatus((current) => ({ ...current, [id]: "saving" }));
 
-    let failed = 0;
-    let firstFailure = null;
+    try {
+      await saveSection({
+        section: id,
+        fields: fieldsFor(id, drafts[id], base[id]),
+        locationId,
+      }).unwrap();
 
-    // One at a time and in page order: every section is its own request, and
-    // a refusal stops only the section it belongs to.
-    for (const id of dirty) {
-      setStatus((current) => ({ ...current, [id]: "saving" }));
-
-      try {
-        await saveSection({
-          section: id,
-          fields: fieldsFor(id, drafts[id], base[id]),
-          locationId,
-        }).unwrap();
-
-        setDrafts((current) => {
-          const next = { ...current };
-
-          delete next[id];
-
-          return next;
-        });
-        setErrors((current) => ({ ...current, [id]: undefined }));
-        setStatus((current) => ({ ...current, [id]: "saved" }));
-      } catch (failure) {
-        failed += 1;
-        firstFailure = firstFailure ?? id;
-
-        setErrors((current) => ({
-          ...current,
-          [id]: {
-            fields: fieldErrors(failure),
-            message: errorMessage(failure),
-          },
-        }));
-        setStatus((current) => ({ ...current, [id]: "error" }));
-        setOpen((current) => ({ ...current, [id]: true }));
-      }
-    }
-
-    setSaving(false);
-
-    clearTimeout(noticeTimer.current);
-
-    if (failed) {
-      setNotice({
-        tone: "bad",
-        text: sprintf(
-          /* translators: %d: number of sections. */
-          _n(
-            "%d section was not saved. Check the highlighted fields.",
-            "%d sections were not saved. Check the highlighted fields.",
-            failed,
-            "foundhint-local-seo",
-          ),
-          failed,
-        ),
-      });
-
-      document
-        .getElementById(`profile-${firstFailure}`)
-        ?.scrollIntoView({ behavior: "smooth", block: "start" });
-    } else {
-      setNotice({ tone: "ok", text: __("Saved.", "foundhint-local-seo") });
-      noticeTimer.current = setTimeout(() => setNotice(null), 4000);
+      setDrafts(without(id));
+      setErrors(without(id));
+      setStatus((current) => ({ ...current, [id]: "saved" }));
+    } catch (failure) {
+      setErrors((current) => ({
+        ...current,
+        [id]: {
+          fields: fieldErrors(failure),
+          message: errorMessage(failure),
+        },
+      }));
+      setStatus((current) => ({ ...current, [id]: "error" }));
     }
   };
 
@@ -385,7 +367,7 @@ export function Profile() {
       return;
     }
 
-    discard();
+    discardAll();
     // Mark the arrival, so the location's listing is read once it has loaded.
     asked.current.delete(id);
     switched.current = id;
@@ -411,9 +393,8 @@ export function Profile() {
     return (
       <div className="fhint:flex fhint:flex-col fhint:gap-4">
         {header}
-        {SECTIONS.map((id) => (
-          <Skeleton key={id} className="fhint:h-[60px] fhint:w-full" />
-        ))}
+        <Skeleton className="fhint:h-9 fhint:w-full" />
+        <Skeleton className="fhint:h-[320px] fhint:w-full" />
       </div>
     );
   }
@@ -429,16 +410,6 @@ export function Profile() {
       </div>
     );
   }
-
-  const section = (id, icon, title, extra = {}) => ({
-    id,
-    icon,
-    title,
-    state: stateOf(id),
-    open: open[id],
-    onToggle: () => setOpen((current) => ({ ...current, [id]: !current[id] })),
-    ...extra,
-  });
 
   // A refusal that names no field still has to be said somewhere.
   const refusal = (id) =>
@@ -456,12 +427,185 @@ export function Profile() {
   const serviceLimits = sections.services?.limits ?? {};
   const photoCount = sections.media?.count ?? 0;
 
+  const tabs = [
+    {
+      id: "info",
+      icon: Building2Icon,
+      tab: __("Information", "foundhint-local-seo"),
+      saveLabel: __("Save Information", "foundhint-local-seo"),
+      body: (
+        <>
+          {refusal("info")}
+          <InfoSection
+            model={model("info")}
+            onChange={change("info")}
+            errors={errors.info?.fields}
+            info={sections.info}
+            google={google}
+            limits={meta.limits}
+          />
+          <p className="fhint:m-0 fhint:text-[12.5px] fhint:text-muted-strong">
+            {__(
+              "Legal name, business type, email, logo, price range and founding date are used only in your website markup.",
+              "foundhint-local-seo",
+            )}{" "}
+            <Link
+              to="/business/details"
+              className="fhint:font-extrabold fhint:text-foreground fhint:underline"
+            >
+              {__("Edit markup details", "foundhint-local-seo")}
+            </Link>
+          </p>
+        </>
+      ),
+    },
+    {
+      id: "address",
+      icon: MapPinIcon,
+      tab: __("Address & Location", "foundhint-local-seo"),
+      saveLabel: __("Save Address", "foundhint-local-seo"),
+      body: (
+        <>
+          {refusal("address")}
+          <AddressSection
+            model={model("address")}
+            onChange={change("address")}
+            errors={errors.address?.fields}
+            address={sections.address}
+          />
+        </>
+      ),
+    },
+    {
+      id: "hours",
+      icon: ClockIcon,
+      tab: __("Business Hours", "foundhint-local-seo"),
+      saveLabel: __("Save Hours", "foundhint-local-seo"),
+      badge: sprintf(
+        /* translators: %d: number of days of the week. */
+        _n("%d day open", "%d days open", openDays, "foundhint-local-seo"),
+        openDays,
+      ),
+      body: (
+        <>
+          {refusal("hours")}
+          <HoursSection
+            model={model("hours")}
+            onChange={change("hours")}
+            errors={errors.hours?.fields}
+          />
+        </>
+      ),
+    },
+    {
+      id: "social",
+      icon: Share2Icon,
+      tab: __("Social Links", "foundhint-local-seo"),
+      saveLabel: __("Save Links", "foundhint-local-seo"),
+      badge: sprintf(
+        /* translators: %d: number of links. */
+        __("%d in your markup", "foundhint-local-seo"),
+        links,
+      ),
+      body: (
+        <>
+          {refusal("social")}
+          <SocialSection
+            model={model("social")}
+            onChange={change("social")}
+            errors={errors.social?.fields}
+            social={sections.social}
+          />
+        </>
+      ),
+    },
+    {
+      id: "attributes",
+      icon: ListChecksIcon,
+      tab: __("Attributes", "foundhint-local-seo"),
+      saveLabel: __("Save Attributes", "foundhint-local-seo"),
+      badge: sprintf(
+        /* translators: %d: number of attributes. */
+        __("%d selected", "foundhint-local-seo"),
+        ticked,
+      ),
+      body: (
+        <>
+          {refusal("attributes")}
+          <AttributesSection
+            model={model("attributes")}
+            onChange={change("attributes")}
+            attributes={sections.attributes}
+            google={google}
+            onRefresh={refresh}
+            refreshing={refreshState.isLoading}
+          />
+        </>
+      ),
+    },
+    {
+      id: "services",
+      icon: WrenchIcon,
+      tab: __("Services", "foundhint-local-seo"),
+      saveLabel: __("Save Services", "foundhint-local-seo"),
+      badge:
+        serviceLimits.unlimited || !serviceLimits.limit
+          ? sprintf(
+              /* translators: %d: number of services. */
+              _n(
+                "%d service",
+                "%d services",
+                serviceCount,
+                "foundhint-local-seo",
+              ),
+              serviceCount,
+            )
+          : sprintf(
+              /* translators: 1: services added, 2: services the plan includes. */
+              __("%1$d of %2$d used", "foundhint-local-seo"),
+              serviceCount,
+              serviceLimits.limit,
+            ),
+      body: (
+        <>
+          {refusal("services")}
+          <ServicesSection
+            model={model("services")}
+            onChange={change("services")}
+            errors={errors.services?.fields}
+            services={sections.services}
+          />
+        </>
+      ),
+    },
+    {
+      id: "media",
+      icon: ImageIcon,
+      tab: __("Photos", "foundhint-local-seo"),
+      badge: sprintf(
+        /* translators: %d: number of photos. */
+        _n("%d photo", "%d photos", photoCount, "foundhint-local-seo"),
+        photoCount,
+      ),
+      badgeTone: "quiet",
+      body: (
+        <PhotosSection
+          media={sections.media}
+          google={google}
+          locationId={locationId}
+          onChanged={refetch}
+        />
+      ),
+    },
+  ];
+
   return (
     <div className="fhint:flex fhint:flex-col fhint:gap-4">
       {header}
 
       <div
         aria-busy={isFetching}
+        hidden={!syncLine(google)}
         className="fhint:grid fhint:gap-1 fhint:text-[13.5px] fhint:text-muted-strong"
       >
         <p className="fhint:m-0 fhint:flex fhint:flex-wrap fhint:items-center fhint:gap-x-3 fhint:gap-y-1 fhint:text-[13px]">
@@ -489,240 +633,68 @@ export function Profile() {
                 : __("Refresh from Google", "foundhint-local-seo")}
             </button>
           ) : null}
-        </p>
-      </div>
-
-      <Section
-        {...section(
-          "info",
-          Building2Icon,
-          __("Business Information", "foundhint-local-seo"),
-        )}
-      >
-        {refusal("info")}
-        <InfoSection
-          model={model("info")}
-          onChange={change("info")}
-          errors={errors.info?.fields}
-          info={sections.info}
-          google={google}
-          limits={meta.limits}
-        />
-        <p className="fhint:m-0 fhint:text-[12.5px] fhint:text-muted-strong">
-          {__(
-            "Legal name, business type, email, logo, price range and founding date are used only in your website markup.",
-            "foundhint-local-seo",
-          )}{" "}
-          <Link
-            to="/business/details"
-            className="fhint:font-extrabold fhint:text-foreground fhint:underline"
-          >
-            {__("Edit markup details", "foundhint-local-seo")}
-          </Link>
-        </p>
-      </Section>
-
-      <Section
-        {...section(
-          "address",
-          MapPinIcon,
-          __("Address and Location", "foundhint-local-seo"),
-        )}
-      >
-        {refusal("address")}
-        <AddressSection
-          model={model("address")}
-          onChange={change("address")}
-          errors={errors.address?.fields}
-          address={sections.address}
-        />
-      </Section>
-
-      <Section
-        {...section(
-          "hours",
-          ClockIcon,
-          __("Business Hours", "foundhint-local-seo"),
-          {
-            badge: sprintf(
-              /* translators: %d: number of days of the week. */
-              _n(
-                "%d day open",
-                "%d days open",
-                openDays,
-                "foundhint-local-seo",
-              ),
-              openDays,
-            ),
-          },
-        )}
-      >
-        {refusal("hours")}
-        <HoursSection
-          model={model("hours")}
-          onChange={change("hours")}
-          errors={errors.hours?.fields}
-        />
-      </Section>
-
-      <Section
-        {...section(
-          "social",
-          Share2Icon,
-          __("Social Links and Listings", "foundhint-local-seo"),
-          {
-            badge: sprintf(
-              /* translators: %d: number of links. */
-              __("%d in your markup", "foundhint-local-seo"),
-              links,
-            ),
-          },
-        )}
-      >
-        {refusal("social")}
-        <SocialSection
-          model={model("social")}
-          onChange={change("social")}
-          errors={errors.social?.fields}
-          social={sections.social}
-        />
-      </Section>
-
-      <Section
-        {...section(
-          "attributes",
-          ListChecksIcon,
-          __("Attributes", "foundhint-local-seo"),
-          {
-            badge: sprintf(
-              /* translators: %d: number of attributes. */
-              __("%d selected", "foundhint-local-seo"),
-              ticked,
-            ),
-          },
-        )}
-      >
-        {refusal("attributes")}
-        <AttributesSection
-          model={model("attributes")}
-          onChange={change("attributes")}
-          attributes={sections.attributes}
-          google={google}
-          onRefresh={refresh}
-          refreshing={refreshState.isLoading}
-        />
-      </Section>
-
-      <Section
-        {...section(
-          "services",
-          WrenchIcon,
-          __("Services", "foundhint-local-seo"),
-          {
-            badge:
-              serviceLimits.unlimited || !serviceLimits.limit
-                ? sprintf(
-                    /* translators: %d: number of services. */
-                    _n(
-                      "%d service",
-                      "%d services",
-                      serviceCount,
-                      "foundhint-local-seo",
-                    ),
-                    serviceCount,
-                  )
-                : sprintf(
-                    /* translators: 1: services added, 2: services the plan includes. */
-                    __("%1$d of %2$d used", "foundhint-local-seo"),
-                    serviceCount,
-                    serviceLimits.limit,
-                  ),
-          },
-        )}
-      >
-        {refusal("services")}
-        <ServicesSection
-          model={model("services")}
-          onChange={change("services")}
-          errors={errors.services?.fields}
-          services={sections.services}
-        />
-      </Section>
-
-      <Section
-        {...section("media", ImageIcon, __("Photos", "foundhint-local-seo"), {
-          badge: sprintf(
-            /* translators: %d: number of photos. */
-            _n("%d photo", "%d photos", photoCount, "foundhint-local-seo"),
-            photoCount,
-          ),
-          badgeTone: "quiet",
-        })}
-      >
-        <PhotosSection
-          media={sections.media}
-          google={google}
-          locationId={locationId}
-          onChanged={refetch}
-        />
-      </Section>
-
-      {isDirty || saving || notice ? (
-        <div
-          role="region"
-          aria-label={__("Save changes", "foundhint-local-seo")}
-          className="fhint:sticky fhint:bottom-0 fhint:z-10 fhint:flex fhint:flex-wrap fhint:items-center fhint:gap-3 fhint:border-2 fhint:border-divider fhint:bg-card fhint:px-[22px] fhint:py-3.5 fhint:shadow-[0_-6px_18px_rgba(45,43,43,0.10)]"
-        >
           <span
             aria-live="polite"
             className={cn(
-              "fhint:min-w-0 fhint:flex-1 fhint:text-[13px] fhint:font-bold",
-              !saving && notice?.tone === "ok" && "fhint:text-success",
-              !saving && notice?.tone === "bad" && "fhint:text-destructive",
+              "fhint:font-bold",
+              notice?.tone === "ok" && "fhint:text-success",
+              notice?.tone === "bad" && "fhint:text-destructive",
             )}
           >
-            {saving
-              ? __("Saving…", "foundhint-local-seo")
-              : (notice?.text ??
-                sprintf(
-                  /* translators: %d: number of sections. */
-                  _n(
-                    "Unsaved changes in %d section.",
-                    "Unsaved changes in %d sections.",
-                    dirty.length,
-                    "foundhint-local-seo",
-                  ),
-                  dirty.length,
-                ))}
+            {notice?.text ?? ""}
           </span>
-          {isDirty || saving ? (
-            <>
-              <button
-                type="button"
-                onClick={discard}
-                disabled={saving}
-                className={cn(
-                  quietButton,
-                  "fhint:px-4 fhint:py-[9px] fhint:text-[13px]",
-                )}
-              >
-                {__("Discard", "foundhint-local-seo")}
-              </button>
-              <button
-                type="button"
-                onClick={save}
-                disabled={saving}
-                className={cn(
-                  primaryButton,
-                  "fhint:px-4 fhint:py-[9px] fhint:text-[13px]",
-                )}
-              >
-                {__("Save changes", "foundhint-local-seo")}
-              </button>
-            </>
-          ) : null}
-        </div>
-      ) : null}
+        </p>
+      </div>
+
+      <Tabs value={tab} onValueChange={setTab} className="fhint:gap-4">
+        <TabsList
+          variant="line"
+          aria-label={__("Profile sections", "foundhint-local-seo")}
+          className="fhint:h-auto! fhint:w-full fhint:flex-nowrap fhint:justify-start fhint:gap-1 fhint:overflow-x-auto fhint:overflow-y-hidden fhint:p-0 fhint:pb-[5px] fhint:shadow-[inset_0_-2px_0_var(--border)]"
+        >
+          {tabs.map(({ id, icon: Icon, tab: name }) => (
+            <TabsTrigger
+              key={id}
+              value={id}
+              className="fhint:flex-none fhint:cursor-pointer fhint:rounded-none fhint:px-2.5 fhint:py-2 fhint:text-[13px] fhint:font-bold"
+            >
+              <Icon aria-hidden="true" />
+              {name}
+              {MARKS[stateOf(id)] ? (
+                <span
+                  className={cn(
+                    "fhint:size-2 fhint:flex-none fhint:rounded-full",
+                    MARKS[stateOf(id)].tone,
+                  )}
+                >
+                  <span className="fhint:sr-only">
+                    {MARKS[stateOf(id)].label()}
+                  </span>
+                </span>
+              ) : null}
+            </TabsTrigger>
+          ))}
+        </TabsList>
+
+        {tabs.map(({ id, icon, tab: name, body, ...extra }) => (
+          // Kept mounted, so a tab's own working state — photos waiting to
+          // upload, an open dialog — is still there on the way back.
+          <TabsContent key={id} value={id} keepMounted>
+            <Section
+              id={id}
+              icon={icon}
+              title={name}
+              state={stateOf(id)}
+              onSave={EDITABLE.includes(id) ? () => save(id) : undefined}
+              onDiscard={() => discard(id)}
+              disabled={saving}
+              {...extra}
+            >
+              {body}
+            </Section>
+          </TabsContent>
+        ))}
+      </Tabs>
 
       {publishing ? (
         <PublishDialog

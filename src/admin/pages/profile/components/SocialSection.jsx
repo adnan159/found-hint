@@ -105,12 +105,12 @@ function LinkCard({ network, value, onChange, error }) {
       : "");
 
   return (
-    <div className="fhint:flex fhint:items-start fhint:gap-3 fhint:rounded-[12px] fhint:border fhint:border-[#e6e3e3] fhint:bg-card fhint:p-3.5">
+    <div className="fhint:flex fhint:items-start fhint:gap-3 fhint:border fhint:border-[#e6e3e3] fhint:bg-card fhint:p-3.5">
       <span
         aria-hidden="true"
         style={{ color: meta.color, backgroundColor: `${meta.color}1F` }}
         className={cn(
-          "fhint:grid fhint:size-[42px] fhint:flex-none fhint:place-items-center fhint:rounded-[10px] fhint:text-[11.5px] fhint:font-extrabold",
+          "fhint:grid fhint:size-[42px] fhint:flex-none fhint:place-items-center fhint:text-[11.5px] fhint:font-extrabold",
           state !== "ok" && "fhint:opacity-60",
         )}
       >
@@ -134,7 +134,7 @@ function LinkCard({ network, value, onChange, error }) {
           onChange={(event) => onChange(event.target.value)}
           aria-invalid={state === "bad" ? true : undefined}
           aria-describedby={message ? `${id}-help` : undefined}
-          className={cn(input, "fhint:rounded-[10px]!")}
+          className={input}
         />
         {message ? (
           <span
@@ -151,7 +151,7 @@ function LinkCard({ network, value, onChange, error }) {
 }
 
 const GRID =
-  "fhint:grid fhint:grid-cols-[repeat(auto-fit,minmax(min(100%,300px),1fr))] fhint:gap-3";
+  "fhint:grid fhint:grid-cols-1 fhint:gap-3 fhint:md:grid-cols-2 fhint:xl:grid-cols-3";
 
 /**
  * Links to the business elsewhere.

@@ -11,10 +11,10 @@ import logoUrl from "@/assets/foundhint-icon.png";
  * Every value here was measured from the prototype's own rendered styles
  * rather than judged by eye: a white 236px panel closed by a 2px
  * `rgb(32 30 29 / 40%)` rule, rows uppercase 12.5px/800 separated by
- * `#eae7e7` hairlines, and an active row set slightly larger (13.5px) in
- * `#fff1eb` on `#8a3b12` behind a 3px `#ff6b35` bar. The active row also
- * indents 6px further than an inactive one, which is what makes the bar
- * read as pushing the label aside rather than sitting on top of it.
+ * `#eae7e7` hairlines, and an active row in `#fff1eb` on `#8a3b12` behind a
+ * 3px `#ff6b35` bar. The prototype also sets the active row larger and
+ * indents it further; that is deliberately not done here, because it makes
+ * the list jump on every navigation.
  *
  * **Only navigation that goes somewhere is listed.** The prototype also
  * shows Landing Pages, Ranking Grid, Performance and Recommendations;
@@ -128,15 +128,17 @@ const NAV_ITEMS = [
   },
 ];
 
+// Size, weight and padding are the same for every row, active or not: a row
+// that grows when it is chosen pushes the ones below it and the list jumps.
 const ROW_BASE =
-  "fhint:block fhint:w-full fhint:border-b fhint:border-b-sidebar-border fhint:border-l-3 fhint:text-left fhint:font-extrabold fhint:tracking-[0.02em] fhint:uppercase fhint:no-underline";
+  "fhint:block fhint:w-full fhint:border-b fhint:border-b-sidebar-border fhint:border-l-3 fhint:py-[11px] fhint:pr-3.5 fhint:pl-3.5 fhint:text-left fhint:text-[12.5px] fhint:font-extrabold fhint:tracking-[0.02em] fhint:uppercase fhint:no-underline";
 
 const rowClasses = (isActive) =>
   cn(
     ROW_BASE,
     isActive
-      ? "fhint:border-l-sidebar-primary fhint:bg-sidebar-accent fhint:py-[13px] fhint:pr-3.5 fhint:pl-[17px] fhint:text-[13.5px] fhint:text-sidebar-accent-foreground"
-      : "fhint:border-l-transparent fhint:py-[11px] fhint:pr-3.5 fhint:pl-3.5 fhint:text-[12.5px] fhint:text-sidebar-foreground fhint:hover:bg-muted",
+      ? "fhint:border-l-sidebar-primary fhint:bg-sidebar-accent fhint:text-sidebar-accent-foreground"
+      : "fhint:border-l-transparent fhint:text-sidebar-foreground fhint:hover:bg-muted",
   );
 
 /**
@@ -258,17 +260,15 @@ function NavGroup({ item }) {
   }, [pending, isActive]);
 
   return (
-    <li>
+    // `m-0` on every row: WordPress gives each `li` in the admin a 6px
+    // bottom margin, which leaves a strip of bare sidebar under the row's
+    // background.
+    <li className="fhint:m-0">
       <div className={cn(rowClasses(isActive), "fhint:p-0")}>
         <div className="fhint:flex fhint:items-center">
           <NavLink
             to={item.to}
-            className={cn(
-              "fhint:flex-1 fhint:text-inherit fhint:no-underline",
-              isActive
-                ? "fhint:py-[13px] fhint:pl-[17px]"
-                : "fhint:py-[11px] fhint:pl-3.5",
-            )}
+            className="fhint:flex-1 fhint:py-[11px] fhint:pl-3.5 fhint:text-inherit fhint:no-underline"
           >
             {item.label()}
           </NavLink>
@@ -301,14 +301,14 @@ function NavGroup({ item }) {
       <ul
         id={panelId}
         hidden={!open}
-        className="fhint:flex fhint:flex-col fhint:border-b fhint:border-b-sidebar-border fhint:py-1"
+        className="fhint:m-0 fhint:flex fhint:flex-col fhint:border-b fhint:border-b-sidebar-border fhint:p-0"
       >
         {item.children.map((child) => (
-          <li key={child.id}>
+          <li key={child.id} className="fhint:m-0">
             <button
               type="button"
               onClick={() => goToSection(child.id)}
-              className="fhint:block fhint:w-full fhint:cursor-pointer fhint:border-l-3 fhint:border-l-transparent fhint:py-[7px] fhint:pr-3.5 fhint:pl-[17px] fhint:text-left fhint:text-[13px] fhint:font-medium fhint:text-sidebar-sub-foreground fhint:hover:bg-muted"
+              className="fhint:block fhint:w-full fhint:cursor-pointer fhint:border-l-3 fhint:border-l-transparent fhint:py-[9px] fhint:pr-3.5 fhint:pl-[17px] fhint:text-left fhint:text-[13px] fhint:font-medium fhint:text-sidebar-sub-foreground fhint:hover:bg-muted"
             >
               {child.label()}
             </button>
@@ -323,9 +323,12 @@ export function Sidebar({ counts }) {
   return (
     <nav
       aria-label={__("FoundHint", "foundhint-local-seo")}
-      className="fhint:flex fhint:w-[236px] fhint:shrink-0 fhint:flex-col fhint:self-stretch fhint:border-r-2 fhint:border-r-divider fhint:bg-sidebar fhint:text-sidebar-foreground"
+      data-slot="sidebar-nav"
+      className="fhint:flex fhint:w-[236px] fhint:shrink-0 fhint:flex-col fhint:self-stretch fhint:border-r fhint:border-r-divider fhint:bg-sidebar fhint:text-sidebar-foreground"
     >
-      <div className="fhint:flex fhint:items-center fhint:gap-2.5 fhint:border-b-2 fhint:border-b-divider fhint:px-3.5 fhint:pt-4 fhint:pb-3.5">
+      {/* 68px with its rule, the same as the bar at the top of every screen
+          (`PageHeader`, `ProfileHeader`), so the two rules meet as one line. */}
+      <div className="fhint:box-border fhint:flex fhint:h-[68px] fhint:flex-none fhint:items-center fhint:gap-2.5 fhint:border-b fhint:border-b-divider fhint:px-3.5">
         {/* Decorative: the wordmark beside it already names the product,
             so an alt text here would be read out twice. */}
         <img
@@ -351,7 +354,7 @@ export function Sidebar({ counts }) {
           item.children ? (
             <NavGroup key={item.to} item={item} />
           ) : (
-            <li key={item.to}>
+            <li key={item.to} className="fhint:m-0">
               <NavLink
                 to={item.to}
                 end={item.end}
@@ -369,7 +372,7 @@ export function Sidebar({ counts }) {
           reading the screen. The prototype closes it with a "See what Pro
           unlocks" button; there is nothing for it to open yet, so the
           figures ship without it. */}
-      <div className="fhint:border-t-2 fhint:border-t-divider fhint:px-3.5 fhint:py-3">
+      <div className="fhint:border-t fhint:border-t-divider fhint:px-3.5 fhint:py-3">
         <div className="fhint:text-[11px] fhint:font-bold fhint:tracking-[0.1em] fhint:text-muted-foreground fhint:uppercase">
           {__("FoundHint Free", "foundhint-local-seo")}
         </div>
