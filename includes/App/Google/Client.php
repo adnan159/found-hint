@@ -205,7 +205,10 @@ class Client {
 		} else {
 			$args['method']                  = $method;
 			$args['headers']['Content-Type'] = 'application/json';
-			$args['body']                    = wp_json_encode( null === $body ? array() : $body );
+			// An empty body has to be an empty *object*. PHP has one kind of
+			// array, and an empty one encodes as `[]` — a list — which Google
+			// refuses with "Root element must be a message".
+			$args['body']                    = $body ? wp_json_encode( $body ) : '{}';
 
 			$response = wp_remote_request( $url, $args );
 		}
