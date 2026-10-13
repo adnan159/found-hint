@@ -13,7 +13,7 @@ import { chip, primaryButton, quietButton, tagTones } from "../styles";
  * A section with no `onSave` (photos, which are stored as they are added)
  * has no footer at all.
  */
-const STATES = {
+const SAVE_STATES = {
   dirty: {
     tone: "fhint:text-foreground",
     label: () => __("Unsaved changes.", "foundhint-local-seo"),
@@ -46,9 +46,9 @@ export function Section({
   disabled,
   children,
 }) {
-  const status = state ? STATES[state] : null;
-  const saving = state === "saving";
-  const changed = state === "dirty" || state === "error";
+  const status = state ? SAVE_STATES[state] : null;
+  const isSaving = state === "saving";
+  const hasUnsavedChanges = state === "dirty" || state === "error";
 
   return (
     <section
@@ -85,7 +85,7 @@ export function Section({
           >
             {status ? status.label() : ""}
           </span>
-          {changed ? (
+          {hasUnsavedChanges ? (
             <button
               type="button"
               onClick={onDiscard}
@@ -101,7 +101,7 @@ export function Section({
           <button
             type="button"
             onClick={onSave}
-            disabled={disabled || saving || !changed}
+            disabled={disabled || isSaving || !hasUnsavedChanges}
             className={cn(
               primaryButton,
               "fhint:px-4 fhint:py-[9px] fhint:text-[13px]",

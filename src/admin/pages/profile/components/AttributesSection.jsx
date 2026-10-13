@@ -48,7 +48,7 @@ export function AttributesSection({
   attributes,
   google,
   onRefresh,
-  refreshing,
+  isRefreshing,
 }) {
   const definitions = attributes?.definitions ?? [];
 
@@ -196,10 +196,10 @@ export function AttributesSection({
             <button
               type="button"
               onClick={onRefresh}
-              disabled={refreshing}
+              disabled={isRefreshing}
               className={primaryButton}
             >
-              {refreshing
+              {isRefreshing
                 ? __("Reading Google…", "foundhint-local-seo")
                 : __("Read from Google", "foundhint-local-seo")}
             </button>
