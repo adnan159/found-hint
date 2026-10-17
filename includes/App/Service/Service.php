@@ -65,6 +65,9 @@ class Service {
 		return array(
 			'id'                  => 0,
 			'business_id'         => 0,
+			// Whose list: 0 = the business's own (the primary location's).
+			// Set by the profile and the import, never by a client.
+			'location_id'         => 0,
 			'name'                => '',
 			'slug'                => '',
 			'description'         => '',

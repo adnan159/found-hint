@@ -23,6 +23,7 @@ Base: `window.FHINT.rest_url` (namespace `fhint/v1`).
 | 2 | `PATCH` | `/profile` | JSON | Save one section | no |
 | 3 | `GET` | `/google/categories` | — | Search Google's categories | no |
 | 4 | `POST` | `/profile/google/refresh` | JSON | Read attributes, photos, services from Google | reads only |
+| 4b | `POST` | `/profile/listing` | JSON | Give a Google listing with no location here a location of its own | reads only |
 | 5 | `POST` | `/profile/media` | multipart | Keep a chosen photo | no |
 | 6 | `POST` | `/profile/media/{id}/publish` | JSON | Send one photo to Google | **writes** |
 | 7 | `DELETE` | `/profile/media/{id}` | — | Remove a photo not yet sent | no |
@@ -359,6 +360,12 @@ GET /profile?location_id=2
       { "id": 1, "name": "Shokher Tola 80Tk – Pet Shop Mirpur-12", "address": "305 (3rd Floor,Lift 2), … Dhaka, 1216, BD", "is_primary": true },
       { "id": 2, "name": "FoundHint", "address": "House 23, Shekhertek 3, Mohammadpur, Dhaka, 1207, BD", "is_primary": false }
     ],
+    "listings": [
+      { "location_name": "locations/14430845320964201281", "title": "Shokher Tola 80Tk – Pet Shop Mirpur-12",
+        "address": "305 (3rd Floor,Lift 2), … Dhaka, 1216, BD", "location_id": 1 },
+      { "location_name": "locations/495652196029249217", "title": "FoundHint",
+        "address": "House 23, Shekhertek 3, Mohammadpur, Dhaka, 1207, BD", "location_id": 0 }
+    ],
     "reviews": { "average": 4.6, "count": 184 },
     "google": {
       "status": "connected",
@@ -383,7 +390,8 @@ GET /profile?location_id=2
 |---|---|---|
 | `exists` | bool | `false` on a site with no business yet. Sections still render, empty. |
 | `location` | object \| null | The location this response is for |
-| `locations` | array | Every location, main one first. Show **Switch location** only when there is more than one. |
+| `locations` | array | Every location here, main one first |
+| `listings` | array | Every listing on the Google account, imported or not. `location_id` is the location it belongs to, `0` = no location here yet. |
 | `reviews` | object \| null | Rating of this location's Google listing. `null` = no listing or no reviews read. |
 | `google.connected` | bool | Signed in to Google |
 | `google.mapped` | bool | **This location** has a Google listing. Use this — not `connected` — to enable Refresh / Send / Upload. |
@@ -539,9 +547,14 @@ descriptions, newest first).
 - Send category **ids**, never names.
 - "View on Google" link: `https://maps.google.com/?cid={cid}`. Hide it while
   `cid` is `""`.
-- Categories follow the location: the main location's are the business's; any
-  other location keeps its own. Just send `location_id` — the server decides
-  where they are stored.
+- **Name, description, phone, website and categories follow the location.**
+  The main location's are the business's. Any other location keeps its own;
+  a field it has not set shows the business's. Just send `location_id` — the
+  server decides where each value is stored. Sending `""` for a non-main
+  location's phone or website clears its own value, so the business's shows
+  again (the name cannot be empty).
+- `history` is the history of the description on screen: the business's for
+  the main location, the location's own for any other.
 
 ---
 
@@ -814,6 +827,10 @@ hard-code the list.
 **Note:** a Yelp link is saved and used in the markup but is never sent to
 Google — Google has no place for it.
 
+**Per location:** a non-main location shows the business's links until it
+saves its own. Once it has saved links — even all empty — the whole set is
+its own, so removing a link there does not bring the business's back.
+
 ---
 
 ### 5.5 Section `attributes` — Attributes
@@ -970,6 +987,11 @@ categories have none. Do not offer a type another row already uses.
 Here service `7` is updated and "Home visits" is created. **Any stored
 service not in the list is deleted.**
 
+**Each location has its own list.** The main location's list is the
+business's. Any other location starts with an empty list of its own; saving
+with its `location_id` adds to, edits and removes from that list only. The
+same service name can be on two lists.
+
 **Response `200`**
 
 ```json
@@ -1103,6 +1125,8 @@ Reads what only Google can supply. **Changes nothing on Google.**
 | Ready-made services for its categories | `services.google_types` |
 | The listing's Maps id | `info.cid` |
 | Categories — **only if the location has none** | `info` |
+| Name and description — **only for a non-main location that has none** | `info` |
+| Social links — **only for a non-main location that has none** | `social` |
 
 **Request body**
 
@@ -1132,6 +1156,8 @@ plus `meta.refresh`:
     "limits": { "description": 750, "additional_categories": 9 },
     "refresh": {
       "categories": false,
+      "details": false,
+      "social": false,
       "service_types": 28,
       "attributes": 42,
       "answers": 26,
@@ -1147,6 +1173,8 @@ Replace your cached profile with this response.
 | `refresh` field | Type | Meaning |
 |---|---|---|
 | `categories` | bool | `true` = categories were filled in (the location had none) |
+| `details` | bool | `true` = a non-main location's empty name or description was filled in |
+| `social` | bool | `true` = a non-main location with no links of its own was given its listing's |
 | `service_types` | int \| null | Ready-made services found |
 | `attributes` | int \| null | Attributes Google offers |
 | `answers` | int \| null | Attribute answers stored |
@@ -1614,20 +1642,72 @@ the main location, so a single-location site never sends it.
 
 **What changes with the location**
 
-| Follows the location | Shared by every location |
+**Everything on the profile follows the location.** The main location uses
+the business's own values; any other location keeps its own:
+
+| Section | A non-main location with nothing of its own shows |
 |---|---|
-| `address` | `info.name`, `info.description`, `info.website`, `info.phone` |
-| `hours` | `social` |
-| `attributes` | `services.items` |
-| `media` | |
-| `info.cid`, `info` categories | |
+| `info.name`, `info.description`, `info.phone`, `info.website` | The business's, field by field |
+| `info` categories | The business's, until it has a main category |
+| `social` | The business's links, until it saves links of its own (even an empty set) |
+| `services.items` | **An empty list.** Each non-main location has its own list from the start. |
+| `address`, `hours`, `attributes`, `media` | Its own (always per location) |
 | `services.google_types` | |
 | `meta.location`, `meta.google`, `meta.reviews` | |
 
+**What the menu lists**
+
+Every location in `meta.locations`, plus every listing in `meta.listings`
+whose `location_id` is `0` (on the Google account, not set up here yet). A
+listing that has a location is that location — list it once. **Show the menu
+when there is more than one entry**, so an account with two listings can
+switch even if only one has been imported. Mark the not-yet-set-up ones.
+
+**Choosing a listing that has no location yet** — `POST /profile/listing`
+
+Request body:
+
+| Field | Type | Required | Value |
+|---|---|---|---|
+| `location_name` | string | yes | The listing's `location_name` from `meta.listings` |
+
+```json
+{ "location_name": "locations/495652196029249217" }
+```
+
+Response `200`:
+
+```json
+{
+  "data": {
+    "location_id": 2,
+    "created": true,
+    "imported": ["name", "description", "address", "coordinates", "hours", "phone", "website", "categories", "social", "services"]
+  }
+}
+```
+
+| Field | Meaning |
+|---|---|
+| `location_id` | The location to switch to |
+| `created` | `true` = a new location was made; `false` = the listing already had one |
+| `imported` | What was brought across from Google |
+
+It creates a **new** location named after the listing, links the listing to
+it, and imports **that listing's own details** onto the new location: name,
+description, address, map pin, hours, phone, website, categories, social
+links and services. The business's own values are **not touched**. Calling it again for the same listing
+returns the same location.
+
+Errors: `404 fhint_import_unknown_profile` (not a listing this site has
+read), `409 fhint_business_required`, `500 fhint_save_failed`. Show the
+`message` next to the switcher.
+
+Then continue with step 3 below, using the returned `location_id`.
+
 **Steps**
 
-1. Fill the **Switch location** menu from `meta.locations`. Show it only when
-   there is more than one.
+1. Build the menu as above.
 2. Keep the choice in the address: `#/business?location=2`. No value = main
    location. A reload then opens the same one.
 3. If there are unsaved edits, ask before switching, then discard them —

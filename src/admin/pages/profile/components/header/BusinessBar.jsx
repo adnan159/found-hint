@@ -3,7 +3,7 @@ import { __, _n, sprintf } from "@wordpress/i18n";
 import { cn } from "cn";
 import { ExternalLinkIcon, StarIcon } from "lucide-react";
 import { Link } from "react-router";
-import LocationSwitcher from "./LocationSwitcher";
+import LocationSwitcher, { switcherEntries } from "./LocationSwitcher";
 import { pillButton } from "./styles";
 
 /**
@@ -14,17 +14,20 @@ import { pillButton } from "./styles";
  * business usually names its only location after itself, and saying the same
  * words twice helps nobody.
  *
- * "Switch location" is drawn only when there is another location to switch
- * to. The design's notification bell and account avatar are not drawn:
+ * "Switch location" is drawn when there is anything else to switch to: another
+ * location here, or another listing on the Google account. The design's notification bell and account avatar are not drawn:
  * nothing produces notifications yet, and WordPress's own toolbar already
  * shows who is signed in.
  *
  * This is the row that lines up with the sidebar's logo block: same height,
  * same rule.
  */
-export function BusinessBar({ info, meta, onSwitch }) {
+export function BusinessBar({ info, meta, onSwitch, switching, switchError }) {
   const location = meta?.location;
-  const locations = meta?.locations ?? [];
+  // The locations here and every other listing on the Google account: an
+  // account with two listings can switch between them before either has
+  // been imported.
+  const entries = switcherEntries(meta?.locations, meta?.listings);
   const reviews = meta?.reviews;
   const cid = info?.cid ?? "";
 
@@ -96,11 +99,12 @@ export function BusinessBar({ info, meta, onSwitch }) {
           </Link>
         ) : null}
 
-        {locations.length > 1 ? (
+        {entries.length > 1 ? (
           <LocationSwitcher
-            locations={locations}
+            entries={entries}
             location={location}
             onSwitch={onSwitch}
+            busy={switching}
           />
         ) : null}
 
@@ -116,6 +120,14 @@ export function BusinessBar({ info, meta, onSwitch }) {
           </a>
         ) : null}
       </div>
+      {switchError ? (
+        <p
+          role="alert"
+          className="fhint:m-0 fhint:w-full fhint:text-[13px] fhint:font-semibold fhint:text-destructive"
+        >
+          {switchError}
+        </p>
+      ) : null}
     </div>
   );
 }

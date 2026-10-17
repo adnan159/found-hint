@@ -320,6 +320,10 @@ class LocationRepository {
 
 		$categories                     = isset( $row['secondary_categories'] ) ? json_decode( (string) $row['secondary_categories'], true ) : null;
 		$record['secondary_categories'] = is_array( $categories ) ? $categories : array();
+		$record['business_name']        = isset( $row['business_name'] ) ? (string) $row['business_name'] : '';
+		$record['description']          = isset( $row['description'] ) ? (string) $row['description'] : '';
+		$social                         = isset( $row['social_profiles'] ) ? json_decode( (string) $row['social_profiles'], true ) : null;
+		$record['social_profiles']      = is_array( $social ) ? $social : null;
 
 		return $record;
 	}
@@ -347,6 +351,10 @@ class LocationRepository {
 			'timezone'       => (string) $record['timezone'],
 			'status'         => (string) $record['status'],
 			'is_primary'     => ! empty( $record['is_primary'] ) ? 1 : 0,
+			'business_name'        => isset( $record['business_name'] ) ? (string) $record['business_name'] : '',
+			'description'          => isset( $record['description'] ) ? (string) $record['description'] : '',
+			// NULL until the location has links of its own; see the table docblock.
+			'social_profiles'      => isset( $record['social_profiles'] ) && is_array( $record['social_profiles'] ) ? wp_json_encode( $record['social_profiles'] ) : null,
 			'primary_category'     => isset( $record['primary_category'] ) ? (string) $record['primary_category'] : '',
 			'primary_category_id'  => isset( $record['primary_category_id'] ) ? (string) $record['primary_category_id'] : '',
 			'secondary_categories' => wp_json_encode( isset( $record['secondary_categories'] ) && is_array( $record['secondary_categories'] ) ? array_values( $record['secondary_categories'] ) : array() ),

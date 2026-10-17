@@ -12,6 +12,7 @@ use FHINT\App\Google\Push\Publisher;
 use FHINT\App\Media\MediaRepository;
 use FHINT\App\Media\MediaUpload;
 use FHINT\App\Profile\GoogleRefresh;
+use FHINT\App\Profile\ListingOpener;
 use FHINT\App\Profile\Profile as ProfileService;
 use WP_REST_Server;
 
@@ -21,6 +22,7 @@ defined( 'ABSPATH' ) || exit;
  * The parts of the profile that are not field saves.
  *
  * - `POST /profile/google/refresh` reads the listing's attributes and photos.
+ * - `POST /profile/listing` gives a Google listing a location of its own.
  * - `POST /profile/media` keeps a chosen photo as waiting. It goes nowhere.
  * - `POST /profile/media/{id}/publish` sends one waiting photo to Google.
  * - `DELETE /profile/media/{id}` forgets a photo that has not been sent.
@@ -58,6 +60,27 @@ class ProfileGoogle extends AbstractController {
 					'callback'            => array( $this, 'refresh' ),
 					'permission_callback' => array( $this, 'permissions_check' ),
 					'args'                => $this->args( $location ),
+				),
+			)
+		);
+
+		register_rest_route(
+			$this->namespace,
+			'/profile/listing',
+			array(
+				array(
+					'methods'             => WP_REST_Server::CREATABLE,
+					'callback'            => array( $this, 'open_listing' ),
+					'permission_callback' => array( $this, 'permissions_check' ),
+					'args'                => $this->args(
+						array(
+							'location_name' => array(
+								'type'        => 'string',
+								'required'    => true,
+								'description' => 'Google listing to open, e.g. locations/123.',
+							),
+						)
+					),
 				),
 			)
 		);
@@ -129,6 +152,18 @@ class ProfileGoogle extends AbstractController {
 		$report = GoogleRefresh::run();
 
 		return is_wp_error( $report ) ? $report : $this->profile( array( 'refresh' => $report ) );
+	}
+
+	/**
+	 * The location for a Google listing, created on first use.
+	 *
+	 * @param \WP_REST_Request $request Request.
+	 * @return \WP_REST_Response|\WP_Error
+	 */
+	public function open_listing( $request ) {
+		$result = ListingOpener::open( (string) $request->get_param( 'location_name' ) );
+
+		return is_wp_error( $result ) ? $result : $this->envelope( $result );
 	}
 
 	/**

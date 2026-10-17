@@ -12,6 +12,8 @@ export function ProfileHeader({
   info,
   meta,
   onSwitch,
+  switching,
+  switchError,
   onPublish,
   publishDisabled,
   publishHint,
@@ -19,7 +21,13 @@ export function ProfileHeader({
   return (
     <header className="fhint:-mx-4 fhint:-mt-6 fhint:flex fhint:flex-col">
       {meta ? (
-        <BusinessBar info={info} meta={meta} onSwitch={onSwitch} />
+        <BusinessBar
+          info={info}
+          meta={meta}
+          onSwitch={onSwitch}
+          switching={switching}
+          switchError={switchError}
+        />
       ) : null}
       <TitleBar
         meta={meta}

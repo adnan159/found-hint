@@ -50,6 +50,21 @@ defined( 'ABSPATH' ) || exit;
  *                           Mirrors what Google lets an operator publish.
  * @column is_primary        1 for the location used when a single place is needed
  *                           (schema output, the dashboard). Exactly one row should hold it.
+ * @column business_name     The business name this location trades under on its
+ *                           own Google listing, when it differs from the
+ *                           business's. Empty means "use the business name".
+ *                           Not the same as `name`, which is the branch's own
+ *                           label ("Downtown") inside this site. Only a location
+ *                           that is not the primary one keeps its own.
+ * @column description       This location's own description, when it differs
+ *                           from the business's. Empty means "use the
+ *                           business's". Same rule as `business_name`.
+ * @column social_profiles   JSON object, network => URL: this location's own
+ *                           links. NULL means "use the business's"; once set,
+ *                           the whole set is the location's, so a link removed
+ *                           here is not quietly replaced by the business's.
+ *                           Only a location that is not the primary one keeps
+ *                           its own.
  * @column primary_category  This location's own main category, when it differs
  *                           from the business's. Empty means "use the business
  *                           value" — the same rule as the contact columns. Only
@@ -95,6 +110,9 @@ class CreateLocationsTable {
 	timezone varchar(64) NOT NULL default '',
 	status varchar(32) NOT NULL default 'active',
 	is_primary tinyint(1) NOT NULL default 0,
+	business_name varchar(255) NOT NULL default '',
+	description text NULL,
+	social_profiles longtext NULL,
 	primary_category varchar(150) NOT NULL default '',
 	primary_category_id varchar(100) NOT NULL default '',
 	secondary_categories longtext NULL,

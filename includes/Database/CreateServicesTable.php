@@ -28,6 +28,11 @@ defined( 'ABSPATH' ) || exit;
  *
  * @column id                  Auto-increment primary key.
  * @column business_id         FK → fhint_business.id.
+ * @column location_id         Whose list this service is on. 0 = the business's
+ *                             own list, which the primary location shows. Any
+ *                             other location keeps a list of its own — two
+ *                             Google listings can be two kinds of business.
+ *                             Slugs are unique within one list.
  * @column name                Service name as displayed. Required.
  * @column slug                URL-safe identifier, unique within the business.
  *                             Collisions are resolved by suffixing (-2, -3).
@@ -67,6 +72,7 @@ class CreateServicesTable {
 		$sql = "CREATE TABLE {$table} (
 	id bigint(20) unsigned NOT NULL auto_increment,
 	business_id bigint(20) unsigned NOT NULL default 0,
+	location_id bigint(20) unsigned NOT NULL default 0,
 	name varchar(255) NOT NULL default '',
 	slug varchar(200) NOT NULL default '',
 	description text NULL,
@@ -82,8 +88,9 @@ class CreateServicesTable {
 	created_at datetime NULL,
 	updated_at datetime NULL,
 	PRIMARY KEY  (id),
-	UNIQUE KEY business_slug (business_id,slug),
+	UNIQUE KEY business_location_slug (business_id,location_id,slug),
 	KEY business_id (business_id),
+	KEY location_id (location_id),
 	KEY status (status),
 	KEY sort_order (sort_order),
 	KEY created_at (created_at),

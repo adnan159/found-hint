@@ -57,6 +57,7 @@ $expected = array(
 	'fhint/v1/onboarding',
 	'fhint/v1/profile',
 	'fhint/v1/profile/google/refresh',
+	'fhint/v1/profile/listing',
 	'fhint/v1/profile/media',
 	'fhint/v1/profile/media/(?P<id>\d+)',
 	'fhint/v1/profile/media/(?P<id>\d+)/publish',

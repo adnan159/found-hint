@@ -12,6 +12,7 @@ use FHINT\App\Business\BusinessRepository;
 use FHINT\App\Business\DescriptionHistoryRepository;
 use FHINT\App\Core\ValidationResult;
 use FHINT\App\Location\LocationCategories;
+use FHINT\App\Location\LocationDetails;
 use FHINT\App\Location\LocationRepository;
 use FHINT\App\Profile\Profile;
 use WP_Error;
@@ -50,21 +51,25 @@ class Info {
 		$business = BusinessRepository::get();
 		$business = $business ? $business : Business::blank();
 		$google   = Profile::google_location();
+		$location = Profile::location();
+		$own      = LocationCategories::kept_on_location( $location );
 		// The selected location's own when it has them, the business's otherwise.
-		$category = LocationCategories::resolve( Profile::location(), $business );
+		$category = LocationCategories::resolve( $location, $business );
+		$details  = LocationDetails::resolve( $location, $business );
 
 		return array(
-			'name'                 => (string) $business['name'],
+			'name'                 => $details['name'],
 			'primary_category'     => $category['primary_category'],
 			'primary_category_id'  => $category['primary_category_id'],
 			'secondary_categories' => $category['secondary_categories'],
-			'description'          => (string) $business['description'],
-			'website'              => (string) $business['website'],
-			'phone'                => (string) $business['phone'],
+			'description'          => $details['description'],
+			'website'              => $details['website'],
+			'phone'                => $details['phone'],
 			// Google's own id for the listing. Read-only: it is shown because
 			// directories ask for it, and it only exists once a listing is mapped.
 			'cid'                  => $google && isset( $google['cid'] ) ? (string) $google['cid'] : '',
-			'history'              => $business['id'] ? DescriptionHistoryRepository::latest( (int) $business['id'] ) : array(),
+			// A location with descriptions of its own has a history of its own.
+			'history'              => $business['id'] ? DescriptionHistoryRepository::latest( (int) $business['id'], 10, $own ? (int) $location['id'] : 0 ) : array(),
 		);
 	}
 
@@ -79,11 +84,12 @@ class Info {
 		$location = Profile::location();
 		$changes  = Business::sanitize( array_intersect_key( $fields, array_flip( self::FIELDS ) ) );
 
-		// Checked against the categories this location shows, so "that is
-		// already your main category" means the one on screen.
+		// Checked against what this location shows, so "that is already your
+		// main category" means the one on screen.
 		$merged = array_merge(
 			$current ? $current : Business::blank(),
 			LocationCategories::resolve( $location, $current ),
+			LocationDetails::resolve( $location, $current ),
 			$changes
 		);
 
@@ -93,18 +99,34 @@ class Info {
 			return $validation;
 		}
 
-		// A location that is not the primary one keeps its categories to
-		// itself. All three are written together even when one was sent: a
-		// location with extra categories and no main one would fall back to
-		// the business's and the edit would vanish.
-		if ( LocationCategories::kept_on_location( $location ) && array_intersect_key( $changes, array_flip( LocationCategories::FIELDS ) ) ) {
-			$own = array_intersect_key( $merged, array_flip( LocationCategories::FIELDS ) );
+		// A location that is not the primary one keeps these to itself: its
+		// name, description, phone, website and categories. The business's
+		// are left alone, so saving a second listing never rewrites the first.
+		if ( LocationCategories::kept_on_location( $location ) ) {
+			$own = LocationDetails::to_columns( $changes );
 
-			if ( ! LocationRepository::update( (int) $location['id'], $own ) ) {
+			// The three category fields are written together even when one was
+			// sent: a location with extra categories and no main one would fall
+			// back to the business's, and the edit would vanish.
+			if ( array_intersect_key( $changes, array_flip( LocationCategories::FIELDS ) ) ) {
+				$own = array_merge( $own, array_intersect_key( $merged, array_flip( LocationCategories::FIELDS ) ) );
+			}
+
+			if ( $own && ! LocationRepository::update( (int) $location['id'], $own ) ) {
 				return Profile::save_failed();
 			}
 
-			$changes = array_diff_key( $changes, array_flip( LocationCategories::FIELDS ) );
+			if ( array_key_exists( 'description', $changes ) && $current ) {
+				$source = isset( $fields['description_source'] ) ? (string) $fields['description_source'] : DescriptionHistoryRepository::SOURCE_USER;
+
+				DescriptionHistoryRepository::record( (int) $current['id'], (string) $changes['description'], $source, (int) $location['id'] );
+			}
+
+			$changes = array_diff_key(
+				$changes,
+				array_flip( LocationCategories::FIELDS ),
+				LocationDetails::COLUMNS
+			);
 
 			if ( ! $changes ) {
 				return true;

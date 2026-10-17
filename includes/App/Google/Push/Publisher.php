@@ -14,6 +14,7 @@ use FHINT\App\Google\Connection;
 use FHINT\App\Google\GoogleLocationRepository;
 use FHINT\App\Location\LocationAttributeRepository;
 use FHINT\App\Location\LocationCategories;
+use FHINT\App\Location\LocationDetails;
 use FHINT\App\Location\SpecialHoursRepository;
 use FHINT\App\Nap\Nap;
 use FHINT\App\Profile\Profile;
@@ -395,10 +396,11 @@ class Publisher {
 		$location = (int) $nap['location_id'];
 		// A listing is sent the categories of its own location.
 		$categories = LocationCategories::resolve( $selected, $business );
+		$details    = LocationDetails::resolve( $selected, $business );
 
 		return array(
-			'name'                 => isset( $business['name'] ) ? (string) $business['name'] : '',
-			'description'          => isset( $business['description'] ) ? (string) $business['description'] : '',
+			'name'                 => $details['name'],
+			'description'          => $details['description'],
 			'website'              => (string) $nap['website'],
 			'phone'                => (string) $nap['phone'],
 			'primary_category'     => $categories['primary_category'],
@@ -406,8 +408,8 @@ class Publisher {
 			'secondary_categories' => $categories['secondary_categories'],
 			'days'                 => isset( $nap['hours']['days'] ) && is_array( $nap['hours']['days'] ) ? $nap['hours']['days'] : array(),
 			'special_rows'         => SpecialHoursRepository::for_location( $location ),
-			'services'             => ServiceRepository::all(),
-			'social_profiles'      => isset( $business['social_profiles'] ) && is_array( $business['social_profiles'] ) ? $business['social_profiles'] : array(),
+			'services'             => ServiceRepository::all( array( 'location_id' => LocationDetails::services_list( $selected ) ) ),
+			'social_profiles'      => LocationDetails::social( $selected, $business ),
 			'attributes'           => $location ? LocationAttributeRepository::for_location( $location ) : array(),
 		);
 	}

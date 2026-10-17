@@ -126,7 +126,12 @@ class Context {
 		$context->business  = is_array( $business ) ? $business : array();
 		$context->location  = is_array( $location ) ? $location : array();
 		$context->locations = LocationRepository::all();
-		$context->services  = ServiceRepository::all( array( 'status' => Service::STATUS_ACTIVE ) );
+		$context->services  = ServiceRepository::all(
+			array(
+				'status'      => Service::STATUS_ACTIVE,
+				'location_id' => \FHINT\App\Location\LocationDetails::services_list( $location ),
+			)
+		);
 
 		$context->schema           = Graph::from_parts( $context->nap, $context->services );
 		$context->schema_published = Ownership::should_publish() && Graph::is_publishable( $context->nap );

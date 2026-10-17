@@ -9,6 +9,8 @@ namespace FHINT\App\Schema;
 
 use FHINT\App\Location\DayOfWeek;
 use FHINT\App\Location\Location;
+use FHINT\App\Location\LocationDetails;
+use FHINT\App\Location\LocationRepository;
 use FHINT\App\Nap\Nap;
 use FHINT\App\Service\Service;
 use FHINT\App\Service\ServiceRepository;
@@ -37,9 +39,83 @@ class Graph {
 	 * @return array
 	 */
 	public static function build( $location_id = 0 ) {
-		return self::from_parts(
-			Nap::resolve( $location_id ),
-			ServiceRepository::all( array( 'status' => Service::STATUS_ACTIVE ) )
+		$nap = Nap::resolve( $location_id );
+
+		return self::from_parts( $nap, self::services_for( $nap ) );
+	}
+
+	/**
+	 * The graph the site publishes: one business node per location.
+	 *
+	 * Every location that can be published gets its own node — its own name,
+	 * description, contact details, address, hours, links and services — so
+	 * two businesses on one Google account are described as two businesses,
+	 * and the branches of one business each as the place they are.
+	 *
+	 * A location that cannot be published (no address, or permanently
+	 * closed) is left out on its own; it does not take the others with it.
+	 *
+	 * @return array The JSON-LD document; `@graph` is empty when nothing can be published.
+	 */
+	public static function build_site() {
+		$ids = array();
+
+		foreach ( LocationRepository::all() as $location ) {
+			$ids[] = (int) $location['id'];
+		}
+
+		/**
+		 * Filter which locations the site-wide markup describes.
+		 *
+		 * The hook for publishing a location only on its own page: return
+		 * the one id a page is about, and only that location is printed.
+		 *
+		 * @param int[] $ids Location ids, primary first.
+		 */
+		$ids = function_exists( 'apply_filters' ) ? (array) apply_filters( 'fhint_schema_locations', $ids ) : $ids;
+
+		$graph = array();
+		$naps  = array();
+
+		foreach ( $ids as $id ) {
+			$nap = Nap::resolve( (int) $id );
+
+			if ( ! self::is_publishable( $nap ) ) {
+				continue;
+			}
+
+			$naps[] = $nap;
+
+			foreach ( self::nodes( $nap, self::services_for( $nap ) ) as $node ) {
+				$graph[] = $node;
+			}
+		}
+
+		$document = array(
+			'@context' => 'https://schema.org',
+			'@graph'   => $graph,
+		);
+
+		/** This filter is documented in from_parts(). */
+		return function_exists( 'apply_filters' )
+			? (array) apply_filters( 'fhint_schema_graph', $document, $naps ? $naps[0] : array() )
+			: $document;
+	}
+
+	/**
+	 * The active services on a location's own list.
+	 *
+	 * @param array $nap Resolved NAP values.
+	 * @return array[]
+	 */
+	private static function services_for( array $nap ) {
+		$location = ! empty( $nap['location_id'] ) ? LocationRepository::find( (int) $nap['location_id'] ) : null;
+
+		return ServiceRepository::all(
+			array(
+				'status'      => Service::STATUS_ACTIVE,
+				'location_id' => LocationDetails::services_list( $location ),
+			)
 		);
 	}
 
@@ -55,16 +131,9 @@ class Graph {
 	 * @return array
 	 */
 	public static function from_parts( array $nap, array $services = array() ) {
-		$graph   = array( self::business_node( $nap, $services ) );
-		$catalog = self::offer_catalog( $nap, $services );
-
-		if ( $catalog ) {
-			$graph[] = $catalog;
-		}
-
 		$document = array(
 			'@context' => 'https://schema.org',
-			'@graph'   => $graph,
+			'@graph'   => self::nodes( $nap, $services ),
 		);
 
 		/**
@@ -185,6 +254,38 @@ class Graph {
 	}
 
 	/**
+	 * A location's nodes: its business node, and its catalog when it has
+	 * services.
+	 *
+	 * @param array $nap      Resolved NAP values.
+	 * @param array $services Active services.
+	 * @return array[]
+	 */
+	private static function nodes( array $nap, array $services ) {
+		$nodes   = array( self::business_node( $nap, $services ) );
+		$catalog = self::offer_catalog( $nap, $services );
+
+		if ( $catalog ) {
+			$nodes[] = $catalog;
+		}
+
+		return $nodes;
+	}
+
+	/**
+	 * Whether these values describe the primary location.
+	 *
+	 * Values with no say in it are the primary location's — that is what a
+	 * single-location site, and every caller that predates locations, means.
+	 *
+	 * @param array $nap Resolved NAP values.
+	 * @return bool
+	 */
+	private static function is_primary( array $nap ) {
+		return ! isset( $nap['is_primary'] ) || ! empty( $nap['is_primary'] );
+	}
+
+	/**
 	 * The LocalBusiness node.
 	 *
 	 * @param array $nap      Resolved NAP values.
@@ -192,11 +293,19 @@ class Graph {
 	 * @return array
 	 */
 	private static function business_node( array $nap, array $services ) {
-		$node = array(
+		$primary = self::is_primary( $nap );
+		$node    = array(
 			'@type' => self::type( $nap ),
-			'@id'   => self::business_id(),
+			'@id'   => $primary ? self::business_id() : self::location_business_id( (int) $nap['location_id'] ),
 			'name'  => (string) $nap['name'],
 		);
+
+		// A branch trading under the business's own name is part of it, and
+		// says so. A location with a name of its own is a business of its
+		// own, and claims no parent.
+		if ( ! $primary && empty( $nap['own_name'] ) ) {
+			$node['parentOrganization'] = array( '@id' => self::business_id() );
+		}
 
 		$node = self::add( $node, 'legalName', $nap['legal_name'] );
 		$node = self::add( $node, 'description', $nap['description'] );
@@ -237,7 +346,7 @@ class Graph {
 		}
 
 		if ( self::offer_catalog( $nap, $services ) ) {
-			$node['hasOfferCatalog'] = array( '@id' => self::catalog_id() );
+			$node['hasOfferCatalog'] = array( '@id' => self::catalog_id_for( $nap ) );
 		}
 
 		return $node;
@@ -426,7 +535,7 @@ class Graph {
 
 		return array(
 			'@type'           => 'OfferCatalog',
-			'@id'             => self::catalog_id(),
+			'@id'             => self::catalog_id_for( $nap ),
 			'name'            => (string) $nap['name'],
 			'itemListElement' => $items,
 		);
@@ -470,6 +579,27 @@ class Graph {
 	 */
 	public static function catalog_id() {
 		return self::home() . '#services';
+	}
+
+	/**
+	 * Stable identifier for a non-primary location's business node.
+	 *
+	 * @param int $location_id Row id in wp_fhint_locations.
+	 * @return string
+	 */
+	public static function location_business_id( $location_id ) {
+		return self::home() . '#localbusiness-' . (int) $location_id;
+	}
+
+	/**
+	 * The catalog identifier for a location: the primary one's is the
+	 * business's, any other location has its own.
+	 *
+	 * @param array $nap Resolved NAP values.
+	 * @return string
+	 */
+	private static function catalog_id_for( array $nap ) {
+		return self::is_primary( $nap ) ? self::catalog_id() : self::home() . '#services-' . (int) $nap['location_id'];
 	}
 
 	/**

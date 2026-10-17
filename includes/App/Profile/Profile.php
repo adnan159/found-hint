@@ -159,6 +159,9 @@ class Profile {
 			'exists'    => BusinessRepository::exists(),
 			'location'  => $location ? self::location_summary( $location ) : null,
 			'locations' => array_map( array( __CLASS__, 'location_summary' ), LocationRepository::all() ),
+			// Every listing on the Google account, imported or not, so the
+			// switcher can offer the ones that have no location here yet.
+			'listings'  => ListingOpener::listings(),
 			'reviews'   => $google ? self::reviews( (string) $google['location_name'] ) : null,
 			'google'    => array(
 				'status'    => Connection::status(),

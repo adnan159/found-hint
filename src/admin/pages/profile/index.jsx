@@ -1,6 +1,10 @@
 import RequestError from "@/components/RequestError";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useGetProfileQuery } from "@/store/api/profileApi";
+import { errorMessage } from "@/lib/errors";
+import {
+  useGetProfileQuery,
+  useOpenGoogleListingMutation,
+} from "@/store/api/profileApi";
 import { __ } from "@wordpress/i18n";
 import { useState } from "react";
 import { useSearchParams } from "react-router";
@@ -55,8 +59,25 @@ export function Profile() {
     ready: Boolean(data) && !isFetching && !isDirty,
   });
 
-  const switchLocation = (id) => {
-    if (id === (meta.location?.id ?? 0)) {
+  const [openListing, { isLoading: isOpeningListing }] =
+    useOpenGoogleListingMutation();
+  const [switchError, setSwitchError] = useState("");
+
+  const goToLocation = (id) => {
+    drafts.discardAllSections();
+    googleRead.markLocationSwitch(id);
+    setParams(id ? { location: String(id) } : {});
+  };
+
+  /**
+   * Switch to an entry of the switcher: a location here, or a Google listing
+   * that has no location yet — which is given one first.
+   */
+  const switchLocation = async (entry) => {
+    if (
+      !entry ||
+      (entry.locationId && entry.locationId === meta.location?.id)
+    ) {
       return;
     }
 
@@ -74,9 +95,22 @@ export function Profile() {
       return;
     }
 
-    drafts.discardAllSections();
-    googleRead.markLocationSwitch(id);
-    setParams(id ? { location: String(id) } : {});
+    setSwitchError("");
+
+    if (entry.locationId) {
+      goToLocation(entry.locationId);
+      return;
+    }
+
+    try {
+      const opened = await openListing({
+        locationName: entry.locationName,
+      }).unwrap();
+
+      goToLocation(opened.location_id);
+    } catch (failure) {
+      setSwitchError(errorMessage(failure));
+    }
   };
 
   const header = (
@@ -84,6 +118,8 @@ export function Profile() {
       info={sections?.info}
       meta={data?.meta}
       onSwitch={switchLocation}
+      switching={isOpeningListing}
+      switchError={switchError}
       onPublish={() => setPublishing(true)}
       publishDisabled={isDirty || isSaving}
       publishHint={

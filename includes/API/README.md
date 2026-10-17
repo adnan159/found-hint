@@ -744,12 +744,16 @@ routes — takes an optional `location_id`. Left out or `0`, it means the
 primary location, which is all a single-location site ever needs. Any other
 id reads, saves or publishes that location: its address, hours, attributes,
 photos and its own Google listing. The business-level sections (`info`,
-`social`, `services`) are the same whichever location is named — **except the
-categories in `info`**, which follow the location: the primary location's are
-the business's, and any other location keeps its own once it has a main
-category, showing the business's until then. Saving categories for a
-non-primary location writes them to that location and leaves the business's
-alone.
+`social`, `services`) are the same whichever location is named — **except
+`info`'s name, description, phone, website and categories**, which follow the
+location: the primary location's are the business's, and any other location
+keeps its own, field by field, showing the business's for a field it has not
+set. Saving them for a non-primary location writes them to that location
+(`business_name`, `description`, `phone`, `website`, categories) and leaves
+the business's alone. A non-primary location's description has its own
+`history`. **`social` and `services` follow the location too:** a non-primary
+location shows the business's links until it saves its own set, and has its
+own list of services from the start (empty), stored with its `location_id`.
 `404 fhint_location_not_found` for an id that does not exist.
 
 `meta` on `GET /profile` carries what a header and a switcher need:
@@ -761,6 +765,20 @@ alone.
   "reviews":   { "average": 4.6, "count": 184 }
 }
 ```
+
+`listings` is every listing on the Google account, imported or not:
+`{ location_name, title, address, location_id }`, with `location_id` `0` for
+one that has no location here yet. The switcher offers those too.
+
+### `POST /profile/listing`
+
+`{ "location_name": "locations/123" }` → `{ "location_id": 2, "created": true,
+"imported": ["address", …] }`. Gives a listing with no location here a **new**
+location, links it, and imports its own details onto it (name, description,
+address, map pin, hours, phone, website, categories, social links, services)
+— never into the business. Again for the same listing returns the same
+location (`created: false`). `404 fhint_import_unknown_profile`,
+`409 fhint_business_required`.
 
 `reviews` is the rating of this location's own Google listing, from stored
 reviews; `null` when the location has no listing or no review has been read.
@@ -1125,9 +1143,34 @@ last 30 runs, their findings going with them.
 
 # Schema
 
+### What the site publishes
+
+Every public page prints **one business entry per location** that can be
+published (it has a name and a complete address, and is not permanently
+closed). Each location's entry carries its own name, description, phone,
+website, address, map pin, hours, links (`sameAs`) and — when it has
+services — its own `OfferCatalog`. A location whose own main category maps
+to a schema.org type is published as that type (a pet shop on the same
+account as a software company is a `PetStore`).
+
+| Node | `@id` |
+|---|---|
+| The primary location | `{home}#localbusiness`, catalog `{home}#services` — unchanged |
+| Any other location | `{home}#localbusiness-{location_id}`, catalog `{home}#services-{location_id}` |
+
+A location that trades under the business's own name is a branch, and its
+entry carries `"parentOrganization": { "@id": "{home}#localbusiness" }`. One
+with a name of its own is a separate business and claims no parent.
+
+A location that cannot be published is left out on its own; it does not
+stop the others. The `fhint_schema_locations` filter (location ids, primary
+first) narrows which locations a page prints — e.g. only the one a location
+page is about.
+
 ### `GET /schema`
 
-Optional `location_id` (default 0, the primary location).
+The graph for **one** location, for the admin preview: optional
+`location_id` (default 0, the primary location).
 
 ```json
 {

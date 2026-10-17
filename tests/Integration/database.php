@@ -2089,10 +2089,202 @@ if ( $admins ) {
 	check_same( 'gcid:dentist', $fhint_profile_at( null )->get_data()['data']['info']['primary_category_id'], 'so switching back to the main location shows its category unchanged' );
 	check_same( 400, $fhint_info_at( (int) $fhint_branch['id'], array( 'secondary_categories' => array( 'gcid:pet_store' ) ) )->get_status(), 'a branch\'s extra category is checked against its own main one' );
 
+	// Name, description, phone and website follow the location too.
+	$fhint_business_details = BusinessRepository::get();
+
+	check_same( $fhint_business_details['name'], $fhint_profile_at( (int) $fhint_branch['id'] )->get_data()['data']['info']['name'], 'a branch with no name of its own shows the business\'s' );
+
+	$fhint_response = $fhint_info_at(
+		(int) $fhint_branch['id'],
+		array(
+			'name'        => 'Harbour Pets',
+			'description' => 'Pet food and grooming by the harbour.',
+			'phone'       => '+880 1700 000002',
+			'website'     => 'https://harbourpets.example',
+		)
+	);
+	$fhint_branch_info = $fhint_profile_at( (int) $fhint_branch['id'] )->get_data()['data']['info'];
+
+	check_same( 200, $fhint_response->get_status(), 'a branch can be given its own name, description, phone and website' );
+	check_same(
+		array( 'Harbour Pets', 'Pet food and grooming by the harbour.', '+880 1700 000002', 'https://harbourpets.example' ),
+		array( $fhint_branch_info['name'], $fhint_branch_info['description'], $fhint_branch_info['phone'], $fhint_branch_info['website'] ),
+		'and shows them'
+	);
+	check_same(
+		array( $fhint_business_details['name'], $fhint_business_details['description'], $fhint_business_details['phone'], $fhint_business_details['website'] ),
+		array( BusinessRepository::get()['name'], BusinessRepository::get()['description'], BusinessRepository::get()['phone'], BusinessRepository::get()['website'] ),
+		'while the business keeps its own'
+	);
+	check_same( $fhint_business_details['name'], $fhint_profile_at( null )->get_data()['data']['info']['name'], 'so the main location still shows the business\'s name' );
+	check_same( array( 'Pet food and grooming by the harbour.' ), array_column( $fhint_branch_info['history'], 'description' ), 'a branch\'s description has a history of its own' );
+	check(
+		! in_array( 'Pet food and grooming by the harbour.', array_column( $fhint_profile_at( null )->get_data()['data']['info']['history'], 'description' ), true ),
+		'which does not appear in the business\'s'
+	);
+
+	$fhint_info_at( (int) $fhint_branch['id'], array( 'phone' => '' ) );
+
+	check_same( $fhint_business_details['phone'], $fhint_profile_at( (int) $fhint_branch['id'] )->get_data()['data']['info']['phone'], 'clearing a branch\'s own phone shows the business\'s again' );
+	check_same( 400, $fhint_info_at( (int) $fhint_branch['id'], array( 'name' => '' ) )->get_status(), 'and a branch cannot be left with no name at all' );
+
+	// Social links and services follow the location too.
+	$fhint_section_at = static function ( $location_id, $section, array $fields ) {
+		$request = new WP_REST_Request( 'PATCH', '/fhint/v1/profile' );
+		$request->set_header( 'content-type', 'application/json' );
+		$request->set_body(
+			wp_json_encode(
+				array(
+					'section'     => $section,
+					'location_id' => (int) $location_id,
+					'fields'      => $fields,
+				)
+			)
+		);
+
+		return rest_do_request( $request );
+	};
+
+	$fhint_business_social = BusinessRepository::get()['social_profiles'];
+	$fhint_main_social     = $fhint_profile_at( null )->get_data()['data']['social']['social_profiles'];
+
+	check_same( $fhint_main_social, $fhint_profile_at( (int) $fhint_branch['id'] )->get_data()['data']['social']['social_profiles'], 'a branch with no links of its own shows the business\'s' );
+
+	$fhint_section_at( (int) $fhint_branch['id'], 'social', array( 'social_profiles' => array( 'facebook' => 'https://facebook.com/harbourpets' ) ) );
+
+	$fhint_branch_social = $fhint_profile_at( (int) $fhint_branch['id'] )->get_data()['data']['social'];
+
+	check_same( 'https://facebook.com/harbourpets', $fhint_branch_social['social_profiles']['facebook'], 'a branch can be given links of its own' );
+	check_same( array( 'https://facebook.com/harbourpets' ), $fhint_branch_social['same_as'], 'and only its own are in its markup list' );
+	check_same( $fhint_business_social, BusinessRepository::get()['social_profiles'], 'while the business keeps its links' );
+	check_same( $fhint_main_social, $fhint_profile_at( null )->get_data()['data']['social']['social_profiles'], 'and the main location still shows them' );
+
+	$fhint_section_at( (int) $fhint_branch['id'], 'social', array( 'social_profiles' => array( 'facebook' => '' ) ) );
+
+	check_same( array(), $fhint_profile_at( (int) $fhint_branch['id'] )->get_data()['data']['social']['same_as'], 'removing a branch\'s last link leaves it with none, not with the business\'s back' );
+
+	$fhint_section_at( (int) $fhint_branch['id'], 'social', array( 'social_profiles' => array( 'facebook' => 'https://facebook.com/harbourpets' ) ) );
+
+	$fhint_main_services = array_column( ServiceRepository::all(), 'name' );
+
+	check_same( array(), $fhint_profile_at( (int) $fhint_branch['id'] )->get_data()['data']['services']['items'], 'a branch starts with a list of services of its own, empty' );
+
+	$fhint_response = $fhint_section_at(
+		(int) $fhint_branch['id'],
+		'services',
+		array(
+			'items' => array(
+				array( 'name' => 'Dog grooming' ),
+				array( 'name' => 'Cat boarding' ),
+			),
+		)
+	);
+	$fhint_branch_services = $fhint_profile_at( (int) $fhint_branch['id'] )->get_data()['data']['services']['items'];
+
+	check_same( 200, $fhint_response->get_status(), 'a branch\'s services can be saved' );
+	check_same( array( 'Dog grooming', 'Cat boarding' ), array_column( $fhint_branch_services, 'name' ), 'onto its own list' );
+	check_same( array( (int) $fhint_branch['id'], (int) $fhint_branch['id'] ), array_map( 'intval', array_column( $fhint_branch_services, 'location_id' ) ), 'which belongs to the branch' );
+	check_same( $fhint_main_services, array_column( ServiceRepository::all(), 'name' ), 'and the business\'s own list is untouched' );
+
+	$fhint_section_at( (int) $fhint_branch['id'], 'services', array( 'items' => array( array( 'name' => 'Dog grooming' ) ) ) );
+
+	check_same( array( 'Dog grooming' ), array_column( $fhint_profile_at( (int) $fhint_branch['id'] )->get_data()['data']['services']['items'], 'name' ), 'saving a branch\'s list removes only from that list' );
+	check_same( $fhint_main_services, array_column( ServiceRepository::all(), 'name' ), 'never from the business\'s' );
+
+	// The same service name on two lists is two services, not a clash.
+	$fhint_branch_slug = ServiceRepository::all( array( 'location_id' => (int) $fhint_branch['id'] ) )[0]['slug'];
+	$fhint_main_dog    = ServiceRepository::create(
+		array(
+			'name' => 'Dog grooming',
+			'slug' => $fhint_branch_slug,
+		)
+	);
+
+	check( null !== $fhint_main_dog && $fhint_branch_slug === $fhint_main_dog['slug'], 'two lists can each have a service with the same name and address' );
+
+	ServiceRepository::delete( (int) $fhint_main_dog['id'] );
+
 	FHINT\App\Profile\Profile::select( (int) $fhint_branch['id'] );
 	check_same( 'gcid:pet_store', FHINT\App\Google\Push\Publisher::local()['primary_category_id'], 'and a publish sends each listing its own location\'s category' );
+	check_same( array( 'Dog grooming' ), array_column( FHINT\App\Google\Push\Publisher::local()['services'], 'name' ), 'its own services' );
+	check_same( 'https://facebook.com/harbourpets', FHINT\App\Google\Push\Publisher::local()['social_profiles']['facebook'], 'and its own links' );
+	check_same( array( 'Harbour Pets', 'Pet food and grooming by the harbour.' ), array( FHINT\App\Google\Push\Publisher::local()['name'], FHINT\App\Google\Push\Publisher::local()['description'] ), 'and its own name and description' );
 	FHINT\App\Profile\Profile::select( 0 );
 	check_same( 'gcid:dentist', FHINT\App\Google\Push\Publisher::local()['primary_category_id'], 'the main listing the business\'s' );
+
+	// The site's structured data: one business per location, each its own.
+	LocationRepository::update( (int) $fhint_branch['id'], array( 'postal_code' => '4100' ) );
+
+	$fhint_site_nodes = static function () {
+		$nodes = array();
+
+		foreach ( Graph::build_site()['@graph'] as $node ) {
+			$nodes[ $node['@id'] ] = $node;
+		}
+
+		return $nodes;
+	};
+
+	$fhint_nodes      = $fhint_site_nodes();
+	$fhint_branch_id  = Graph::location_business_id( (int) $fhint_branch['id'] );
+	$fhint_branch_node = isset( $fhint_nodes[ $fhint_branch_id ] ) ? $fhint_nodes[ $fhint_branch_id ] : array();
+
+	check( ! empty( $fhint_branch_node ), 'the site\'s structured data has a business entry for each location' );
+	check_same(
+		array( 'Harbour Pets', 'Pet food and grooming by the harbour.', 'PetStore', array( 'https://facebook.com/harbourpets' ) ),
+		array(
+			isset( $fhint_branch_node['name'] ) ? $fhint_branch_node['name'] : '',
+			isset( $fhint_branch_node['description'] ) ? $fhint_branch_node['description'] : '',
+			isset( $fhint_branch_node['@type'] ) ? $fhint_branch_node['@type'] : '',
+			isset( $fhint_branch_node['sameAs'] ) ? $fhint_branch_node['sameAs'] : array(),
+		),
+		'with that location\'s own name, description, type from its own category, and links'
+	);
+	check_same( '4100', isset( $fhint_branch_node['address']['postalCode'] ) ? $fhint_branch_node['address']['postalCode'] : '', 'and its own address' );
+	check( ! isset( $fhint_branch_node['parentOrganization'] ), 'a location with a name of its own is published as a business of its own' );
+
+	$fhint_branch_catalog_id = isset( $fhint_branch_node['hasOfferCatalog']['@id'] ) ? $fhint_branch_node['hasOfferCatalog']['@id'] : '';
+
+	check( '' !== $fhint_branch_catalog_id && Graph::catalog_id() !== $fhint_branch_catalog_id, 'its services are a catalog of their own' );
+	check_same(
+		array( 'Dog grooming' ),
+		isset( $fhint_nodes[ $fhint_branch_catalog_id ] ) ? array_column( array_column( $fhint_nodes[ $fhint_branch_catalog_id ]['itemListElement'], 'itemOffered' ), 'name' ) : array(),
+		'listing that location\'s services only'
+	);
+
+	if ( isset( $fhint_nodes[ Graph::business_id() ] ) ) {
+		check( 'Harbour Pets' !== $fhint_nodes[ Graph::business_id() ]['name'], 'while the main location keeps its own entry' );
+	}
+
+	LocationRepository::update( (int) $fhint_branch['id'], array( 'business_name' => '' ) );
+
+	$fhint_nodes = $fhint_site_nodes();
+
+	check_same(
+		array( '@id' => Graph::business_id() ),
+		isset( $fhint_nodes[ $fhint_branch_id ]['parentOrganization'] ) ? $fhint_nodes[ $fhint_branch_id ]['parentOrganization'] : null,
+		'a branch trading under the business\'s name points to the business as its parent'
+	);
+
+	$fhint_only_branch = static function () use ( $fhint_branch ) {
+		return array( (int) $fhint_branch['id'] );
+	};
+
+	add_filter( 'fhint_schema_locations', $fhint_only_branch );
+	check_same( array( $fhint_branch_id, trailingslashit( home_url( '/' ) ) . '#services-' . (int) $fhint_branch['id'] ), array_keys( $fhint_site_nodes() ), 'a page can be limited to one location' );
+	remove_filter( 'fhint_schema_locations', $fhint_only_branch );
+
+	LocationRepository::update( (int) $fhint_branch['id'], array( 'postal_code' => '' ) );
+
+	check( ! isset( $fhint_site_nodes()[ $fhint_branch_id ] ), 'a location that cannot be published is left out on its own' );
+
+	LocationRepository::update(
+		(int) $fhint_branch['id'],
+		array(
+			'business_name' => 'Harbour Pets',
+			'postal_code'   => '4100',
+		)
+	);
 
 	// The rating in the header is the chosen listing's own, from stored
 	// reviews. Borrow a listing already in the table, then hand it back.
@@ -2314,6 +2506,11 @@ if ( $admins ) {
 					'values'    => array( true ),
 				),
 				array(
+					'name'      => 'attributes/url_facebook',
+					'valueType' => 'URL',
+					'uriValues' => array( array( 'uri' => 'https://facebook.com/harbour-from-google' ) ),
+				),
+				array(
 					'name'      => 'attributes/wi_fi',
 					'valueType' => 'ENUM',
 					'values'    => array( 'free_wi_fi' ),
@@ -2368,6 +2565,15 @@ if ( $admins ) {
 		return rest_do_request( $request );
 	};
 
+	// Emptied, so the refresh below has a name and description to fill in.
+	LocationRepository::update(
+		(int) $fhint_branch['id'],
+		array(
+			'business_name' => '',
+			'description'   => '',
+		)
+	);
+
 	// The branch was given a category of its own above. A refresh fills in
 	// categories only where there are none, so this one must survive it.
 	$fhint_response = $fhint_branch_post( '/profile/google/refresh' );
@@ -2377,6 +2583,8 @@ if ( $admins ) {
 	check_same(
 		array(
 			'categories'    => false,
+			'details'       => true,
+			'social'        => false,
 			'service_types' => 2,
 			'attributes'    => 4,
 			'answers'    => 2,
@@ -2387,6 +2595,22 @@ if ( $admins ) {
 		'and says what arrived: the attributes offered, the answers held, the photos'
 	);
 	check_same( 'gcid:pet_store', $fhint_read['data']['info']['primary_category_id'], 'a location that has a category keeps it through a refresh' );
+	check_same( 'Harbour Pets', LocationRepository::find( (int) $fhint_branch['id'] )['business_name'], 'a branch with no name of its own is given its listing\'s' );
+
+	LocationRepository::update( (int) $fhint_branch['id'], array( 'social_profiles' => null ) );
+
+	$fhint_filled_social = $fhint_branch_post( '/profile/google/refresh' )->get_data();
+
+	check_same(
+		array( true, 'https://facebook.com/harbour-from-google' ),
+		array( $fhint_filled_social['meta']['refresh']['social'], $fhint_filled_social['data']['social']['social_profiles']['facebook'] ),
+		'a branch with no links of its own is given its listing\'s'
+	);
+
+	LocationRepository::update( (int) $fhint_branch['id'], array( 'business_name' => 'Named Here' ) );
+	$fhint_branch_post( '/profile/google/refresh' );
+
+	check_same( 'Named Here', LocationRepository::find( (int) $fhint_branch['id'] )['business_name'], 'and one that has a name keeps it' );
 	check_same(
 		array(
 			array(
@@ -2685,13 +2909,79 @@ if ( $admins ) {
 		wp_delete_attachment( $fhint_sent['attachment_id'], true );
 	}
 
+	// A listing on the account with no location here yet: the switcher
+	// offers it, and choosing it gives it a location of its own.
+	GoogleLocationRepository::upsert(
+		array(
+			'account_name'       => 'accounts/999',
+			'location_name'      => 'locations/refresh-me-too',
+			'store_code'         => '',
+			'title'              => 'Harbour Pets, North',
+			'address'            => '9 North Road, Chittagong',
+			'phone'              => '',
+			'website'            => '',
+			'verification_state' => 'VERIFIED',
+			'payload'            => array(),
+		)
+	);
+
+	$fhint_listings = array_column(
+		$fhint_profile_at( null )->get_data()['meta']['listings'],
+		'location_id',
+		'location_name'
+	);
+
+	check( isset( $fhint_listings['locations/refresh-me-too'] ) && 0 === $fhint_listings['locations/refresh-me-too'], 'GET /profile lists every listing on the account, including one with no location here' );
+	check_same( (int) $fhint_branch['id'], $fhint_listings['locations/refresh-me'], 'and says which location an imported one belongs to' );
+
+	$fhint_business_before = BusinessRepository::get();
+	$fhint_locations_before = LocationRepository::count();
+
+	$fhint_open = static function ( $location_name ) {
+		$request = new WP_REST_Request( 'POST', '/fhint/v1/profile/listing' );
+		$request->set_body_params( array( 'location_name' => $location_name ) );
+
+		return rest_do_request( $request );
+	};
+
+	$fhint_response = $fhint_open( 'locations/refresh-me-too' );
+	$fhint_opened   = $fhint_response->get_data()['data'];
+	$fhint_new      = LocationRepository::find( (int) $fhint_opened['location_id'] );
+
+	check_same( 200, $fhint_response->get_status(), 'POST /profile/listing opens a listing with no location' );
+	check( true === $fhint_opened['created'] && null !== $fhint_new, 'by creating one for it' );
+	check_same( $fhint_locations_before + 1, LocationRepository::count(), 'a new location, not one that already existed' );
+	check_same( array( 'Harbour Pets, North', false ), array( $fhint_new['name'], (bool) $fhint_new['is_primary'] ), 'named after the listing, and not the main location' );
+	check_same( (int) $fhint_new['id'], GoogleLocationRepository::find_by_location_name( 'locations/refresh-me-too' )['fhint_location_id'], 'and linked to the listing' );
+	check_same( 'gcid:pet_store', $fhint_new['primary_category_id'], 'with the listing\'s own details brought across' );
+	check_same( 'Harbour Pets', $fhint_new['business_name'], 'its name among them, kept on the location' );
+	check_same(
+		array( $fhint_business_before['name'], $fhint_business_before['description'], $fhint_business_before['primary_category_id'] ),
+		array( BusinessRepository::get()['name'], BusinessRepository::get()['description'], BusinessRepository::get()['primary_category_id'] ),
+		'while the business\'s name, description and categories are left alone'
+	);
+
+	$fhint_again = $fhint_open( 'locations/refresh-me-too' )->get_data()['data'];
+
+	check_same( array( (int) $fhint_new['id'], false ), array( $fhint_again['location_id'], $fhint_again['created'] ), 'opening it again goes to the same location' );
+	check_same( $fhint_locations_before + 1, LocationRepository::count(), 'without making another' );
+	check_same( 404, $fhint_open( 'locations/not-on-this-account' )->get_status(), 'a listing this site has not read is a 404' );
+
+	LocationRepository::delete( (int) $fhint_new['id'] );
+	// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+	$wpdb->delete( fhint_table( 'google_locations' ), array( 'location_name' => 'locations/refresh-me-too' ) );
+
 	remove_filter( 'pre_http_request', $fhint_fake_listing, 12 );
 	FHINT\App\Google\ReferenceRepository::replace( 'attribute', 'locations/refresh-me', array() );
 	FHINT\App\Google\ReferenceRepository::replace( 'service_type', 'locations/refresh-me', array() );
 	// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 	$wpdb->delete( fhint_table( 'google_locations' ), array( 'location_name' => 'locations/refresh-me' ) );
 
+	$fhint_branch_list = ServiceRepository::count( (int) $fhint_branch['id'] );
+
 	LocationRepository::delete( (int) $fhint_branch['id'] );
+
+	check( $fhint_branch_list > 0 && 0 === ServiceRepository::count( (int) $fhint_branch['id'] ), 'deleting a location deletes its own services with it' );
 
 	// Put things back as this block found them: the checks further down
 	// count locations and services from zero.

@@ -94,6 +94,20 @@ export const profileApi = baseApi.injectEndpoints({
 
     // The four below answer with the whole profile, so each writes its
     // answer over the cached one and the screen repaints from that.
+    // Give a Google listing with no location here a location of its own,
+    // so the switcher can open it. Answers `{ location_id, created }`.
+    openGoogleListing: builder.mutation({
+      query: ({ locationName }) => ({
+        url: "/profile/listing",
+        method: "POST",
+        body: { location_name: locationName },
+      }),
+      transformResponse: (response) => response?.data ?? null,
+      // A new location changes every location's list of locations.
+      invalidatesTags: (result, error) =>
+        error || !result?.created ? [] : ["Location"],
+    }),
+
     refreshFromGoogle: builder.mutation({
       query: ({ locationId = 0 } = {}) => ({
         url: "/profile/google/refresh",
@@ -170,6 +184,7 @@ export const profileApi = baseApi.injectEndpoints({
 });
 
 export const {
+  useOpenGoogleListingMutation,
   useGetProfileQuery,
   useSaveProfileSectionMutation,
   useLazySearchGoogleCategoriesQuery,

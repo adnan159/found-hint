@@ -10,6 +10,9 @@ namespace FHINT\App\Profile\Sections;
 use FHINT\App\Business\Business;
 use FHINT\App\Business\BusinessRepository;
 use FHINT\App\Core\ValidationResult;
+use FHINT\App\Location\LocationCategories;
+use FHINT\App\Location\LocationDetails;
+use FHINT\App\Location\LocationRepository;
 use FHINT\App\Profile\Profile;
 use WP_Error;
 
@@ -31,8 +34,9 @@ class Social {
 	 * @return array
 	 */
 	public static function read() {
-		$business = BusinessRepository::get();
-		$stored   = $business && is_array( $business['social_profiles'] ) ? $business['social_profiles'] : array();
+		// The selected location's own links when it has saved some, the
+		// business's otherwise.
+		$stored = LocationDetails::social( Profile::location(), BusinessRepository::get() );
 
 		$profiles = array();
 		$same_as  = array();
@@ -77,6 +81,16 @@ class Social {
 
 		if ( ! $validation->is_valid() ) {
 			return $validation;
+		}
+
+		$location = Profile::location();
+
+		// A location that is not the primary one keeps its links to itself,
+		// and the business's are left as they were.
+		if ( LocationCategories::kept_on_location( $location ) ) {
+			return LocationRepository::update( (int) $location['id'], array( 'social_profiles' => $changes['social_profiles'] ) )
+				? true
+				: Profile::save_failed();
 		}
 
 		return BusinessRepository::save( $changes ) ? true : Profile::save_failed();

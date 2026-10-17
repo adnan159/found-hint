@@ -7,8 +7,6 @@
 
 namespace FHINT\Frontend;
 
-use FHINT\App\Nap\Nap;
-use FHINT\App\Schema\Graph;
 use FHINT\App\Schema\Ownership;
 use FHINT\App\Schema\SchemaCache;
 
@@ -21,6 +19,9 @@ defined( 'ABSPATH' ) || exit;
  * it does as little as possible: read a cached array, encode it, print it.
  * No audit, no external HTTP, no writes — building the graph is the cache's
  * job and it only happens after data has actually changed.
+ *
+ * The graph holds one business per location that can be published; when
+ * none can, `script_tag()` prints nothing.
  */
 class Schema {
 
@@ -47,7 +48,8 @@ class Schema {
 			return;
 		}
 
-		echo self::script_tag( SchemaCache::graph() ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+		// Every location that can be published, each as its own business.
+		echo self::script_tag( SchemaCache::site() ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 	}
 
 	/**
@@ -87,10 +89,6 @@ class Schema {
 	 */
 	private static function should_render() {
 		if ( ! self::context_allows() ) {
-			return false;
-		}
-
-		if ( ! Graph::is_publishable( Nap::resolve() ) ) {
 			return false;
 		}
 

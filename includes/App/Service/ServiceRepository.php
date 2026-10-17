@@ -20,9 +20,14 @@ defined( 'ABSPATH' ) || exit;
 class ServiceRepository {
 
 	/**
-	 * Services for the current business, in display order.
+	 * Services on one list, in display order.
 	 *
-	 * @param array $args status, per_page, offset.
+	 * Each location that keeps its own services has its own list;
+	 * `location_id` 0 — the default — is the business's own list, which the
+	 * primary location shows and which the schema, the audit and `/services`
+	 * read.
+	 *
+	 * @param array $args status, per_page, offset, location_id.
 	 * @return array[]
 	 */
 	public static function all( array $args = array() ) {
@@ -39,8 +44,8 @@ class ServiceRepository {
 		}
 
 		$table  = Tables::name( Tables::SERVICES );
-		$where  = 'WHERE business_id = %d';
-		$params = array( $business_id );
+		$where  = 'WHERE business_id = %d AND location_id = %d';
+		$params = array( $business_id, isset( $args['location_id'] ) ? (int) $args['location_id'] : 0 );
 
 		if ( ! empty( $args['status'] ) ) {
 			$where   .= ' AND status = %s';
@@ -91,11 +96,12 @@ class ServiceRepository {
 	}
 
 	/**
-	 * How many services exist.
+	 * How many services are on one list.
 	 *
+	 * @param int $location_id 0 for the business's own list.
 	 * @return int
 	 */
-	public static function count() {
+	public static function count( $location_id = 0 ) {
 		global $wpdb;
 
 		if ( ! Tables::exists( Tables::SERVICES ) ) {
@@ -111,7 +117,7 @@ class ServiceRepository {
 		$table = Tables::name( Tables::SERVICES );
 
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-		return (int) $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM {$table} WHERE business_id = %d", $business_id ) );
+		return (int) $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM {$table} WHERE business_id = %d AND location_id = %d", $business_id, (int) $location_id ) );
 	}
 
 	/**
@@ -131,6 +137,7 @@ class ServiceRepository {
 
 		$record                = array_merge( Service::blank(), $data );
 		$record['business_id'] = $business_id;
+		$location_id           = (int) $record['location_id'];
 
 		// Derived here rather than only in the REST controller: the slug is
 		// half of a unique key, so a caller that does not supply one would
@@ -138,15 +145,16 @@ class ServiceRepository {
 		// with the first and fail the insert. Every caller gets the rule.
 		$slug = '' !== trim( (string) $record['slug'] ) ? $record['slug'] : $record['name'];
 
-		$record['slug'] = self::unique_slug( $slug, $business_id, 0 );
+		$record['slug'] = self::unique_slug( $slug, $business_id, 0, $location_id );
 
 		if ( ! isset( $data['sort_order'] ) ) {
-			$record['sort_order'] = self::next_sort_order( $business_id );
+			$record['sort_order'] = self::next_sort_order( $business_id, $location_id );
 		}
 
 		$now                    = Validator::now();
 		$columns                = self::columns( $record );
 		$columns['business_id'] = $business_id;
+		$columns['location_id'] = $location_id;
 		$columns['created_at']  = $now;
 		$columns['updated_at']  = $now;
 
@@ -189,7 +197,7 @@ class ServiceRepository {
 		$record = array_merge( $existing, $changes );
 
 		if ( array_key_exists( 'slug', $changes ) ) {
-			$record['slug'] = self::unique_slug( $record['slug'], (int) $existing['business_id'], (int) $id );
+			$record['slug'] = self::unique_slug( $record['slug'], (int) $existing['business_id'], (int) $id, (int) $existing['location_id'] );
 		}
 
 		$columns               = self::columns( $record );
@@ -256,10 +264,11 @@ class ServiceRepository {
 	 * the rule in one place and makes it impossible for two services to end
 	 * up sharing a position.
 	 *
-	 * @param int[] $ids Service ids in their new order.
+	 * @param int[] $ids         Service ids in their new order.
+	 * @param int   $location_id The list they are on; 0 for the business's.
 	 * @return int How many rows were reordered.
 	 */
-	public static function reorder( array $ids ) {
+	public static function reorder( array $ids, $location_id = 0 ) {
 		global $wpdb;
 
 		$business_id = BusinessRepository::current_id();
@@ -270,7 +279,7 @@ class ServiceRepository {
 
 		$owned = array();
 
-		foreach ( self::all() as $service ) {
+		foreach ( self::all( array( 'location_id' => (int) $location_id ) ) as $service ) {
 			$owned[ (int) $service['id'] ] = true;
 		}
 
@@ -316,14 +325,15 @@ class ServiceRepository {
 	}
 
 	/**
-	 * Make a slug unique within the business by suffixing (-2, -3).
+	 * Make a slug unique within one list by suffixing (-2, -3).
 	 *
 	 * @param string $slug        Desired slug.
 	 * @param int    $business_id Owning business.
 	 * @param int    $ignore_id   Service id to exclude (itself, on update).
+	 * @param int    $location_id The list; 0 for the business's own.
 	 * @return string
 	 */
-	private static function unique_slug( $slug, $business_id, $ignore_id = 0 ) {
+	private static function unique_slug( $slug, $business_id, $ignore_id = 0, $location_id = 0 ) {
 		global $wpdb;
 
 		$slug = sanitize_title( (string) $slug );
@@ -341,8 +351,9 @@ class ServiceRepository {
 			$taken = (int) $wpdb->get_var(
 				$wpdb->prepare(
 					// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-					"SELECT COUNT(*) FROM {$table} WHERE business_id = %d AND slug = %s AND id != %d",
+					"SELECT COUNT(*) FROM {$table} WHERE business_id = %d AND location_id = %d AND slug = %s AND id != %d",
 					(int) $business_id,
+					(int) $location_id,
 					$slug,
 					(int) $ignore_id
 				)
@@ -361,15 +372,16 @@ class ServiceRepository {
 	 * The sort_order a newly created service should take.
 	 *
 	 * @param int $business_id Owning business.
+	 * @param int $location_id The list; 0 for the business's own.
 	 * @return int
 	 */
-	private static function next_sort_order( $business_id ) {
+	private static function next_sort_order( $business_id, $location_id = 0 ) {
 		global $wpdb;
 
 		$table = Tables::name( Tables::SERVICES );
 
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-		$max = $wpdb->get_var( $wpdb->prepare( "SELECT MAX(sort_order) FROM {$table} WHERE business_id = %d", (int) $business_id ) );
+		$max = $wpdb->get_var( $wpdb->prepare( "SELECT MAX(sort_order) FROM {$table} WHERE business_id = %d AND location_id = %d", (int) $business_id, (int) $location_id ) );
 
 		return null === $max ? 0 : (int) $max + 1;
 	}
@@ -385,6 +397,7 @@ class ServiceRepository {
 
 		$record['id']                  = (int) $row['id'];
 		$record['business_id']         = (int) $row['business_id'];
+		$record['location_id']         = isset( $row['location_id'] ) ? (int) $row['location_id'] : 0;
 		$record['image_attachment_id'] = (int) $row['image_attachment_id'];
 		$record['sort_order']          = (int) $row['sort_order'];
 		$record['price']               = ( null === $row['price'] || '' === $row['price'] ) ? null : (float) $row['price'];
@@ -413,5 +426,26 @@ class ServiceRepository {
 			'status'              => (string) $record['status'],
 			'sort_order'          => (int) $record['sort_order'],
 		);
+	}
+
+	/**
+	 * Forget a location's own list of services.
+	 *
+	 * The business's own list (location 0) is never touched from here.
+	 *
+	 * @param int $location_id Row id in wp_fhint_locations.
+	 * @return bool
+	 */
+	public static function delete_for_location( $location_id ) {
+		global $wpdb;
+
+		$location_id = (int) $location_id;
+
+		if ( ! $location_id || ! Tables::exists( Tables::SERVICES ) ) {
+			return false;
+		}
+
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+		return false !== $wpdb->delete( Tables::name( Tables::SERVICES ), array( 'location_id' => $location_id ) );
 	}
 }

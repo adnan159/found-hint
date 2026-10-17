@@ -267,6 +267,16 @@ class ImportMapper {
 	}
 
 	/**
+	 * A category name as a schema.org type, e.g. "Pet store" → `PetStore`.
+	 *
+	 * @param string $category_name Google's category name.
+	 * @return string '' when it maps to nothing more specific.
+	 */
+	public static function type_for_category( $category_name ) {
+		return self::business_type( array( 'categories' => array( 'primaryCategory' => array( 'displayName' => (string) $category_name ) ) ) );
+	}
+
+	/**
 	 * Google's category as a schema.org type.
 	 *
 	 * Google has thousands of categories and schema.org has dozens, so this
@@ -376,7 +386,7 @@ class ImportMapper {
 	 * @param array $attributes Decoded attributes response.
 	 * @return array<string, string> Network => URL.
 	 */
-	private static function social( array $attributes ) {
+	public static function social( array $attributes ) {
 		$items  = isset( $attributes['attributes'] ) && is_array( $attributes['attributes'] ) ? $attributes['attributes'] : array();
 		$social = array();
 

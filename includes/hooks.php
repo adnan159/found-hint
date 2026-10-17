@@ -45,3 +45,5 @@ add_action(
  * know which modules hold a reference to a location.
  */
 add_action( 'fhint_location_deleted', array( \FHINT\App\Media\MediaRepository::class, 'delete_for_location' ) );
+add_action( 'fhint_location_deleted', array( \FHINT\App\Business\DescriptionHistoryRepository::class, 'delete_for_location' ) );
+add_action( 'fhint_location_deleted', array( \FHINT\App\Service\ServiceRepository::class, 'delete_for_location' ) );

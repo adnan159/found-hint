@@ -9,6 +9,7 @@ namespace FHINT\App\Google;
 
 use FHINT\App\Business\BusinessRepository;
 use FHINT\App\Location\LocationCategories;
+use FHINT\App\Location\LocationDetails;
 use FHINT\App\Location\LocationRepository;
 use FHINT\App\Location\OpeningHours;
 use FHINT\App\Location\OpeningHoursRepository;
@@ -278,7 +279,7 @@ class Import {
 		$applied = array_merge(
 			self::write_business( $fields, $chosen, (bool) $location['is_primary'] ),
 			self::write_location( $fields, $chosen, (int) $location['id'], (bool) $location['is_primary'] ),
-			self::write_services( $fields, $chosen )
+			self::write_services( $fields, $chosen, LocationDetails::services_list( $location ) )
 		);
 
 		return array(
@@ -489,9 +490,9 @@ class Import {
 		foreach ( array_intersect( self::BUSINESS_FIELDS, $chosen ) as $key ) {
 			// A branch's phone and website are its own. Writing them to the
 			// business as well would make the second shop's number answer
-			// for the first. Its categories are too, and are written to the
-			// branch itself in write_location().
-			if ( ! $is_primary && in_array( $key, array( 'phone', 'website', 'categories' ), true ) ) {
+			// for the first. So are its name, description and categories:
+			// all of them are written to the branch itself in write_location().
+			if ( ! $is_primary && in_array( $key, array( 'name', 'description', 'phone', 'website', 'categories', 'social' ), true ) ) {
 				continue;
 			}
 
@@ -550,6 +551,25 @@ class Import {
 		// A branch's listing has its own categories, and they are kept on
 		// the branch. The primary location's are the business's and were
 		// written there.
+		if ( ! $is_primary ) {
+			foreach ( array( 'name' => 'business_name', 'description' => 'description' ) as $key => $column ) {
+				if ( in_array( $key, $chosen, true ) ) {
+					$changes[ $column ] = $fields[ $key ]['theirs_raw'];
+					$written[]          = $key;
+				}
+			}
+		}
+
+		if ( ! $is_primary && in_array( 'social', $chosen, true ) ) {
+			$location = LocationRepository::find( (int) $location_id );
+			$current  = $location && is_array( $location['social_profiles'] ) ? $location['social_profiles'] : array();
+
+			// Merged, not replaced, as for the business: a network the owner
+			// filled in here that Google does not know about is still theirs.
+			$changes['social_profiles'] = array_merge( $current, $fields['social']['theirs_raw'] );
+			$written[]                  = 'social';
+		}
+
 		if ( ! $is_primary && in_array( 'categories', $chosen, true ) ) {
 			$changes['primary_category']     = $fields['categories']['theirs_raw']['primary']['name'];
 			$changes['primary_category_id']  = $fields['categories']['theirs_raw']['primary']['id'];
@@ -599,16 +619,18 @@ class Import {
 	 *
 	 * @param array $fields Compared fields, keyed.
 	 * @param array $chosen Field keys being imported.
+	 * @param int   $list   The list to add to: 0 for the business's, or a
+	 *                      location's own.
 	 * @return array Keys written.
 	 */
-	private static function write_services( array $fields, array $chosen ) {
+	private static function write_services( array $fields, array $chosen, $list = 0 ) {
 		if ( ! in_array( 'services', $chosen, true ) ) {
 			return array();
 		}
 
 		$existing = array();
 
-		foreach ( ServiceRepository::all() as $service ) {
+		foreach ( ServiceRepository::all( array( 'location_id' => (int) $list ) ) as $service ) {
 			$existing[ strtolower( trim( $service['name'] ) ) ] = true;
 		}
 
@@ -627,6 +649,7 @@ class Import {
 					'currency'               => $service['currency'],
 					'google_item_type'       => isset( $service['google_item_type'] ) ? $service['google_item_type'] : '',
 					'google_service_type_id' => isset( $service['google_service_type_id'] ) ? $service['google_service_type_id'] : '',
+					'location_id'            => (int) $list,
 				)
 			);
 
@@ -786,7 +809,8 @@ class Import {
 					)
 					: '';
 
-				$count    = ServiceRepository::count();
+				$services_list = LocationDetails::services_list( ! empty( $nap['location_id'] ) ? LocationRepository::find( (int) $nap['location_id'] ) : null );
+				$count         = ServiceRepository::count( $services_list );
 				$our_text = $count
 					? sprintf(
 						/* translators: %d: how many services this site already has. */
@@ -797,7 +821,7 @@ class Import {
 
 				$have = array();
 
-				foreach ( ServiceRepository::all() as $service ) {
+				foreach ( ServiceRepository::all( array( 'location_id' => $services_list ) ) as $service ) {
 					$have[ strtolower( trim( $service['name'] ) ) ] = true;
 				}
 

@@ -33,7 +33,27 @@ class SchemaCache {
 	 * @return array
 	 */
 	public static function graph( $location_id = 0 ) {
-		$key    = self::key( $location_id );
+		return self::remember( self::key( $location_id ), array( Graph::class, 'build' ), array( (int) $location_id ) );
+	}
+
+	/**
+	 * The graph the site publishes, every location in it, built or from cache.
+	 *
+	 * @return array
+	 */
+	public static function site() {
+		return self::remember( 'site', array( Graph::class, 'build_site' ), array() );
+	}
+
+	/**
+	 * A graph from the cache, or built and stored.
+	 *
+	 * @param string   $key   Cache key.
+	 * @param callable $build What builds it.
+	 * @param array    $args  Arguments for the builder.
+	 * @return array
+	 */
+	private static function remember( $key, $build, array $args ) {
 		$stamp  = self::stamp();
 		$cached = get_option( self::OPTION, array() );
 		$cached = is_array( $cached ) ? $cached : array();
@@ -43,7 +63,7 @@ class SchemaCache {
 			return $cached[ $key ]['graph'];
 		}
 
-		$graph = Graph::build( $location_id );
+		$graph = call_user_func_array( $build, $args );
 
 		// Only the entries still matching the current stamp are kept, so the
 		// option cannot grow without bound as data changes over time.

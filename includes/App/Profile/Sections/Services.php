@@ -11,6 +11,7 @@ use FHINT\App\Business\BusinessRepository;
 use FHINT\App\Core\Limits;
 use FHINT\App\Core\ValidationResult;
 use FHINT\App\Google\ReferenceRepository;
+use FHINT\App\Location\LocationDetails;
 use FHINT\App\Profile\Profile;
 use FHINT\App\Service\Service;
 use FHINT\App\Service\ServiceRepository;
@@ -54,7 +55,9 @@ class Services {
 	 * @return array
 	 */
 	public static function read() {
-		$items = ServiceRepository::all();
+		// The primary location's list is the business's; any other location
+		// has a list of its own.
+		$items = ServiceRepository::all( array( 'location_id' => LocationDetails::services_list( Profile::location() ) ) );
 
 		return array(
 			'items'        => $items,
@@ -115,9 +118,10 @@ class Services {
 			return Profile::business_required();
 		}
 
+		$list     = LocationDetails::services_list( Profile::location() );
 		$existing = array();
 
-		foreach ( ServiceRepository::all() as $service ) {
+		foreach ( ServiceRepository::all( array( 'location_id' => $list ) ) as $service ) {
 			$existing[ (int) $service['id'] ] = $service;
 		}
 
@@ -194,7 +198,7 @@ class Services {
 		foreach ( $plan as $entry ) {
 			$saved = $entry['id']
 				? ServiceRepository::update( $entry['id'], $entry['changes'] )
-				: ServiceRepository::create( $entry['changes'] );
+				: ServiceRepository::create( array_merge( $entry['changes'], array( 'location_id' => $list ) ) );
 
 			if ( ! $saved ) {
 				return Profile::save_failed();
@@ -210,7 +214,7 @@ class Services {
 		}
 
 		if ( $order ) {
-			ServiceRepository::reorder( $order );
+			ServiceRepository::reorder( $order, $list );
 		}
 
 		return true;

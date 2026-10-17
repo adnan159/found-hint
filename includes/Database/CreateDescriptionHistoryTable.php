@@ -27,6 +27,8 @@ defined( 'ABSPATH' ) || exit;
  *
  * @column id          Primary key.
  * @column business_id Row id in wp_fhint_business.
+ * @column location_id Row id in wp_fhint_locations for a location's own
+ *                     description; 0 for the business's.
  * @column description The text as it stood.
  * @column source      user | ai | google — where this wording came from.
  * @column user_id     WordPress user who made the change, 0 when unknown.
@@ -48,12 +50,14 @@ class CreateDescriptionHistoryTable {
 		$sql = "CREATE TABLE {$table} (
 	id bigint(20) unsigned NOT NULL auto_increment,
 	business_id bigint(20) unsigned NOT NULL default 0,
+	location_id bigint(20) unsigned NOT NULL default 0,
 	description longtext NULL,
 	source varchar(32) NOT NULL default 'user',
 	user_id bigint(20) unsigned NOT NULL default 0,
 	created_at datetime NULL,
 	PRIMARY KEY  (id),
 	KEY business_id (business_id),
+	KEY location_id (location_id),
 	KEY created_at (created_at)
 ) {$charset_collate};";
 

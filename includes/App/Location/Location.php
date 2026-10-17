@@ -93,6 +93,9 @@ class Location {
 			'is_primary'        => false,
 			// Not client-writable through /locations: these are set by the
 			// profile and the Google import, which know the rules for them.
+			'business_name'        => '',
+			'description'          => '',
+			'social_profiles'      => null,
 			'primary_category'     => '',
 			'primary_category_id'  => '',
 			'secondary_categories' => array(),

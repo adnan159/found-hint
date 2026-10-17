@@ -100,13 +100,20 @@ class AttributeCatalog {
 	 * @return array|WP_Error `attribute_id => { type, value }`, links left out.
 	 */
 	public static function fetch_values( $location_name ) {
-		$response = Client::get( sprintf( self::VALUES_URL, (string) $location_name ) );
+		$response = self::fetch_raw_values( $location_name );
 
-		if ( is_wp_error( $response ) ) {
-			return $response;
-		}
+		return is_wp_error( $response ) ? $response : self::values_from_google( $response );
+	}
 
-		return self::values_from_google( $response );
+	/**
+	 * The listing's attribute answers exactly as Google sent them, links
+	 * included.
+	 *
+	 * @param string $location_name Google location resource name.
+	 * @return array|WP_Error Decoded response.
+	 */
+	public static function fetch_raw_values( $location_name ) {
+		return Client::get( sprintf( self::VALUES_URL, (string) $location_name ) );
 	}
 
 	/**

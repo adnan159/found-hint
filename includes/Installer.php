@@ -106,6 +106,36 @@ class Installer {
 		// rewrites them, which for a working connection might be months.
 		// This rewrites them once, and costs a single option read after that.
 		Tokens::encrypt_stored();
+
+		self::drop_old_service_slug_key();
+	}
+
+	/**
+	 * Remove the services table's old unique key on (business, slug).
+	 *
+	 * Slugs became unique per list — per location — in DB 0.11.0, under a
+	 * new key. dbDelta adds the new key but never drops the old one, which
+	 * would go on refusing two locations a service with the same name.
+	 * Checked against the live table first, so it runs once.
+	 *
+	 * @return void
+	 */
+	private static function drop_old_service_slug_key() {
+		global $wpdb;
+
+		if ( ! Tables::exists( Tables::SERVICES ) ) {
+			return;
+		}
+
+		$table = Tables::name( Tables::SERVICES );
+
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+		$exists = $wpdb->get_var( $wpdb->prepare( "SHOW INDEX FROM {$table} WHERE Key_name = %s", 'business_slug' ) );
+
+		if ( $exists ) {
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.SchemaChange, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+			$wpdb->query( "ALTER TABLE {$table} DROP INDEX business_slug" );
+		}
 	}
 
 	/**

@@ -21,7 +21,7 @@ msgstr ""
 msgid "Some of the submitted values are not valid."
 msgstr ""
 
-#: includes/API/AbstractController.php:113 includes/App/Profile/Profile.php:290
+#: includes/API/AbstractController.php:113 includes/App/Profile/Profile.php:293
 msgid "Create the business profile first."
 msgstr ""
 
@@ -29,11 +29,11 @@ msgstr ""
 msgid "That item could not be found."
 msgstr ""
 
-#: includes/API/AbstractController.php:140 includes/App/Profile/Profile.php:303
+#: includes/API/AbstractController.php:140 includes/App/Profile/Profile.php:306
 msgid "The changes could not be saved."
 msgstr ""
 
-#: includes/API/AbstractController.php:157 includes/App/Profile/Sections/Services.php:182
+#: includes/API/AbstractController.php:157 includes/App/Profile/Sections/Services.php:186
 msgid "This plan allows up to %d of these."
 msgstr ""
 
@@ -49,7 +49,7 @@ msgstr ""
 msgid "None of those services belong to this business."
 msgstr ""
 
-#: includes/Admin/Menu.php:55 includes/Admin/Menu.php:56 src/admin/components/PageHeader.jsx:27 src/admin/layouts/root/components/Sidebar.jsx:325 src/admin/layouts/root/components/Sidebar.jsx:341 src/admin/pages/setup/components/WizardShell.jsx:44
+#: includes/Admin/Menu.php:55 includes/Admin/Menu.php:56 src/admin/components/PageHeader.jsx:37 src/admin/layouts/root/components/Sidebar.jsx:325 src/admin/layouts/root/components/Sidebar.jsx:344 src/admin/pages/setup/components/WizardShell.jsx:44
 msgid "FoundHint"
 msgstr ""
 
@@ -315,31 +315,31 @@ msgstr ""
 msgid "The attributes Google offers could not be stored."
 msgstr ""
 
-#: includes/App/Google/Client.php:216 includes/App/Google/OAuth.php:281
+#: includes/App/Google/Client.php:219 includes/App/Google/OAuth.php:281
 msgid "Google could not be reached. Please try again."
 msgstr ""
 
-#: includes/App/Google/Client.php:262
+#: includes/App/Google/Client.php:265
 msgid "Google refused the request. The Business Profile APIs have to be enabled for your Google Cloud project, and Google has to approve your project for them before they return anything."
 msgstr ""
 
-#: includes/App/Google/Client.php:270
+#: includes/App/Google/Client.php:273
 msgid "Google rejected the sign-in. Connect again."
 msgstr ""
 
-#: includes/App/Google/Client.php:277
+#: includes/App/Google/Client.php:280
 msgid "Google refused the request."
 msgstr ""
 
-#: includes/App/Google/Client.php:302
+#: includes/App/Google/Client.php:305
 msgid "Google has granted this project no quota for the Business Profile APIs, which means it has not been approved for them yet. Approval is a separate request to Google — waiting will not change this."
 msgstr ""
 
-#: includes/App/Google/Client.php:306
+#: includes/App/Google/Client.php:309
 msgid "Google is rate limiting this project. Wait a few minutes and try again."
 msgstr ""
 
-#: includes/App/Google/Client.php:309
+#: includes/App/Google/Client.php:312
 msgid "Google refused the request as over quota. On a new project this normally means Google has not approved it for the Business Profile APIs yet; on an approved one it means too many requests just now."
 msgstr ""
 
@@ -435,59 +435,59 @@ msgstr ""
 msgid "Google rejected the stored grant; the connection was cleared."
 msgstr ""
 
-#: includes/App/Google/Import.php:124
+#: includes/App/Google/Import.php:125
 msgid "That is not a step of the import."
 msgstr ""
 
-#: includes/App/Google/Import.php:314
+#: includes/App/Google/Import.php:315 includes/App/Profile/ListingOpener.php:52
 msgid "That Google profile is not one this site has read. Read your profiles again."
 msgstr ""
 
-#: includes/App/Google/Import.php:327
+#: includes/App/Google/Import.php:328
 msgid "Read your Google profiles first, under Business profiles."
 msgstr ""
 
-#: includes/App/Google/Import.php:344
+#: includes/App/Google/Import.php:345
 msgid "Choose which Google profile to import from."
 msgstr ""
 
-#: includes/App/Google/Import.php:395
+#: includes/App/Google/Import.php:396
 msgid "Google holds no business name for this profile, so there is nothing to create a business from."
 msgstr ""
 
-#: includes/App/Google/Import.php:405
+#: includes/App/Google/Import.php:406
 msgid "The business could not be created."
 msgstr ""
 
-#: includes/App/Google/Import.php:434
+#: includes/App/Google/Import.php:435
 msgid "Google holds no address for this profile, so there is nothing to create a location from."
 msgstr ""
 
-#: includes/App/Google/Import.php:465
+#: includes/App/Google/Import.php:466
 msgid "The location could not be created from Google\\'s address."
 msgstr ""
 
-#: includes/App/Google/Import.php:752
+#: includes/App/Google/Import.php:775
 msgid "Already set"
 msgstr ""
 
-#: includes/App/Google/Import.php:783
+#: includes/App/Google/Import.php:806
 msgid "%1$d from Google: %2$s"
 msgstr ""
 
-#: includes/App/Google/Import.php:846
+#: includes/App/Google/Import.php:870
 msgid "%1$s → %2$s"
 msgstr ""
 
-#: includes/App/Google/Import.php:891
+#: includes/App/Google/Import.php:915
 msgid "%1$s, plus %2$s"
 msgstr ""
 
-#: includes/App/Google/Import.php:1080
+#: includes/App/Google/Import.php:1104
 msgid "%1$d days with hours, %2$d closed"
 msgstr ""
 
-#: includes/App/Google/Import.php:793 src/admin/layouts/root/index.jsx:38 src/admin/pages/profile/index.jsx:632
+#: includes/App/Google/Import.php:817 src/admin/layouts/root/index.jsx:39 src/admin/pages/profile/tabs.jsx:197
 msgid "%d service"
 msgid_plural "%d services"
 msgstr[0] ""
@@ -557,7 +557,7 @@ msgstr ""
 msgid "Read %1$s across %2$s."
 msgstr ""
 
-#: includes/App/Google/Profiles.php:100 includes/App/Review/ReviewSync.php:99 src/admin/layouts/root/index.jsx:33 src/admin/pages/google/components/BusinessProfiles.jsx:52
+#: includes/App/Google/Profiles.php:100 includes/App/Review/ReviewSync.php:99 src/admin/layouts/root/index.jsx:34 src/admin/pages/google/components/BusinessProfiles.jsx:52
 msgid "%d location"
 msgid_plural "%d locations"
 msgstr[0] ""
@@ -569,39 +569,39 @@ msgid_plural "%d accounts"
 msgstr[0] ""
 msgstr[1] ""
 
-#: includes/App/Google/Push/Publisher.php:87
+#: includes/App/Google/Push/Publisher.php:88
 msgid "Planned a publish: %1$d steps, %2$d fields left alone."
 msgstr ""
 
-#: includes/App/Google/Push/Publisher.php:121
+#: includes/App/Google/Push/Publisher.php:122
 msgid "That is not a step of a publish."
 msgstr ""
 
-#: includes/App/Google/Push/Publisher.php:129
+#: includes/App/Google/Push/Publisher.php:130
 msgid "Google cannot check links and attributes without saving them."
 msgstr ""
 
-#: includes/App/Google/Push/Publisher.php:173
+#: includes/App/Google/Push/Publisher.php:174
 msgid "There is nothing left to send for this step. Google already has it."
 msgstr ""
 
-#: includes/App/Google/Push/Publisher.php:181
+#: includes/App/Google/Push/Publisher.php:182
 msgid "Your profile or your Google listing has changed since this was prepared. Review the changes again before publishing."
 msgstr ""
 
-#: includes/App/Google/Push/Publisher.php:249
+#: includes/App/Google/Push/Publisher.php:250
 msgid "Published changes to the Google Business Profile."
 msgstr ""
 
-#: includes/App/Google/Push/Publisher.php:326
+#: includes/App/Google/Push/Publisher.php:327
 msgid "Google did not accept some of these values. Nothing was changed on your listing."
 msgstr ""
 
-#: includes/App/Google/Push/Publisher.php:424
+#: includes/App/Google/Push/Publisher.php:426
 msgid "Connect your Google account before publishing."
 msgstr ""
 
-#: includes/App/Google/Push/Publisher.php:438
+#: includes/App/Google/Push/Publisher.php:440
 msgid "Choose which Google Business Profile this location is before publishing."
 msgstr ""
 
@@ -645,7 +645,7 @@ msgstr ""
 msgid "Google did not confirm the photo."
 msgstr ""
 
-#: includes/App/Profile/GoogleRefresh.php:147
+#: includes/App/Profile/GoogleRefresh.php:151
 msgid "Attributes and photos were read from Google."
 msgstr ""
 
@@ -669,7 +669,7 @@ msgstr ""
 msgid "There are no Google locations to read reviews for yet. Read your Google profile first."
 msgstr ""
 
-#: includes/App/Review/ReviewSync.php:94 src/admin/pages/profile/components/ProfileHeader.jsx:126
+#: includes/App/Review/ReviewSync.php:94 src/admin/pages/profile/components/header/BusinessBar.jsx:90
 msgid "%d review"
 msgid_plural "%d reviews"
 msgstr[0] ""
@@ -677,6 +677,18 @@ msgstr[1] ""
 
 #: src/admin/components/GoogleSignInButton.jsx:47 src/admin/pages/google/index.jsx:600
 msgid "Continue with Google"
+msgstr ""
+
+#: src/admin/components/Hint.jsx:30 src/admin/pages/business/index.jsx:155 src/admin/pages/google/components/ImportFromGoogle.jsx:46 src/admin/pages/profile/components/InfoSection.jsx:23 src/admin/pages/profile/components/publish/labels.js:10 src/admin/pages/setup/components/BusinessStep.jsx:93
+msgid "Business name"
+msgstr ""
+
+#: src/admin/components/Hint.jsx:74
+msgid "About %s"
+msgstr ""
+
+#: src/admin/components/Hint.jsx:77
+msgid "More information"
 msgstr ""
 
 #: src/admin/components/RequestError.jsx:21
@@ -687,7 +699,7 @@ msgstr ""
 msgid "Dashboard"
 msgstr ""
 
-#: src/admin/layouts/root/components/Sidebar.jsx:37 src/admin/pages/setup/components/WizardShell.jsx:47 src/admin/pages/setup/google.jsx:212
+#: src/admin/layouts/root/components/Sidebar.jsx:37 src/admin/pages/setup/components/WizardShell.jsx:47 src/admin/pages/setup/google.jsx:217
 msgid "Setup"
 msgstr ""
 
@@ -699,7 +711,7 @@ msgstr ""
 msgid "Locations"
 msgstr ""
 
-#: src/admin/layouts/root/components/Sidebar.jsx:45 src/admin/pages/dashboard/index.jsx:271 src/admin/pages/google/components/ImportFromGoogle.jsx:64 src/admin/pages/profile/components/PublishDialog.jsx:40 src/admin/pages/profile/index.jsx:626 src/admin/pages/services/index.jsx:124
+#: src/admin/layouts/root/components/Sidebar.jsx:45 src/admin/pages/dashboard/index.jsx:271 src/admin/pages/google/components/ImportFromGoogle.jsx:64 src/admin/pages/profile/components/publish/labels.js:17 src/admin/pages/profile/tabs.jsx:191 src/admin/pages/services/index.jsx:124
 msgid "Services"
 msgstr ""
 
@@ -759,7 +771,7 @@ msgstr ""
 msgid "Location mapping"
 msgstr ""
 
-#: src/admin/layouts/root/components/Sidebar.jsx:107 src/admin/pages/google/components/ImportFromGoogle.jsx:172 src/admin/pages/setup/google.jsx:471
+#: src/admin/layouts/root/components/Sidebar.jsx:107 src/admin/pages/google/components/ImportFromGoogle.jsx:172 src/admin/pages/setup/google.jsx:476
 msgid "Import from Google"
 msgstr ""
 
@@ -783,15 +795,15 @@ msgstr ""
 msgid "Expand section list"
 msgstr ""
 
-#: src/admin/layouts/root/components/Sidebar.jsx:344
+#: src/admin/layouts/root/components/Sidebar.jsx:347
 msgid "Local SEO"
 msgstr ""
 
-#: src/admin/layouts/root/components/Sidebar.jsx:374
+#: src/admin/layouts/root/components/Sidebar.jsx:377
 msgid "FoundHint Free"
 msgstr ""
 
-#: src/admin/layouts/root/index.jsx:28
+#: src/admin/layouts/root/index.jsx:29
 msgid "%d business"
 msgid_plural "%d businesses"
 msgstr[0] ""
@@ -1113,7 +1125,7 @@ msgstr ""
 msgid "Hours"
 msgstr ""
 
-#: src/admin/pages/audit/index.jsx:43 src/admin/pages/business/index.jsx:324 src/admin/pages/google/components/ImportFromGoogle.jsx:52 src/admin/pages/locations/detail.jsx:391 src/admin/pages/profile/components/InfoSection.jsx:353 src/admin/pages/profile/components/PublishDialog.jsx:35
+#: src/admin/pages/audit/index.jsx:43 src/admin/pages/business/index.jsx:323 src/admin/pages/google/components/ImportFromGoogle.jsx:52 src/admin/pages/locations/detail.jsx:391 src/admin/pages/profile/components/InfoSection.jsx:52 src/admin/pages/profile/components/publish/labels.js:12
 msgid "Website"
 msgstr ""
 
@@ -1235,103 +1247,99 @@ msgstr ""
 msgid "The details customers and search engines see. Everything else in FoundHint reads from here, so it only needs entering once."
 msgstr ""
 
-#: src/admin/pages/business/index.jsx:147 src/admin/pages/profile/components/PublishDialog.jsx:28 src/admin/pages/setup/components/DoneStep.jsx:6
+#: src/admin/pages/business/index.jsx:146 src/admin/pages/profile/components/publish/labels.js:5 src/admin/pages/setup/components/DoneStep.jsx:6
 msgid "Business details"
 msgstr ""
 
-#: src/admin/pages/business/index.jsx:148
+#: src/admin/pages/business/index.jsx:147
 msgid "How your business is identified."
 msgstr ""
 
-#: src/admin/pages/business/index.jsx:156 src/admin/pages/google/components/ImportFromGoogle.jsx:46 src/admin/pages/profile/components/InfoSection.jsx:81 src/admin/pages/profile/components/PublishDialog.jsx:33 src/admin/pages/setup/components/BusinessStep.jsx:93
-msgid "Business name"
-msgstr ""
-
-#: src/admin/pages/business/index.jsx:169
+#: src/admin/pages/business/index.jsx:168
 msgid "The name customers know you by."
 msgstr ""
 
-#: src/admin/pages/business/index.jsx:176
+#: src/admin/pages/business/index.jsx:175
 msgid "Legal name"
 msgstr ""
 
-#: src/admin/pages/business/index.jsx:188
+#: src/admin/pages/business/index.jsx:187
 msgid "Only if it differs from the trading name."
 msgstr ""
 
-#: src/admin/pages/business/index.jsx:198 src/admin/pages/google/components/ImportFromGoogle.jsx:60 src/admin/pages/setup/components/BusinessStep.jsx:113
+#: src/admin/pages/business/index.jsx:197 src/admin/pages/google/components/ImportFromGoogle.jsx:60 src/admin/pages/setup/components/BusinessStep.jsx:113
 msgid "Business type"
 msgstr ""
 
-#: src/admin/pages/business/index.jsx:218 src/admin/pages/setup/components/BusinessStep.jsx:125
+#: src/admin/pages/business/index.jsx:217 src/admin/pages/setup/components/BusinessStep.jsx:125
 msgid "Choose a type"
 msgstr ""
 
-#: src/admin/pages/business/index.jsx:235
+#: src/admin/pages/business/index.jsx:234
 msgid "Used in your structured data."
 msgstr ""
 
-#: src/admin/pages/business/index.jsx:242
+#: src/admin/pages/business/index.jsx:241
 msgid "Primary category"
 msgstr ""
 
-#: src/admin/pages/business/index.jsx:254
+#: src/admin/pages/business/index.jsx:253
 msgid "In your own words, e.g. Grocery Store."
 msgstr ""
 
-#: src/admin/pages/business/index.jsx:267 src/admin/pages/google/components/ImportFromGoogle.jsx:54 src/admin/pages/profile/components/PublishDialog.jsx:34 src/admin/pages/profile/components/ServiceDialog.jsx:371 src/admin/pages/services/components/ServiceDialog.jsx:174
+#: src/admin/pages/business/index.jsx:266 src/admin/pages/google/components/ImportFromGoogle.jsx:54 src/admin/pages/profile/components/publish/labels.js:11 src/admin/pages/profile/components/services/ServiceDescriptionField.jsx:17 src/admin/pages/services/components/ServiceDialog.jsx:174
 msgid "Description"
 msgstr ""
 
-#: src/admin/pages/business/index.jsx:276
+#: src/admin/pages/business/index.jsx:275
 msgid "A short summary of what you do and who you serve."
 msgstr ""
 
-#: src/admin/pages/business/index.jsx:287 src/admin/pages/locations/detail.jsx:354
+#: src/admin/pages/business/index.jsx:286 src/admin/pages/locations/detail.jsx:354
 msgid "Contact"
 msgstr ""
 
-#: src/admin/pages/business/index.jsx:288
+#: src/admin/pages/business/index.jsx:287
 msgid "Locations can override these; leave a location's field empty to use the business value."
 msgstr ""
 
-#: src/admin/pages/business/index.jsx:296 src/admin/pages/google/components/BusinessProfiles.jsx:153 src/admin/pages/google/components/ImportFromGoogle.jsx:50 src/admin/pages/locations/detail.jsx:363 src/admin/pages/setup/components/BusinessStep.jsx:149
+#: src/admin/pages/business/index.jsx:295 src/admin/pages/google/components/BusinessProfiles.jsx:153 src/admin/pages/google/components/ImportFromGoogle.jsx:50 src/admin/pages/locations/detail.jsx:363 src/admin/pages/setup/components/BusinessStep.jsx:149
 msgid "Phone"
 msgstr ""
 
-#: src/admin/pages/business/index.jsx:310 src/admin/pages/locations/detail.jsx:377 src/admin/pages/setup/components/BusinessStep.jsx:163
+#: src/admin/pages/business/index.jsx:309 src/admin/pages/locations/detail.jsx:377 src/admin/pages/setup/components/BusinessStep.jsx:163
 msgid "Email"
 msgstr ""
 
-#: src/admin/pages/business/index.jsx:343
+#: src/admin/pages/business/index.jsx:342
 msgid "Presentation"
 msgstr ""
 
-#: src/admin/pages/business/index.jsx:348
+#: src/admin/pages/business/index.jsx:347
 msgid "Logo URL"
 msgstr ""
 
-#: src/admin/pages/business/index.jsx:365
+#: src/admin/pages/business/index.jsx:364
 msgid "Price range"
 msgstr ""
 
-#: src/admin/pages/business/index.jsx:381
+#: src/admin/pages/business/index.jsx:380
 msgid "Founded"
 msgstr ""
 
-#: src/admin/pages/business/index.jsx:399 src/admin/pages/google/components/ImportFromGoogle.jsx:62
+#: src/admin/pages/business/index.jsx:398 src/admin/pages/google/components/ImportFromGoogle.jsx:62
 msgid "Social profiles"
 msgstr ""
 
-#: src/admin/pages/business/index.jsx:400
+#: src/admin/pages/business/index.jsx:399
 msgid "Published as the profiles that belong to this business."
 msgstr ""
 
-#: src/admin/pages/business/index.jsx:437 src/admin/pages/locations/detail.jsx:508 src/admin/pages/profile/index.jsx:679 src/admin/pages/profile/index.jsx:726
+#: src/admin/pages/business/index.jsx:436 src/admin/pages/locations/detail.jsx:508
 msgid "Save changes"
 msgstr ""
 
-#: src/admin/pages/business/index.jsx:441 src/admin/pages/locations/detail.jsx:513 src/admin/pages/settings/index.jsx:223
+#: src/admin/pages/business/index.jsx:440 src/admin/pages/locations/detail.jsx:513 src/admin/pages/settings/index.jsx:223
 msgid "You have unsaved changes."
 msgstr ""
 
@@ -1591,7 +1599,7 @@ msgstr ""
 msgid "View the audit"
 msgstr ""
 
-#: src/admin/pages/dashboard/components/ScoreCard.jsx:298 src/admin/pages/profile/components/PublishDialog.jsx:322
+#: src/admin/pages/dashboard/components/ScoreCard.jsx:298 src/admin/pages/profile/components/PublishDialog.jsx:132
 msgid "Check again"
 msgstr ""
 
@@ -1639,7 +1647,7 @@ msgstr ""
 msgid "Setup progress"
 msgstr ""
 
-#: src/admin/pages/dashboard/index.jsx:167 src/admin/pages/setup/google.jsx:396
+#: src/admin/pages/dashboard/index.jsx:167 src/admin/pages/setup/google.jsx:401
 msgid "%1$d of %2$d steps done"
 msgstr ""
 
@@ -1795,7 +1803,7 @@ msgstr ""
 msgid "In FoundHint"
 msgstr ""
 
-#: src/admin/pages/google/components/ImportFromGoogle.jsx:272 src/admin/pages/profile/components/PhotosSection.jsx:122
+#: src/admin/pages/google/components/ImportFromGoogle.jsx:272 src/admin/pages/profile/components/photos/PhotoSlot.jsx:36
 msgid "On Google"
 msgstr ""
 
@@ -1891,11 +1899,11 @@ msgstr ""
 msgid "Could not copy. Select the address instead."
 msgstr ""
 
-#: src/admin/pages/google/index.jsx:131 src/admin/pages/profile/components/InfoSection.jsx:400
+#: src/admin/pages/google/index.jsx:131 src/admin/pages/profile/components/info/GoogleCid.jsx:57
 msgid "Copied"
 msgstr ""
 
-#: src/admin/pages/google/index.jsx:132 src/admin/pages/profile/components/InfoSection.jsx:401 src/admin/pages/schema/index.jsx:287
+#: src/admin/pages/google/index.jsx:132 src/admin/pages/profile/components/info/GoogleCid.jsx:58 src/admin/pages/schema/index.jsx:287
 msgid "Copy"
 msgstr ""
 
@@ -2023,19 +2031,19 @@ msgstr ""
 msgid "Add your Google client ID and secret above first — this button will take you to them."
 msgstr ""
 
-#: src/admin/pages/locations/components/OpeningHoursEditor.jsx:142 src/admin/pages/locations/components/OpeningHoursEditor.jsx:203 src/admin/pages/locations/index.jsx:166 src/admin/pages/profile/components/HoursSection.jsx:318 src/admin/pages/profile/components/PhotosSection.jsx:146
+#: src/admin/pages/locations/components/OpeningHoursEditor.jsx:142 src/admin/pages/locations/components/OpeningHoursEditor.jsx:203 src/admin/pages/locations/index.jsx:166 src/admin/pages/profile/components/hours/WeekDayRow.jsx:84 src/admin/pages/profile/components/photos/PhotoSlot.jsx:60
 msgid "Not set"
 msgstr ""
 
-#: src/admin/pages/locations/components/OpeningHoursEditor.jsx:143 src/admin/pages/locations/components/OpeningHoursEditor.jsx:206 src/admin/pages/profile/components/HoursSection.jsx:320 src/admin/pages/profile/components/HoursSection.jsx:408
+#: src/admin/pages/locations/components/OpeningHoursEditor.jsx:143 src/admin/pages/locations/components/OpeningHoursEditor.jsx:206 src/admin/pages/profile/components/hours/SpecialDayRow.jsx:59 src/admin/pages/profile/components/hours/WeekDayRow.jsx:86
 msgid "Open"
 msgstr ""
 
-#: src/admin/pages/locations/components/OpeningHoursEditor.jsx:144 src/admin/pages/locations/components/OpeningHoursEditor.jsx:209 src/admin/pages/profile/components/HoursSection.jsx:321 src/admin/pages/profile/components/HoursSection.jsx:409
+#: src/admin/pages/locations/components/OpeningHoursEditor.jsx:144 src/admin/pages/locations/components/OpeningHoursEditor.jsx:209 src/admin/pages/profile/components/hours/SpecialDayRow.jsx:60 src/admin/pages/profile/components/hours/WeekDayRow.jsx:87
 msgid "Closed"
 msgstr ""
 
-#: src/admin/pages/locations/components/OpeningHoursEditor.jsx:147 src/admin/pages/locations/components/OpeningHoursEditor.jsx:212 src/admin/pages/profile/components/HoursSection.jsx:78
+#: src/admin/pages/locations/components/OpeningHoursEditor.jsx:147 src/admin/pages/locations/components/OpeningHoursEditor.jsx:212 src/admin/pages/profile/components/hours/DayTimes.jsx:36
 msgid "Open 24 hours"
 msgstr ""
 
@@ -2047,7 +2055,7 @@ msgstr ""
 msgid "Opens on %s"
 msgstr ""
 
-#: src/admin/pages/locations/components/OpeningHoursEditor.jsx:252 src/admin/pages/profile/components/HoursSection.jsx:115
+#: src/admin/pages/locations/components/OpeningHoursEditor.jsx:252 src/admin/pages/profile/components/hours/DayTimes.jsx:73
 msgid "to"
 msgstr ""
 
@@ -2271,7 +2279,7 @@ msgstr ""
 msgid "No map pin yet. It is filled in from your Google listing."
 msgstr ""
 
-#: src/admin/pages/profile/components/AddressSection.jsx:112 src/admin/pages/profile/components/InfoSection.jsx:410
+#: src/admin/pages/profile/components/AddressSection.jsx:112 src/admin/pages/profile/components/info/GoogleCid.jsx:67
 msgid "Open in Maps"
 msgstr ""
 
@@ -2295,11 +2303,11 @@ msgstr ""
 msgid "Google decides which attributes a business can have, from its category and country, so the list is read from your own listing."
 msgstr ""
 
-#: src/admin/pages/profile/components/AttributesSection.jsx:203 src/admin/pages/profile/index.jsx:494
+#: src/admin/pages/profile/components/AttributesSection.jsx:203 src/admin/pages/profile/components/SyncStatus.jsx:50
 msgid "Reading Google…"
 msgstr ""
 
-#: src/admin/pages/profile/components/AttributesSection.jsx:211 src/admin/pages/profile/components/InfoSection.jsx:420 src/admin/pages/profile/components/PhotosSection.jsx:372 src/admin/pages/profile/components/ProfileHeader.jsx:259
+#: src/admin/pages/profile/components/AttributesSection.jsx:211 src/admin/pages/profile/components/header/TitleBar.jsx:103 src/admin/pages/profile/components/info/GoogleCid.jsx:74 src/admin/pages/profile/components/photos/PendingPhotos.jsx:88
 msgid "Connect Google"
 msgstr ""
 
@@ -2307,533 +2315,163 @@ msgstr ""
 msgid "Matching Google categories"
 msgstr ""
 
-#: src/admin/pages/profile/components/HoursSection.jsx:86
-msgid "Set custom hours"
-msgstr ""
-
-#: src/admin/pages/profile/components/HoursSection.jsx:109
-msgid "%s opens at"
-msgstr ""
-
-#: src/admin/pages/profile/components/HoursSection.jsx:126
-msgid "%s closes at"
-msgstr ""
-
-#: src/admin/pages/profile/components/HoursSection.jsx:142
-msgid "Remove these hours from %s"
-msgstr ""
-
-#: src/admin/pages/profile/components/HoursSection.jsx:166
-msgid "+ Add a break"
-msgstr ""
-
-#: src/admin/pages/profile/components/HoursSection.jsx:272 src/admin/pages/profile/components/HoursSection.jsx:375
-msgid "Closed all day"
-msgstr ""
-
-#: src/admin/pages/profile/components/HoursSection.jsx:273
-msgid "Not set yet"
-msgstr ""
-
-#: src/admin/pages/profile/components/HoursSection.jsx:280
-msgid "Mark as closed"
-msgstr ""
-
-#: src/admin/pages/profile/components/HoursSection.jsx:293
-msgid "Copied to all"
-msgstr ""
-
-#: src/admin/pages/profile/components/HoursSection.jsx:294
-msgid "Copy to all"
-msgstr ""
-
-#: src/admin/pages/profile/components/HoursSection.jsx:305 src/admin/pages/profile/components/HoursSection.jsx:395
-msgid "%s is open"
-msgstr ""
-
-#: src/admin/pages/profile/components/HoursSection.jsx:336 src/admin/pages/profile/components/PublishDialog.jsx:39
+#: src/admin/pages/profile/components/HoursSection.jsx:82 src/admin/pages/profile/components/publish/labels.js:16
 msgid "Special hours"
 msgstr ""
 
-#: src/admin/pages/profile/components/HoursSection.jsx:339
+#: src/admin/pages/profile/components/HoursSection.jsx:85
 msgid "Holidays and one-off days, so customers do not turn up to a closed door."
 msgstr ""
 
-#: src/admin/pages/profile/components/HoursSection.jsx:349
-msgid "This day"
-msgstr ""
-
-#: src/admin/pages/profile/components/HoursSection.jsx:362
-msgid "Date"
-msgstr ""
-
-#: src/admin/pages/profile/components/HoursSection.jsx:388 src/admin/pages/profile/components/ServicesSection.jsx:196
-msgid "Remove"
-msgstr ""
-
-#: src/admin/pages/profile/components/HoursSection.jsx:429
+#: src/admin/pages/profile/components/HoursSection.jsx:116
 msgid "Add special hours"
 msgstr ""
 
-#: src/admin/pages/profile/components/InfoSection.jsx:85
+#: src/admin/pages/profile/components/InfoSection.jsx:27
 msgid "Exactly as it appears on your sign. Adding extra words like “best dentist” can get your listing suspended."
 msgstr ""
 
-#: src/admin/pages/profile/components/InfoSection.jsx:93
-msgid "Main category"
-msgstr ""
-
-#: src/admin/pages/profile/components/InfoSection.jsx:100
-msgid "Search Google's categories"
-msgstr ""
-
-#: src/admin/pages/profile/components/InfoSection.jsx:128
-msgid "Choose one from the list. A category typed by hand is kept here but cannot be sent to Google."
-msgstr ""
-
-#: src/admin/pages/profile/components/InfoSection.jsx:135
-msgid "The single thing you are best known for. It affects which searches you show up in more than anything else here."
-msgstr ""
-
-#: src/admin/pages/profile/components/InfoSection.jsx:147
-msgid "Extra categories"
-msgstr ""
-
-#: src/admin/pages/profile/components/InfoSection.jsx:152 src/admin/pages/profile/index.jsx:642
-msgid "%1$d of %2$d used"
-msgstr ""
-
-#: src/admin/pages/profile/components/InfoSection.jsx:182 src/admin/pages/profile/components/ServicesSection.jsx:191 src/admin/pages/setup/components/ServicesStep.jsx:92
-msgid "Remove %s"
-msgstr ""
-
-#: src/admin/pages/profile/components/InfoSection.jsx:206
-msgid "You have used all %d"
-msgstr ""
-
-#: src/admin/pages/profile/components/InfoSection.jsx:209
-msgid "Type a category and choose it"
-msgstr ""
-
-#: src/admin/pages/profile/components/InfoSection.jsx:228
-msgid "Add other things you genuinely do. Only pick categories that are true, because unrelated ones can hurt you."
-msgstr ""
-
-#: src/admin/pages/profile/components/InfoSection.jsx:238
-msgid "Business description"
-msgstr ""
-
-#: src/admin/pages/profile/components/InfoSection.jsx:252
-msgid "History"
-msgstr ""
-
-#: src/admin/pages/profile/components/InfoSection.jsx:265
-msgid "%1$d / %2$d characters"
-msgstr ""
-
-#: src/admin/pages/profile/components/InfoSection.jsx:305
-msgid "Your description has a web link in it. Google does not allow links here and will reject the update, so please remove it."
-msgstr ""
-
-#: src/admin/pages/profile/components/InfoSection.jsx:318
-msgid "Say what you do and where, in plain words. Please do not add web links, because Google rejects descriptions that have them."
-msgstr ""
-
-#: src/admin/pages/profile/components/InfoSection.jsx:343
-msgid "Use this"
-msgstr ""
-
-#: src/admin/pages/profile/components/InfoSection.jsx:361 src/admin/pages/profile/components/PublishDialog.jsx:36
+#: src/admin/pages/profile/components/InfoSection.jsx:60 src/admin/pages/profile/components/publish/labels.js:13
 msgid "Phone number"
 msgstr ""
 
-#: src/admin/pages/profile/components/InfoSection.jsx:373
-msgid "Google CID"
-msgstr ""
-
-#: src/admin/pages/profile/components/InfoSection.jsx:377
-msgid "Google's own ID for this listing on Maps. You cannot change it, but some directories and tools ask for it."
-msgstr ""
-
-#: src/admin/pages/profile/components/InfoSection.jsx:382
-msgid "Google's ID for your listing on Maps. It appears here the next time your listing is read from Google."
-msgstr ""
-
-#: src/admin/pages/profile/components/InfoSection.jsx:386
-msgid "Google's ID for your listing on Maps. It appears here once you connect Google."
-msgstr ""
-
-#: src/admin/pages/profile/components/InfoSection.jsx:273
-msgid "%d word"
-msgid_plural "%d words"
-msgstr[0] ""
-msgstr[1] ""
-
-#: src/admin/pages/profile/components/PhotosSection.jsx:48
-msgid "Ready to upload"
-msgstr ""
-
-#: src/admin/pages/profile/components/PhotosSection.jsx:52 src/admin/pages/profile/components/PhotosSection.jsx:364
-msgid "Uploading…"
-msgstr ""
-
-#: src/admin/pages/profile/components/PhotosSection.jsx:56
-msgid "Not accepted"
-msgstr ""
-
-#: src/admin/pages/profile/components/PhotosSection.jsx:152
-msgid "Choose another"
-msgstr ""
-
-#: src/admin/pages/profile/components/PhotosSection.jsx:153
-msgid "Choose photo"
-msgstr ""
-
-#: src/admin/pages/profile/components/PhotosSection.jsx:255
+#: src/admin/pages/profile/components/PhotosSection.jsx:34
 msgid "What Google accepts:"
 msgstr ""
 
-#: src/admin/pages/profile/components/PhotosSection.jsx:257
+#: src/admin/pages/profile/components/PhotosSection.jsx:36
 msgid "JPG or PNG, up to 5 MB each. Your logo should be square. Your cover photo should be wide (16 by 9)."
 msgstr ""
 
-#: src/admin/pages/profile/components/PhotosSection.jsx:265 src/admin/pages/profile/components/PhotosSection.jsx:418
+#: src/admin/pages/profile/components/PhotosSection.jsx:44 src/admin/pages/profile/components/photos/PendingPhotos.jsx:131
 msgid "Logo"
 msgstr ""
 
-#: src/admin/pages/profile/components/PhotosSection.jsx:266
+#: src/admin/pages/profile/components/PhotosSection.jsx:45
 msgid "Square"
 msgstr ""
 
-#: src/admin/pages/profile/components/PhotosSection.jsx:273
+#: src/admin/pages/profile/components/PhotosSection.jsx:52
 msgid "Cover photo"
 msgstr ""
 
-#: src/admin/pages/profile/components/PhotosSection.jsx:274
+#: src/admin/pages/profile/components/PhotosSection.jsx:53
 msgid "Wide"
 msgstr ""
 
-#: src/admin/pages/profile/components/PhotosSection.jsx:286
+#: src/admin/pages/profile/components/PhotosSection.jsx:65
 msgid "Add photos to your gallery"
 msgstr ""
 
-#: src/admin/pages/profile/components/PhotosSection.jsx:289
+#: src/admin/pages/profile/components/PhotosSection.jsx:68
 msgid "Pick several at once. You can check them before they go to Google."
 msgstr ""
 
-#: src/admin/pages/profile/components/PhotosSection.jsx:302
+#: src/admin/pages/profile/components/PhotosSection.jsx:81
 msgid "Working…"
 msgstr ""
 
-#: src/admin/pages/profile/components/PhotosSection.jsx:303
+#: src/admin/pages/profile/components/PhotosSection.jsx:82
 msgid "Choose photos"
 msgstr ""
 
-#: src/admin/pages/profile/components/PhotosSection.jsx:338
-msgid "Not on Google yet. Press Upload to Google to send them."
-msgstr ""
-
-#: src/admin/pages/profile/components/PhotosSection.jsx:342
-msgid "Not on Google yet. Connect Google to send them."
-msgstr ""
-
-#: src/admin/pages/profile/components/PhotosSection.jsx:354
-msgid "Remove all"
-msgstr ""
-
-#: src/admin/pages/profile/components/PhotosSection.jsx:365
-msgid "Upload to Google"
-msgstr ""
-
-#: src/admin/pages/profile/components/PhotosSection.jsx:399
-msgid "Remove this photo"
-msgstr ""
-
-#: src/admin/pages/profile/components/PhotosSection.jsx:419
-msgid "Cover"
-msgstr ""
-
-#: src/admin/pages/profile/components/PhotosSection.jsx:437
-msgid "Photo gallery"
-msgstr ""
-
-#: src/admin/pages/profile/components/PhotosSection.jsx:461
-msgid "Photo on your Google listing"
-msgstr ""
-
-#: src/admin/pages/profile/components/PhotosSection.jsx:480 src/admin/pages/reviews/index.jsx:401
-msgid "Show more"
-msgstr ""
-
-#: src/admin/pages/profile/components/PhotosSection.jsx:490
+#: src/admin/pages/profile/components/PhotosSection.jsx:116
 msgid "Your Google photos will appear here"
 msgstr ""
 
-#: src/admin/pages/profile/components/PhotosSection.jsx:494
+#: src/admin/pages/profile/components/PhotosSection.jsx:120
 msgid "Press Refresh from Google at the top of the page to load the photos on your listing."
 msgstr ""
 
-#: src/admin/pages/profile/components/PhotosSection.jsx:498
+#: src/admin/pages/profile/components/PhotosSection.jsx:124
 msgid "Connect your Google Business Profile and FoundHint will load the photos on your listing."
 msgstr ""
 
-#: src/admin/pages/profile/components/PhotosSection.jsx:327
-msgid "%d photo ready to upload"
-msgid_plural "%d photos ready to upload"
-msgstr[0] ""
-msgstr[1] ""
-
-#: src/admin/pages/profile/components/PhotosSection.jsx:442 src/admin/pages/profile/index.jsx:662
-msgid "%d photo"
-msgid_plural "%d photos"
-msgstr[0] ""
-msgstr[1] ""
-
-#: src/admin/pages/profile/components/ProfileHeader.jsx:73
-msgid "Your business"
-msgstr ""
-
-#: src/admin/pages/profile/components/ProfileHeader.jsx:114
-msgid "Rated"
-msgstr ""
-
-#: src/admin/pages/profile/components/ProfileHeader.jsx:119
-msgid "out of 5"
-msgstr ""
-
-#: src/admin/pages/profile/components/ProfileHeader.jsx:145
-msgid "Switch location"
-msgstr ""
-
-#: src/admin/pages/profile/components/ProfileHeader.jsx:153
-msgid "Show the profile of"
-msgstr ""
-
-#: src/admin/pages/profile/components/ProfileHeader.jsx:170
-msgid "Main"
-msgstr ""
-
-#: src/admin/pages/profile/components/ProfileHeader.jsx:199
-msgid "View on Google"
-msgstr ""
-
-#: src/admin/pages/profile/components/ProfileHeader.jsx:209
-msgid "FoundHint / Business Profile"
-msgstr ""
-
-#: src/admin/pages/profile/components/ProfileHeader.jsx:216
-msgid "Business Profile"
-msgstr ""
-
-#: src/admin/pages/profile/components/ProfileHeader.jsx:235
-msgid "Google connected"
-msgstr ""
-
-#: src/admin/pages/profile/components/ProfileHeader.jsx:237
-msgid "No Google listing chosen"
-msgstr ""
-
-#: src/admin/pages/profile/components/ProfileHeader.jsx:238
-msgid "Google not connected"
-msgstr ""
-
-#: src/admin/pages/profile/components/ProfileHeader.jsx:252 src/admin/pages/profile/components/PublishDialog.jsx:158 src/admin/pages/profile/components/PublishDialog.jsx:336
-msgid "Send to Google"
-msgstr ""
-
-#: src/admin/pages/profile/components/ProfileHeader.jsx:258
-msgid "Choose a listing"
-msgstr ""
-
-#: src/admin/pages/profile/components/PublishDialog.jsx:29
-msgid "Links and attributes"
-msgstr ""
-
-#: src/admin/pages/profile/components/PublishDialog.jsx:37
-msgid "Categories"
-msgstr ""
-
-#: src/admin/pages/profile/components/PublishDialog.jsx:38
-msgid "Business hours"
-msgstr ""
-
-#: src/admin/pages/profile/components/PublishDialog.jsx:53
-msgid "%s link"
-msgstr ""
-
-#: src/admin/pages/profile/components/PublishDialog.jsx:63
-msgid "Empty here, so Google keeps what it has. FoundHint never clears a field on Google."
-msgstr ""
-
-#: src/admin/pages/profile/components/PublishDialog.jsx:68
-msgid "Typed by hand. Choose the category from Google's list to send it."
-msgstr ""
-
-#: src/admin/pages/profile/components/PublishDialog.jsx:73
-msgid "Google does not let this listing change it."
-msgstr ""
-
-#: src/admin/pages/profile/components/PublishDialog.jsx:75
-msgid "Google has no place for it. It stays in your website markup."
-msgstr ""
-
-#: src/admin/pages/profile/components/PublishDialog.jsx:164
-msgid "What is saved here, compared with your Google listing “%s”."
-msgstr ""
-
-#: src/admin/pages/profile/components/PublishDialog.jsx:170
-msgid "What is saved here, compared with your Google listing."
-msgstr ""
-
-#: src/admin/pages/profile/components/PublishDialog.jsx:181
-msgid "Checking what Google has…"
-msgstr ""
-
-#: src/admin/pages/profile/components/PublishDialog.jsx:193
-msgid "Google already has everything saved here. There is nothing to send."
-msgstr ""
-
-#: src/admin/pages/profile/components/PublishDialog.jsx:216
-msgid "Step %1$d: %2$s"
-msgstr ""
-
-#: src/admin/pages/profile/components/PublishDialog.jsx:246 src/admin/pages/profile/components/PublishDialog.jsx:333
-msgid "Sending…"
-msgstr ""
-
-#: src/admin/pages/profile/components/PublishDialog.jsx:248
-msgid "Sent"
-msgstr ""
-
-#: src/admin/pages/profile/components/PublishDialog.jsx:250
-msgid "Not sent"
-msgstr ""
-
-#: src/admin/pages/profile/components/PublishDialog.jsx:251 src/admin/pages/setup/google.jsx:45
-msgid "Waiting"
-msgstr ""
-
-#: src/admin/pages/profile/components/PublishDialog.jsx:280
-msgid "Not being sent"
-msgstr ""
-
-#: src/admin/pages/profile/components/PublishDialog.jsx:297
-msgid "Sent to Google. It can take a few minutes to show on your listing."
-msgstr ""
-
-#: src/admin/pages/profile/components/PublishDialog.jsx:313 src/admin/pages/profile/components/ServiceDialog.jsx:199
-msgid "Close"
-msgstr ""
-
-#: src/admin/pages/profile/components/PublishDialog.jsx:314 src/admin/pages/profile/components/ServiceDialog.jsx:464 src/admin/pages/services/components/ServiceDialog.jsx:305
-msgid "Cancel"
-msgstr ""
-
-#: src/admin/pages/profile/components/PublishDialog.jsx:335 src/admin/pages/setup/google.jsx:317 src/admin/pages/setup/google.jsx:470
-msgid "Try again"
-msgstr ""
-
-#: src/admin/pages/profile/components/Section.jsx:21
+#: src/admin/pages/profile/components/ProfileTabs.jsx:12
 msgid "Unsaved changes"
 msgstr ""
 
-#: src/admin/pages/profile/components/Section.jsx:25 src/admin/pages/profile/index.jsx:691
+#: src/admin/pages/profile/components/ProfileTabs.jsx:16 src/admin/pages/profile/components/Section.jsx:23
 msgid "Saving…"
 msgstr ""
 
-#: src/admin/pages/profile/components/Section.jsx:29
-msgid "Saved"
-msgstr ""
-
-#: src/admin/pages/profile/components/Section.jsx:33
+#: src/admin/pages/profile/components/ProfileTabs.jsx:20
 msgid "Not saved"
 msgstr ""
 
-#: src/admin/pages/profile/components/ServiceDialog.jsx:182 src/admin/pages/services/components/ServiceDialog.jsx:139 src/admin/pages/services/components/ServiceDialog.jsx:311 src/admin/pages/services/index.jsx:132
+#: src/admin/pages/profile/components/ProfileTabs.jsx:54
+msgid "Profile sections"
+msgstr ""
+
+#: src/admin/pages/profile/components/PublishDialog.jsx:45 src/admin/pages/profile/components/PublishDialog.jsx:146 src/admin/pages/profile/components/header/TitleBar.jsx:96
+msgid "Send to Google"
+msgstr ""
+
+#: src/admin/pages/profile/components/PublishDialog.jsx:51
+msgid "What is saved here, compared with your Google listing “%s”."
+msgstr ""
+
+#: src/admin/pages/profile/components/PublishDialog.jsx:57
+msgid "What is saved here, compared with your Google listing."
+msgstr ""
+
+#: src/admin/pages/profile/components/PublishDialog.jsx:68
+msgid "Checking what Google has…"
+msgstr ""
+
+#: src/admin/pages/profile/components/PublishDialog.jsx:80
+msgid "Google already has everything saved here. There is nothing to send."
+msgstr ""
+
+#: src/admin/pages/profile/components/PublishDialog.jsx:107
+msgid "Sent to Google. It can take a few minutes to show on your listing."
+msgstr ""
+
+#: src/admin/pages/profile/components/PublishDialog.jsx:123 src/admin/pages/profile/components/ServiceDialog.jsx:133
+msgid "Close"
+msgstr ""
+
+#: src/admin/pages/profile/components/PublishDialog.jsx:124 src/admin/pages/profile/components/ServiceDialog.jsx:200 src/admin/pages/services/components/ServiceDialog.jsx:305
+msgid "Cancel"
+msgstr ""
+
+#: src/admin/pages/profile/components/PublishDialog.jsx:143 src/admin/pages/profile/components/publish/PublishStep.jsx:51
+msgid "Sending…"
+msgstr ""
+
+#: src/admin/pages/profile/components/PublishDialog.jsx:145 src/admin/pages/setup/google.jsx:322 src/admin/pages/setup/google.jsx:475
+msgid "Try again"
+msgstr ""
+
+#: src/admin/pages/profile/components/Section.jsx:19
+msgid "Unsaved changes."
+msgstr ""
+
+#: src/admin/pages/profile/components/Section.jsx:27 src/admin/pages/schema/index.jsx:141
+msgid "Saved."
+msgstr ""
+
+#: src/admin/pages/profile/components/Section.jsx:32
+msgid "Not saved. Check the highlighted fields."
+msgstr ""
+
+#: src/admin/pages/profile/components/Section.jsx:98
+msgid "Discard"
+msgstr ""
+
+#: src/admin/pages/profile/components/ServiceDialog.jsx:116 src/admin/pages/services/components/ServiceDialog.jsx:139 src/admin/pages/services/components/ServiceDialog.jsx:311 src/admin/pages/services/index.jsx:132
 msgid "Add service"
 msgstr ""
 
-#: src/admin/pages/profile/components/ServiceDialog.jsx:183 src/admin/pages/services/components/ServiceDialog.jsx:138
+#: src/admin/pages/profile/components/ServiceDialog.jsx:117 src/admin/pages/services/components/ServiceDialog.jsx:138
 msgid "Edit service"
 msgstr ""
 
-#: src/admin/pages/profile/components/ServiceDialog.jsx:186
+#: src/admin/pages/profile/components/ServiceDialog.jsx:120
 msgid "This service is shown on your Google profile and in your website markup."
 msgstr ""
 
-#: src/admin/pages/profile/components/ServiceDialog.jsx:212
-msgid "Kind of service"
-msgstr ""
-
-#: src/admin/pages/profile/components/ServiceDialog.jsx:218
-msgid "Custom name"
-msgstr ""
-
-#: src/admin/pages/profile/components/ServiceDialog.jsx:223 src/admin/pages/profile/components/ServiceDialog.jsx:231 src/admin/pages/profile/components/ServicesSection.jsx:140
-msgid "Google service"
-msgstr ""
-
-#: src/admin/pages/profile/components/ServiceDialog.jsx:234
-msgid "Services Google already knows for your categories. Picking one helps Google match you to searches for it."
-msgstr ""
-
-#: src/admin/pages/profile/components/ServiceDialog.jsx:250
-msgid "Choose a service"
-msgstr ""
-
-#: src/admin/pages/profile/components/ServiceDialog.jsx:277
-msgid "Choose a service from the list, or switch to Custom name."
-msgstr ""
-
-#: src/admin/pages/profile/components/ServiceDialog.jsx:281
-msgid "Google has no ready-made services for this listing’s categories, or they have not been read yet. Press Refresh from Google at the top of the page, or use a custom name."
-msgstr ""
-
-#: src/admin/pages/profile/components/ServiceDialog.jsx:292 src/admin/pages/setup/components/ServicesStep.jsx:59
-msgid "Service name"
-msgstr ""
-
-#: src/admin/pages/profile/components/ServiceDialog.jsx:295
-msgid "Use the words customers search for, like “Emergency dentist”."
-msgstr ""
-
-#: src/admin/pages/profile/components/ServiceDialog.jsx:315
-msgid "Please add a name for this service."
-msgstr ""
-
-#: src/admin/pages/profile/components/ServiceDialog.jsx:326 src/admin/pages/services/components/ServiceDialog.jsx:186 src/admin/pages/services/index.jsx:179
-msgid "Price"
-msgstr ""
-
-#: src/admin/pages/profile/components/ServiceDialog.jsx:329 src/admin/pages/profile/components/ServiceDialog.jsx:374
-msgid "Optional"
-msgstr ""
-
-#: src/admin/pages/profile/components/ServiceDialog.jsx:332
-msgid "Shown next to the service on Google. Leave it empty if the price depends on the visit."
-msgstr ""
-
-#: src/admin/pages/profile/components/ServiceDialog.jsx:342 src/admin/pages/services/components/ServiceDialog.jsx:209
-msgid "Currency"
-msgstr ""
-
-#: src/admin/pages/profile/components/ServiceDialog.jsx:387
-msgid "What this service is, in one or two plain sentences"
-msgstr ""
-
-#: src/admin/pages/profile/components/ServiceDialog.jsx:398
-msgid "Google shows %d characters at most. Please shorten it."
-msgstr ""
-
-#: src/admin/pages/profile/components/ServiceDialog.jsx:414
-msgid "Show on Google"
-msgstr ""
-
-#: src/admin/pages/profile/components/ServiceDialog.jsx:420
-msgid "Turn this off to hide the service for now without deleting it."
-msgstr ""
-
-#: src/admin/pages/profile/components/ServiceDialog.jsx:474 src/admin/pages/services/components/ServiceDialog.jsx:310
+#: src/admin/pages/profile/components/ServiceDialog.jsx:210 src/admin/pages/services/components/ServiceDialog.jsx:310
 msgid "Save service"
 msgstr ""
 
@@ -2853,6 +2491,10 @@ msgstr ""
 msgid "Hidden"
 msgstr ""
 
+#: src/admin/pages/profile/components/ServicesSection.jsx:140 src/admin/pages/profile/components/services/GoogleTypeField.jsx:35 src/admin/pages/profile/components/services/KindSwitch.jsx:38
+msgid "Google service"
+msgstr ""
+
 #: src/admin/pages/profile/components/ServicesSection.jsx:145
 msgid "New"
 msgstr ""
@@ -2869,6 +2511,14 @@ msgstr ""
 msgid "Edit"
 msgstr ""
 
+#: src/admin/pages/profile/components/ServicesSection.jsx:191 src/admin/pages/profile/components/info/ExtraCategoriesField.jsx:68 src/admin/pages/setup/components/ServicesStep.jsx:92
+msgid "Remove %s"
+msgstr ""
+
+#: src/admin/pages/profile/components/ServicesSection.jsx:196 src/admin/pages/profile/components/hours/SpecialDayRow.jsx:41
+msgid "Remove"
+msgstr ""
+
 #: src/admin/pages/profile/components/ServicesSection.jsx:206
 msgid "No services added yet"
 msgstr ""
@@ -2881,197 +2531,579 @@ msgstr ""
 msgid "You have used all %d services on Free. Pro removes the limit."
 msgstr ""
 
-#: src/admin/pages/profile/components/SocialSection.jsx:78
-msgid "Working"
-msgstr ""
-
-#: src/admin/pages/profile/components/SocialSection.jsx:81
-msgid "Check link"
-msgstr ""
-
-#: src/admin/pages/profile/components/SocialSection.jsx:85
-msgid "Not added"
-msgstr ""
-
-#: src/admin/pages/profile/components/SocialSection.jsx:101
-msgid "This needs to be a full web address starting with https://"
-msgstr ""
-
-#: src/admin/pages/profile/components/SocialSection.jsx:197
+#: src/admin/pages/profile/components/SocialSection.jsx:53
 msgid "Shown on your Google profile"
 msgstr ""
 
-#: src/admin/pages/profile/components/SocialSection.jsx:200
+#: src/admin/pages/profile/components/SocialSection.jsx:56
 msgid "Customers see these links on your listing in Search and Maps."
 msgstr ""
 
-#: src/admin/pages/profile/components/SocialSection.jsx:213
+#: src/admin/pages/profile/components/SocialSection.jsx:69
 msgid "Directories and review sites"
 msgstr ""
 
-#: src/admin/pages/profile/components/SocialSection.jsx:216
+#: src/admin/pages/profile/components/SocialSection.jsx:72
 msgid "Other places your business is listed. These are not shown on your Google profile, but every working link goes into your website markup so search engines can tell they all belong to you."
 msgstr ""
 
-#: src/admin/pages/profile/components/SocialSection.jsx:242
+#: src/admin/pages/profile/components/SocialSection.jsx:98
 msgid "Empty and broken links are left out."
 msgstr ""
 
-#: src/admin/pages/profile/components/SocialSection.jsx:256
+#: src/admin/pages/profile/components/SocialSection.jsx:112
 msgid "Hide the markup"
 msgstr ""
 
-#: src/admin/pages/profile/components/SocialSection.jsx:257
+#: src/admin/pages/profile/components/SocialSection.jsx:113
 msgid "Show the markup"
 msgstr ""
 
-#: src/admin/pages/profile/components/SocialSection.jsx:268
+#: src/admin/pages/profile/components/SocialSection.jsx:124
 msgid "The links saved before are still in your markup until you save."
 msgstr ""
 
-#: src/admin/pages/profile/components/SocialSection.jsx:232
+#: src/admin/pages/profile/components/SocialSection.jsx:88
 msgid "%d link will be added to your business markup as sameAs."
 msgid_plural "%d links will be added to your business markup as sameAs."
 msgstr[0] ""
 msgstr[1] ""
 
-#: src/admin/pages/profile/index.jsx:62
-msgid "just now"
-msgstr ""
-
-#: src/admin/pages/profile/index.jsx:94
-msgid "Connect Google to keep your listing and your website saying the same thing."
-msgstr ""
-
-#: src/admin/pages/profile/index.jsx:101
-msgid "Google is connected, but no listing has been chosen for this location yet."
-msgstr ""
-
-#: src/admin/pages/profile/index.jsx:120
-msgid "Last read from Google %s."
-msgstr ""
-
-#: src/admin/pages/profile/index.jsx:130
-msgid "Last sent to Google %s."
-msgstr ""
-
-#: src/admin/pages/profile/index.jsx:138
-msgid "Connected to your Google listing."
-msgstr ""
-
-#: src/admin/pages/profile/index.jsx:212
-msgid "Google answered for only part of your listing. Try again in a moment."
-msgstr ""
-
-#: src/admin/pages/profile/index.jsx:219
-msgid "Up to date with Google."
-msgstr ""
-
-#: src/admin/pages/profile/index.jsx:364 src/admin/pages/schema/index.jsx:141
-msgid "Saved."
-msgstr ""
-
-#: src/admin/pages/profile/index.jsx:379
-msgid "You have unsaved changes for this location. Switch and discard them?"
-msgstr ""
-
-#: src/admin/pages/profile/index.jsx:404
-msgid "Save your changes first."
-msgstr ""
-
-#: src/admin/pages/profile/index.jsx:427
-msgid "Your profile could not be loaded"
-msgstr ""
-
-#: src/admin/pages/profile/index.jsx:468
-msgid "Your business name, address, hours, links, attributes, services and photos, all in one place. FoundHint uses these details for your website markup and your location pages."
-msgstr ""
-
-#: src/admin/pages/profile/index.jsx:480
+#: src/admin/pages/profile/components/SyncStatus.jsx:36
 msgid "Reads your attributes and photos from Google. Nothing on Google is changed."
 msgstr ""
 
-#: src/admin/pages/profile/index.jsx:495
+#: src/admin/pages/profile/components/SyncStatus.jsx:51
 msgid "Refresh from Google"
 msgstr ""
 
-#: src/admin/pages/profile/index.jsx:505
-msgid "Business Information"
+#: src/admin/pages/profile/components/header/BusinessBar.jsx:39
+msgid "Your business"
 msgstr ""
 
-#: src/admin/pages/profile/index.jsx:518
-msgid "Legal name, business type, email, logo, price range and founding date are used only in your website markup."
+#: src/admin/pages/profile/components/header/BusinessBar.jsx:78
+msgid "Rated"
 msgstr ""
 
-#: src/admin/pages/profile/index.jsx:526
-msgid "Edit markup details"
+#: src/admin/pages/profile/components/header/BusinessBar.jsx:83
+msgid "out of 5"
 msgstr ""
 
-#: src/admin/pages/profile/index.jsx:535
-msgid "Address and Location"
+#: src/admin/pages/profile/components/header/BusinessBar.jsx:119
+msgid "View on Google"
 msgstr ""
 
-#: src/admin/pages/profile/index.jsx:551
-msgid "Business Hours"
+#: src/admin/pages/profile/components/header/LocationSwitcher.jsx:73
+msgid "Opening…"
 msgstr ""
 
-#: src/admin/pages/profile/index.jsx:578
-msgid "Social Links and Listings"
+#: src/admin/pages/profile/components/header/LocationSwitcher.jsx:74
+msgid "Switch location"
 msgstr ""
 
-#: src/admin/pages/profile/index.jsx:582
-msgid "%d in your markup"
+#: src/admin/pages/profile/components/header/LocationSwitcher.jsx:82
+msgid "Show the profile of"
 msgstr ""
 
-#: src/admin/pages/profile/index.jsx:601
-msgid "Attributes"
+#: src/admin/pages/profile/components/header/LocationSwitcher.jsx:101
+msgid "Main"
 msgstr ""
 
-#: src/admin/pages/profile/index.jsx:605
-msgid "%d selected"
+#: src/admin/pages/profile/components/header/LocationSwitcher.jsx:112
+msgid "On Google, not set up here yet. Opening it brings its details across."
 msgstr ""
 
-#: src/admin/pages/profile/index.jsx:659
-msgid "Photos"
+#: src/admin/pages/profile/components/header/TitleBar.jsx:42
+msgid "FoundHint / Business Profile"
 msgstr ""
 
-#: src/admin/pages/profile/index.jsx:715
-msgid "Discard"
+#: src/admin/pages/profile/components/header/TitleBar.jsx:50 src/admin/pages/profile/components/header/TitleBar.jsx:53
+msgid "Business Profile"
 msgstr ""
 
-#: src/admin/pages/profile/index.jsx:68
+#: src/admin/pages/profile/components/header/TitleBar.jsx:56
+msgid "Your business name, address, hours, links, attributes, services and photos, all in one place. FoundHint uses these details for your website markup and your location pages."
+msgstr ""
+
+#: src/admin/pages/profile/components/header/TitleBar.jsx:79
+msgid "Google connected"
+msgstr ""
+
+#: src/admin/pages/profile/components/header/TitleBar.jsx:81
+msgid "No Google listing chosen"
+msgstr ""
+
+#: src/admin/pages/profile/components/header/TitleBar.jsx:82
+msgid "Google not connected"
+msgstr ""
+
+#: src/admin/pages/profile/components/header/TitleBar.jsx:102
+msgid "Choose a listing"
+msgstr ""
+
+#: src/admin/pages/profile/components/hours/DayTimes.jsx:44
+msgid "Set custom hours"
+msgstr ""
+
+#: src/admin/pages/profile/components/hours/DayTimes.jsx:67
+msgid "%s opens at"
+msgstr ""
+
+#: src/admin/pages/profile/components/hours/DayTimes.jsx:84
+msgid "%s closes at"
+msgstr ""
+
+#: src/admin/pages/profile/components/hours/DayTimes.jsx:100
+msgid "Remove these hours from %s"
+msgstr ""
+
+#: src/admin/pages/profile/components/hours/DayTimes.jsx:124
+msgid "+ Add a break"
+msgstr ""
+
+#: src/admin/pages/profile/components/hours/SpecialDayRow.jsx:16
+msgid "This day"
+msgstr ""
+
+#: src/admin/pages/profile/components/hours/SpecialDayRow.jsx:24
+msgid "Date"
+msgstr ""
+
+#: src/admin/pages/profile/components/hours/SpecialDayRow.jsx:37 src/admin/pages/profile/components/hours/WeekDayRow.jsx:42
+msgid "Closed all day"
+msgstr ""
+
+#: src/admin/pages/profile/components/hours/SpecialDayRow.jsx:48 src/admin/pages/profile/components/hours/WeekDayRow.jsx:71
+msgid "%s is open"
+msgstr ""
+
+#: src/admin/pages/profile/components/hours/WeekDayRow.jsx:43
+msgid "Not set yet"
+msgstr ""
+
+#: src/admin/pages/profile/components/hours/WeekDayRow.jsx:50
+msgid "Mark as closed"
+msgstr ""
+
+#: src/admin/pages/profile/components/hours/WeekDayRow.jsx:59
+msgid "Copied to all"
+msgstr ""
+
+#: src/admin/pages/profile/components/hours/WeekDayRow.jsx:60
+msgid "Copy to all"
+msgstr ""
+
+#: src/admin/pages/profile/components/info/DescriptionField.jsx:54 src/admin/pages/profile/components/info/DescriptionField.jsx:57
+msgid "Business description"
+msgstr ""
+
+#: src/admin/pages/profile/components/info/DescriptionField.jsx:58
+msgid "Say what you do and where, in plain words. Please do not add web links, because Google rejects descriptions that have them."
+msgstr ""
+
+#: src/admin/pages/profile/components/info/DescriptionField.jsx:76
+msgid "History"
+msgstr ""
+
+#: src/admin/pages/profile/components/info/DescriptionField.jsx:89
+msgid "%1$d / %2$d characters"
+msgstr ""
+
+#: src/admin/pages/profile/components/info/DescriptionField.jsx:127
+msgid "Your description has a web link in it. Google does not allow links here and will reject the update, so please remove it."
+msgstr ""
+
+#: src/admin/pages/profile/components/info/DescriptionField.jsx:157
+msgid "Use this"
+msgstr ""
+
+#: src/admin/pages/profile/components/info/DescriptionField.jsx:97
+msgid "%d word"
+msgid_plural "%d words"
+msgstr[0] ""
+msgstr[1] ""
+
+#: src/admin/pages/profile/components/info/ExtraCategoriesField.jsx:25 src/admin/pages/profile/components/info/ExtraCategoriesField.jsx:28
+msgid "Extra categories"
+msgstr ""
+
+#: src/admin/pages/profile/components/info/ExtraCategoriesField.jsx:29
+msgid "Add other things you genuinely do. Only pick categories that are true, because unrelated ones can hurt you."
+msgstr ""
+
+#: src/admin/pages/profile/components/info/ExtraCategoriesField.jsx:38 src/admin/pages/profile/tabs.jsx:207
+msgid "%1$d of %2$d used"
+msgstr ""
+
+#: src/admin/pages/profile/components/info/ExtraCategoriesField.jsx:89
+msgid "You have used all %d"
+msgstr ""
+
+#: src/admin/pages/profile/components/info/ExtraCategoriesField.jsx:92
+msgid "Type a category and choose it"
+msgstr ""
+
+#: src/admin/pages/profile/components/info/GoogleCid.jsx:30
+msgid "Google CID"
+msgstr ""
+
+#: src/admin/pages/profile/components/info/GoogleCid.jsx:34
+msgid "Google's own ID for this listing on Maps. You cannot change it, but some directories and tools ask for it."
+msgstr ""
+
+#: src/admin/pages/profile/components/info/GoogleCid.jsx:39
+msgid "Google's ID for your listing on Maps. It appears here the next time your listing is read from Google."
+msgstr ""
+
+#: src/admin/pages/profile/components/info/GoogleCid.jsx:43
+msgid "Google's ID for your listing on Maps. It appears here once you connect Google."
+msgstr ""
+
+#: src/admin/pages/profile/components/info/MainCategoryField.jsx:22 src/admin/pages/profile/components/info/MainCategoryField.jsx:25
+msgid "Main category"
+msgstr ""
+
+#: src/admin/pages/profile/components/info/MainCategoryField.jsx:26
+msgid "The single thing you are best known for. It affects which searches you show up in more than anything else here."
+msgstr ""
+
+#: src/admin/pages/profile/components/info/MainCategoryField.jsx:37
+msgid "Search Google's categories"
+msgstr ""
+
+#: src/admin/pages/profile/components/info/MainCategoryField.jsx:62
+msgid "Choose one from the list. A category typed by hand is kept here but cannot be sent to Google."
+msgstr ""
+
+#: src/admin/pages/profile/components/photos/Gallery.jsx:19
+msgid "Photo gallery"
+msgstr ""
+
+#: src/admin/pages/profile/components/photos/Gallery.jsx:38
+msgid "Photo on your Google listing"
+msgstr ""
+
+#: src/admin/pages/profile/components/photos/Gallery.jsx:54 src/admin/pages/reviews/index.jsx:401
+msgid "Show more"
+msgstr ""
+
+#: src/admin/pages/profile/components/photos/Gallery.jsx:24 src/admin/pages/profile/tabs.jsx:229
+msgid "%d photo"
+msgid_plural "%d photos"
+msgstr[0] ""
+msgstr[1] ""
+
+#: src/admin/pages/profile/components/photos/PendingPhotos.jsx:54
+msgid "Not on Google yet. Press Upload to Google to send them."
+msgstr ""
+
+#: src/admin/pages/profile/components/photos/PendingPhotos.jsx:58
+msgid "Not on Google yet. Connect Google to send them."
+msgstr ""
+
+#: src/admin/pages/profile/components/photos/PendingPhotos.jsx:70
+msgid "Remove all"
+msgstr ""
+
+#: src/admin/pages/profile/components/photos/PendingPhotos.jsx:80 src/admin/pages/profile/components/photos/lib.js:31
+msgid "Uploading…"
+msgstr ""
+
+#: src/admin/pages/profile/components/photos/PendingPhotos.jsx:81
+msgid "Upload to Google"
+msgstr ""
+
+#: src/admin/pages/profile/components/photos/PendingPhotos.jsx:115
+msgid "Remove this photo"
+msgstr ""
+
+#: src/admin/pages/profile/components/photos/PendingPhotos.jsx:132
+msgid "Cover"
+msgstr ""
+
+#: src/admin/pages/profile/components/photos/PendingPhotos.jsx:43
+msgid "%d photo ready to upload"
+msgid_plural "%d photos ready to upload"
+msgstr[0] ""
+msgstr[1] ""
+
+#: src/admin/pages/profile/components/photos/PhotoSlot.jsx:66
+msgid "Choose another"
+msgstr ""
+
+#: src/admin/pages/profile/components/photos/PhotoSlot.jsx:67
+msgid "Choose photo"
+msgstr ""
+
+#: src/admin/pages/profile/components/photos/lib.js:27
+msgid "Ready to upload"
+msgstr ""
+
+#: src/admin/pages/profile/components/photos/lib.js:35
+msgid "Not accepted"
+msgstr ""
+
+#: src/admin/pages/profile/components/publish/PublishStep.jsx:27
+msgid "Step %1$d: %2$s"
+msgstr ""
+
+#: src/admin/pages/profile/components/publish/PublishStep.jsx:53
+msgid "Sent"
+msgstr ""
+
+#: src/admin/pages/profile/components/publish/PublishStep.jsx:55
+msgid "Not sent"
+msgstr ""
+
+#: src/admin/pages/profile/components/publish/PublishStep.jsx:56 src/admin/pages/setup/google.jsx:45
+msgid "Waiting"
+msgstr ""
+
+#: src/admin/pages/profile/components/publish/SkippedList.jsx:13
+msgid "Not being sent"
+msgstr ""
+
+#: src/admin/pages/profile/components/publish/labels.js:6
+msgid "Links and attributes"
+msgstr ""
+
+#: src/admin/pages/profile/components/publish/labels.js:14
+msgid "Categories"
+msgstr ""
+
+#: src/admin/pages/profile/components/publish/labels.js:15
+msgid "Business hours"
+msgstr ""
+
+#: src/admin/pages/profile/components/publish/labels.js:30
+msgid "%s link"
+msgstr ""
+
+#: src/admin/pages/profile/components/publish/labels.js:40
+msgid "Empty here, so Google keeps what it has. FoundHint never clears a field on Google."
+msgstr ""
+
+#: src/admin/pages/profile/components/publish/labels.js:45
+msgid "Typed by hand. Choose the category from Google's list to send it."
+msgstr ""
+
+#: src/admin/pages/profile/components/publish/labels.js:50
+msgid "Google does not let this listing change it."
+msgstr ""
+
+#: src/admin/pages/profile/components/publish/labels.js:52
+msgid "Google has no place for it. It stays in your website markup."
+msgstr ""
+
+#: src/admin/pages/profile/components/services/GoogleTypeField.jsx:38
+msgid "Services Google already knows for your categories. Picking one helps Google match you to searches for it."
+msgstr ""
+
+#: src/admin/pages/profile/components/services/GoogleTypeField.jsx:54
+msgid "Choose a service"
+msgstr ""
+
+#: src/admin/pages/profile/components/services/GoogleTypeField.jsx:77
+msgid "Choose a service from the list, or switch to Custom name."
+msgstr ""
+
+#: src/admin/pages/profile/components/services/GoogleTypeField.jsx:81
+msgid "Google has no ready-made services for this listing’s categories, or they have not been read yet. Press Refresh from Google at the top of the page, or use a custom name."
+msgstr ""
+
+#: src/admin/pages/profile/components/services/KindSwitch.jsx:34
+msgid "Kind of service"
+msgstr ""
+
+#: src/admin/pages/profile/components/services/KindSwitch.jsx:37
+msgid "Custom name"
+msgstr ""
+
+#: src/admin/pages/profile/components/services/NameField.jsx:16 src/admin/pages/setup/components/ServicesStep.jsx:59
+msgid "Service name"
+msgstr ""
+
+#: src/admin/pages/profile/components/services/NameField.jsx:19
+msgid "Use the words customers search for, like “Emergency dentist”."
+msgstr ""
+
+#: src/admin/pages/profile/components/services/NameField.jsx:39
+msgid "Please add a name for this service."
+msgstr ""
+
+#: src/admin/pages/profile/components/services/PriceField.jsx:33 src/admin/pages/services/components/ServiceDialog.jsx:186 src/admin/pages/services/index.jsx:179
+msgid "Price"
+msgstr ""
+
+#: src/admin/pages/profile/components/services/PriceField.jsx:36 src/admin/pages/profile/components/services/ServiceDescriptionField.jsx:20
+msgid "Optional"
+msgstr ""
+
+#: src/admin/pages/profile/components/services/PriceField.jsx:39
+msgid "Shown next to the service on Google. Leave it empty if the price depends on the visit."
+msgstr ""
+
+#: src/admin/pages/profile/components/services/PriceField.jsx:49 src/admin/pages/services/components/ServiceDialog.jsx:209
+msgid "Currency"
+msgstr ""
+
+#: src/admin/pages/profile/components/services/ServiceDescriptionField.jsx:31
+msgid "What this service is, in one or two plain sentences"
+msgstr ""
+
+#: src/admin/pages/profile/components/services/ServiceDescriptionField.jsx:42
+msgid "Google shows %d characters at most. Please shorten it."
+msgstr ""
+
+#: src/admin/pages/profile/components/services/ShownSwitch.jsx:15
+msgid "Show on Google"
+msgstr ""
+
+#: src/admin/pages/profile/components/services/ShownSwitch.jsx:21
+msgid "Turn this off to hide the service for now without deleting it."
+msgstr ""
+
+#: src/admin/pages/profile/components/social/LinkCard.jsx:10
+msgid "Working"
+msgstr ""
+
+#: src/admin/pages/profile/components/social/LinkCard.jsx:13
+msgid "Check link"
+msgstr ""
+
+#: src/admin/pages/profile/components/social/LinkCard.jsx:17
+msgid "Not added"
+msgstr ""
+
+#: src/admin/pages/profile/components/social/LinkCard.jsx:36
+msgid "This needs to be a full web address starting with https://"
+msgstr ""
+
+#: src/admin/pages/profile/hooks/useGoogleRead.js:47
+msgid "Google answered for only part of your listing. Try again in a moment."
+msgstr ""
+
+#: src/admin/pages/profile/hooks/useGoogleRead.js:54
+msgid "Up to date with Google."
+msgstr ""
+
+#: src/admin/pages/profile/index.jsx:89
+msgid "You have unsaved changes for this location. Switch and discard them?"
+msgstr ""
+
+#: src/admin/pages/profile/index.jsx:127
+msgid "Save your changes first."
+msgstr ""
+
+#: src/admin/pages/profile/index.jsx:149
+msgid "Your profile could not be loaded"
+msgstr ""
+
+#: src/admin/pages/profile/lib/sync.js:20
+msgid "just now"
+msgstr ""
+
+#: src/admin/pages/profile/lib/sync.js:61
+msgid "Google is connected, but no listing has been chosen for this location yet."
+msgstr ""
+
+#: src/admin/pages/profile/lib/sync.js:80
+msgid "Last read from Google %s."
+msgstr ""
+
+#: src/admin/pages/profile/lib/sync.js:90
+msgid "Last sent to Google %s."
+msgstr ""
+
+#: src/admin/pages/profile/lib/sync.js:98
+msgid "Connected to your Google listing."
+msgstr ""
+
+#: src/admin/pages/profile/lib/sync.js:26
 msgid "%d minute ago"
 msgid_plural "%d minutes ago"
 msgstr[0] ""
 msgstr[1] ""
 
-#: src/admin/pages/profile/index.jsx:78
+#: src/admin/pages/profile/lib/sync.js:36
 msgid "%d hour ago"
 msgid_plural "%d hours ago"
 msgstr[0] ""
 msgstr[1] ""
 
-#: src/admin/pages/profile/index.jsx:87
+#: src/admin/pages/profile/lib/sync.js:45
 msgid "%d day ago"
 msgid_plural "%d days ago"
 msgstr[0] ""
 msgstr[1] ""
 
-#: src/admin/pages/profile/index.jsx:350
-msgid "%d section was not saved. Check the highlighted fields."
-msgid_plural "%d sections were not saved. Check the highlighted fields."
-msgstr[0] ""
-msgstr[1] ""
+#: src/admin/pages/profile/tabs.jsx:76
+msgid "Information"
+msgstr ""
 
-#: src/admin/pages/profile/index.jsx:555
+#: src/admin/pages/profile/tabs.jsx:77
+msgid "Save Information"
+msgstr ""
+
+#: src/admin/pages/profile/tabs.jsx:90
+msgid "Legal name, business type, email, logo, price range and founding date are used only in your website markup."
+msgstr ""
+
+#: src/admin/pages/profile/tabs.jsx:98
+msgid "Edit markup details"
+msgstr ""
+
+#: src/admin/pages/profile/tabs.jsx:107
+msgid "Address & Location"
+msgstr ""
+
+#: src/admin/pages/profile/tabs.jsx:108
+msgid "Save Address"
+msgstr ""
+
+#: src/admin/pages/profile/tabs.jsx:124
+msgid "Business Hours"
+msgstr ""
+
+#: src/admin/pages/profile/tabs.jsx:125
+msgid "Save Hours"
+msgstr ""
+
+#: src/admin/pages/profile/tabs.jsx:145
+msgid "Social Links"
+msgstr ""
+
+#: src/admin/pages/profile/tabs.jsx:146
+msgid "Save Links"
+msgstr ""
+
+#: src/admin/pages/profile/tabs.jsx:149
+msgid "%d in your markup"
+msgstr ""
+
+#: src/admin/pages/profile/tabs.jsx:167
+msgid "Attributes"
+msgstr ""
+
+#: src/admin/pages/profile/tabs.jsx:168
+msgid "Save Attributes"
+msgstr ""
+
+#: src/admin/pages/profile/tabs.jsx:171
+msgid "%d selected"
+msgstr ""
+
+#: src/admin/pages/profile/tabs.jsx:192
+msgid "Save Services"
+msgstr ""
+
+#: src/admin/pages/profile/tabs.jsx:226
+msgid "Photos"
+msgstr ""
+
+#: src/admin/pages/profile/tabs.jsx:128
 msgid "%d day open"
 msgid_plural "%d days open"
-msgstr[0] ""
-msgstr[1] ""
-
-#: src/admin/pages/profile/index.jsx:695
-msgid "Unsaved changes in %d section."
-msgid_plural "Unsaved changes in %d sections."
 msgstr[0] ""
 msgstr[1] ""
 
@@ -3555,7 +3587,7 @@ msgstr ""
 msgid "Step %1$d of %2$d"
 msgstr ""
 
-#: src/admin/pages/setup/components/WizardShell.jsx:63 src/admin/pages/setup/google.jsx:223
+#: src/admin/pages/setup/components/WizardShell.jsx:63 src/admin/pages/setup/google.jsx:228
 msgid "I'll do this later"
 msgstr ""
 
@@ -3575,7 +3607,7 @@ msgstr ""
 msgid "Phone and website"
 msgstr ""
 
-#: src/admin/pages/setup/google.jsx:46 src/admin/pages/setup/google.jsx:468
+#: src/admin/pages/setup/google.jsx:46 src/admin/pages/setup/google.jsx:473
 msgid "Importing…"
 msgstr ""
 
@@ -3595,55 +3627,55 @@ msgstr ""
 msgid "Not imported"
 msgstr ""
 
-#: src/admin/pages/setup/google.jsx:192
+#: src/admin/pages/setup/google.jsx:197
 msgid "Import finished"
 msgstr ""
 
-#: src/admin/pages/setup/google.jsx:194
+#: src/admin/pages/setup/google.jsx:199
 msgid "Importing your details"
 msgstr ""
 
-#: src/admin/pages/setup/google.jsx:195
+#: src/admin/pages/setup/google.jsx:200
 msgid "Bring your details in from Google"
 msgstr ""
 
-#: src/admin/pages/setup/google.jsx:215
+#: src/admin/pages/setup/google.jsx:220
 msgid "Connecting Google"
 msgstr ""
 
-#: src/admin/pages/setup/google.jsx:256
+#: src/admin/pages/setup/google.jsx:261
 msgid "Connect Google first"
 msgstr ""
 
-#: src/admin/pages/setup/google.jsx:257
+#: src/admin/pages/setup/google.jsx:262
 msgid "Sign in with the Google account that manages your Business Profile and your details can be brought across."
 msgstr ""
 
-#: src/admin/pages/setup/google.jsx:279
+#: src/admin/pages/setup/google.jsx:284
 msgid "We are copying your details from Google into FoundHint. Nothing on Google changes."
 msgstr ""
 
-#: src/admin/pages/setup/google.jsx:294
+#: src/admin/pages/setup/google.jsx:299
 msgid "Reading your Google Business Profiles…"
 msgstr ""
 
-#: src/admin/pages/setup/google.jsx:310
+#: src/admin/pages/setup/google.jsx:315
 msgid "Google returned no Business Profiles for this account. Check you signed in with the account that manages your listing."
 msgstr ""
 
-#: src/admin/pages/setup/google.jsx:324
+#: src/admin/pages/setup/google.jsx:329
 msgid "Enter my details myself"
 msgstr ""
 
-#: src/admin/pages/setup/google.jsx:338
+#: src/admin/pages/setup/google.jsx:343
 msgid "Which Business Profile is this website for?"
 msgstr ""
 
-#: src/admin/pages/setup/google.jsx:390
+#: src/admin/pages/setup/google.jsx:395
 msgid "Import progress"
 msgstr ""
 
-#: src/admin/pages/setup/google.jsx:458
+#: src/admin/pages/setup/google.jsx:463
 msgid "Review imported details"
 msgstr ""
 

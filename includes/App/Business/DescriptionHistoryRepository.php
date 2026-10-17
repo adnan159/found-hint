@@ -29,12 +29,14 @@ class DescriptionHistoryRepository {
 	 *
 	 * @param int $business_id Row id in wp_fhint_business.
 	 * @param int $limit       How many to return.
+	 * @param int $location_id A location's own history, or 0 for the business's.
 	 * @return array[]
 	 */
-	public static function latest( $business_id, $limit = 10 ) {
+	public static function latest( $business_id, $limit = 10, $location_id = 0 ) {
 		global $wpdb;
 
 		$business_id = (int) $business_id;
+		$location_id = (int) $location_id;
 
 		if ( ! $business_id || ! Tables::exists( Tables::DESCRIPTION_HISTORY ) ) {
 			return array();
@@ -45,7 +47,7 @@ class DescriptionHistoryRepository {
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		$rows = $wpdb->get_results(
 			// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-			$wpdb->prepare( "SELECT * FROM {$table} WHERE business_id = %d ORDER BY id DESC LIMIT %d", $business_id, max( 1, (int) $limit ) ),
+			$wpdb->prepare( "SELECT * FROM {$table} WHERE business_id = %d AND location_id = %d ORDER BY id DESC LIMIT %d", $business_id, $location_id, max( 1, (int) $limit ) ),
 			ARRAY_A
 		);
 
@@ -73,19 +75,21 @@ class DescriptionHistoryRepository {
 	 * @param int    $business_id Row id in wp_fhint_business.
 	 * @param string $description The text as it now stands.
 	 * @param string $source      Where the wording came from.
+	 * @param int    $location_id A location's own description, or 0 for the business's.
 	 * @return bool Whether a version was written.
 	 */
-	public static function record( $business_id, $description, $source = self::SOURCE_USER ) {
+	public static function record( $business_id, $description, $source = self::SOURCE_USER, $location_id = 0 ) {
 		global $wpdb;
 
 		$business_id = (int) $business_id;
+		$location_id = (int) $location_id;
 		$description = trim( (string) $description );
 
 		if ( ! $business_id || '' === $description || ! Tables::exists( Tables::DESCRIPTION_HISTORY ) ) {
 			return false;
 		}
 
-		$newest = self::latest( $business_id, 1 );
+		$newest = self::latest( $business_id, 1, $location_id );
 
 		if ( $newest && $newest[0]['description'] === $description ) {
 			return false;
@@ -98,11 +102,31 @@ class DescriptionHistoryRepository {
 			Tables::name( Tables::DESCRIPTION_HISTORY ),
 			array(
 				'business_id' => $business_id,
+				'location_id' => $location_id,
 				'description' => $description,
 				'source'      => in_array( $source, $sources, true ) ? $source : self::SOURCE_USER,
 				'user_id'     => function_exists( 'get_current_user_id' ) ? (int) get_current_user_id() : 0,
 				'created_at'  => Validator::now(),
 			)
 		);
+	}
+
+	/**
+	 * Forget a location's own description history.
+	 *
+	 * @param int $location_id Row id in wp_fhint_locations.
+	 * @return bool
+	 */
+	public static function delete_for_location( $location_id ) {
+		global $wpdb;
+
+		$location_id = (int) $location_id;
+
+		if ( ! $location_id || ! Tables::exists( Tables::DESCRIPTION_HISTORY ) ) {
+			return false;
+		}
+
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+		return false !== $wpdb->delete( Tables::name( Tables::DESCRIPTION_HISTORY ), array( 'location_id' => $location_id ) );
 	}
 }

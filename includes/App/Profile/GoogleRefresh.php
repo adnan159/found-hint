@@ -55,7 +55,7 @@ class GoogleRefresh {
 	/**
 	 * Read the listing the selected location is mapped to.
 	 *
-	 * @return array|WP_Error `{ categories, service_types, attributes, answers, photos, failed }`.
+	 * @return array|WP_Error `{ categories, details, social, service_types, attributes, answers, photos, failed }`.
 	 */
 	public static function run() {
 		$ready = Publisher::ready();
@@ -73,6 +73,8 @@ class GoogleRefresh {
 		$location_name = $ready['location_name'];
 		$report        = array(
 			'categories'    => false,
+			'details'       => false,
+			'social'        => false,
 			'service_types' => null,
 			'attributes'    => null,
 			'answers'    => null,
@@ -83,12 +85,13 @@ class GoogleRefresh {
 
 		// The Maps id. Small, and nothing else depends on it, so a refusal
 		// here is not reported as a failure of the refresh.
-		$listing = Client::get( sprintf( self::LOCATION_URL, $location_name ), array( 'readMask' => 'metadata,categories' ) );
+		$listing = Client::get( sprintf( self::LOCATION_URL, $location_name ), array( 'readMask' => 'metadata,categories,title,profile' ) );
 
 		if ( ! is_wp_error( $listing ) ) {
 			GoogleLocationRepository::set_cid( $location_name, Profiles::cid( $listing ) );
 
 			$report['categories'] = self::fill_categories( $location, ImportMapper::categories( $listing ) );
+			$report['details']    = self::fill_details( $location, $listing );
 
 			// The services Google already knows for this listing's
 			// categories, for the service form to offer.
@@ -116,13 +119,14 @@ class GoogleRefresh {
 		} else {
 			$report['attributes'] = (int) $offered;
 
-			$answers = AttributeCatalog::fetch_values( $location_name );
+			$raw = AttributeCatalog::fetch_raw_values( $location_name );
 
-			if ( is_wp_error( $answers ) ) {
-				$errors[]           = $answers;
+			if ( is_wp_error( $raw ) ) {
+				$errors[]           = $raw;
 				$report['failed'][] = 'answers';
 			} else {
-				$report['answers'] = (int) LocationAttributeRepository::store_synced( (int) $location['id'], $answers );
+				$report['answers'] = (int) LocationAttributeRepository::store_synced( (int) $location['id'], AttributeCatalog::values_from_google( $raw ) );
+				$report['social']  = self::fill_social( $location, ImportMapper::social( $raw ) );
 			}
 		}
 
@@ -186,5 +190,57 @@ class GoogleRefresh {
 		}
 
 		return (bool) BusinessRepository::save( $values );
+	}
+
+	/**
+	 * Give a location that keeps its own details Google's name and
+	 * description, where it has none.
+	 *
+	 * Only a location that is not the primary one: the primary location's
+	 * name and description are the business's, which is never filled from a
+	 * refresh. And only an empty field — a name or description set here,
+	 * by hand or by import, is left alone.
+	 *
+	 * @param array $location The selected location.
+	 * @param array $listing  The listing as Google sent it.
+	 * @return bool Whether anything was written.
+	 */
+	private static function fill_details( array $location, array $listing ) {
+		if ( ! LocationCategories::kept_on_location( $location ) ) {
+			return false;
+		}
+
+		$theirs = array(
+			'business_name' => isset( $listing['title'] ) ? trim( (string) $listing['title'] ) : '',
+			'description'   => isset( $listing['profile']['description'] ) ? trim( (string) $listing['profile']['description'] ) : '',
+		);
+		$values = array();
+
+		foreach ( $theirs as $column => $value ) {
+			if ( '' !== $value && '' === trim( (string) $location[ $column ] ) ) {
+				$values[ $column ] = $value;
+			}
+		}
+
+		return $values ? (bool) LocationRepository::update( (int) $location['id'], $values ) : false;
+	}
+
+	/**
+	 * Give a location that keeps its own links Google's, when it has none.
+	 *
+	 * Only a location that is not the primary one, and only while it has no
+	 * links of its own at all (`NULL`): a set saved here — even an empty one
+	 * — is the owner's, and a refresh does not touch it.
+	 *
+	 * @param array $location The selected location.
+	 * @param array $links    Network => URL, as Google holds them.
+	 * @return bool Whether anything was written.
+	 */
+	private static function fill_social( array $location, array $links ) {
+		if ( ! $links || ! LocationCategories::kept_on_location( $location ) || is_array( $location['social_profiles'] ) ) {
+			return false;
+		}
+
+		return (bool) LocationRepository::update( (int) $location['id'], array( 'social_profiles' => $links ) );
 	}
 }

@@ -1390,3 +1390,49 @@ Google sign-in and six-step import) and `docs/frontend/business-profile.md`
 (the profile screen). Every endpoint is given with its method, a request
 sample, a response sample and its errors. `docs/SETUP-WIZARD-API.md` was
 folded into the first.
+
+## Step 32 — Switching to listings not yet imported
+
+`GET /profile` `meta.listings` lists every listing on the Google account. The
+switcher shows when there is more than one location-or-listing, so an account
+with two listings can switch before the second is imported. Choosing an
+unimported listing calls `POST /profile/listing` (`App\Profile\ListingOpener`),
+which creates a new location, links it, and imports only location-level
+fields — the business's shared name, description, social links and services
+are left alone.
+
+## Step 33 — Name, description, phone and website per location
+
+`fhint_locations` gained `business_name` and `description`
+(`fhint_description_history` gained `location_id`; DB 0.10.0).
+`App\Location\LocationDetails` resolves name, description, phone and website
+location first, business second, field by field — the rule categories already
+follow. The primary location's values are the business's. The profile save,
+the Google import (`write_location` for a non-primary location), the listing
+opener, the publish plan and the refresh (fills an empty name or description)
+all go through it. Social links and services are still shared.
+
+## Step 34 — Social links and services per location
+
+`fhint_locations.social_profiles` (NULL = use the business's; once set, the
+whole set is the location's) and `fhint_services.location_id` (0 = the
+business's own list, shown by the primary location), DB 0.11.0. Service slugs
+are unique per list: the unique key is now `(business_id, location_id, slug)`,
+and `Installer` drops the old `business_slug` key once. A non-primary location
+has its own service list from the start. The profile, import, listing opener,
+publish plan and refresh (fills a location's links when it has none) all go
+through `LocationDetails::social()` / `services_list()`. Deleting a location
+deletes its own services. The schema output, audit, dashboard and `/services`
+still read the business's own list.
+
+## Step 35 — Structured data per location
+
+The front end now prints `Graph::build_site()` (cached as `SchemaCache::site()`):
+one LocalBusiness per publishable location, each from its own `Nap`
+(name, description, links and type now resolve per location) and its own
+service list. The primary keeps `#localbusiness` / `#services`; others are
+`#localbusiness-{id}` / `#services-{id}`. Branches without a name of their own
+carry `parentOrganization`. Unpublishable locations are skipped individually.
+`fhint_schema_locations` filters which locations a page prints. The admin
+preview (`GET /schema`) and the audit still look at one location at a time;
+the audit now reads that location's own services.
