@@ -92,19 +92,19 @@ export default function DashboardPage() {
       id: "location",
       label: __("Add your address", "foundhint-local-seo"),
       done: Boolean(primary?.address_line_1 && primary?.city),
-      to: "/locations",
+      to: "/business?tab=address",
     },
     {
       id: "hours",
       label: __("Set your opening hours", "foundhint-local-seo"),
       done: Boolean(primary?.opening_hours?.has_any_hours),
-      to: primary ? `/locations/${primary.id}` : "/locations",
+      to: "/business?tab=hours",
     },
     {
       id: "services",
       label: __("List what you offer", "foundhint-local-seo"),
       done: services.length > 0,
-      to: "/services",
+      to: "/business?tab=services",
     },
   ];
 
@@ -264,7 +264,7 @@ export default function DashboardPage() {
             __("%d added", "foundhint-local-seo"),
             locationsData?.total ?? 0,
           )}
-          to="/locations"
+          to="/business?tab=address"
         />
         <StatCard
           icon={WrenchIcon}
@@ -274,7 +274,7 @@ export default function DashboardPage() {
             __("%d added", "foundhint-local-seo"),
             servicesData?.total ?? 0,
           )}
-          to="/services"
+          to="/business?tab=services"
         />
       </div>
     </>

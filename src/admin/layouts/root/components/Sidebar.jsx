@@ -41,8 +41,9 @@ const NAV_ITEMS = [
     to: "/business",
     label: () => __("Business", "foundhint-local-seo"),
   },
-  { to: "/locations", label: () => __("Locations", "foundhint-local-seo") },
-  { to: "/services", label: () => __("Services", "foundhint-local-seo") },
+  // Locations and services are tabs of the Business profile — every
+  // location is reached through its "Switch location" menu — so they have no
+  // rows of their own here.
   {
     to: "/schema",
     label: () => __("Schema", "foundhint-local-seo"),

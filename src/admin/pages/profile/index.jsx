@@ -184,6 +184,7 @@ export function Profile() {
         onSave={drafts.saveSection}
         onDiscard={drafts.discardSection}
         disabled={isSaving}
+        initialTab={params.get("tab") ?? ""}
       />
 
       {publishing ? (

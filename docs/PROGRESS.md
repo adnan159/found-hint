@@ -1436,3 +1436,13 @@ carry `parentOrganization`. Unpublishable locations are skipped individually.
 `fhint_schema_locations` filters which locations a page prints. The admin
 preview (`GET /schema`) and the audit still look at one location at a time;
 the audit now reads that location's own services.
+
+## Step 36 — Locations and Services screens removed
+
+Both are tabs of the Business profile now, so their sidebar rows and screens
+(`pages/locations`, `pages/services`) are gone. `#/locations`,
+`#/locations/{id}` and `#/services` redirect to `#/business` with `?tab=` (and
+`?location=`), which `ProfileTabs` reads as the tab to open. The dashboard's
+links point at the tabs. The `/locations` and `/services` REST routes stay —
+the dashboard, the plan line and the setup wizard still read them. The
+opening-hours editor the setup wizard uses moved to `pages/setup/components/`.

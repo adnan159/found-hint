@@ -18,7 +18,7 @@ import OpeningHoursEditor, {
   emptyHoursState,
   hoursToState,
   stateToPayload,
-} from "@/pages/locations/components/OpeningHoursEditor";
+} from "./OpeningHoursEditor";
 import StepActions from "./StepActions";
 
 /**

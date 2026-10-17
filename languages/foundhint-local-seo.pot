@@ -49,11 +49,11 @@ msgstr ""
 msgid "None of those services belong to this business."
 msgstr ""
 
-#: includes/Admin/Menu.php:55 includes/Admin/Menu.php:56 src/admin/components/PageHeader.jsx:37 src/admin/layouts/root/components/Sidebar.jsx:325 src/admin/layouts/root/components/Sidebar.jsx:344 src/admin/pages/setup/components/WizardShell.jsx:44
+#: includes/Admin/Menu.php:55 includes/Admin/Menu.php:56 src/admin/components/PageHeader.jsx:37 src/admin/layouts/root/components/Sidebar.jsx:326 src/admin/layouts/root/components/Sidebar.jsx:345 src/admin/pages/setup/components/WizardShell.jsx:44
 msgid "FoundHint"
 msgstr ""
 
-#: includes/Admin.php:42 src/admin/layouts/root/components/Sidebar.jsx:113 src/admin/pages/settings/index.jsx:87 src/admin/pages/settings/index.jsx:96
+#: includes/Admin.php:42 src/admin/layouts/root/components/Sidebar.jsx:114 src/admin/pages/settings/index.jsx:87 src/admin/pages/settings/index.jsx:96
 msgid "Settings"
 msgstr ""
 
@@ -707,99 +707,91 @@ msgstr ""
 msgid "Business"
 msgstr ""
 
-#: src/admin/layouts/root/components/Sidebar.jsx:44 src/admin/pages/dashboard/index.jsx:261 src/admin/pages/locations/index.jsx:53 src/admin/pages/locations/index.jsx:82
-msgid "Locations"
-msgstr ""
-
-#: src/admin/layouts/root/components/Sidebar.jsx:45 src/admin/pages/dashboard/index.jsx:271 src/admin/pages/google/components/ImportFromGoogle.jsx:64 src/admin/pages/profile/components/publish/labels.js:17 src/admin/pages/profile/tabs.jsx:191 src/admin/pages/services/index.jsx:124
-msgid "Services"
-msgstr ""
-
-#: src/admin/layouts/root/components/Sidebar.jsx:48 src/admin/pages/audit/index.jsx:42 src/admin/pages/schema/index.jsx:125 src/admin/pages/schema/index.jsx:152
+#: src/admin/layouts/root/components/Sidebar.jsx:49 src/admin/pages/audit/index.jsx:42 src/admin/pages/schema/index.jsx:125 src/admin/pages/schema/index.jsx:152
 msgid "Schema"
 msgstr ""
 
-#: src/admin/layouts/root/components/Sidebar.jsx:52 src/admin/pages/schema/index.jsx:165
+#: src/admin/layouts/root/components/Sidebar.jsx:53 src/admin/pages/schema/index.jsx:165
 msgid "Who publishes it"
 msgstr ""
 
-#: src/admin/layouts/root/components/Sidebar.jsx:56 src/admin/pages/schema/index.jsx:264
+#: src/admin/layouts/root/components/Sidebar.jsx:57 src/admin/pages/schema/index.jsx:264
 msgid "What gets published"
 msgstr ""
 
-#: src/admin/layouts/root/components/Sidebar.jsx:62 src/admin/pages/audit/index.jsx:157 src/admin/pages/audit/index.jsx:226 src/admin/pages/audit/index.jsx:246
+#: src/admin/layouts/root/components/Sidebar.jsx:63 src/admin/pages/audit/index.jsx:157 src/admin/pages/audit/index.jsx:226 src/admin/pages/audit/index.jsx:246
 msgid "SEO audit"
 msgstr ""
 
-#: src/admin/layouts/root/components/Sidebar.jsx:64 src/admin/pages/audit/index.jsx:268
+#: src/admin/layouts/root/components/Sidebar.jsx:65 src/admin/pages/audit/index.jsx:268
 msgid "Score"
 msgstr ""
 
-#: src/admin/layouts/root/components/Sidebar.jsx:67 src/admin/pages/audit/index.jsx:314
+#: src/admin/layouts/root/components/Sidebar.jsx:68 src/admin/pages/audit/index.jsx:314
 msgid "What to fix"
 msgstr ""
 
-#: src/admin/layouts/root/components/Sidebar.jsx:73 src/admin/pages/reviews/index.jsx:202 src/admin/pages/reviews/index.jsx:231 src/admin/pages/reviews/index.jsx:277
+#: src/admin/layouts/root/components/Sidebar.jsx:74 src/admin/pages/reviews/index.jsx:202 src/admin/pages/reviews/index.jsx:231 src/admin/pages/reviews/index.jsx:277
 msgid "Reviews"
 msgstr ""
 
-#: src/admin/layouts/root/components/Sidebar.jsx:77 src/admin/pages/reviews/index.jsx:249
+#: src/admin/layouts/root/components/Sidebar.jsx:78 src/admin/pages/reviews/index.jsx:249
 msgid "At a glance"
 msgstr ""
 
-#: src/admin/layouts/root/components/Sidebar.jsx:81 src/admin/pages/reviews/index.jsx:296
+#: src/admin/layouts/root/components/Sidebar.jsx:82 src/admin/pages/reviews/index.jsx:296
 msgid "Every review"
 msgstr ""
 
-#: src/admin/layouts/root/components/Sidebar.jsx:87
+#: src/admin/layouts/root/components/Sidebar.jsx:88
 msgid "Google"
 msgstr ""
 
-#: src/admin/layouts/root/components/Sidebar.jsx:91 src/admin/pages/google/index.jsx:428
+#: src/admin/layouts/root/components/Sidebar.jsx:92 src/admin/pages/google/index.jsx:428
 msgid "Google client"
 msgstr ""
 
-#: src/admin/layouts/root/components/Sidebar.jsx:95 src/admin/pages/google/index.jsx:544
+#: src/admin/layouts/root/components/Sidebar.jsx:96 src/admin/pages/google/index.jsx:544
 msgid "Connection"
 msgstr ""
 
-#: src/admin/layouts/root/components/Sidebar.jsx:99 src/admin/pages/google/components/BusinessProfiles.jsx:104
+#: src/admin/layouts/root/components/Sidebar.jsx:100 src/admin/pages/google/components/BusinessProfiles.jsx:104
 msgid "Business profiles"
 msgstr ""
 
-#: src/admin/layouts/root/components/Sidebar.jsx:103 src/admin/pages/google/components/LocationMapping.jsx:173
+#: src/admin/layouts/root/components/Sidebar.jsx:104 src/admin/pages/google/components/LocationMapping.jsx:173
 msgid "Location mapping"
 msgstr ""
 
-#: src/admin/layouts/root/components/Sidebar.jsx:107 src/admin/pages/google/components/ImportFromGoogle.jsx:172 src/admin/pages/setup/google.jsx:476
+#: src/admin/layouts/root/components/Sidebar.jsx:108 src/admin/pages/google/components/ImportFromGoogle.jsx:172 src/admin/pages/setup/google.jsx:476
 msgid "Import from Google"
 msgstr ""
 
-#: src/admin/layouts/root/components/Sidebar.jsx:117 src/admin/pages/settings/index.jsx:111
+#: src/admin/layouts/root/components/Sidebar.jsx:118 src/admin/pages/settings/index.jsx:111
 msgid "Your data"
 msgstr ""
 
-#: src/admin/layouts/root/components/Sidebar.jsx:121 src/admin/pages/settings/index.jsx:148
+#: src/admin/layouts/root/components/Sidebar.jsx:122 src/admin/pages/settings/index.jsx:148
 msgid "Activity log"
 msgstr ""
 
-#: src/admin/layouts/root/components/Sidebar.jsx:125 src/admin/pages/settings/index.jsx:231
+#: src/admin/layouts/root/components/Sidebar.jsx:126 src/admin/pages/settings/index.jsx:231
 msgid "System"
 msgstr ""
 
-#: src/admin/layouts/root/components/Sidebar.jsx:286
+#: src/admin/layouts/root/components/Sidebar.jsx:287
 msgid "Collapse section list"
 msgstr ""
 
-#: src/admin/layouts/root/components/Sidebar.jsx:287
+#: src/admin/layouts/root/components/Sidebar.jsx:288
 msgid "Expand section list"
 msgstr ""
 
-#: src/admin/layouts/root/components/Sidebar.jsx:347
+#: src/admin/layouts/root/components/Sidebar.jsx:348
 msgid "Local SEO"
 msgstr ""
 
-#: src/admin/layouts/root/components/Sidebar.jsx:377
+#: src/admin/layouts/root/components/Sidebar.jsx:378
 msgid "FoundHint Free"
 msgstr ""
 
@@ -1117,15 +1109,15 @@ msgstr ""
 msgid "Excellent"
 msgstr ""
 
-#: src/admin/pages/audit/index.jsx:40 src/admin/pages/locations/detail.jsx:184 src/admin/pages/locations/index.jsx:136
+#: src/admin/pages/audit/index.jsx:40
 msgid "Location"
 msgstr ""
 
-#: src/admin/pages/audit/index.jsx:41 src/admin/pages/locations/index.jsx:138 src/admin/pages/setup/index.jsx:75
+#: src/admin/pages/audit/index.jsx:41 src/admin/pages/setup/index.jsx:75
 msgid "Hours"
 msgstr ""
 
-#: src/admin/pages/audit/index.jsx:43 src/admin/pages/business/index.jsx:323 src/admin/pages/google/components/ImportFromGoogle.jsx:52 src/admin/pages/locations/detail.jsx:391 src/admin/pages/profile/components/InfoSection.jsx:52 src/admin/pages/profile/components/publish/labels.js:12
+#: src/admin/pages/audit/index.jsx:43 src/admin/pages/business/index.jsx:323 src/admin/pages/google/components/ImportFromGoogle.jsx:52 src/admin/pages/profile/components/InfoSection.jsx:52 src/admin/pages/profile/components/publish/labels.js:12 src/admin/pages/setup/components/BusinessStep.jsx:177
 msgid "Website"
 msgstr ""
 
@@ -1287,7 +1279,7 @@ msgstr ""
 msgid "In your own words, e.g. Grocery Store."
 msgstr ""
 
-#: src/admin/pages/business/index.jsx:266 src/admin/pages/google/components/ImportFromGoogle.jsx:54 src/admin/pages/profile/components/publish/labels.js:11 src/admin/pages/profile/components/services/ServiceDescriptionField.jsx:17 src/admin/pages/services/components/ServiceDialog.jsx:174
+#: src/admin/pages/business/index.jsx:266 src/admin/pages/google/components/ImportFromGoogle.jsx:54 src/admin/pages/profile/components/publish/labels.js:11 src/admin/pages/profile/components/services/ServiceDescriptionField.jsx:17
 msgid "Description"
 msgstr ""
 
@@ -1295,7 +1287,7 @@ msgstr ""
 msgid "A short summary of what you do and who you serve."
 msgstr ""
 
-#: src/admin/pages/business/index.jsx:286 src/admin/pages/locations/detail.jsx:354
+#: src/admin/pages/business/index.jsx:286
 msgid "Contact"
 msgstr ""
 
@@ -1303,11 +1295,11 @@ msgstr ""
 msgid "Locations can override these; leave a location's field empty to use the business value."
 msgstr ""
 
-#: src/admin/pages/business/index.jsx:295 src/admin/pages/google/components/BusinessProfiles.jsx:153 src/admin/pages/google/components/ImportFromGoogle.jsx:50 src/admin/pages/locations/detail.jsx:363 src/admin/pages/setup/components/BusinessStep.jsx:149
+#: src/admin/pages/business/index.jsx:295 src/admin/pages/google/components/BusinessProfiles.jsx:153 src/admin/pages/google/components/ImportFromGoogle.jsx:50 src/admin/pages/setup/components/BusinessStep.jsx:149
 msgid "Phone"
 msgstr ""
 
-#: src/admin/pages/business/index.jsx:309 src/admin/pages/locations/detail.jsx:377 src/admin/pages/setup/components/BusinessStep.jsx:163
+#: src/admin/pages/business/index.jsx:309 src/admin/pages/setup/components/BusinessStep.jsx:163
 msgid "Email"
 msgstr ""
 
@@ -1335,11 +1327,11 @@ msgstr ""
 msgid "Published as the profiles that belong to this business."
 msgstr ""
 
-#: src/admin/pages/business/index.jsx:436 src/admin/pages/locations/detail.jsx:508
+#: src/admin/pages/business/index.jsx:436
 msgid "Save changes"
 msgstr ""
 
-#: src/admin/pages/business/index.jsx:440 src/admin/pages/locations/detail.jsx:513 src/admin/pages/settings/index.jsx:223
+#: src/admin/pages/business/index.jsx:440 src/admin/pages/settings/index.jsx:223
 msgid "You have unsaved changes."
 msgstr ""
 
@@ -1535,7 +1527,7 @@ msgstr ""
 msgid "Read from Google"
 msgstr ""
 
-#: src/admin/pages/dashboard/components/GoogleCard.jsx:146 src/admin/pages/dashboard/index.jsx:298 src/admin/pages/locations/index.jsx:185
+#: src/admin/pages/dashboard/components/GoogleCard.jsx:146 src/admin/pages/dashboard/index.jsx:298
 msgid "Manage"
 msgstr ""
 
@@ -1675,8 +1667,16 @@ msgstr ""
 msgid "Not started"
 msgstr ""
 
+#: src/admin/pages/dashboard/index.jsx:261
+msgid "Locations"
+msgstr ""
+
 #: src/admin/pages/dashboard/index.jsx:264 src/admin/pages/dashboard/index.jsx:274
 msgid "%d added"
+msgstr ""
+
+#: src/admin/pages/dashboard/index.jsx:271 src/admin/pages/google/components/ImportFromGoogle.jsx:64 src/admin/pages/profile/components/publish/labels.js:17 src/admin/pages/profile/tabs.jsx:191 src/admin/pages/setup/components/DoneStep.jsx:9 src/admin/pages/setup/google.jsx:37
+msgid "Services"
 msgstr ""
 
 #: src/admin/pages/google/components/BusinessProfiles.jsx:30
@@ -1715,7 +1715,7 @@ msgstr ""
 msgid "Profile"
 msgstr ""
 
-#: src/admin/pages/google/components/BusinessProfiles.jsx:152 src/admin/pages/google/components/ImportFromGoogle.jsx:48 src/admin/pages/locations/detail.jsx:200 src/admin/pages/locations/index.jsx:137 src/admin/pages/setup/components/DoneStep.jsx:7 src/admin/pages/setup/index.jsx:74
+#: src/admin/pages/google/components/BusinessProfiles.jsx:152 src/admin/pages/google/components/ImportFromGoogle.jsx:48 src/admin/pages/setup/components/DoneStep.jsx:7 src/admin/pages/setup/index.jsx:74
 msgid "Address"
 msgstr ""
 
@@ -1731,7 +1731,7 @@ msgstr ""
 msgid "Not mapped"
 msgstr ""
 
-#: src/admin/pages/google/components/ImportFromGoogle.jsx:56 src/admin/pages/locations/detail.jsx:409 src/admin/pages/setup/components/DoneStep.jsx:8 src/admin/pages/setup/google.jsx:36
+#: src/admin/pages/google/components/ImportFromGoogle.jsx:56 src/admin/pages/setup/components/DoneStep.jsx:8 src/admin/pages/setup/google.jsx:36
 msgid "Opening hours"
 msgstr ""
 
@@ -1855,7 +1855,7 @@ msgstr ""
 msgid "Closest match: %s"
 msgstr ""
 
-#: src/admin/pages/google/components/LocationMapping.jsx:133 src/admin/pages/services/components/ServiceDialog.jsx:230
+#: src/admin/pages/google/components/LocationMapping.jsx:133
 msgid "Link"
 msgstr ""
 
@@ -1871,7 +1871,7 @@ msgstr ""
 msgid "Say which Google profile is which of your locations. Nothing is linked for you."
 msgstr ""
 
-#: src/admin/pages/google/components/LocationMapping.jsx:184 src/admin/pages/locations/index.jsx:115
+#: src/admin/pages/google/components/LocationMapping.jsx:184
 msgid "No locations yet"
 msgstr ""
 
@@ -2031,222 +2031,6 @@ msgstr ""
 msgid "Add your Google client ID and secret above first — this button will take you to them."
 msgstr ""
 
-#: src/admin/pages/locations/components/OpeningHoursEditor.jsx:142 src/admin/pages/locations/components/OpeningHoursEditor.jsx:203 src/admin/pages/locations/index.jsx:166 src/admin/pages/profile/components/hours/WeekDayRow.jsx:84 src/admin/pages/profile/components/photos/PhotoSlot.jsx:60
-msgid "Not set"
-msgstr ""
-
-#: src/admin/pages/locations/components/OpeningHoursEditor.jsx:143 src/admin/pages/locations/components/OpeningHoursEditor.jsx:206 src/admin/pages/profile/components/hours/SpecialDayRow.jsx:59 src/admin/pages/profile/components/hours/WeekDayRow.jsx:86
-msgid "Open"
-msgstr ""
-
-#: src/admin/pages/locations/components/OpeningHoursEditor.jsx:144 src/admin/pages/locations/components/OpeningHoursEditor.jsx:209 src/admin/pages/profile/components/hours/SpecialDayRow.jsx:60 src/admin/pages/profile/components/hours/WeekDayRow.jsx:87
-msgid "Closed"
-msgstr ""
-
-#: src/admin/pages/locations/components/OpeningHoursEditor.jsx:147 src/admin/pages/locations/components/OpeningHoursEditor.jsx:212 src/admin/pages/profile/components/hours/DayTimes.jsx:36
-msgid "Open 24 hours"
-msgstr ""
-
-#: src/admin/pages/locations/components/OpeningHoursEditor.jsx:194
-msgid "Opening hours for %s"
-msgstr ""
-
-#: src/admin/pages/locations/components/OpeningHoursEditor.jsx:242
-msgid "Opens on %s"
-msgstr ""
-
-#: src/admin/pages/locations/components/OpeningHoursEditor.jsx:252 src/admin/pages/profile/components/hours/DayTimes.jsx:73
-msgid "to"
-msgstr ""
-
-#: src/admin/pages/locations/components/OpeningHoursEditor.jsx:261
-msgid "Closes on %s"
-msgstr ""
-
-#: src/admin/pages/locations/components/OpeningHoursEditor.jsx:275
-msgid "Remove this period"
-msgstr ""
-
-#: src/admin/pages/locations/components/OpeningHoursEditor.jsx:317
-msgid "Split shift"
-msgstr ""
-
-#: src/admin/pages/locations/detail.jsx:53 src/admin/pages/locations/index.jsx:31 src/admin/pages/services/components/ServiceDialog.jsx:40 src/admin/pages/services/index.jsx:203
-msgid "Active"
-msgstr ""
-
-#: src/admin/pages/locations/detail.jsx:54 src/admin/pages/locations/index.jsx:32 src/admin/pages/services/components/ServiceDialog.jsx:41 src/admin/pages/services/index.jsx:204
-msgid "Inactive"
-msgstr ""
-
-#: src/admin/pages/locations/detail.jsx:55 src/admin/pages/locations/index.jsx:33
-msgid "Temporarily closed"
-msgstr ""
-
-#: src/admin/pages/locations/detail.jsx:56 src/admin/pages/locations/index.jsx:34
-msgid "Permanently closed"
-msgstr ""
-
-#: src/admin/pages/locations/detail.jsx:146
-msgid "Location added."
-msgstr ""
-
-#: src/admin/pages/locations/detail.jsx:154
-msgid "Location saved."
-msgstr ""
-
-#: src/admin/pages/locations/detail.jsx:163
-msgid "Location deleted."
-msgstr ""
-
-#: src/admin/pages/locations/detail.jsx:166
-msgid "Could not delete the location."
-msgstr ""
-
-#: src/admin/pages/locations/detail.jsx:174
-msgid "Loading location…"
-msgstr ""
-
-#: src/admin/pages/locations/detail.jsx:183 src/admin/pages/locations/detail.jsx:507 src/admin/pages/locations/index.jsx:90
-msgid "Add location"
-msgstr ""
-
-#: src/admin/pages/locations/detail.jsx:189 src/admin/pages/reviews/index.jsx:310 src/admin/pages/reviews/index.jsx:314 src/admin/pages/reviews/index.jsx:320
-msgid "All locations"
-msgstr ""
-
-#: src/admin/pages/locations/detail.jsx:207 src/admin/pages/setup/components/LocationStep.jsx:91
-msgid "Location name"
-msgstr ""
-
-#: src/admin/pages/locations/detail.jsx:220
-msgid "For example Downtown, or Main Office."
-msgstr ""
-
-#: src/admin/pages/locations/detail.jsx:230 src/admin/pages/profile/components/AddressSection.jsx:56 src/admin/pages/setup/components/LocationStep.jsx:117
-msgid "Street address"
-msgstr ""
-
-#: src/admin/pages/locations/detail.jsx:245
-msgid "Suite, unit or floor"
-msgstr ""
-
-#: src/admin/pages/locations/detail.jsx:256 src/admin/pages/profile/components/AddressSection.jsx:61 src/admin/pages/setup/components/LocationStep.jsx:132
-msgid "City"
-msgstr ""
-
-#: src/admin/pages/locations/detail.jsx:269 src/admin/pages/profile/components/AddressSection.jsx:62 src/admin/pages/setup/components/LocationStep.jsx:145
-msgid "State or region"
-msgstr ""
-
-#: src/admin/pages/locations/detail.jsx:282 src/admin/pages/profile/components/AddressSection.jsx:63 src/admin/pages/setup/components/LocationStep.jsx:158
-msgid "Postal code"
-msgstr ""
-
-#: src/admin/pages/locations/detail.jsx:293 src/admin/pages/profile/components/AddressSection.jsx:64 src/admin/pages/setup/components/LocationStep.jsx:169
-msgid "Country"
-msgstr ""
-
-#: src/admin/pages/locations/detail.jsx:307 src/admin/pages/setup/components/LocationStep.jsx:183
-msgid "Two-letter country code."
-msgstr ""
-
-#: src/admin/pages/locations/detail.jsx:314
-msgid "Latitude"
-msgstr ""
-
-#: src/admin/pages/locations/detail.jsx:327
-msgid "Leave empty if you don't know it."
-msgstr ""
-
-#: src/admin/pages/locations/detail.jsx:337
-msgid "Longitude"
-msgstr ""
-
-#: src/admin/pages/locations/detail.jsx:355
-msgid "Leave a field empty to use the business value."
-msgstr ""
-
-#: src/admin/pages/locations/detail.jsx:410
-msgid "A day left as Not set publishes nothing — which is different from being closed."
-msgstr ""
-
-#: src/admin/pages/locations/detail.jsx:425 src/admin/pages/locations/detail.jsx:429 src/admin/pages/locations/index.jsx:139 src/admin/pages/services/components/ServiceDialog.jsx:245 src/admin/pages/services/index.jsx:180
-msgid "Status"
-msgstr ""
-
-#: src/admin/pages/locations/detail.jsx:459 src/admin/pages/settings/index.jsx:271
-msgid "Time zone"
-msgstr ""
-
-#: src/admin/pages/locations/detail.jsx:490
-msgid "Primary location"
-msgstr ""
-
-#: src/admin/pages/locations/detail.jsx:493
-msgid "Used wherever a single place is needed. Only one location can be primary."
-msgstr ""
-
-#: src/admin/pages/locations/detail.jsx:525 src/admin/pages/locations/detail.jsx:549
-msgid "Delete location"
-msgstr ""
-
-#: src/admin/pages/locations/detail.jsx:535
-msgid "Delete this location?"
-msgstr ""
-
-#: src/admin/pages/locations/detail.jsx:538
-msgid "Its opening hours go with it. This cannot be undone."
-msgstr ""
-
-#: src/admin/pages/locations/detail.jsx:546 src/admin/pages/services/index.jsx:311
-msgid "Keep it"
-msgstr ""
-
-#: src/admin/pages/locations/index.jsx:60
-msgid "Add your business first"
-msgstr ""
-
-#: src/admin/pages/locations/index.jsx:63
-msgid "A location belongs to a business, so start with your business details."
-msgstr ""
-
-#: src/admin/pages/locations/index.jsx:71
-msgid "Go to Business"
-msgstr ""
-
-#: src/admin/pages/locations/index.jsx:83
-msgid "Where you trade from. Leave a contact field empty and the business value is used instead."
-msgstr ""
-
-#: src/admin/pages/locations/index.jsx:97
-msgid "Could not load locations"
-msgstr ""
-
-#: src/admin/pages/locations/index.jsx:118
-msgid "Add the address customers visit. It is what puts you on the map."
-msgstr ""
-
-#: src/admin/pages/locations/index.jsx:127
-msgid "Add your first location"
-msgstr ""
-
-#: src/admin/pages/locations/index.jsx:141 src/admin/pages/services/index.jsx:182
-msgid "Actions"
-msgstr ""
-
-#: src/admin/pages/locations/index.jsx:152
-msgid "Primary"
-msgstr ""
-
-#: src/admin/pages/locations/index.jsx:163
-msgid "%d periods"
-msgstr ""
-
-#: src/admin/pages/locations/index.jsx:199
-msgid "Your plan includes %d location. Multi-location management is a Pro feature."
-msgstr ""
-
 #: src/admin/pages/not-found/index.jsx:7
 msgid "Page not found"
 msgstr ""
@@ -2255,8 +2039,28 @@ msgstr ""
 msgid "For your safety, Google does not let apps change a verified address. To move your address, update it in your Google Business Profile and FoundHint will pick up the change on the next sync."
 msgstr ""
 
+#: src/admin/pages/profile/components/AddressSection.jsx:56 src/admin/pages/setup/components/LocationStep.jsx:117
+msgid "Street address"
+msgstr ""
+
 #: src/admin/pages/profile/components/AddressSection.jsx:59
 msgid "Suite, floor or unit"
+msgstr ""
+
+#: src/admin/pages/profile/components/AddressSection.jsx:61 src/admin/pages/setup/components/LocationStep.jsx:132
+msgid "City"
+msgstr ""
+
+#: src/admin/pages/profile/components/AddressSection.jsx:62 src/admin/pages/setup/components/LocationStep.jsx:145
+msgid "State or region"
+msgstr ""
+
+#: src/admin/pages/profile/components/AddressSection.jsx:63 src/admin/pages/setup/components/LocationStep.jsx:158
+msgid "Postal code"
+msgstr ""
+
+#: src/admin/pages/profile/components/AddressSection.jsx:64 src/admin/pages/setup/components/LocationStep.jsx:169
+msgid "Country"
 msgstr ""
 
 #: src/admin/pages/profile/components/AddressSection.jsx:68
@@ -2399,7 +2203,7 @@ msgstr ""
 msgid "Not saved"
 msgstr ""
 
-#: src/admin/pages/profile/components/ProfileTabs.jsx:54
+#: src/admin/pages/profile/components/ProfileTabs.jsx:59
 msgid "Profile sections"
 msgstr ""
 
@@ -2431,7 +2235,7 @@ msgstr ""
 msgid "Close"
 msgstr ""
 
-#: src/admin/pages/profile/components/PublishDialog.jsx:124 src/admin/pages/profile/components/ServiceDialog.jsx:200 src/admin/pages/services/components/ServiceDialog.jsx:305
+#: src/admin/pages/profile/components/PublishDialog.jsx:124 src/admin/pages/profile/components/ServiceDialog.jsx:200
 msgid "Cancel"
 msgstr ""
 
@@ -2459,11 +2263,11 @@ msgstr ""
 msgid "Discard"
 msgstr ""
 
-#: src/admin/pages/profile/components/ServiceDialog.jsx:116 src/admin/pages/services/components/ServiceDialog.jsx:139 src/admin/pages/services/components/ServiceDialog.jsx:311 src/admin/pages/services/index.jsx:132
+#: src/admin/pages/profile/components/ServiceDialog.jsx:116
 msgid "Add service"
 msgstr ""
 
-#: src/admin/pages/profile/components/ServiceDialog.jsx:117 src/admin/pages/services/components/ServiceDialog.jsx:138
+#: src/admin/pages/profile/components/ServiceDialog.jsx:117
 msgid "Edit service"
 msgstr ""
 
@@ -2471,7 +2275,7 @@ msgstr ""
 msgid "This service is shown on your Google profile and in your website markup."
 msgstr ""
 
-#: src/admin/pages/profile/components/ServiceDialog.jsx:210 src/admin/pages/services/components/ServiceDialog.jsx:310
+#: src/admin/pages/profile/components/ServiceDialog.jsx:210
 msgid "Save service"
 msgstr ""
 
@@ -2503,7 +2307,7 @@ msgstr ""
 msgid "No description yet."
 msgstr ""
 
-#: src/admin/pages/profile/components/ServicesSection.jsx:177 src/admin/pages/services/index.jsx:241
+#: src/admin/pages/profile/components/ServicesSection.jsx:177
 msgid "Edit %s"
 msgstr ""
 
@@ -2641,12 +2445,20 @@ msgstr ""
 msgid "Choose a listing"
 msgstr ""
 
+#: src/admin/pages/profile/components/hours/DayTimes.jsx:36 src/admin/pages/setup/components/OpeningHoursEditor.jsx:147 src/admin/pages/setup/components/OpeningHoursEditor.jsx:212
+msgid "Open 24 hours"
+msgstr ""
+
 #: src/admin/pages/profile/components/hours/DayTimes.jsx:44
 msgid "Set custom hours"
 msgstr ""
 
 #: src/admin/pages/profile/components/hours/DayTimes.jsx:67
 msgid "%s opens at"
+msgstr ""
+
+#: src/admin/pages/profile/components/hours/DayTimes.jsx:73 src/admin/pages/setup/components/OpeningHoursEditor.jsx:252
+msgid "to"
 msgstr ""
 
 #: src/admin/pages/profile/components/hours/DayTimes.jsx:84
@@ -2677,6 +2489,14 @@ msgstr ""
 msgid "%s is open"
 msgstr ""
 
+#: src/admin/pages/profile/components/hours/SpecialDayRow.jsx:59 src/admin/pages/profile/components/hours/WeekDayRow.jsx:86 src/admin/pages/setup/components/OpeningHoursEditor.jsx:143 src/admin/pages/setup/components/OpeningHoursEditor.jsx:206
+msgid "Open"
+msgstr ""
+
+#: src/admin/pages/profile/components/hours/SpecialDayRow.jsx:60 src/admin/pages/profile/components/hours/WeekDayRow.jsx:87 src/admin/pages/setup/components/OpeningHoursEditor.jsx:144 src/admin/pages/setup/components/OpeningHoursEditor.jsx:209
+msgid "Closed"
+msgstr ""
+
 #: src/admin/pages/profile/components/hours/WeekDayRow.jsx:43
 msgid "Not set yet"
 msgstr ""
@@ -2691,6 +2511,10 @@ msgstr ""
 
 #: src/admin/pages/profile/components/hours/WeekDayRow.jsx:60
 msgid "Copy to all"
+msgstr ""
+
+#: src/admin/pages/profile/components/hours/WeekDayRow.jsx:84 src/admin/pages/profile/components/photos/PhotoSlot.jsx:60 src/admin/pages/setup/components/OpeningHoursEditor.jsx:142 src/admin/pages/setup/components/OpeningHoursEditor.jsx:203
+msgid "Not set"
 msgstr ""
 
 #: src/admin/pages/profile/components/info/DescriptionField.jsx:54 src/admin/pages/profile/components/info/DescriptionField.jsx:57
@@ -2931,7 +2755,7 @@ msgstr ""
 msgid "Please add a name for this service."
 msgstr ""
 
-#: src/admin/pages/profile/components/services/PriceField.jsx:33 src/admin/pages/services/components/ServiceDialog.jsx:186 src/admin/pages/services/index.jsx:179
+#: src/admin/pages/profile/components/services/PriceField.jsx:33
 msgid "Price"
 msgstr ""
 
@@ -2943,7 +2767,7 @@ msgstr ""
 msgid "Shown next to the service on Google. Leave it empty if the price depends on the visit."
 msgstr ""
 
-#: src/admin/pages/profile/components/services/PriceField.jsx:49 src/admin/pages/services/components/ServiceDialog.jsx:209
+#: src/admin/pages/profile/components/services/PriceField.jsx:49
 msgid "Currency"
 msgstr ""
 
@@ -3159,6 +2983,10 @@ msgstr ""
 msgid "Waiting on a reply"
 msgstr ""
 
+#: src/admin/pages/reviews/index.jsx:310 src/admin/pages/reviews/index.jsx:314 src/admin/pages/reviews/index.jsx:320
+msgid "All locations"
+msgstr ""
+
 #: src/admin/pages/reviews/index.jsx:341
 msgid "Only those needing a reply"
 msgstr ""
@@ -3291,102 +3119,6 @@ msgstr ""
 msgid "Could not copy. Select the text instead."
 msgstr ""
 
-#: src/admin/pages/services/components/ServiceDialog.jsx:116
-msgid "Service updated."
-msgstr ""
-
-#: src/admin/pages/services/components/ServiceDialog.jsx:119
-msgid "Service added."
-msgstr ""
-
-#: src/admin/pages/services/components/ServiceDialog.jsx:142
-msgid "Services appear in your structured data and on your location pages."
-msgstr ""
-
-#: src/admin/pages/services/components/ServiceDialog.jsx:157
-msgid "Name"
-msgstr ""
-
-#: src/admin/pages/services/components/ServiceDialog.jsx:199
-msgid "Leave empty to publish no price."
-msgstr ""
-
-#: src/admin/pages/services/components/ServiceDialog.jsx:223
-msgid "Required when a price is set."
-msgstr ""
-
-#: src/admin/pages/services/components/ServiceDialog.jsx:277
-msgid "URL slug"
-msgstr ""
-
-#: src/admin/pages/services/components/ServiceDialog.jsx:289
-msgid "Renaming the service does not change this, because it may already be in a published link."
-msgstr ""
-
-#: src/admin/pages/services/index.jsx:102
-msgid "Could not reorder the services."
-msgstr ""
-
-#: src/admin/pages/services/index.jsx:113
-msgid "Service deleted."
-msgstr ""
-
-#: src/admin/pages/services/index.jsx:115
-msgid "Could not delete the service."
-msgstr ""
-
-#: src/admin/pages/services/index.jsx:125
-msgid "What you offer. The order here is the order they are published in."
-msgstr ""
-
-#: src/admin/pages/services/index.jsx:139
-msgid "Could not load services"
-msgstr ""
-
-#: src/admin/pages/services/index.jsx:157
-msgid "No services yet"
-msgstr ""
-
-#: src/admin/pages/services/index.jsx:160
-msgid "Add the things you actually sell. Search engines use them to tell what your business does."
-msgstr ""
-
-#: src/admin/pages/services/index.jsx:169
-msgid "Add your first service"
-msgstr ""
-
-#: src/admin/pages/services/index.jsx:178
-msgid "Service"
-msgstr ""
-
-#: src/admin/pages/services/index.jsx:216
-msgid "Move %s up"
-msgstr ""
-
-#: src/admin/pages/services/index.jsx:229
-msgid "Move %s down"
-msgstr ""
-
-#: src/admin/pages/services/index.jsx:253
-msgid "Delete %s"
-msgstr ""
-
-#: src/admin/pages/services/index.jsx:272
-msgid "You are using all %d services included in your plan."
-msgstr ""
-
-#: src/admin/pages/services/index.jsx:294
-msgid "Delete this service?"
-msgstr ""
-
-#: src/admin/pages/services/index.jsx:300
-msgid "%s will be removed from your structured data. This cannot be undone."
-msgstr ""
-
-#: src/admin/pages/services/index.jsx:314
-msgid "Delete service"
-msgstr ""
-
 #: src/admin/pages/settings/index.jsx:63
 msgid "Settings saved."
 msgstr ""
@@ -3475,6 +3207,10 @@ msgstr ""
 msgid "WordPress version"
 msgstr ""
 
+#: src/admin/pages/settings/index.jsx:271
+msgid "Time zone"
+msgstr ""
+
 #: src/admin/pages/setup/components/BusinessStep.jsx:106
 msgid "Exactly as customers know you."
 msgstr ""
@@ -3519,8 +3255,36 @@ msgstr ""
 msgid "Continue"
 msgstr ""
 
+#: src/admin/pages/setup/components/LocationStep.jsx:91
+msgid "Location name"
+msgstr ""
+
 #: src/admin/pages/setup/components/LocationStep.jsx:104
 msgid "Something you would recognise, like Downtown or Main Office."
+msgstr ""
+
+#: src/admin/pages/setup/components/LocationStep.jsx:183
+msgid "Two-letter country code."
+msgstr ""
+
+#: src/admin/pages/setup/components/OpeningHoursEditor.jsx:194
+msgid "Opening hours for %s"
+msgstr ""
+
+#: src/admin/pages/setup/components/OpeningHoursEditor.jsx:242
+msgid "Opens on %s"
+msgstr ""
+
+#: src/admin/pages/setup/components/OpeningHoursEditor.jsx:261
+msgid "Closes on %s"
+msgstr ""
+
+#: src/admin/pages/setup/components/OpeningHoursEditor.jsx:275
+msgid "Remove this period"
+msgstr ""
+
+#: src/admin/pages/setup/components/OpeningHoursEditor.jsx:317
+msgid "Split shift"
 msgstr ""
 
 #: src/admin/pages/setup/components/ServicesStep.jsx:65

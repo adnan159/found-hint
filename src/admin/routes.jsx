@@ -1,16 +1,13 @@
-import { createHashRouter } from "react-router";
+import { Navigate, createHashRouter, useParams } from "react-router";
 import RootLayout from "./layouts/root";
 import Audit from "./pages/audit";
 import Business from "./pages/business";
 import Dashboard from "./pages/dashboard";
 import Google from "./pages/google";
-import LocationDetail from "./pages/locations/detail";
-import Locations from "./pages/locations";
 import Reviews from "./pages/reviews";
 import Schema from "./pages/schema";
 import NotFound from "./pages/not-found";
 import Profile from "./pages/profile";
-import Services from "./pages/services";
 import Setup from "./pages/setup";
 import SetupGoogle from "./pages/setup/google";
 import Settings from "./pages/settings";
@@ -25,6 +22,16 @@ import Settings from "./pages/settings";
  * prototype's Landing Pages, Ranking Grid and Performance screens have no
  * engine yet, so they are absent rather than empty.
  */
+/**
+ * An old link to one location: that location's profile, on its address tab.
+ */
+function LocationRedirect() {
+  const { id } = useParams();
+  const location = Number(id) > 0 ? `&location=${Number(id)}` : "";
+
+  return <Navigate to={`/business?tab=address${location}`} replace />;
+}
+
 export const router = createHashRouter([
   {
     path: "/",
@@ -38,11 +45,19 @@ export const router = createHashRouter([
       { path: "business", element: <Profile /> },
       { path: "business/details", element: <Business /> },
       { path: "google", element: <Google /> },
-      { path: "locations", element: <Locations /> },
-      { path: "locations/:id", element: <LocationDetail /> },
+      // The old Locations and Services screens are tabs of the Business
+      // profile now. Their addresses still work, and land on the right tab.
+      {
+        path: "locations",
+        element: <Navigate to="/business?tab=address" replace />,
+      },
+      { path: "locations/:id", element: <LocationRedirect /> },
       { path: "reviews", element: <Reviews /> },
       { path: "schema", element: <Schema /> },
-      { path: "services", element: <Services /> },
+      {
+        path: "services",
+        element: <Navigate to="/business?tab=services" replace />,
+      },
       { path: "settings", element: <Settings /> },
       { path: "setup", element: <Setup /> },
       // Where a first Google sign-in lands: the guided import.

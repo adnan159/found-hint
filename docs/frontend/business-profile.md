@@ -3,7 +3,12 @@
 The Business Profile is one screen with seven collapsible sections: business
 information, address, hours, social links, attributes, services and photos.
 
-- Screen route: `#/business` (optionally `#/business?location=2`)
+- Screen route: `#/business`, optionally with `?location=2` (which location)
+  and `?tab=hours` (which tab opens: `info`, `address`, `hours`, `social`,
+  `attributes`, `services`, `media`)
+- There are no separate Locations or Services screens: the old addresses
+  `#/locations`, `#/locations/{id}` and `#/services` redirect here, to the
+  matching tab and location
 - Reference code: `src/admin/pages/profile/`,
   `src/admin/store/api/profileApi.js`
 - The setup flow that leads here is in [setup-widget.md](setup-widget.md).

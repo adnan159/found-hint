@@ -40,8 +40,13 @@ export function ProfileTabs({
   onSave,
   onDiscard,
   disabled,
+  initialTab,
 }) {
-  const [activeTab, setActiveTab] = useState(tabs[0].id);
+  // A link can name the tab to open on (`#/business?tab=hours`); anything
+  // that is not a tab opens the first one.
+  const [activeTab, setActiveTab] = useState(
+    tabs.some((tab) => tab.id === initialTab) ? initialTab : tabs[0].id,
+  );
 
   return (
     <Tabs
