@@ -37,6 +37,7 @@ use FHINT\App\Business\DescriptionHistoryRepository;
 use FHINT\App\Location\LocationAttributeRepository;
 use FHINT\App\Media\MediaRepository;
 use FHINT\App\Nap\Nap;
+use FHINT\App\Review\ReviewReply;
 use FHINT\App\Review\ReviewRepository;
 use FHINT\App\Review\Reviews as ReviewService;
 use FHINT\App\Schema\Graph;
@@ -1431,6 +1432,201 @@ check_same( 1, count( $listing['items'] ), 'the listing returns the stored revie
 check( $listing['items'][0]['needs_reply'], 'and marks it as needing a reply' );
 check_same( 1, $listing['total'], 'with a total that ignores paging' );
 
+// -- Replying to a review, with Google answered in-process ------------------
+//
+// A reply is public the moment Google takes it, so what is sent — and that
+// nothing is stored unless Google said yes — is the thing to be sure of.
+
+$fhint_reply_calls  = array();
+$fhint_reply_answer = array( 200, array() );
+$fhint_fake_reply   = static function ( $pre, $args, $url ) use ( &$fhint_reply_calls, &$fhint_reply_answer ) {
+	if ( false === strpos( (string) $url, '/reply' ) ) {
+		return $pre;
+	}
+
+	$fhint_reply_calls[] = array(
+		'method' => isset( $args['method'] ) ? strtoupper( (string) $args['method'] ) : 'GET',
+		'url'    => (string) $url,
+		'body'   => isset( $args['body'] ) ? json_decode( (string) $args['body'], true ) : null,
+	);
+
+	return array(
+		'headers'  => array(),
+		'body'     => wp_json_encode( $fhint_reply_answer[1] ),
+		'response' => array(
+			'code'    => $fhint_reply_answer[0],
+			'message' => '',
+		),
+		'cookies'  => array(),
+	);
+};
+
+add_filter( 'pre_http_request', $fhint_fake_reply, 10, 3 );
+
+$fhint_result = ReviewReply::save( 'rev-unknown', 'Thanks!' );
+check( is_wp_error( $fhint_result ) && 'fhint_review_not_found' === $fhint_result->get_error_code(), 'a reply to a review this site never read is refused' );
+check_same( 404, $fhint_result->get_error_data()['status'], 'as not found' );
+
+$fhint_result = ReviewReply::save( 'rev-9', "  \n " );
+check( $fhint_result instanceof FHINT\App\Core\ValidationResult, 'a blank reply is refused before anything is sent' );
+check_same( array(), $fhint_reply_calls, 'so Google is never asked' );
+
+$fhint_reply_answer = array(
+	200,
+	array(
+		'comment'    => 'Thank you, Asha!',
+		'updateTime' => '2026-10-18T08:30:00.5Z',
+	),
+);
+
+$fhint_result = ReviewReply::save( 'rev-9', '<b>Thank you, Asha!</b>' );
+check( is_array( $fhint_result ) && ! is_wp_error( $fhint_result ), 'a reply is posted' );
+check_same( 'PUT', $fhint_reply_calls[0]['method'], 'with PUT' );
+check_same( 'https://mybusiness.googleapis.com/v4/accounts/1/locations/1/reviews/rev-9/reply', $fhint_reply_calls[0]['url'], 'to the review the stored row names' );
+check_same( array( 'comment' => 'Thank you, Asha!' ), $fhint_reply_calls[0]['body'], 'carrying the reply as plain text' );
+check_same( 'Thank you, Asha!', ReviewRepository::find( 'rev-9' )['reply_comment'], 'and the reply is stored' );
+check_same( '2026-10-18 08:30:00', ReviewRepository::find( 'rev-9' )['replied_at'], "stamped with Google's time" );
+check( ! $fhint_result['needs_reply'], 'so the review no longer needs a reply' );
+
+// Google refuses: the stored reply stays what the public sees.
+$fhint_reply_answer = array(
+	400,
+	array(
+		'error' => array(
+			'code'    => 400,
+			'message' => 'Request contains an invalid argument.',
+			'status'  => 'INVALID_ARGUMENT',
+		),
+	),
+);
+
+$fhint_result = ReviewReply::save( 'rev-9', 'An edit Google will refuse.' );
+check( is_wp_error( $fhint_result ), "a reply Google refuses is reported as an error" );
+check_same( 'Thank you, Asha!', ReviewRepository::find( 'rev-9' )['reply_comment'], 'and the stored reply is left as Google has it' );
+
+$fhint_result = ReviewReply::delete( 'rev-9' );
+check( is_wp_error( $fhint_result ), 'a delete Google refuses is reported' );
+check_same( 'Thank you, Asha!', ReviewRepository::find( 'rev-9' )['reply_comment'], 'and the reply is kept' );
+
+$fhint_reply_calls  = array();
+$fhint_reply_answer = array( 200, array() );
+
+$fhint_result = ReviewReply::delete( 'rev-9' );
+check_same( 'DELETE', $fhint_reply_calls[0]['method'], 'a reply is removed with DELETE' );
+check_same( '', ReviewRepository::find( 'rev-9' )['reply_comment'], 'and the stored reply is cleared' );
+check( null === ReviewRepository::find( 'rev-9' )['replied_at'], 'with its date' );
+check( $fhint_result['needs_reply'], 'so the review needs a reply again' );
+
+// Removed on Google already: the owner's goal holds, so the copy catches up.
+ReviewRepository::set_reply( 'rev-9', 'Removed on Google itself.', '2026-10-01 00:00:00' );
+$fhint_reply_answer = array( 404, array( 'error' => array( 'code' => 404, 'status' => 'NOT_FOUND' ) ) );
+
+$fhint_result = ReviewReply::delete( 'rev-9' );
+check( ! is_wp_error( $fhint_result ), 'deleting a reply Google no longer has succeeds' );
+check_same( '', ReviewRepository::find( 'rev-9' )['reply_comment'], 'and clears the stale copy' );
+
+// Over REST, as the screen calls it.
+$fhint_admin = get_users( array( 'role' => 'administrator', 'number' => 1 ) );
+
+if ( $fhint_admin ) {
+	wp_set_current_user( $fhint_admin[0]->ID );
+
+	$fhint_reply_answer = array( 200, array( 'comment' => 'See you again!' ) );
+
+	$fhint_request = new WP_REST_Request( 'PUT', '/fhint/v1/reviews/rev-9/reply' );
+	$fhint_request->set_param( 'comment', 'See you again!' );
+	$fhint_response = rest_do_request( $fhint_request );
+
+	check_same( 200, $fhint_response->get_status(), 'PUT /reviews/{id}/reply answers' );
+	check_same( 'See you again!', $fhint_response->get_data()['data']['reply_comment'], 'with the review as now stored' );
+	check_same( 0, $fhint_response->get_data()['meta']['state']['unanswered'], "and that listing's counts, so the screen's figures move with it" );
+
+	$fhint_request = new WP_REST_Request( 'PUT', '/fhint/v1/reviews/rev-9/reply' );
+	$fhint_request->set_param( 'comment', '' );
+	$fhint_response = rest_do_request( $fhint_request );
+
+	check_same( 400, $fhint_response->get_status(), 'an empty reply over REST is a 400' );
+	check_same( array( 'review.reply.required' ), $fhint_response->get_data()['data']['fields']['comment'], 'with the code on the comment field' );
+
+	$fhint_request = new WP_REST_Request( 'PUT', '/fhint/v1/reviews/rev-nope/reply' );
+	$fhint_request->set_param( 'comment', 'Hello' );
+	check_same( 404, rest_do_request( $fhint_request )->get_status(), 'a reply to an unknown review over REST is a 404' );
+
+	$fhint_response = rest_do_request( new WP_REST_Request( 'DELETE', '/fhint/v1/reviews/rev-9/reply' ) );
+	check_same( 200, $fhint_response->get_status(), 'DELETE /reviews/{id}/reply answers' );
+	check_same( '', $fhint_response->get_data()['data']['reply_comment'], 'with the reply gone' );
+
+	wp_set_current_user( 0 );
+
+	$fhint_calls_before = count( $fhint_reply_calls );
+	$fhint_request      = new WP_REST_Request( 'PUT', '/fhint/v1/reviews/rev-9/reply' );
+	$fhint_request->set_param( 'comment', 'Not allowed.' );
+
+	check_same( 401, rest_do_request( $fhint_request )->get_status(), 'a logged-out reply is refused' );
+	check_same( $fhint_calls_before, count( $fhint_reply_calls ), 'before Google is asked' );
+}
+
+remove_filter( 'pre_http_request', $fhint_fake_reply, 10 );
+
+// -- No Google account linked: nothing shown, nothing changed ---------------
+//
+// Unlinked by taking the tokens away, and given back afterwards. The stored
+// details must survive untouched — locked is not deleted.
+
+$fhint_tokens = get_option( 'fhint_google_tokens' );
+$fhint_admin  = get_users( array( 'role' => 'administrator', 'number' => 1 ) );
+
+if ( $fhint_admin ) {
+	wp_set_current_user( $fhint_admin[0]->ID );
+
+	$fhint_name_before   = BusinessRepository::get()['name'];
+	$fhint_linked_shape  = rest_do_request( new WP_REST_Request( 'GET', '/fhint/v1/profile' ) )->get_data()['data'];
+
+	delete_option( 'fhint_google_tokens' );
+
+	$fhint_response = rest_do_request( new WP_REST_Request( 'GET', '/fhint/v1/profile' ) );
+	$fhint_profile  = $fhint_response->get_data();
+
+	check_same( 200, $fhint_response->get_status(), 'with no Google account, the profile still answers' );
+	check_same( false, $fhint_profile['meta']['google']['linked'], 'and says nothing is linked' );
+	check_same( '', $fhint_profile['data']['info']['name'], 'with the business name left out' );
+	check_same( '', $fhint_profile['data']['address']['city'], 'and the address' );
+	check_same( array(), $fhint_profile['data']['address']['service_area'], 'and the service area' );
+	check_same( array(), $fhint_profile['data']['services']['items'], 'and the services' );
+	check_same( '', $fhint_profile['data']['social']['social_profiles']['facebook'], 'and the social links' );
+	check( ! $fhint_profile['data']['hours']['opening_hours']['has_any_hours'], 'and the hours' );
+	check( null === $fhint_profile['data']['media']['logo'], 'and the photos' );
+	check( count( $fhint_profile['data']['social']['networks'] ) > 0, 'while the form keeps its shape' );
+	check_same( $fhint_linked_shape['attributes']['definitions'], $fhint_profile['data']['attributes']['definitions'], 'including the attribute definitions' );
+
+	$fhint_request = new WP_REST_Request( 'PATCH', '/fhint/v1/profile' );
+	$fhint_request->set_param( 'section', 'info' );
+	$fhint_request->set_param( 'fields', array( 'name' => 'Changed while unlinked' ) );
+	$fhint_response = rest_do_request( $fhint_request );
+
+	check_same( 409, $fhint_response->get_status(), 'a profile save is refused' );
+	check_same( 'fhint_google_required', $fhint_response->get_data()['code'], 'saying Google is needed' );
+
+	$fhint_request = new WP_REST_Request( 'PATCH', '/fhint/v1/business' );
+	$fhint_request->set_param( 'name', 'Changed while unlinked' );
+	check_same( 409, rest_do_request( $fhint_request )->get_status(), 'and so is a business save' );
+
+	check_same( 409, rest_do_request( new WP_REST_Request( 'DELETE', '/fhint/v1/locations/' . $location_id ) )->get_status(), 'and a location delete' );
+	check( null !== LocationRepository::find( $location_id ), 'which leaves the location in place' );
+	check_same( $fhint_name_before, BusinessRepository::get()['name'], 'and the stored name untouched' );
+
+	update_option( 'fhint_google_tokens', $fhint_tokens );
+
+	$fhint_profile = rest_do_request( new WP_REST_Request( 'GET', '/fhint/v1/profile' ) )->get_data();
+
+	check_same( true, $fhint_profile['meta']['google']['linked'], 'linked again' );
+	check_same( $fhint_name_before, $fhint_profile['data']['info']['name'], 'the details are all back' );
+
+	wp_set_current_user( 0 );
+}
+
+update_option( 'fhint_google_tokens', $fhint_tokens );
+
 ReviewRepository::truncate();
 check_same( 0, ReviewRepository::count(), 'truncate clears the table' );
 
@@ -1561,8 +1757,10 @@ if ( $admins ) {
 	$response = rest_do_request( new WP_REST_Request( 'GET', '/fhint/v1/reviews/state' ) );
 	$body     = $response->get_data();
 
+
 	check( isset( $body['data']['count'] ), '/reviews/state answers under data as well' );
 	check( isset( $body['data']['locations'] ), 'and carries the locations a chooser needs' );
+
 
 	ReviewRepository::truncate();
 
@@ -1743,6 +1941,73 @@ if ( $admins ) {
 
 	check_same( 200, $fhint_response->get_status(), 'saving the info section succeeds' );
 	check_same( 'info', $fhint_body['meta']['section'], 'the answer names the section saved' );
+
+	// The opening date: a month, stored on the first of it. On the primary
+	// location it is the business's founding date.
+	$fhint_founding_before = BusinessRepository::get()['founding_date'];
+
+	$fhint_body = $fhint_profile_save( 'info', array( 'opening_date' => '2014-03' ) )->get_data();
+
+	check_same( '2014-03', $fhint_body['data']['opening_date'], 'an opening date is saved as a month' );
+	$fhint_primary_location = null;
+
+	foreach ( LocationRepository::all() as $fhint_candidate ) {
+		if ( $fhint_candidate['is_primary'] ) {
+			$fhint_primary_location = $fhint_candidate;
+		}
+	}
+
+	check_same( $fhint_primary_location ? $fhint_primary_location['country'] : '', isset( $fhint_body['data']['country'] ) ? $fhint_body['data']['country'] : null, "the Info section carries the location's country, for the phone fields' country code" );
+	check_same( 200, $fhint_profile_save( 'info', array( 'phone' => '+8801518984873' ) )->get_status(), 'a main number in international form, as the country code field writes it, is accepted' );
+	check_same( '2014-03-01', BusinessRepository::get()['founding_date'], "on the primary location, as the business's founding date" );
+
+	$fhint_response = $fhint_profile_save( 'info', array( 'opening_date' => '2014-13' ) );
+	check_same( 400, $fhint_response->get_status(), 'a month that does not exist is refused' );
+	check_same( array( 'opening_date.invalid' ), $fhint_response->get_data()['data']['fields']['opening_date'], 'with its code on the field' );
+
+	$fhint_response = $fhint_profile_save( 'info', array( 'opening_date' => gmdate( 'Y-m', strtotime( '+14 months' ) ) ) );
+	check_same( array( 'opening_date.too_far' ), $fhint_response->get_data()['data']['fields']['opening_date'], 'and so is one more than a year ahead, as Google refuses it' );
+	check_same( '2014-03-01', BusinessRepository::get()['founding_date'], 'leaving the saved date alone' );
+
+	$fhint_profile_save( 'info', array( 'opening_date' => '' ) );
+	check_same( '', BusinessRepository::get()['founding_date'], 'an empty date clears it' );
+
+	BusinessRepository::save( array( 'founding_date' => $fhint_founding_before ) );
+
+	// Extra numbers: up to two, each a real number, none repeating the main.
+	$fhint_phones_before = BusinessRepository::get();
+
+	$fhint_body = $fhint_profile_save(
+		'info',
+		array(
+			'phone'             => '(512) 555-0148',
+			'additional_phones' => array( '(512) 555-0199', '', '512 555 0199' ),
+		)
+	)->get_data();
+
+	check_same( array( '(512) 555-0199' ), $fhint_body['data']['additional_phones'], 'extra numbers are saved, with blanks and repeats dropped' );
+	check_same( array( '(512) 555-0199' ), BusinessRepository::get()['additional_phones'], "on the primary location, as the business's" );
+
+	$fhint_response = $fhint_profile_save( 'info', array( 'additional_phones' => array( '01700-000001', '01700-000002', '01700-000003' ) ) );
+	check_same( 400, $fhint_response->get_status(), 'a third extra number is refused' );
+	check_same( array( 'business.additional_phones.too_many' ), $fhint_response->get_data()['data']['fields']['additional_phones'], 'as too many, on the list' );
+
+	$fhint_response = $fhint_profile_save( 'info', array( 'additional_phones' => array( '01700-000001', 'call us' ) ) );
+	check_same( array( 'business.phone.invalid' ), $fhint_response->get_data()['data']['fields']['additional_phones.1'], 'a number that is not one is refused, on its own box' );
+
+	$fhint_response = $fhint_profile_save( 'info', array( 'additional_phones' => array( '+1 (512) 555-0148' ) ) );
+	check_same( array( 'business.additional_phones.same_as_main' ), $fhint_response->get_data()['data']['fields']['additional_phones.0'], 'and so is the main number again' );
+	check_same( array( '(512) 555-0199' ), BusinessRepository::get()['additional_phones'], 'leaving the saved numbers alone' );
+
+	$fhint_profile_save( 'info', array( 'additional_phones' => array() ) );
+	check_same( array(), BusinessRepository::get()['additional_phones'], 'an empty list removes them' );
+
+	BusinessRepository::save(
+		array(
+			'phone'             => $fhint_phones_before['phone'],
+			'additional_phones' => $fhint_phones_before['additional_phones'],
+		)
+	);
 	check_same( 'Profile Dental', $fhint_body['data']['name'], 'and carries the section as it now reads' );
 	check_same( 'Profile Dental', BusinessRepository::get()['name'], 'which is what reached the database' );
 	check_same( 'Dentist', BusinessRepository::get()['primary_category'], 'through the same category rules as /business' );
@@ -2286,6 +2551,69 @@ if ( $admins ) {
 		)
 	);
 
+	// The audit and the schema preview are per location too.
+	$fhint_audit_at = static function ( $location_id ) {
+		$request = new WP_REST_Request( 'GET', '/fhint/v1/audits' );
+
+		if ( null !== $location_id ) {
+			$request->set_query_params( array( 'location_id' => $location_id ) );
+		}
+
+		return rest_do_request( $request );
+	};
+
+	$fhint_main_run   = FHINT\App\Audit\Runner::run( 0, FHINT\App\Audit\Runner::TRIGGER_MANUAL );
+	$fhint_branch_run = FHINT\App\Audit\Runner::run( (int) $fhint_branch['id'], FHINT\App\Audit\Runner::TRIGGER_MANUAL );
+	$fhint_branch_audit = $fhint_audit_at( (int) $fhint_branch['id'] )->get_data();
+	$fhint_main_audit   = $fhint_audit_at( null )->get_data();
+
+	check_same( $fhint_branch_run['id'], $fhint_branch_audit['data']['id'], 'GET /audits?location_id shows that location\'s latest audit' );
+	check_same( (int) $fhint_branch['id'], $fhint_branch_audit['meta']['location_id'], 'and says which location it is for' );
+	check_same( $fhint_main_run['id'], $fhint_main_audit['data']['id'], 'while GET /audits shows the main location\'s, though the branch ran later' );
+	check(
+		! in_array( $fhint_main_run['id'], array_column( $fhint_branch_audit['meta']['history'], 'id' ), true ),
+		'and a location\'s history holds only its own runs'
+	);
+	check_same( 404, $fhint_audit_at( 999999 )->get_status(), 'an audit for a location that does not exist is a 404' );
+
+	$fhint_dashboard_at = static function ( $location_id ) {
+		$request = new WP_REST_Request( 'GET', '/fhint/v1/dashboard' );
+
+		if ( null !== $location_id ) {
+			$request->set_query_params( array( 'location_id' => $location_id ) );
+		}
+
+		return rest_do_request( $request );
+	};
+
+	check_same( $fhint_branch_run['id'], $fhint_dashboard_at( (int) $fhint_branch['id'] )->get_data()['data']['score']['audit_id'], 'the dashboard\'s score card shows the chosen location\'s audit' );
+	check_same( $fhint_main_run['id'], $fhint_dashboard_at( null )->get_data()['data']['score']['audit_id'], 'and the main location\'s when none is chosen, though the branch ran later' );
+	check_same( 404, $fhint_dashboard_at( 999999 )->get_status(), 'a dashboard for a location that does not exist is a 404' );
+
+	$fhint_unaudited = LocationRepository::create( array( 'name' => 'Never audited' ) );
+
+	check( false === $fhint_dashboard_at( (int) $fhint_unaudited['id'] )->get_data()['data']['score']['has_audit'], 'a location never audited shows no score, not another location\'s' );
+
+	LocationRepository::delete( (int) $fhint_unaudited['id'] );
+
+	$fhint_schema_request = new WP_REST_Request( 'GET', '/fhint/v1/schema' );
+	$fhint_schema_request->set_query_params( array( 'location_id' => (int) $fhint_branch['id'] ) );
+
+	check_same( 'Harbour Pets', rest_do_request( $fhint_schema_request )->get_data()['data']['@graph'][0]['name'], 'GET /schema?location_id previews that location\'s own markup' );
+
+	$fhint_schema_request->set_query_params( array( 'location_id' => 999999 ) );
+
+	check_same( 404, rest_do_request( $fhint_schema_request )->get_status(), 'and a location that does not exist is a 404' );
+
+	// The dashboard checks further down count on their own runs being the
+	// newest, so these two go.
+	foreach ( array( $fhint_main_run['id'], $fhint_branch_run['id'] ) as $fhint_run_id ) {
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+		$wpdb->delete( Tables::name( Tables::AUDIT_ISSUES ), array( 'audit_id' => (int) $fhint_run_id ) );
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+		$wpdb->delete( Tables::name( Tables::AUDITS ), array( 'id' => (int) $fhint_run_id ) );
+	}
+
 	// The rating in the header is the chosen listing's own, from stored
 	// reviews. Borrow a listing already in the table, then hand it back.
 	$fhint_listings = GoogleLocationRepository::all();
@@ -2349,6 +2677,16 @@ if ( $admins ) {
 		)
 	);
 	GoogleLocationRepository::map( 'locations/refresh-me', (int) $fhint_branch['id'] );
+
+	// The Reviews screen opens on the location chosen in the Business
+	// profile, so each listing it offers says which location it belongs to.
+	$fhint_review_listings = array_column(
+		rest_do_request( new WP_REST_Request( 'GET', '/fhint/v1/reviews/state' ) )->get_data()['data']['locations'],
+		'location_id',
+		'location_name'
+	);
+
+	check_same( (int) $fhint_branch['id'], isset( $fhint_review_listings['locations/refresh-me'] ) ? $fhint_review_listings['locations/refresh-me'] : null, 'each listing on the Reviews screen says which location it belongs to' );
 
 	$fhint_google = array(
 		'calls'         => array(),
@@ -2493,6 +2831,16 @@ if ( $admins ) {
 							'valueType'   => 'URL',
 							'displayName' => 'Facebook',
 						),
+						array(
+							'parent'      => 'attributes/url_whatsapp',
+							'valueType'   => 'URL',
+							'displayName' => 'WhatsApp',
+						),
+						array(
+							'parent'      => 'attributes/url_text_messaging',
+							'valueType'   => 'URL',
+							'displayName' => 'Texting number',
+						),
 					),
 				)
 			);
@@ -2511,6 +2859,16 @@ if ( $admins ) {
 					'uriValues' => array( array( 'uri' => 'https://facebook.com/harbour-from-google' ) ),
 				),
 				array(
+					'name'      => 'attributes/url_whatsapp',
+					'valueType' => 'URL',
+					'uriValues' => array( array( 'uri' => 'https://wa.me/8801700000009' ) ),
+				),
+				array(
+					'name'      => 'attributes/url_text_messaging',
+					'valueType' => 'URL',
+					'uriValues' => array( array( 'uri' => 'sms:+8801700000008' ) ),
+				),
+				array(
 					'name'      => 'attributes/wi_fi',
 					'valueType' => 'ENUM',
 					'values'    => array( 'free_wi_fi' ),
@@ -2525,6 +2883,33 @@ if ( $admins ) {
 				'name'       => 'locations/refresh-me',
 				'title'      => 'Harbour Pets',
 				'metadata'   => array( 'mapsUri' => 'https://maps.google.com/maps?cid=777000111' ),
+				'serviceArea'  => array(
+					'businessType' => 'CUSTOMER_AND_BUSINESS_LOCATION',
+					'places'       => array(
+						'placeInfos' => array(
+							array(
+								'placeName' => 'Mirpur, Dhaka',
+								'placeId'   => 'ChIJ-mirpur',
+							),
+							array(
+								'placeName' => 'Pallabi, Dhaka',
+								'placeId'   => 'ChIJ-pallabi',
+							),
+						),
+					),
+				),
+				'phoneNumbers' => array(
+					'primaryPhone'     => '01700-000001',
+					'additionalPhones' => array( '01700-000002', '01700-000003' ),
+				),
+				'openInfo'   => array(
+					'status'      => 'OPEN',
+					'openingDate' => array(
+						'year'  => 2014,
+						'month' => 3,
+						'day'   => 15,
+					),
+				),
 				'categories' => array(
 					'primaryCategory'      => array(
 						'name'        => 'categories/gcid:pet_store',
@@ -2584,9 +2969,13 @@ if ( $admins ) {
 		array(
 			'categories'    => false,
 			'details'       => true,
+			'opening_date'  => true,
+			'additional_phones' => true,
+			'service_area'  => true,
 			'social'        => false,
+			'booking'       => true,
 			'service_types' => 2,
-			'attributes'    => 4,
+			'attributes'    => 6,
 			'answers'    => 2,
 			'photos'     => 2,
 			'failed'     => array(),
@@ -2596,6 +2985,258 @@ if ( $admins ) {
 	);
 	check_same( 'gcid:pet_store', $fhint_read['data']['info']['primary_category_id'], 'a location that has a category keeps it through a refresh' );
 	check_same( 'Harbour Pets', LocationRepository::find( (int) $fhint_branch['id'] )['business_name'], 'a branch with no name of its own is given its listing\'s' );
+	check_same( '2014-03-01', LocationRepository::find( (int) $fhint_branch['id'] )['opening_date'], "a branch with no opening date is given its listing's, to the month" );
+	check_same( '2014-03', $fhint_read['data']['info']['opening_date'], 'and the Info section shows it as a month' );
+	check_same( array( '01700-000002', '01700-000003' ), LocationRepository::find( (int) $fhint_branch['id'] )['additional_phones'], "a branch with no extra numbers is given its listing's" );
+	check_same( array( '01700-000002', '01700-000003' ), $fhint_read['data']['info']['additional_phones'], 'and the Info section lists them' );
+	check_same(
+		array(
+			array( 'name' => 'Mirpur, Dhaka', 'place_id' => 'ChIJ-mirpur' ),
+			array( 'name' => 'Pallabi, Dhaka', 'place_id' => 'ChIJ-pallabi' ),
+		),
+		$fhint_read['data']['address']['service_area'],
+		"a location with no service area is given its listing's, with Google's place ids"
+	);
+	check_same( 20, $fhint_read['data']['address']['service_area_max'], 'and told the most it may have' );
+
+	// The branch is mapped, so its address is Google's — but its service
+	// area is still the owner's to edit.
+	$fhint_area_save = static function ( array $fields ) use ( $fhint_branch_post ) {
+		return $fhint_branch_post(
+			'/profile',
+			array(
+				'section' => 'address',
+				'fields'  => $fields,
+			),
+			array(),
+			'PATCH'
+		);
+	};
+
+	$fhint_saved = $fhint_area_save(
+		array(
+			'service_area' => array(
+				array( 'name' => 'Mirpur, Dhaka', 'place_id' => 'ChIJ-mirpur' ),
+				'Uttara, Dhaka',
+			),
+		)
+	);
+
+	check_same( 200, $fhint_saved->get_status(), 'a mapped location saves its service area though its address is locked' );
+	check_same(
+		array(
+			array( 'name' => 'Mirpur, Dhaka', 'place_id' => 'ChIJ-mirpur' ),
+			array( 'name' => 'Uttara, Dhaka', 'place_id' => '' ),
+		),
+		LocationRepository::find( (int) $fhint_branch['id'] )['service_area'],
+		"a removed place goes, a typed one is kept without a place id"
+	);
+	check_same( 409, $fhint_area_save( array( 'city' => 'Elsewhere' ) )->get_status(), 'while the address itself stays locked' );
+	check_same(
+		array( 'service_area' => array( 'service_area.too_many' ) ),
+		$fhint_area_save( array( 'service_area' => array_map( static function ( $i ) { return 'Area ' . $i; }, range( 1, 21 ) ) ) )->get_data()['data']['fields'],
+		'a 21st place is refused'
+	);
+
+	$fhint_kept_area = $fhint_branch_post( '/profile/google/refresh' )->get_data();
+	check_same( false, $fhint_kept_area['meta']['refresh']['service_area'], 'a refresh leaves an area edited here alone' );
+	check_same( 2, count( LocationRepository::find( (int) $fhint_branch['id'] )['service_area'] ), 'with both its places' );
+
+	$fhint_branch_node = null;
+
+	foreach ( FHINT\App\Schema\Graph::build_site()['@graph'] as $fhint_graph_node ) {
+		if ( isset( $fhint_graph_node['@id'] ) && FHINT\App\Schema\Graph::location_business_id( (int) $fhint_branch['id'] ) === $fhint_graph_node['@id'] ) {
+			$fhint_branch_node = $fhint_graph_node;
+		}
+	}
+
+	check_same(
+		array(
+			array( '@type' => 'Place', 'name' => 'Mirpur, Dhaka' ),
+			array( '@type' => 'Place', 'name' => 'Uttara, Dhaka' ),
+		),
+		$fhint_branch_node && isset( $fhint_branch_node['areaServed'] ) ? $fhint_branch_node['areaServed'] : null,
+		"the website's markup names every place, the typed one too"
+	);
+	check_same(
+		array(
+			'appointment'    => '',
+			'text_messaging' => '+8801700000008',
+			'whatsapp'       => 'https://wa.me/8801700000009',
+		),
+		$fhint_read['data']['social']['booking_links'],
+		"a branch with no booking links is given its listing's, the texting number without its sms: prefix"
+	);
+	check_same(
+		array(
+			'appointment'    => false,
+			'text_messaging' => true,
+			'whatsapp'       => true,
+		),
+		$fhint_read['data']['social']['booking_offered'],
+		"and the Social section says which of them Google offers this listing"
+	);
+
+	// A refresh leaves a set the branch already has alone.
+	LocationRepository::update( (int) $fhint_branch['id'], array( 'booking_links' => array( 'whatsapp' => 'https://wa.me/111111111' ) ) );
+	$fhint_kept_links = $fhint_branch_post( '/profile/google/refresh' )->get_data();
+
+	check_same( false, $fhint_kept_links['meta']['refresh']['booking'], 'a refresh fills no booking links when the branch has its own' );
+	check_same( 'https://wa.me/111111111', LocationRepository::find( (int) $fhint_branch['id'] )['booking_links']['whatsapp'], 'and its own link is kept' );
+
+	// Real WordPress escaping: esc_url_raw() would make "not a link" into an
+	// address that looks valid. It must reach validation as typed.
+	check_same( 'not a link', FHINT\App\Business\BookingLinks::sanitize( array( 'appointment' => 'not a link' ) )['appointment'], 'text that is not a link is not turned into one' );
+
+	$fhint_business_booking = BusinessRepository::get()['booking_links'];
+
+	// Saved on the branch: its own set; refused values name their field.
+	$fhint_saved = $fhint_branch_post(
+		'/profile',
+		array(
+			'section' => 'social',
+			'fields'  => array(
+				'booking_links' => array(
+					'appointment'    => '',
+					'text_messaging' => '+880 1700-000007',
+					'whatsapp'       => 'https://wa.me/8801700000007',
+				),
+			),
+		),
+		array(),
+		'PATCH'
+	);
+
+	check_same( 200, $fhint_saved->get_status(), 'a branch saves booking links of its own, through the Social section' );
+	check_same( $fhint_business_booking, BusinessRepository::get()['booking_links'], "and the business's are untouched" );
+	check_same( '+8801700000007', LocationRepository::find( (int) $fhint_branch['id'] )['booking_links']['text_messaging'], 'the texting number kept as + and digits' );
+	check_same( $fhint_business_booking, BusinessRepository::get()['booking_links'], "and the business's links are untouched" );
+
+	$fhint_saved = $fhint_branch_post(
+		'/profile',
+		array(
+			'section' => 'social',
+			'fields'  => array(
+				'booking_links' => array(
+					'appointment'    => 'not a link',
+					'text_messaging' => '01700000007',
+					'whatsapp'       => 'https://example.com/chat',
+				),
+			),
+		),
+		array(),
+		'PATCH'
+	);
+
+	check_same( 400, $fhint_saved->get_status(), 'bad booking links are refused' );
+	check_same(
+		array(
+			'booking_links.appointment'    => array( 'booking.appointment.invalid' ),
+			'booking_links.text_messaging' => array( 'booking.text_messaging.invalid' ),
+			'booking_links.whatsapp'       => array( 'booking.whatsapp.invalid' ),
+		),
+		$fhint_saved->get_data()['data']['fields'],
+		'each on its own field: not a link, no country code, not WhatsApp'
+	);
+	check_same( '+8801700000007', LocationRepository::find( (int) $fhint_branch['id'] )['booking_links']['text_messaging'], 'leaving the saved links alone' );
+
+	// One card, one save: a good social link sent with a bad booking link
+	// is not saved either.
+	$fhint_social_before = LocationRepository::find( (int) $fhint_branch['id'] )['social_profiles'];
+	$fhint_saved         = $fhint_branch_post(
+		'/profile',
+		array(
+			'section' => 'social',
+			'fields'  => array(
+				'social_profiles' => array( 'facebook' => 'https://facebook.com/saved-with-a-bad-booking-link' ),
+				'booking_links'   => array( 'whatsapp' => 'https://example.com/chat' ),
+			),
+		),
+		array(),
+		'PATCH'
+	);
+
+	check_same( 400, $fhint_saved->get_status(), 'a bad booking link refuses the whole card' );
+	check_same( $fhint_social_before, LocationRepository::find( (int) $fhint_branch['id'] )['social_profiles'], 'so the social link sent with it is not saved either' );
+
+	LocationRepository::update( (int) $fhint_branch['id'], array( 'additional_phones' => array() ) );
+	$fhint_kept_phones = $fhint_branch_post( '/profile/google/refresh' )->get_data();
+
+	check_same( false, $fhint_kept_phones['meta']['refresh']['additional_phones'], 'a branch that removed its extra numbers is not given them back' );
+	check_same( array(), LocationRepository::find( (int) $fhint_branch['id'] )['additional_phones'], 'its empty list is kept' );
+
+	LocationRepository::update( (int) $fhint_branch['id'], array( 'opening_date' => '2019-06-01' ) );
+	$fhint_kept_date = $fhint_branch_post( '/profile/google/refresh' )->get_data();
+
+	check_same( false, $fhint_kept_date['meta']['refresh']['opening_date'], 'a refresh reports nothing filled when the date is set here' );
+	check_same( '2019-06-01', LocationRepository::find( (int) $fhint_branch['id'] )['opening_date'], 'and the owner\'s date is kept' );
+
+	// Saved on a branch, the date is the branch's own and the business's is
+	// left alone; cleared, the branch shows the business's again.
+	$fhint_business_date = BusinessRepository::get()['founding_date'];
+
+	BusinessRepository::save( array( 'founding_date' => '2001-05-01' ) );
+
+	$fhint_saved = $fhint_branch_post(
+		'/profile',
+		array(
+			'section' => 'info',
+			'fields'  => array( 'opening_date' => '2020-09' ),
+		),
+		array(),
+		'PATCH'
+	)->get_data();
+
+	check_same( '2020-09', $fhint_saved['data']['opening_date'], 'a branch saves an opening date of its own' );
+	check_same( '2020-09-01', LocationRepository::find( (int) $fhint_branch['id'] )['opening_date'], 'on the branch' );
+	check_same( '2001-05-01', BusinessRepository::get()['founding_date'], "and the business's is untouched" );
+
+	$fhint_saved = $fhint_branch_post(
+		'/profile',
+		array(
+			'section' => 'info',
+			'fields'  => array( 'opening_date' => '' ),
+		),
+		array(),
+		'PATCH'
+	)->get_data();
+
+	check_same( '', LocationRepository::find( (int) $fhint_branch['id'] )['opening_date'], "cleared, the branch keeps none of its own" );
+	check_same( '2001-05', $fhint_saved['data']['opening_date'], "and shows the business's" );
+
+	BusinessRepository::save( array( 'founding_date' => $fhint_business_date ) );
+
+	// Extra numbers on a branch are its own list; NULL shows the business's.
+	$fhint_business_phones = BusinessRepository::get()['additional_phones'];
+
+	BusinessRepository::save( array( 'additional_phones' => array( '01800-111111' ) ) );
+	LocationRepository::update( (int) $fhint_branch['id'], array( 'additional_phones' => null ) );
+
+	$fhint_shown = rest_do_request(
+		( static function () use ( $fhint_branch ) {
+			$request = new WP_REST_Request( 'GET', '/fhint/v1/profile' );
+			$request->set_param( 'location_id', (int) $fhint_branch['id'] );
+
+			return $request;
+		} )()
+	)->get_data();
+
+	check_same( array( '01800-111111' ), $fhint_shown['data']['info']['additional_phones'], "a branch with no list of its own shows the business's numbers" );
+
+	$fhint_saved = $fhint_branch_post(
+		'/profile',
+		array(
+			'section' => 'info',
+			'fields'  => array( 'additional_phones' => array( '01900-222222', ' ', '01900 222222' ) ),
+		),
+		array(),
+		'PATCH'
+	)->get_data();
+
+	check_same( array( '01900-222222' ), $fhint_saved['data']['additional_phones'], 'a branch saves its own, blanks and repeats dropped' );
+	check_same( array( '01800-111111' ), BusinessRepository::get()['additional_phones'], "and the business's are untouched" );
+
+	BusinessRepository::save( array( 'additional_phones' => $fhint_business_phones ) );
 
 	LocationRepository::update( (int) $fhint_branch['id'], array( 'social_profiles' => null ) );
 

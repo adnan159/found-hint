@@ -261,6 +261,34 @@ class AttributeCatalog {
 	}
 
 	/**
+	 * Whether a listing's menu holds each of some attributes.
+	 *
+	 * @param string   $location_name Google location resource name.
+	 * @param string[] $ids           Attribute ids, e.g. 'url_appointment'.
+	 * @return array<string,bool>|null Id => offered; null when the menu has
+	 *                                 never been read, which is not "no".
+	 */
+	public static function offers( $location_name, array $ids ) {
+		$menu = array();
+
+		foreach ( ReferenceRepository::for_parent( ReferenceRepository::KIND_ATTRIBUTE, (string) $location_name ) as $entry ) {
+			$menu[ (string) $entry['item_id'] ] = true;
+		}
+
+		if ( ! $menu ) {
+			return null;
+		}
+
+		$offered = array();
+
+		foreach ( $ids as $id ) {
+			$offered[ $id ] = isset( $menu[ $id ] );
+		}
+
+		return $offered;
+	}
+
+	/**
 	 * Google's value type as this plugin names it.
 	 *
 	 * @param mixed $type e.g. 'BOOL', 'REPEATED_ENUM'.

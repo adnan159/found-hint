@@ -1,17 +1,12 @@
 import { useEffect, useRef, useState } from "react";
 import { __ } from "@wordpress/i18n";
-import { Link } from "react-router";
 import { Button } from "@/components/ui/button";
-import { Spinner } from "@/components/ui/spinner";
 import GoogleSignInButton from "@/components/GoogleSignInButton";
+import { isGoogleLinked } from "@/components/GoogleRequired";
 import RequestError from "@/components/RequestError";
 import logoUrl from "@/assets/foundhint-icon.png";
 import { useGetGoogleQuery } from "@/store/api/googleApi";
 import useGoogleConnect from "@/hooks/useGoogleConnect";
-import {
-  useGetOnboardingQuery,
-  useMoveOnboardingMutation,
-} from "@/store/api/onboardingApi";
 
 /**
  * The first-run introduction, on the dashboard.
@@ -23,9 +18,9 @@ import {
  *
  * **On a fresh site this is the whole dashboard**, not a banner above it:
  * there is no score to read and nothing to summarise, so a screen of empty
- * cards would only bury the one thing worth doing. Skipping dismisses it
- * through the onboarding position store — which already exists for exactly
- * this and survives a reload — and the ordinary dashboard appears.
+ * cards would only bury the one thing worth doing. It cannot be skipped:
+ * until a Google account is linked it is the dashboard, and connecting is
+ * the way through.
  *
  * Because it is the page, its heading is the page's `h1` and takes focus
  * when the step changes, the same contract `PageHeader` keeps elsewhere:
@@ -73,7 +68,7 @@ const PROMISE = [
 /** Where Google sends someone to create a profile. */
 const GOOGLE_CREATE_URL = "https://business.google.com/create";
 
-function Welcome({ onStart, onSkip, isSkipping, headingRef }) {
+function Welcome({ onStart, headingRef }) {
   return (
     <>
       <div className="fhint:border fhint:border-border fhint:bg-card">
@@ -109,16 +104,6 @@ function Welcome({ onStart, onSkip, isSkipping, headingRef }) {
               className="fhint:h-auto fhint:px-[22px] fhint:py-[13px] fhint:text-[15px] fhint:font-extrabold"
             >
               {__("Get started", "foundhint-local-seo")}
-            </Button>
-            <Button
-              type="button"
-              variant="outline"
-              onClick={onSkip}
-              disabled={isSkipping}
-              className="fhint:h-auto fhint:border-foreground fhint:px-[22px] fhint:py-[13px] fhint:text-[15px] fhint:font-extrabold"
-            >
-              {isSkipping ? <Spinner data-icon="inline-start" /> : null}
-              {__("Skip to dashboard", "foundhint-local-seo")}
             </Button>
           </div>
         </div>
@@ -227,13 +212,13 @@ function Decision({ onConnect, isConnecting, headingRef }) {
           label={__("Option B", "foundhint-local-seo")}
           title={__("No, I don't have one", "foundhint-local-seo")}
           body={__(
-            "Fill in your business details here first. We will get everything ready so you can create your Google Business Profile afterwards without repeating yourself.",
+            "Create one on Google first — FoundHint works from your Google Business Profile. Once it is set up, come back here and connect it.",
             "foundhint-local-seo",
           )}
           points={[
             __("Creating one on Google is free", "foundhint-local-seo"),
-            __("Your details power your website too", "foundhint-local-seo"),
-            __("Connect Google whenever you are ready", "foundhint-local-seo"),
+            __("Google checks the business is yours", "foundhint-local-seo"),
+            __("Then connect it here", "foundhint-local-seo"),
           ]}
           action={
             <div className="fhint:flex fhint:flex-wrap fhint:items-center fhint:gap-3">
@@ -253,12 +238,6 @@ function Decision({ onConnect, isConnecting, headingRef }) {
               >
                 {__("Create one on Google", "foundhint-local-seo")}
               </Button>
-              <Link
-                to="/business"
-                className="fhint:text-[13px] fhint:font-extrabold fhint:text-link-accent fhint:no-underline fhint:hover:underline"
-              >
-                {__("Fill in my business details", "foundhint-local-seo")}
-              </Link>
             </div>
           }
         />
@@ -277,23 +256,19 @@ function Decision({ onConnect, isConnecting, headingRef }) {
  * @param {Object} business The business record, or null.
  * @return {{show: boolean, isLoading: boolean}} What to render.
  */
-export function useGetStartedState(business) {
-  const { data: onboarding, isLoading: loadingOnboarding } =
-    useGetOnboardingQuery();
-  const { data: google, isLoading: loadingGoogle } = useGetGoogleQuery();
-
-  const connected =
-    google?.status === "connected" || google?.status === "needs_reconnect";
+export function useGetStartedState() {
+  const { data: google, isLoading } = useGetGoogleQuery();
 
   return {
-    isLoading: loadingOnboarding || loadingGoogle,
-    // A fresh site: nothing entered, no Google, and not already dismissed.
-    show: Boolean(onboarding?.is_open) && !connected && !business?.name,
+    isLoading,
+    // Whenever no Google account is linked. There is no skipping it: the
+    // business details come from Google, so without it there is nothing
+    // for the dashboard to show.
+    show: isGoogleLinked(google) === false,
   };
 }
 
 export function GetStarted() {
-  const [move, { isLoading: isSkipping }] = useMoveOnboardingMutation();
   const { connect, isConnecting, error } = useGoogleConnect();
 
   const [step, setStep] = useState("welcome");
@@ -314,12 +289,7 @@ export function GetStarted() {
       />
 
       {step === "welcome" ? (
-        <Welcome
-          onStart={() => setStep("decision")}
-          onSkip={() => move({ action: "dismiss" })}
-          isSkipping={isSkipping}
-          headingRef={headingRef}
-        />
+        <Welcome onStart={() => setStep("decision")} headingRef={headingRef} />
       ) : (
         <Decision
           onConnect={connect}

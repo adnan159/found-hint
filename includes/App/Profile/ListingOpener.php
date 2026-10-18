@@ -35,7 +35,7 @@ defined( 'ABSPATH' ) || exit;
 class ListingOpener {
 
 	/** What is imported for a listing opened from the switcher. */
-	const FIELDS = array( 'name', 'description', 'address', 'coordinates', 'hours', 'phone', 'website', 'categories', 'social', 'services' );
+	const FIELDS = array( 'name', 'description', 'opening_date', 'address', 'coordinates', 'service_area', 'hours', 'phone', 'additional_phones', 'website', 'categories', 'social', 'booking', 'services' );
 
 	/**
 	 * The location for a listing, creating it on first use.

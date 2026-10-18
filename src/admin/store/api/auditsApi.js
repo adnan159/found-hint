@@ -1,4 +1,4 @@
-import { baseApi } from "./baseApi";
+import { baseApi, withQuery } from "./baseApi";
 
 /**
  * GET/POST /audits.
@@ -10,13 +10,18 @@ import { baseApi } from "./baseApi";
 export const auditsApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
     getAudit: builder.query({
-      query: () => "/audits",
+      // One location's audit; 0 (the default) is the main location's.
+      query: (locationId = 0) =>
+        locationId
+          ? withQuery("/audits", { location_id: locationId })
+          : "/audits",
       transformResponse: (response) => ({
         audit: response?.data ?? null,
         issues: response?.meta?.issues ?? [],
         passes: response?.meta?.passes ?? [],
         history: response?.meta?.history ?? [],
         stale: Boolean(response?.meta?.stale),
+        locationId: response?.meta?.location_id ?? 0,
       }),
       providesTags: ["Audit"],
     }),

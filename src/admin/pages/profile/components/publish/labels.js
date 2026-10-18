@@ -11,6 +11,10 @@ const FIELD_NAMES = {
   description: () => __("Description", "foundhint-local-seo"),
   website: () => __("Website", "foundhint-local-seo"),
   phone: () => __("Phone number", "foundhint-local-seo"),
+  additional_phones: () =>
+    __("Additional phone numbers", "foundhint-local-seo"),
+  opening_date: () => __("Opening date", "foundhint-local-seo"),
+  service_area: () => __("Service area", "foundhint-local-seo"),
   categories: () => __("Categories", "foundhint-local-seo"),
   hours: () => __("Business hours", "foundhint-local-seo"),
   special_hours: () => __("Special hours", "foundhint-local-seo"),
@@ -23,6 +27,16 @@ export function fieldName(field) {
   }
 
   const [kind, id] = String(field).split(".");
+
+  if (kind === "booking" && id) {
+    const BOOKING = {
+      appointment: () => __("Appointment link", "foundhint-local-seo"),
+      text_messaging: () => __("Texting number", "foundhint-local-seo"),
+      whatsapp: () => __("WhatsApp link", "foundhint-local-seo"),
+    };
+
+    return BOOKING[id] ? BOOKING[id]() : id;
+  }
 
   if (kind === "social" && id) {
     return sprintf(
@@ -44,6 +58,11 @@ export const SKIP_REASONS = {
   no_google_id: () =>
     __(
       "Typed by hand. Choose the category from Google's list to send it.",
+      "foundhint-local-seo",
+    ),
+  no_place_id: () =>
+    __(
+      "Typed here. Google only accepts places chosen on Google, so these stay on your website.",
       "foundhint-local-seo",
     ),
   not_allowed: () =>

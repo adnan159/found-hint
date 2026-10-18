@@ -7,6 +7,11 @@
 
 namespace FHINT\App\Google\Push;
 
+use FHINT\App\Business\AdditionalPhones;
+use FHINT\App\Business\BookingLinks;
+use FHINT\App\Business\OpeningDate;
+use FHINT\App\Location\ServiceArea;
+
 defined( 'ABSPATH' ) || exit;
 
 /**
@@ -36,6 +41,7 @@ class Plan {
 
 	const REASON_EMPTY_HERE    = 'empty_here';
 	const REASON_NO_GOOGLE_ID  = 'no_google_id';
+	const REASON_NO_PLACE_ID   = 'no_place_id';
 	const REASON_NOT_ALLOWED   = 'not_allowed';
 	const REASON_NOT_ON_GOOGLE = 'not_on_google';
 
@@ -123,32 +129,194 @@ class Plan {
 			self::change( $step, 'website', 'websiteUri', $google_website, $website, array( 'websiteUri' => $website ) );
 		}
 
-		// Phone.
-		$phone        = self::value( $local, 'phone' );
-		$google_phone = isset( $google['phoneNumbers']['primaryPhone'] ) ? trim( (string) $google['phoneNumbers']['primaryPhone'] ) : '';
+		self::phones( $step, $plan, $local, $google );
 
-		if ( '' === $phone ) {
-			self::skip_or_unchanged( $plan, 'phone', $google_phone );
-		} elseif ( GoogleFormat::same_phone( $phone, $google_phone ) ) {
-			$plan['unchanged'][] = 'phone';
-		} else {
-			$numbers = isset( $google['phoneNumbers'] ) && is_array( $google['phoneNumbers'] ) && isset( $google['phoneNumbers']['additionalPhones'] )
-				? array( 'additionalPhones' => $google['phoneNumbers']['additionalPhones'] )
-				: array();
-
-			// `phoneNumbers` is one field to Google, so the extra numbers it
-			// already holds are sent back with it or they would be dropped.
-			$numbers['primaryPhone'] = $phone;
-
-			self::change( $step, 'phone', 'phoneNumbers', $google_phone, $phone, array( 'phoneNumbers' => $numbers ) );
-		}
-
+		self::opening_date( $step, $plan, $local, $google );
+		self::service_area( $step, $plan, $local, $google );
 		self::categories( $step, $plan, $local, $google );
 		self::hours( $step, $plan, $local, $google );
 		self::special_hours( $step, $plan, $local, $google );
 		self::services( $step, $plan, $local, $google );
 
 		return $step;
+	}
+
+	/**
+	 * The main number and the extra ones.
+	 *
+	 * Two fields on screen, one to Google: `phoneNumbers` is replaced whole,
+	 * so whichever side changed, both are sent, and the side this site did
+	 * not change goes back as Google has it — otherwise sending a new main
+	 * number would drop the extra ones, and the other way round. Each side
+	 * follows the plan's rule on its own: nothing here is skipped, never
+	 * sent as a clear.
+	 *
+	 * @param array $step   The location step.
+	 * @param array $plan   The plan.
+	 * @param array $local  This site's profile.
+	 * @param array $google The location as Google returned it.
+	 * @return void
+	 */
+	private static function phones( array &$step, array &$plan, array $local, array $google ) {
+		$phone        = self::value( $local, 'phone' );
+		$google_phone = isset( $google['phoneNumbers']['primaryPhone'] ) ? trim( (string) $google['phoneNumbers']['primaryPhone'] ) : '';
+		$extra        = isset( $local['additional_phones'] ) && is_array( $local['additional_phones'] ) ? array_values( $local['additional_phones'] ) : array();
+		$google_extra = AdditionalPhones::from_google( isset( $google['phoneNumbers'] ) ? $google['phoneNumbers'] : null );
+		$changes      = array();
+
+		if ( '' === $phone ) {
+			self::skip_or_unchanged( $plan, 'phone', $google_phone );
+		} elseif ( GoogleFormat::same_phone( $phone, $google_phone ) ) {
+			$plan['unchanged'][] = 'phone';
+		} else {
+			$changes['phone'] = array( $google_phone, $phone );
+		}
+
+		if ( ! $extra ) {
+			self::skip_or_unchanged( $plan, 'additional_phones', $google_extra );
+		} elseif ( AdditionalPhones::same( $extra, $google_extra ) ) {
+			$plan['unchanged'][] = 'additional_phones';
+		} else {
+			$changes['additional_phones'] = array( $google_extra, $extra );
+		}
+
+		if ( ! $changes ) {
+			return;
+		}
+
+		$numbers = array( 'additionalPhones' => isset( $changes['additional_phones'] ) ? $extra : $google_extra );
+		$primary = isset( $changes['phone'] ) ? $phone : $google_phone;
+
+		if ( '' !== $primary ) {
+			$numbers['primaryPhone'] = $primary;
+		}
+
+		foreach ( $changes as $field => $values ) {
+			$step['fields'][] = array(
+				'field' => $field,
+				'from'  => $values[0],
+				'to'    => $values[1],
+			);
+		}
+
+		// One mask entry and one payload for the two fields: Google's field
+		// is `phoneNumbers`, and naming it twice would be one request saying
+		// the same thing twice.
+		$step['mask'][]  = 'phoneNumbers';
+		$step['payload'] = array_replace_recursive( $step['payload'], array( 'phoneNumbers' => $numbers ) );
+	}
+
+	/**
+	 * The places the listing serves.
+	 *
+	 * Google needs a place id for every place, and only a place read from
+	 * Google has one. So only those are sent; a place typed here is listed
+	 * as skipped (`no_place_id`) — it stays in the website's markup. The
+	 * places are compared by id, and sent as one list, which Google replaces
+	 * whole: removing a place here and publishing removes it there.
+	 *
+	 * The business type is kept as Google has it; a listing that has none
+	 * yet is sent "at the customer's and at the business", because a
+	 * listing with a storefront that also travels is the common case and
+	 * the other one would make Google drop its address.
+	 *
+	 * @param array $step   The location step.
+	 * @param array $plan   The plan.
+	 * @param array $local  This site's profile.
+	 * @param array $google The location as Google returned it.
+	 * @return void
+	 */
+	private static function service_area( array &$step, array &$plan, array $local, array $google ) {
+		$places  = isset( $local['service_area'] ) && is_array( $local['service_area'] ) ? $local['service_area'] : array();
+		$current = ServiceArea::from_google( isset( $google['serviceArea'] ) ? $google['serviceArea'] : null );
+		$typed   = ServiceArea::typed_only( $places );
+
+		if ( $typed ) {
+			$plan['skipped'][] = array(
+				'field'  => 'service_area',
+				'reason' => self::REASON_NO_PLACE_ID,
+				'google' => $typed,
+			);
+		}
+
+		$infos   = ServiceArea::place_infos( $places );
+		$names   = static function ( array $list ) {
+			return array_column( $list, 'name' );
+		};
+
+		if ( ! $infos ) {
+			// Nothing here Google could take. Never a clear: an area Google
+			// has stays until someone removes its places here one by one.
+			if ( ! $typed ) {
+				self::skip_or_unchanged( $plan, 'service_area', $names( $current ) );
+			}
+
+			return;
+		}
+
+		if ( ServiceArea::signature( $infos ) === ServiceArea::signature( ServiceArea::place_infos( $current ) ) ) {
+			$plan['unchanged'][] = 'service_area';
+
+			return;
+		}
+
+		$type = isset( $google['serviceArea']['businessType'] ) && 'BUSINESS_TYPE_UNSPECIFIED' !== $google['serviceArea']['businessType']
+			? (string) $google['serviceArea']['businessType']
+			: 'CUSTOMER_AND_BUSINESS_LOCATION';
+
+		$area = array(
+			'businessType' => $type,
+			'places'       => array( 'placeInfos' => $infos ),
+		);
+
+		if ( isset( $google['serviceArea']['regionCode'] ) ) {
+			$area['regionCode'] = (string) $google['serviceArea']['regionCode'];
+		}
+
+		self::change( $step, 'service_area', 'serviceArea', $names( $current ), array_column( $infos, 'placeName' ), array( 'serviceArea' => $area ) );
+	}
+
+	/**
+	 * The opening date, compared and sent to the month.
+	 *
+	 * Sent as a year and a month with no day, which Google takes as "opened
+	 * in March 2014". A day Google already holds within the same month is
+	 * not a difference: this site keeps no day, and sending one back would
+	 * erase it for nothing. Only `openInfo.openingDate` is named in the
+	 * mask, so the listing's open or closed status is never touched.
+	 *
+	 * @param array $step   The location step.
+	 * @param array $plan   The plan.
+	 * @param array $local  This site's profile.
+	 * @param array $google The location as Google returned it.
+	 * @return void
+	 */
+	private static function opening_date( array &$step, array &$plan, array $local, array $google ) {
+		$here  = OpeningDate::for_screen( self::value( $local, 'opening_date' ) );
+		$there = OpeningDate::for_screen(
+			OpeningDate::from_google( isset( $google['openInfo']['openingDate'] ) ? $google['openInfo']['openingDate'] : null )
+		);
+
+		if ( '' === $here ) {
+			self::skip_or_unchanged( $plan, 'opening_date', $there );
+
+			return;
+		}
+
+		if ( $here === $there ) {
+			$plan['unchanged'][] = 'opening_date';
+
+			return;
+		}
+
+		self::change(
+			$step,
+			'opening_date',
+			'openInfo.openingDate',
+			$there,
+			$here,
+			array( 'openInfo' => array( 'openingDate' => OpeningDate::to_google( $here ) ) )
+		);
 	}
 
 	/**
@@ -385,6 +553,65 @@ class Plan {
 	}
 
 	/**
+	 * The appointment link, texting number and WhatsApp link.
+	 *
+	 * Link attributes like the social ones, with one difference: Google does
+	 * not offer every listing all three, and a link it does not offer is a
+	 * request that can only be refused. So a link the listing's menu leaves
+	 * out is skipped and said so. A menu never read holds nothing back.
+	 *
+	 * @param array $step   The attributes step.
+	 * @param array $plan   The plan.
+	 * @param array $local  This site's profile.
+	 * @param array $google Google's attributes, by id.
+	 * @return void
+	 */
+	private static function booking( array &$step, array &$plan, array $local, array $google ) {
+		$links   = BookingLinks::complete( isset( $local['booking_links'] ) ? $local['booking_links'] : array() );
+		$offered = isset( $local['booking_offered'] ) && is_array( $local['booking_offered'] ) ? $local['booking_offered'] : null;
+
+		foreach ( BookingLinks::ATTRIBUTES as $field => $id ) {
+			$here    = trim( $links[ $field ] );
+			$label   = 'booking.' . $field;
+			$current = isset( $google[ $id ]['uriValues'][0]['uri'] ) ? (string) $google[ $id ]['uriValues'][0]['uri'] : '';
+
+			if ( '' === $here ) {
+				self::skip_or_unchanged( $plan, $label, $current );
+				continue;
+			}
+
+			if ( null !== $offered && empty( $offered[ $id ] ) ) {
+				$plan['skipped'][] = array(
+					'field'  => $label,
+					'reason' => self::REASON_NOT_ON_GOOGLE,
+					'google' => $current,
+				);
+				continue;
+			}
+
+			if ( BookingLinks::same( $field, $here, $current ) ) {
+				$plan['unchanged'][] = $label;
+				continue;
+			}
+
+			$uri = BookingLinks::to_google( $field, $here );
+
+			self::attribute(
+				$step,
+				$label,
+				$id,
+				$current,
+				$uri,
+				array(
+					'name'      => 'attributes/' . $id,
+					'valueType' => 'URL',
+					'uriValues' => array( array( 'uri' => $uri ) ),
+				)
+			);
+		}
+	}
+
+	/**
 	 * The step that patches attributes: social links and attribute answers.
 	 *
 	 * @param array $local      This site's profile.
@@ -452,6 +679,8 @@ class Plan {
 				)
 			);
 		}
+
+		self::booking( $step, $plan, $local, $google );
 
 		// Attribute answers changed here since the last push. Only those: an
 		// answer that has not changed is not named, so it cannot be disturbed.

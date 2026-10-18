@@ -9,6 +9,7 @@ namespace FHINT\API;
 
 use FHINT\App\Core\Capabilities;
 use FHINT\App\Core\ValidationResult;
+use FHINT\App\Google\Connection;
 use FHINT\API as ApiModule;
 use WP_Error;
 use WP_REST_Controller;
@@ -54,6 +55,34 @@ abstract class AbstractController extends WP_REST_Controller {
 				'fhint_forbidden',
 				__( 'You do not have permission to manage this.', 'foundhint-local-seo' ),
 				array( 'status' => 403 )
+			);
+		}
+
+		return true;
+	}
+
+	/**
+	 * Whether the current user may change the business details.
+	 *
+	 * The same capability check as a read, and then a linked Google account:
+	 * the details are a Google Business Profile's, so with none linked they
+	 * cannot be written at all. Checked here, on the server, because the
+	 * screen locking its fields is a courtesy and not a control.
+	 *
+	 * @return true|WP_Error
+	 */
+	public function google_write_check() {
+		$allowed = $this->permissions_check();
+
+		if ( true !== $allowed ) {
+			return $allowed;
+		}
+
+		if ( ! Connection::is_linked() ) {
+			return new WP_Error(
+				'fhint_google_required',
+				__( 'Connect your Google Business Profile first. Your business details can only be changed while Google is connected.', 'foundhint-local-seo' ),
+				array( 'status' => 409 )
 			);
 		}
 

@@ -45,10 +45,7 @@ class Reviews {
 		$titles = self::location_titles();
 
 		foreach ( $items as $index => $item ) {
-			$name = $item['location_name'];
-
-			$items[ $index ]['location_title'] = isset( $titles[ $name ] ) ? $titles[ $name ] : '';
-			$items[ $index ]['needs_reply']    = self::needs_reply( $item );
+			$items[ $index ] = self::present( $item, $titles );
 		}
 
 		return array(
@@ -60,6 +57,35 @@ class Reviews {
 				)
 			),
 		);
+	}
+
+	/**
+	 * One stored review, shaped as the listing shapes it.
+	 *
+	 * @param string $review_id Google review id.
+	 * @return array|null
+	 */
+	public static function one( $review_id ) {
+		$review = ReviewRepository::find( $review_id );
+
+		return $review ? self::present( $review, self::location_titles() ) : null;
+	}
+
+	/**
+	 * Add what a screen shows beside a review: the listing's title and
+	 * whether it is still waiting on an answer.
+	 *
+	 * @param array                $review One review, as the repository returns it.
+	 * @param array<string,string> $titles Listing titles by location name.
+	 * @return array
+	 */
+	private static function present( array $review, array $titles ) {
+		$name = $review['location_name'];
+
+		$review['location_title'] = isset( $titles[ $name ] ) ? $titles[ $name ] : '';
+		$review['needs_reply']    = self::needs_reply( $review );
+
+		return $review;
 	}
 
 	/**
@@ -93,6 +119,9 @@ class Reviews {
 			$locations[] = array(
 				'location_name' => $location['location_name'],
 				'title'         => $location['title'],
+				// The FoundHint location this listing belongs to, 0 for none —
+				// so a screen can open on the location chosen elsewhere.
+				'location_id'   => (int) $location['fhint_location_id'],
 				'count'         => ReviewRepository::count( array( 'location_name' => $location['location_name'] ) ),
 			);
 		}

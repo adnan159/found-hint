@@ -1,9 +1,9 @@
-import logoUrl from "@/assets/foundhint-icon.png";
 import { __, _n, sprintf } from "@wordpress/i18n";
 import { cn } from "cn";
 import { ExternalLinkIcon, StarIcon } from "lucide-react";
 import { Link } from "react-router";
 import LocationSwitcher, { switcherEntries } from "./LocationSwitcher";
+import { thumb } from "@/pages/profile/components/photos/lib";
 import { pillButton } from "./styles";
 
 /**
@@ -22,7 +22,39 @@ import { pillButton } from "./styles";
  * This is the row that lines up with the sidebar's logo block: same height,
  * same rule.
  */
-export function BusinessBar({ info, meta, onSwitch, switching, switchError }) {
+/**
+ * Up to two capital letters standing in for a missing logo: the first
+ * letter of the first two words, or the first two letters of a one-word name.
+ *
+ * @param {string} name Business name.
+ * @return {string}
+ */
+export function initials(name) {
+  const words = String(name ?? "")
+    .split(/\s+/)
+    .filter((word) => /[\p{L}\p{N}]/u.test(word))
+    .map((word) => word.replace(/^[^\p{L}\p{N}]+/u, ""));
+
+  if (!words.length) {
+    return "";
+  }
+
+  const letters =
+    words.length > 1
+      ? [...words[0]][0] + [...words[1]][0]
+      : [...words[0]].slice(0, 2).join("");
+
+  return letters.toUpperCase();
+}
+
+export function BusinessBar({
+  info,
+  meta,
+  logo,
+  onSwitch,
+  switching,
+  switchError,
+}) {
   const location = meta?.location;
   // The locations here and every other listing on the Google account: an
   // account with two listings can switch between them before either has
@@ -43,11 +75,23 @@ export function BusinessBar({ info, meta, onSwitch, switching, switchError }) {
 
   return (
     <div className="fhint:box-border fhint:flex fhint:min-h-[68px] fhint:flex-wrap fhint:items-center fhint:gap-x-4 fhint:gap-y-3 fhint:border-b fhint:border-b-divider fhint:bg-card fhint:px-4 fhint:py-2.5">
+      {/* The listing's own logo from Google; without one, its initials. */}
       <span
         aria-hidden="true"
-        className="fhint:grid fhint:size-11 fhint:flex-none fhint:place-items-center fhint:rounded-xl fhint:border fhint:border-border fhint:bg-card"
+        className="fhint:grid fhint:size-11 fhint:flex-none fhint:place-items-center fhint:overflow-hidden fhint:rounded-xl fhint:border fhint:border-border fhint:bg-notice fhint:text-[15px] fhint:font-extrabold fhint:tracking-[0.02em] fhint:text-notice-foreground"
       >
-        <img src={logoUrl} alt="" width={26} height={26} />
+        {logo?.url ? (
+          <img
+            src={thumb(logo.url, 96)}
+            alt=""
+            width={44}
+            height={44}
+            referrerPolicy="no-referrer"
+            className="fhint:size-full fhint:bg-card fhint:object-cover"
+          />
+        ) : (
+          initials(name)
+        )}
       </span>
       <div className="fhint:min-w-[180px] fhint:flex-1">
         <p className="fhint:m-0 fhint:truncate fhint:text-[16px] fhint:leading-tight fhint:font-extrabold fhint:tracking-[-0.01em]">

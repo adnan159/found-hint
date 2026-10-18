@@ -18,7 +18,12 @@
 
 require __DIR__ . '/bootstrap.php';
 
+use FHINT\App\Google\Client;
+use FHINT\App\Google\Credentials;
+use FHINT\App\Google\OAuth;
+use FHINT\App\Google\Tokens;
 use FHINT\App\Review\ReviewMapper;
+use FHINT\App\Review\ReviewReply;
 use FHINT\App\Review\Reviews;
 
 echo "Reviews\n";
@@ -180,5 +185,53 @@ check_same(
 	ReviewMapper::from_page( array( 'reviews' => 'nonsense' ), 'locations/42', 'accounts/7' ),
 	'a response whose reviews are not a list is an empty list'
 );
+
+
+// ── replying ────────────────────────────────────────────────────────────
+
+check_same( 'Thanks for coming in!', ReviewReply::sanitize( "  <b>Thanks</b> for coming in!  " ), 'a reply is plain text, trimmed' );
+check_same( "Thank you.\n\nSee you soon.", ReviewReply::sanitize( "Thank you.\n\nSee you soon." ), 'and keeps its paragraphs' );
+check_same( '', ReviewReply::sanitize( array( 'x' ) ), 'anything but a string is an empty reply' );
+
+check_same( array( 'comment' => array( 'review.reply.required' ) ), ReviewReply::validate( '' )->errors(), 'an empty reply is refused, on the comment field' );
+check( ReviewReply::validate( str_repeat( 'a', 4096 ) )->is_valid(), 'a reply of exactly 4,096 bytes is allowed' );
+check_same( array( 'comment' => array( 'review.reply.too_long' ) ), ReviewReply::validate( str_repeat( 'a', 4097 ) )->errors(), 'one byte more is too long' );
+
+// Google counts bytes. 1,366 Bengali letters are 4,098 bytes: short in
+// characters, too long for Google, and refused here rather than there.
+check( ! ReviewReply::validate( str_repeat( 'ক', 1366 ) )->is_valid(), 'the limit is counted in bytes, not characters' );
+
+// ── what Google is sent ─────────────────────────────────────────────────
+
+$GLOBALS['__options']       = array();
+$GLOBALS['__http_queue']    = array();
+$GLOBALS['__http_requests'] = array();
+
+Credentials::save( 'client-id', 'client-secret' );
+Tokens::save(
+	array(
+		'access_token'  => 'access-1',
+		'refresh_token' => 'refresh-1',
+		'expires_in'    => 3600,
+		'scope'         => OAuth::SCOPE_BUSINESS,
+	)
+);
+
+queue_http( 200, array( 'comment' => 'Thank you!' ) );
+$reply = Client::put( 'https://mybusiness.googleapis.com/v4/accounts/7/locations/42/reviews/rev-1/reply', array(), array( 'comment' => 'Thank you!' ) );
+$sent  = $GLOBALS['__http_requests'][0];
+
+check_same( 'PUT', $sent['method'], 'a reply is sent with PUT' );
+check_same( '{"comment":"Thank you!"}', $sent['args']['body'], 'with the reply as its JSON body' );
+check_same( 'application/json', $sent['args']['headers']['Content-Type'], 'marked as JSON' );
+check_same( 'Thank you!', $reply['comment'], "and Google's answer comes back decoded" );
+
+queue_http( 200, '' );
+Client::delete( 'https://mybusiness.googleapis.com/v4/accounts/7/locations/42/reviews/rev-1/reply' );
+$sent = $GLOBALS['__http_requests'][1];
+
+check_same( 'DELETE', $sent['method'], 'a reply is removed with DELETE' );
+check( ! isset( $sent['args']['body'] ), 'which carries no body' );
+
 
 finish( 'Reviews' );

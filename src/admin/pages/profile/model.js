@@ -52,13 +52,24 @@ export function infoModel(info = {}) {
     description: info.description ?? "",
     website: info.website ?? "",
     phone: info.phone ?? "",
+    additional_phones: Array.isArray(info.additional_phones)
+      ? [...info.additional_phones]
+      : [],
+    // `YYYY-MM`, as a month input reads and writes it.
+    opening_date: info.opening_date ?? "",
   };
 }
 
 export function infoFields(model, base) {
   const fields = {};
 
-  for (const key of ["name", "description", "website", "phone"]) {
+  for (const key of [
+    "name",
+    "description",
+    "website",
+    "phone",
+    "opening_date",
+  ]) {
     if (model[key] !== base[key]) {
       fields[key] = model[key];
     }
@@ -75,6 +86,11 @@ export function infoFields(model, base) {
     } else {
       fields.primary_category = model.primary_category;
     }
+  }
+
+  if (!same(model.additional_phones, base.additional_phones)) {
+    // The whole list, in order; the server drops empty boxes and repeats.
+    fields.additional_phones = model.additional_phones;
   }
 
   if (!same(model.secondary_categories, base.secondary_categories)) {
@@ -121,6 +137,12 @@ export function addressModel(address = {}) {
     model[key] = address[key] ?? "";
   }
 
+  // Each `{ name, place_id }`; a place typed here has no place_id.
+  model.service_area = (address.service_area ?? []).map((place) => ({
+    name: place?.name ?? "",
+    place_id: place?.place_id ?? "",
+  }));
+
   return model;
 }
 
@@ -131,6 +153,12 @@ export function addressFields(model, base) {
     if (model[key] !== base[key]) {
       fields[key] = model[key];
     }
+  }
+
+  // Sent on its own when only it changed, so a mapped location — whose
+  // address is Google's and refused — can still save its area.
+  if (!same(model.service_area, base.service_area)) {
+    fields.service_area = model.service_area;
   }
 
   return fields;
@@ -245,18 +273,49 @@ export function newPeriod() {
 
 // ── social ──────────────────────────────────────────────────────────────
 
+/**
+ * The Social Links card: the networks, and the booking links beside them.
+ * Kept apart in the model as they are on the server, so a booking page
+ * never ends up in the profiles listed as `sameAs`.
+ */
 export function socialModel(social = {}) {
-  const model = {};
+  const profiles = {};
 
   for (const network of social.networks ?? []) {
-    model[network] = social.social_profiles?.[network] ?? "";
+    profiles[network] = social.social_profiles?.[network] ?? "";
   }
 
-  return model;
+  return { profiles, booking: bookingModel(social) };
 }
 
-export function socialFields(model) {
-  return { social_profiles: { ...model } };
+export function socialFields(model, base) {
+  const fields = {};
+
+  // Each part only when it changed, so saving a new Facebook link does not
+  // also rewrite the booking links — or create a branch's own set of them.
+  if (!base || !same(model.profiles, base.profiles)) {
+    fields.social_profiles = { ...model.profiles };
+  }
+
+  if (!base || !same(model.booking, base.booking)) {
+    // The whole set: a location's booking links are one set.
+    fields.booking_links = { ...model.booking };
+  }
+
+  return fields;
+}
+
+// ── booking (part of the social card) ──────────────────────────────────
+
+export function bookingModel(social = {}) {
+  const links = social.booking_links ?? {};
+
+  return {
+    appointment: links.appointment ?? "",
+    // One international number, "+8801712345678"; the field splits it.
+    text_messaging: links.text_messaging ?? "",
+    whatsapp: links.whatsapp ?? "",
+  };
 }
 
 /**

@@ -89,6 +89,15 @@ because the *message* is a fallback; the `code` is what a client keys off.
 | `fhint_service_limit_reached` | 403 | Plan limit hit (Free: 5) |
 | `fhint_nothing_to_reorder` | 400 | No submitted id belongs to this business |
 | `fhint_save_failed` | 500 | The write itself failed |
+| `fhint_google_required` | 409 | A write to the business details with no Google account linked |
+
+**The business details need a linked Google account.** Every route that
+changes them — `/business`, `/locations`, `/services`, `PATCH /profile` and
+the `/profile/media`, `/profile/listing`, `/profile/google/refresh` and
+`/profile/publish/*` routes — answers `409 fhint_google_required` while no
+Google account is linked. Reads still answer; `GET /profile` then returns
+every section in its usual shape with the values emptied (see below).
+"Needs reconnect" counts as linked.
 
 ### Domain validation codes
 
@@ -507,6 +516,12 @@ read after a move.
 
 ### `GET /dashboard`
 
+Optional `location_id` (default 0, the primary location): the score card for
+that location's latest audit, with `meta.location_id`. A named location shows
+only its own runs (`has_audit: false` if it has none); the primary location
+falls back to the latest run of any location. `404` for a location that does
+not exist.
+
 **Reads stored figures and never measures.** There is no write method: the
 dashboard is the most-opened screen, and anything that ran the audit from
 here would put the rule set on its render. Running an audit is
@@ -567,6 +582,12 @@ says "+6 since Sep 10" rather than a false "+6 in the last 30 days".
 # SEO audit
 
 ### `GET /audits`
+
+Optional `location_id` (default 0, the primary location): the latest run and
+the history **for that location only**. `meta.location_id` is the location
+the answer is for. Runs recorded before the site had a location (location 0)
+count as the primary location's. `404` for a location that does not exist.
+`GET /dashboard` takes the same `location_id`.
 
 **Never measures.** It reads the most recent stored run; `meta.stale` says
 whether that run is older than the data it describes. Running the rule set
@@ -629,6 +650,12 @@ the same value saved through `/business`, `/locations` or `/services` pass
 through one set of rules.
 
 **Saving stores to this site only.** Nothing on this route contacts Google.
+
+**With no Google account linked** (`meta.google.linked: false`) every section
+comes back **empty but whole** — the form's structure stays (`social.networks`,
+`attributes.definitions`, `services.limits`), the values do not, and
+`meta.reviews` is `null`. Stored data is not deleted and reappears as soon
+as an account is linked; saving answers `409 fhint_google_required`.
 
 ### `GET /profile`
 
@@ -705,10 +732,10 @@ exist yet; `401`/`403` as everywhere.
 
 | Section | Fields | Notes |
 |---|---|---|
-| `info` | `name`, `primary_category_id`, `primary_category`, `secondary_categories`, `description`, `website`, `phone` | The `/business` rules, including [categories](#categories-on-a-business). Any other key is ignored. A changed description is added to `history`; saving the same words again is not. Optional `description_source`: `user` (default), `ai`, `google`. |
-| `address` | `address_line_1`, `address_line_2`, `city`, `region`, `postal_code`, `country`, `latitude`, `longitude` | Creates the primary location if the business has none. **`409 fhint_address_locked` once the location is mapped to a Google listing** — the address is then Google's. |
+| `info` | `name`, `primary_category_id`, `primary_category`, `secondary_categories`, `description`, `website`, `phone`, `additional_phones` (up to 2, whole list; `business.additional_phones.too_many`, per box `additional_phones.N`: `business.phone.invalid`, `business.additional_phones.same_as_main`), `opening_date` (`YYYY-MM`, `""` clears; `opening_date.invalid`, `opening_date.too_far` past one year ahead) | The `/business` rules, including [categories](#categories-on-a-business). Any other key is ignored. A changed description is added to `history`; saving the same words again is not. Optional `description_source`: `user` (default), `ai`, `google`. |
+| `address` | `address_line_1`, `address_line_2`, `city`, `region`, `postal_code`, `country`, `latitude`, `longitude` | Creates the primary location if the business has none. **`409 fhint_address_locked` once the location is mapped to a Google listing** — the address is then Google's. Also `service_area`: the whole list of places served, at most 20, each `{ name, place_id }` or a plain name (a typed place, `place_id` empty — kept and published as `areaServed`, never sent to Google, which requires a place id); saved even when the address is locked, if sent without address fields; codes `service_area.too_many`, `service_area.name.too_long` (per chip, `service_area.N`). |
 | `hours` | `opening_hours`, `special_hours` | Each key is saved on its own and **replaces the whole of what it names**. `opening_hours` takes what `/locations` takes. Error keys are prefixed: `opening_hours.day_1.period_0.close_time`, `special_hours.day_0.date`. |
-| `social` | `social_profiles` | An object of network → URL; the `/business` rules. |
+| `social` | `social_profiles`, `booking_links` | `social_profiles`: an object of network → URL; the `/business` rules. `booking_links`: `{ appointment, text_messaging, whatsapp }` — an http(s) link, an international number (`+8801712345678`, sent to Google as `sms:+…`), a wa.me link; whole set, `""` clears one; codes `booking.appointment.invalid`, `booking.text_messaging.invalid`, `booking.whatsapp.invalid` on `booking_links.<field>`. Either or both; both are checked before either is written. The read also carries `booking_offered` (which of the three Google offers this listing; `null` = unknown) and the location's `country`. |
 | `attributes` | `values` | `{ attribute_id: value }`. `true`/`false`, one string, a list of strings, or a list of URLs. **`null` withdraws an answer**, which is not the same as `false`. Only the attributes named are touched. |
 | `services` | `items` | **The whole list, in order.** An entry with an `id` is updated, one without is created, a stored service left out is **removed**. Every entry is validated before any is written; error keys are `items.0.name`. `403 fhint_service_limit_reached` only when the list grows past the plan limit. |
 | `media` | — | `400 fhint_section_read_only`. Photos arrive by upload, not by a section save. |
@@ -745,11 +772,11 @@ primary location, which is all a single-location site ever needs. Any other
 id reads, saves or publishes that location: its address, hours, attributes,
 photos and its own Google listing. The business-level sections (`info`,
 `social`, `services`) are the same whichever location is named — **except
-`info`'s name, description, phone, website and categories**, which follow the
+`info`'s name, description, phone, additional phones, website, opening date and categories**, which follow the
 location: the primary location's are the business's, and any other location
 keeps its own, field by field, showing the business's for a field it has not
 set. Saving them for a non-primary location writes them to that location
-(`business_name`, `description`, `phone`, `website`, categories) and leaves
+(`business_name`, `description`, `phone`, `additional_phones`, `website`, `opening_date`, categories) and leaves
 the business's alone. A non-primary location's description has its own
 `history`. **`social` and `services` follow the location too:** a non-primary
 location shows the business's links until it saves its own set, and has its
@@ -1043,8 +1070,8 @@ returns to `#/google`, where its explanation is shown.
 
 Reviews still live on Google's legacy v4 API, which is why they are read
 through a different host than the rest of the Google module. Everything this
-plugin shows comes from stored rows; only `POST /reviews/sync` contacts
-Google.
+plugin shows comes from stored rows; only `POST /reviews/sync` and the reply
+routes contact Google.
 
 ### `GET /reviews`
 
@@ -1087,6 +1114,10 @@ Counts, the average, the distribution across one to five stars, when Google
 last answered, and the locations reviews can be read for. This is what the
 screen and any dashboard card read; it never measures and never calls Google.
 
+
+Each entry in `locations` is `{ location_name, title, location_id, count }`;
+`location_id` is the FoundHint location the listing belongs to, 0 for none.
+
 ### `POST /reviews/sync`
 
 Asks Google for fresh reviews, for one `location_name` or for every synced
@@ -1101,6 +1132,52 @@ the refreshed figures, so a screen does not need a second request after a sync.
 When every location refuses, the first error is returned rather than a
 cheerful "0 reviews": reporting nothing read as success would tell an owner
 nobody has reviewed them when in fact Google never answered.
+
+### `PUT /reviews/{review_id}/reply`
+
+Posts the owner's reply to a review **on Google, publicly**, or replaces the
+one already there — Google keeps one reply per review, so writing and editing
+are the same call.
+
+```json
+{ "comment": "Thank you, Asha! See you next time." }
+```
+
+`comment` is plain text (tags are stripped, line breaks kept), required, and
+at most **4,096 bytes** — Google counts bytes, so a reply in Bengali or with
+emoji reaches the limit in far fewer letters.
+
+The stored row changes **only after Google accepts** the reply, so the
+screen never shows a reply the public cannot see. `data` is the review as
+now stored (the same shape as one entry of `GET /reviews`), and `meta.state`
+that listing's refreshed figures, so "Waiting on a reply" moves without a
+second request.
+
+```json
+{
+  "data": {
+    "review_id": "abc123",
+    "reply_comment": "Thank you, Asha! See you next time.",
+    "replied_at": "2026-10-18 08:30:00",
+    "needs_reply": false
+  },
+  "meta": { "state": { "count": 2, "unanswered": 1, "average": 5 } }
+}
+```
+
+| Status | Code | When |
+|---|---|---|
+| 400 | `fhint_validation_failed` | `data.fields.comment` is `review.reply.required` or `review.reply.too_long` |
+| 404 | `fhint_review_not_found` | No stored review has that id — read reviews from Google again |
+| 502 | `fhint_google_request_failed` | Google refused or failed; the stored reply is unchanged |
+| 500 | `fhint_save_failed` | Google took the reply but it could not be stored here |
+
+### `DELETE /reviews/{review_id}/reply`
+
+Removes the reply on Google, then clears it here. Same response shape as
+the `PUT`. If Google says there is no reply (already removed on Google
+itself), the stored copy is cleared and the call succeeds — the owner's goal
+holds either way.
 
 ## How the score works
 
@@ -1170,7 +1247,8 @@ page is about.
 ### `GET /schema`
 
 The graph for **one** location, for the admin preview: optional
-`location_id` (default 0, the primary location).
+`location_id` (default 0, the primary location). `404` for a location that
+does not exist.
 
 ```json
 {

@@ -164,24 +164,50 @@ class AuditRepository {
 	/**
 	 * The most recent completed run.
 	 *
+	 * @param int[]|null $location_ids Locations the run covered; null for any.
 	 * @return array|null
 	 */
-	public static function latest() {
+	public static function latest( $location_ids = null ) {
+		$rows = self::completed( 1, $location_ids );
+
+		return $rows ? $rows[0] : null;
+	}
+
+	/**
+	 * Completed runs, newest first, optionally for some locations only.
+	 *
+	 * @param int        $limit        How many.
+	 * @param int[]|null $location_ids Locations the runs covered; null for every one.
+	 * @return array[]
+	 */
+	private static function completed( $limit, $location_ids = null ) {
 		global $wpdb;
 
-		$table = Tables::name( Tables::AUDITS );
+		$table  = Tables::name( Tables::AUDITS );
+		$where  = 'status = %s';
+		$params = array( self::STATUS_COMPLETED );
+
+		if ( is_array( $location_ids ) ) {
+			$location_ids = array_values( array_unique( array_map( 'intval', $location_ids ) ) );
+
+			if ( ! $location_ids ) {
+				return array();
+			}
+
+			$where .= ' AND location_id IN (' . implode( ',', array_fill( 0, count( $location_ids ), '%d' ) ) . ')';
+			$params = array_merge( $params, $location_ids );
+		}
+
+		$params[] = (int) $limit;
 
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
-		$row = $wpdb->get_row(
-			$wpdb->prepare(
-				// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-				"SELECT * FROM {$table} WHERE status = %s ORDER BY completed_at DESC, id DESC LIMIT 1",
-				self::STATUS_COMPLETED
-			),
+		$rows = $wpdb->get_results(
+			// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.PreparedSQLPlaceholders.UnfinishedPrepare
+			$wpdb->prepare( "SELECT * FROM {$table} WHERE {$where} ORDER BY completed_at DESC, id DESC LIMIT %d", $params ),
 			ARRAY_A
 		);
 
-		return $row ? self::to_array( $row ) : null;
+		return array_map( array( __CLASS__, 'to_array' ), is_array( $rows ) ? $rows : array() );
 	}
 
 	/**
@@ -208,26 +234,12 @@ class AuditRepository {
 	/**
 	 * Recent completed runs, newest first.
 	 *
-	 * @param int $limit How many.
+	 * @param int        $limit        How many.
+	 * @param int[]|null $location_ids Locations the runs covered; null for every one.
 	 * @return array[]
 	 */
-	public static function history( $limit = 10 ) {
-		global $wpdb;
-
-		$table = Tables::name( Tables::AUDITS );
-
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
-		$rows = $wpdb->get_results(
-			$wpdb->prepare(
-				// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-				"SELECT * FROM {$table} WHERE status = %s ORDER BY completed_at DESC, id DESC LIMIT %d",
-				self::STATUS_COMPLETED,
-				(int) $limit
-			),
-			ARRAY_A
-		);
-
-		return array_map( array( __CLASS__, 'to_array' ), is_array( $rows ) ? $rows : array() );
+	public static function history( $limit = 10, $location_ids = null ) {
+		return self::completed( $limit, $location_ids );
 	}
 
 	/**
@@ -524,5 +536,23 @@ class AuditRepository {
 			'fix_handler'    => (string) $row['fix_handler'],
 			'status'         => (string) $row['status'],
 		);
+	}
+
+	/**
+	 * The location ids whose runs describe a location.
+	 *
+	 * A run records the location it audited. Runs made before the site had a
+	 * location record 0; those describe the business, which is the primary
+	 * location's — so the primary location's runs include them.
+	 *
+	 * @param array|null $location The location, or null for none.
+	 * @return int[]
+	 */
+	public static function ids_for( $location ) {
+		if ( ! is_array( $location ) || empty( $location['id'] ) ) {
+			return array( 0 );
+		}
+
+		return ! empty( $location['is_primary'] ) ? array( (int) $location['id'], 0 ) : array( (int) $location['id'] );
 	}
 }

@@ -1,6 +1,7 @@
 import { __ } from "@wordpress/i18n";
 import { cn } from "cn";
-import { errorText, help, primaryButton } from "../styles";
+import { ArrowUpToLineIcon } from "lucide-react";
+import { errorText, help } from "../styles";
 import Gallery from "./photos/Gallery";
 import PendingPhotos from "./photos/PendingPhotos";
 import PhotoSlot from "./photos/PhotoSlot";
@@ -39,10 +40,13 @@ export function PhotosSection({ media, google, locationId, onChanged }) {
         )}
       </p>
 
-      <div className="fhint:grid fhint:grid-cols-[repeat(auto-fit,minmax(min(100%,220px),1fr))] fhint:gap-[18px]">
+      {/* Logo, cover and the gallery's picker side by side, as in the
+          design; they stack on a narrow screen. */}
+      <div className="fhint:grid fhint:grid-cols-[repeat(auto-fit,minmax(min(100%,240px),1fr))] fhint:items-stretch fhint:gap-[18px]">
         <PhotoSlot
           title={__("Logo", "foundhint-local-seo")}
           shape={__("Square", "foundhint-local-seo")}
+          placeholder={__("Your logo", "foundhint-local-seo")}
           photo={media?.logo}
           waiting={waitingFor("logo")}
           disabled={busy}
@@ -51,35 +55,46 @@ export function PhotosSection({ media, google, locationId, onChanged }) {
         <PhotoSlot
           title={__("Cover photo", "foundhint-local-seo")}
           shape={__("Wide", "foundhint-local-seo")}
+          placeholder={__("Your cover photo", "foundhint-local-seo")}
           photo={media?.cover}
           waiting={waitingFor("cover")}
           disabled={busy}
           onFiles={add("cover")}
           wide
         />
-      </div>
 
-      <div className="fhint:flex fhint:flex-wrap fhint:items-center fhint:gap-3 fhint:border fhint:border-dashed fhint:border-input fhint:px-[15px] fhint:py-[13px]">
-        <div className="fhint:min-w-0 fhint:flex-1">
-          <strong className="fhint:block fhint:text-[13px]">
+        <Picker
+          droppable
+          multiple
+          disabled={busy}
+          onFiles={add("gallery")}
+          label={__("Choose photos for your gallery", "foundhint-local-seo")}
+          className="fhint:grid fhint:cursor-pointer fhint:content-start fhint:justify-items-start fhint:gap-2.5 fhint:rounded-[12px] fhint:border fhint:border-dashed fhint:border-primary/40 fhint:bg-primary/5 fhint:p-4 fhint:text-left fhint:transition-colors fhint:hover:bg-primary/10"
+          draggingClassName="fhint:border-primary fhint:bg-primary/15"
+        >
+          <span
+            aria-hidden="true"
+            className="fhint:grid fhint:size-9 fhint:place-items-center fhint:rounded-[8px] fhint:bg-primary/15 fhint:text-primary"
+          >
+            <ArrowUpToLineIcon className="fhint:size-4" />
+          </span>
+          <strong className="fhint:text-[14.5px] fhint:font-extrabold">
             {__("Add photos to your gallery", "foundhint-local-seo")}
           </strong>
-          <span className={help}>
+          <span className={cn(help, "fhint:leading-relaxed")}>
             {__(
               "Pick several at once. You can check them before they go to Google.",
               "foundhint-local-seo",
             )}
           </span>
-        </div>
-        <Picker
-          multiple
-          disabled={busy}
-          onFiles={add("gallery")}
-          className={primaryButton}
-        >
-          {busy && !sending
-            ? __("Working…", "foundhint-local-seo")
-            : __("Choose photos", "foundhint-local-seo")}
+          {/* Looks like a button; the whole card is what opens the picker. */}
+          <span className="fhint:mt-1 fhint:inline-flex fhint:items-center fhint:rounded-full fhint:bg-primary fhint:px-[18px] fhint:py-2.5 fhint:text-[13.5px] fhint:font-extrabold fhint:text-primary-foreground">
+            {busy && !sending
+              ? __("Working…", "foundhint-local-seo")
+              : gallery.length
+                ? __("Add more photos", "foundhint-local-seo")
+                : __("Choose photos", "foundhint-local-seo")}
+          </span>
         </Picker>
       </div>
 
@@ -111,18 +126,23 @@ export function PhotosSection({ media, google, locationId, onChanged }) {
       {gallery.length ? <Gallery gallery={gallery} /> : null}
 
       {nothing ? (
-        <div className="fhint:border fhint:border-dashed fhint:border-input fhint:bg-muted fhint:px-5 fhint:py-6">
-          <strong className="fhint:block fhint:text-sm">
+        <div className="fhint:rounded-[12px] fhint:border fhint:border-dashed fhint:border-[#cfc8c6] fhint:px-6 fhint:py-7">
+          <strong className="fhint:mb-1.5 fhint:block fhint:text-base fhint:font-extrabold">
             {__("Your Google photos will appear here", "foundhint-local-seo")}
           </strong>
-          <span className={help}>
+          <span
+            className={cn(
+              help,
+              "fhint:block fhint:max-w-[62ch] fhint:text-[13.5px] fhint:leading-relaxed",
+            )}
+          >
             {google?.mapped
               ? __(
-                  "Press Refresh from Google at the top of the page to load the photos on your listing.",
+                  "Press Refresh from Google at the top of the page and FoundHint will load every photo on your listing, from you and from your customers.",
                   "foundhint-local-seo",
                 )
               : __(
-                  "Connect your Google Business Profile and FoundHint will load the photos on your listing.",
+                  "Connect your Google Business Profile and FoundHint will load every photo on your listing, from you and from your customers.",
                   "foundhint-local-seo",
                 )}
           </span>

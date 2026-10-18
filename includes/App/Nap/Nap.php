@@ -81,6 +81,9 @@ class Nap {
 			'social_profiles' => LocationDetails::social( $location ? $location : null, $business ),
 			'address'        => self::address( $location ),
 			'coordinates'    => self::coordinates( $location ),
+			// The names of the places this location serves — typed here or
+			// read from Google alike: the website names them all.
+			'service_area'   => isset( $location['service_area'] ) && is_array( $location['service_area'] ) ? array_values( array_filter( array_map( 'strval', array_column( $location['service_area'], 'name' ) ) ) ) : array(),
 			'timezone'       => isset( $location['timezone'] ) ? (string) $location['timezone'] : '',
 			'status'         => isset( $location['status'] ) ? (string) $location['status'] : '',
 			'hours'          => $hours,

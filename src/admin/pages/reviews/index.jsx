@@ -5,20 +5,15 @@ import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Empty, EmptyDescription, EmptyTitle } from "@/components/ui/empty";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Spinner } from "@/components/ui/spinner";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import PageHeader from "@/components/PageHeader";
+import useSelectedLocation from "@/hooks/useSelectedLocation";
 import RequestError from "@/components/RequestError";
 import SectionCard from "@/components/SectionCard";
+import ReplyBox from "./components/ReplyBox";
 import {
   useGetReviewStateQuery,
   useGetReviewsQuery,
@@ -29,8 +24,9 @@ import {
  * Google reviews.
  *
  * Everything on this screen is read from stored rows. Pressing *Read from
- * Google* is the only thing that contacts Google, because asking costs a
- * request against a quota every site using this plugin shares.
+ * Google*, or posting, editing or deleting a reply, are the only things that
+ * contact Google, because asking costs a request against a quota every site
+ * using this plugin shares.
  *
  * Reviews are shown here, in the admin, and are deliberately not published
  * to the front end: review content belongs to its author and to Google, and
@@ -136,42 +132,48 @@ function ReviewRow({ review }) {
         </p>
       )}
 
-      {review.reply_comment ? (
-        <div className="fhint:mt-3 fhint:border-l-2 fhint:border-border fhint:pl-3">
-          <p className="fhint:text-[13px] fhint:font-bold">
-            {__("Your reply", "foundhint-local-seo")}
-            {review.replied_at ? ` · ${formatWhen(review.replied_at)}` : ""}
-          </p>
-          <p className="fhint:mt-1 fhint:text-sm">{review.reply_comment}</p>
-        </div>
-      ) : null}
+      <ReplyBox review={review} formatWhen={formatWhen} />
     </li>
   );
 }
 
 export default function Reviews() {
-  const [locationName, setLocationName] = useState("");
+  // Always one location's reviews: the location chosen in the bar at the
+  // top of every page, through the Google listing that belongs to it.
+  const { current, ready } = useSelectedLocation();
   const [unanswered, setUnanswered] = useState(false);
   const [perPage, setPerPage] = useState(PER_PAGE);
 
-  const {
-    data: state,
-    isLoading: stateLoading,
-    error: stateError,
-  } = useGetReviewStateQuery({ locationName });
+  // The list of listings comes with the state, asked for once without a
+  // listing; the figures are then asked for that location's listing.
+  const { data: listingsState } = useGetReviewStateQuery({ locationName: "" });
+  const listings = listingsState?.locations ?? [];
+  const listing =
+    current && listings.find((item) => item.location_id === current.id);
+  const locationName = listing ? listing.location_name : "";
 
   const {
-    data: listing,
+    currentData: state,
+    isFetching: stateFetching,
+    error: stateError,
+  } = useGetReviewStateQuery({ locationName }, { skip: !locationName });
+  const stateLoading = !ready || !listingsState || (stateFetching && !state);
+
+  const {
+    currentData: listingData,
     isFetching: listLoading,
     error: listError,
-  } = useGetReviewsQuery({ locationName, unanswered, perPage });
+  } = useGetReviewsQuery(
+    { locationName, unanswered, perPage },
+    { skip: !locationName },
+  );
 
   const [sync, { isLoading: syncing, error: syncError }] =
     useSyncReviewsMutation();
 
-  const locations = state?.locations ?? [];
-  const items = listing?.items ?? [];
-  const total = listing?.total ?? 0;
+  const locations = listings;
+  const items = listingData?.items ?? [];
+  const total = listingData?.total ?? 0;
 
   const onSync = async () => {
     try {
@@ -208,7 +210,8 @@ export default function Reviews() {
           <Button
             type="button"
             onClick={onSync}
-            disabled={syncing || !locations.length}
+            // Reads only the location on screen, never every location.
+            disabled={syncing || !locationName}
           >
             {syncing ? (
               <>
@@ -227,7 +230,7 @@ export default function Reviews() {
 
       <RequestError error={stateError ?? listError ?? syncError} />
 
-      {!stateLoading && !locations.length ? (
+      {listingsState && !locations.length ? (
         <SectionCard title={__("Reviews", "foundhint-local-seo")}>
           <Empty>
             <EmptyTitle>
@@ -243,7 +246,23 @@ export default function Reviews() {
         </SectionCard>
       ) : null}
 
-      {locations.length ? (
+      {ready && listingsState && locations.length > 0 && !listing ? (
+        <SectionCard title={__("Reviews", "foundhint-local-seo")}>
+          <Empty>
+            <EmptyTitle>
+              {__("This location has no Google listing", "foundhint-local-seo")}
+            </EmptyTitle>
+            <EmptyDescription>
+              {__(
+                "Reviews are read from a location's own Google listing. Link this location to one on the Google screen, or choose another location at the top of the page.",
+                "foundhint-local-seo",
+              )}
+            </EmptyDescription>
+          </Empty>
+        </SectionCard>
+      ) : null}
+
+      {listing ? (
         <SectionCard
           id="reviews-summary"
           title={__("At a glance", "foundhint-local-seo")}
@@ -257,7 +276,7 @@ export default function Reviews() {
               : __("Not read from Google yet.", "foundhint-local-seo")
           }
         >
-          {stateLoading ? (
+          {stateLoading || !locationName ? (
             <Skeleton className="fhint:h-20 fhint:w-full" />
           ) : (
             <div className="fhint:flex fhint:flex-wrap fhint:gap-8">
@@ -290,47 +309,12 @@ export default function Reviews() {
         </SectionCard>
       ) : null}
 
-      {locations.length ? (
+      {listing ? (
         <SectionCard
           id="reviews-list"
           title={__("Every review", "foundhint-local-seo")}
           action={
             <div className="fhint:flex fhint:flex-wrap fhint:items-center fhint:gap-4">
-              {locations.length > 1 ? (
-                <Select
-                  value={locationName || "all"}
-                  onValueChange={(value) =>
-                    setLocationName(value === "all" ? "" : value)
-                  }
-                >
-                  <SelectTrigger className="fhint:min-w-[220px]">
-                    <SelectValue>
-                      {(value) =>
-                        value === "all"
-                          ? __("All locations", "foundhint-local-seo")
-                          : (locations.find(
-                              (item) => item.location_name === value,
-                            )?.title ??
-                            __("All locations", "foundhint-local-seo"))
-                      }
-                    </SelectValue>
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">
-                      {__("All locations", "foundhint-local-seo")}
-                    </SelectItem>
-                    {locations.map((item) => (
-                      <SelectItem
-                        key={item.location_name}
-                        value={item.location_name}
-                      >
-                        {item.title || item.location_name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              ) : null}
-
               <div className="fhint:flex fhint:items-center fhint:gap-2">
                 <Switch
                   id="reviews-unanswered"

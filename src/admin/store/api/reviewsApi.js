@@ -4,9 +4,8 @@ import { baseApi, withQuery } from "./baseApi";
  * GET/POST /reviews.
  *
  * The two GETs read stored rows and never contact Google, so opening the
- * screen costs a database query. Only the sync is a POST, because asking
- * Google for fresh reviews is work and has a cost somebody has to choose to
- * pay.
+ * screen costs a database query. The sync and the reply calls are the only
+ * ones that reach Google, and only because somebody pressed a button.
  *
  * Query strings go through withQuery(), which picks ? or & from the REST
  * root — a site on plain permalinks has one in its URL already, and a second
@@ -53,6 +52,28 @@ export const reviewsApi = baseApi.injectEndpoints({
       }),
       invalidatesTags: ["Reviews"],
     }),
+
+    // Both reply calls change the review on Google, publicly, then here.
+    // The list and the figures are refetched, so "Waiting on a reply"
+    // moves with the change.
+    saveReviewReply: builder.mutation({
+      query: ({ reviewId, comment }) => ({
+        url: `/reviews/${encodeURIComponent(reviewId)}/reply`,
+        method: "PUT",
+        body: { comment },
+      }),
+      transformResponse: (response) => response?.data ?? null,
+      invalidatesTags: ["Reviews"],
+    }),
+
+    deleteReviewReply: builder.mutation({
+      query: ({ reviewId }) => ({
+        url: `/reviews/${encodeURIComponent(reviewId)}/reply`,
+        method: "DELETE",
+      }),
+      transformResponse: (response) => response?.data ?? null,
+      invalidatesTags: ["Reviews"],
+    }),
   }),
 });
 
@@ -60,4 +81,6 @@ export const {
   useGetReviewsQuery,
   useGetReviewStateQuery,
   useSyncReviewsMutation,
+  useSaveReviewReplyMutation,
+  useDeleteReviewReplyMutation,
 } = reviewsApi;

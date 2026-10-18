@@ -114,6 +114,7 @@ export function buildProfileTabs({
             onChange={getChangeHandler("address")}
             errors={errors.address?.fields}
             address={sections.address}
+            businessName={sections.info?.name ?? ""}
           />
         </>
       ),

@@ -1,8 +1,9 @@
 import { __, sprintf } from "@wordpress/i18n";
 import { ExternalLinkIcon, MapPinIcon } from "lucide-react";
 import { quietButton } from "../styles";
-import MapPreview from "./MapPreview";
+import MapPreview, { mapQuery } from "./MapPreview";
 import TextField from "./TextField";
+import ServiceAreaField from "./address/ServiceAreaField";
 
 /**
  * Where the business is.
@@ -11,9 +12,16 @@ import TextField from "./TextField";
  * here: Google does not let an app move a verified address, so letting this
  * screen edit it would only create a difference that can never be sent.
  *
- * The map shows where Google has the pin. It cannot be moved from here.
+ * The map is Google's: at the pin when there is one, else the business
+ * found by name and address. It cannot be moved from here.
  */
-export function AddressSection({ model, onChange, errors, address }) {
+export function AddressSection({
+  model,
+  onChange,
+  errors,
+  address,
+  businessName,
+}) {
   const locked = Boolean(address?.locked);
   const set = (key) => (value) => onChange({ ...model, [key]: value });
 
@@ -26,6 +34,23 @@ export function AddressSection({ model, onChange, errors, address }) {
     longitude !== undefined &&
     latitude !== "" &&
     longitude !== "";
+  // With no pin the map looks the business up by name and address, as the
+  // address stands in the form — so it follows an edit before it is saved.
+  const addressText = [
+    model.address_line_1,
+    model.address_line_2,
+    model.city,
+    model.region,
+    model.postal_code,
+    model.country,
+  ]
+    .map((part) => String(part ?? "").trim())
+    .filter(Boolean)
+    .join(", ");
+  const mapSearch = addressText
+    ? [businessName, addressText].filter(Boolean).join(", ")
+    : "";
+  const showMap = Boolean(mapQuery({ latitude, longitude, query: mapSearch }));
 
   const field = (key, label, extra = {}) => (
     <TextField
@@ -69,10 +94,11 @@ export function AddressSection({ model, onChange, errors, address }) {
         })}
       </div>
 
-      {hasPin ? (
+      {showMap ? (
         <MapPreview
           latitude={latitude}
           longitude={longitude}
+          query={mapSearch}
           label={
             address?.formatted || __("Your location", "foundhint-local-seo")
           }
@@ -102,9 +128,9 @@ export function AddressSection({ model, onChange, errors, address }) {
                 )}
           </span>
         </div>
-        {hasPin ? (
+        {showMap ? (
           <a
-            href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${latitude},${longitude}`)}`}
+            href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(mapQuery({ latitude, longitude, query: mapSearch }))}`}
             target="_blank"
             rel="noopener noreferrer"
             className={quietButton}
@@ -125,6 +151,15 @@ export function AddressSection({ model, onChange, errors, address }) {
           </a>
         ) : null}
       </div>
+
+      {/* After the map: the places served beyond the address. Editable
+          even when the address is Google's. */}
+      <ServiceAreaField
+        value={model.service_area}
+        onChange={set("service_area")}
+        errors={errors}
+        max={address?.service_area_max ?? 20}
+      />
     </>
   );
 }

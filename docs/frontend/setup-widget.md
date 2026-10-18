@@ -3,6 +3,11 @@
 The setup widget is the first-run flow: **Continue with Google**, choose a
 listing, **import it in six steps**, then open the Business Profile.
 
+**Google is required.** Until a Google account is linked the dashboard is
+the Get Started introduction, with no "Skip to dashboard": the business
+details come from Google, every Business field stays empty and locked, and
+every write answers `409 fhint_google_required`.
+
 - Screen route: `#/setup/google`
 - Reference code: `src/admin/pages/setup/google.jsx`,
   `src/admin/store/api/googleApi.js`, `src/admin/store/api/onboardingApi.js`
@@ -275,10 +280,10 @@ anywhere you only need what was last read.
 ```json
 {
   "data": [
-    { "id": "identity", "fields": ["name", "description"] },
+    { "id": "identity", "fields": ["name", "description", "opening_date"] },
     { "id": "category", "fields": ["categories", "business_type"] },
-    { "id": "address",  "fields": ["address", "coordinates"] },
-    { "id": "contact",  "fields": ["phone", "website", "social"] },
+    { "id": "address",  "fields": ["address", "coordinates", "service_area"] },
+    { "id": "contact",  "fields": ["phone", "additional_phones", "website", "social", "booking"] },
     { "id": "hours",    "fields": ["hours"] },
     { "id": "services", "fields": ["services"] }
   ]
@@ -289,10 +294,10 @@ The front end supplies the label for each `id`:
 
 | `id` | Label to show |
 |---|---|
-| `identity` | Business name and description |
+| `identity` | Business name, description and opening date |
 | `category` | Category |
 | `address` | Address and map pin |
-| `contact` | Phone and website |
+| `contact` | Phone numbers and website |
 | `hours` | Opening hours |
 | `services` | Services |
 
@@ -323,7 +328,7 @@ The front end supplies the label for each `id`:
   "data": {
     "step": "address",
     "status": "imported",
-    "applied": ["address", "coordinates"],
+    "applied": ["address", "coordinates", "service_area"],
     "skipped": [],
     "location_id": 1,
     "next": "contact"

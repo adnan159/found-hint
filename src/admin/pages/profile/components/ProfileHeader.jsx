@@ -1,34 +1,17 @@
-import BusinessBar from "./header/BusinessBar";
 import TitleBar from "./header/TitleBar";
 
 /**
- * The two bars at the top of the profile: which business and location the
- * screen is showing, and the page's own title row beneath it.
- *
- * The business bar needs the profile, so it is left out until `meta` has
- * loaded.
+ * The profile's own title row. Which business and location it shows is the
+ * bar at the top of every page (`components/location-bar`).
  */
 export function ProfileHeader({
-  info,
   meta,
-  onSwitch,
-  switching,
-  switchError,
   onPublish,
   publishDisabled,
   publishHint,
 }) {
   return (
     <header className="fhint:-mx-4 fhint:-mt-6 fhint:flex fhint:flex-col">
-      {meta ? (
-        <BusinessBar
-          info={info}
-          meta={meta}
-          onSwitch={onSwitch}
-          switching={switching}
-          switchError={switchError}
-        />
-      ) : null}
       <TitleBar
         meta={meta}
         onPublish={onPublish}

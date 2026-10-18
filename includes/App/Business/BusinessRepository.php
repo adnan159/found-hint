@@ -26,7 +26,7 @@ class BusinessRepository {
 	 *
 	 * @var string[]
 	 */
-	private static $json_columns = array( 'secondary_categories', 'social_profiles' );
+	private static $json_columns = array( 'secondary_categories', 'social_profiles', 'additional_phones', 'booking_links' );
 
 	/**
 	 * The business profile, or null when none has been created yet.

@@ -135,11 +135,13 @@ class Business {
 			'logo_attachment_id',
 			'logo_url',
 			'phone',
+			'additional_phones',
 			'email',
 			'website',
 			'price_range',
 			'founding_date',
 			'social_profiles',
+			'booking_links',
 		);
 	}
 
@@ -161,11 +163,13 @@ class Business {
 			'logo_attachment_id'   => 0,
 			'logo_url'             => '',
 			'phone'                => '',
+			'additional_phones'    => array(),
 			'email'                => '',
 			'website'              => '',
 			'price_range'          => '',
 			'founding_date'        => '',
 			'social_profiles'      => array(),
+			'booking_links'        => array(),
 			'created_at'           => '',
 			'updated_at'           => '',
 		);
@@ -197,6 +201,14 @@ class Business {
 
 				case 'social_profiles':
 					$clean[ $field ] = self::sanitize_social( $value );
+					break;
+
+				case 'booking_links':
+					$clean[ $field ] = BookingLinks::sanitize( $value );
+					break;
+
+				case 'additional_phones':
+					$clean[ $field ] = AdditionalPhones::sanitize( $value );
 					break;
 
 				case 'description':
@@ -485,6 +497,14 @@ class Business {
 
 		if ( ! empty( $data['phone'] ) && ! Validator::is_phone( (string) $data['phone'] ) ) {
 			$result->add( 'phone', 'business.phone.invalid' );
+		}
+
+		if ( isset( $data['booking_links'] ) && is_array( $data['booking_links'] ) ) {
+			$result->merge( BookingLinks::validate( $data['booking_links'] ) );
+		}
+
+		if ( isset( $data['additional_phones'] ) && is_array( $data['additional_phones'] ) ) {
+			$result->merge( AdditionalPhones::validate( $data['additional_phones'], isset( $data['phone'] ) ? (string) $data['phone'] : '' ) );
 		}
 
 		if ( ! empty( $data['website'] ) && ! Validator::is_url( (string) $data['website'] ) ) {

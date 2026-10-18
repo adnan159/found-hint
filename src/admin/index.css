@@ -105,6 +105,14 @@
      by its 2px weight, not by a darker colour. Left undefined, it falls back
      to the text colour and every such rule turns near-black. */
   --divider: var(--border);
+  /* Plan-limit, "heads up" and "coming soon" notices — an accent-tinted
+     band, not an error — measured from the prototype. Left undefined (they
+     were lost once, in the tooltip commit), `bg-notice` is transparent and
+     `border-notice-border` falls back to the text colour: every notice
+     turns into a near-black outline on white. */
+  --notice: #fff1eb;
+  --notice-border: #ffc9af;
+  --notice-foreground: #8a3b12;
 }
 
 .dark {

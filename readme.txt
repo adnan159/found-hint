@@ -31,7 +31,7 @@ Small businesses with a shop, a clinic, a studio or a van — and the agencies l
 
 == External services ==
 
-This plugin connects to three external services. Google and FoundHint Connect are not contacted until you choose to connect Google; OpenStreetMap is contacted only when the Business Profile screen shows a map.
+This plugin connects to three external services. Google's Business Profile APIs and FoundHint Connect are not contacted until you choose to connect Google; Google Maps is contacted only when the Business Profile screen shows a map.
 
 **1. Google Business Profile APIs** (Google LLC)
 
@@ -52,14 +52,14 @@ Google requires an OAuth client, and an OAuth client requires one fixed web addr
 * Terms of service: https://foundhint.com/terms-and-conditions/
 * Privacy policy: https://foundhint.com/privacy-policy/
 
-**3. OpenStreetMap map tiles** (OpenStreetMap Foundation)
+**3. Google Maps embed** (Google LLC)
 
-The Business Profile screen shows your location on a small map. The map images are loaded by your browser from OpenStreetMap's tile servers.
+The Business Profile screen shows your location on a Google map. The map is Google's own embed page, loaded in a frame by your browser; it needs no API key.
 
-* What is sent: your browser's IP address and which squares of the map are being shown, as with any image request. Your business details are not sent.
-* When: when an administrator opens the Business Profile screen for a location that has map coordinates. Never on a visitor-facing page.
-* Terms of use: https://wiki.osmfoundation.org/wiki/Terms_of_Use
-* Privacy policy: https://osmfoundation.org/wiki/Privacy_Policy
+* What is sent: your browser's IP address, and either the location's map coordinates or, when it has none, the business name and address, so Google can find the place. No referrer is sent with it. Your Google sign-in and tokens are not involved.
+* When: when an administrator opens the Address tab of the Business Profile screen. Never on a visitor-facing page.
+* Terms of service: https://policies.google.com/terms and https://www.google.com/help/terms_maps/
+* Privacy policy: https://policies.google.com/privacy
 
 If you would rather not use that service, open **Google → Advanced: use your own Google client** and enter a client ID and secret from your own Google Cloud project. The plugin then talks only to Google.
 
@@ -72,8 +72,8 @@ JavaScript in `src/admin/`, which ships with the plugin. To reproduce it:
 
 It bundles two third-party resources, which are GPL-compatible:
 
-* **Leaflet** (map library) — Volodymyr Agafonkin and contributors, BSD 2-Clause License. Source and licence: https://github.com/Leaflet/Leaflet
 * **Archivo Variable** (webfont) — Omnibus-Type, SIL Open Font License 1.1. Source and licence: https://github.com/Omnibus-Type/Archivo
+* **Simple Icons** (social network logos) — Simple Icons contributors, CC0 1.0. Source and licence: https://github.com/simple-icons/simple-icons
 
 The category search reads a list of Google Business Profile categories that ships
 with the plugin (`includes/App/Google/data/google-categories.json`). It was compiled

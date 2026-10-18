@@ -8,6 +8,7 @@
 namespace FHINT\API;
 
 use FHINT\App\Audit\AuditRepository;
+use FHINT\App\Location\LocationRepository;
 use FHINT\App\Audit\Fixes\FixRunner;
 use FHINT\App\Audit\Runner;
 use FHINT\App\Audit\Score;
@@ -52,6 +53,15 @@ class Audits extends AbstractController {
 					'methods'             => WP_REST_Server::READABLE,
 					'callback'            => array( $this, 'get_item' ),
 					'permission_callback' => array( $this, 'permissions_check' ),
+					'args'                => $this->args(
+						array(
+							'location_id' => array(
+								'type'    => 'integer',
+								'minimum' => 0,
+								'default' => 0,
+							),
+						)
+					),
 				),
 				array(
 					'methods'             => WP_REST_Server::CREATABLE,
@@ -120,21 +130,31 @@ class Audits extends AbstractController {
 	 * The latest stored run, its findings, and the history.
 	 *
 	 * @param \WP_REST_Request $request Request.
-	 * @return \WP_REST_Response
+	 * @return \WP_REST_Response|WP_Error
 	 */
 	public function get_item( $request ) {
-		$latest = AuditRepository::latest();
+		// One location's audit: the one named, or the primary location.
+		$location_id = (int) $request->get_param( 'location_id' );
+		$location    = $location_id ? LocationRepository::find( $location_id ) : LocationRepository::primary();
+
+		if ( $location_id && ! $location ) {
+			return $this->not_found( 'location' );
+		}
+
+		$ids    = AuditRepository::ids_for( $location );
+		$latest = AuditRepository::latest( $ids );
 
 		return $this->envelope(
 			$latest,
 			array(
-				'issues'  => $latest ? AuditRepository::issues( $latest['id'] ) : array(),
-				'passes'  => $latest ? AuditRepository::issues( $latest['id'], 'pass' ) : array(),
-				'history' => AuditRepository::history( 10 ),
+				'location_id' => $location ? (int) $location['id'] : 0,
+				'issues'      => $latest ? AuditRepository::issues( $latest['id'] ) : array(),
+				'passes'      => $latest ? AuditRepository::issues( $latest['id'], 'pass' ) : array(),
+				'history'     => AuditRepository::history( 10, $ids ),
 				// Reported, never acted on here. A stale score is shown with
 				// a warning rather than hidden or silently refreshed.
-				'stale'   => Runner::is_stale( $latest ),
-				'bands'   => Score::bands(),
+				'stale'       => Runner::is_stale( $latest ),
+				'bands'       => Score::bands(),
 			)
 		);
 	}

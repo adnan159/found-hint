@@ -13,7 +13,9 @@ import {
 } from "@/components/ui/select";
 import { Skeleton } from "@/components/ui/skeleton";
 import NoticeBar from "@/components/NoticeBar";
+import ComingSoonBanner from "@/components/ComingSoonBanner";
 import PageHeader from "@/components/PageHeader";
+import useSelectedLocation from "@/hooks/useSelectedLocation";
 import RequestError from "@/components/RequestError";
 import SectionCard from "@/components/SectionCard";
 import { messageForCode } from "@/lib/errors";
@@ -115,7 +117,15 @@ function StatusBanner({ schema }) {
 }
 
 export default function SchemaPage() {
-  const { data: schema, isLoading, error } = useGetSchemaQuery(0);
+  // The preview is per location: the one chosen here or elsewhere, else
+  // the main location. Every location is published; this shows one.
+  const { locationId, ready } = useSelectedLocation();
+  const {
+    currentData: schema,
+    isFetching,
+    error,
+  } = useGetSchemaQuery(locationId, { skip: !ready });
+  const isLoading = !ready || (isFetching && !schema);
   const { data: settingsData } = useGetSettingsQuery();
   const [updateSettings, { isLoading: isSaving }] = useUpdateSettingsMutation();
 
@@ -151,7 +161,15 @@ export default function SchemaPage() {
       <PageHeader
         title={__("Schema", "foundhint-local-seo")}
         description={__(
-          "The structured data that tells search engines what your business is, where it is, and when it is open.",
+          "The structured data that tells search engines what your business is, where it is, and when it is open. Every location is published; this is the one chosen at the top of the page.",
+          "foundhint-local-seo",
+        )}
+      />
+
+      <ComingSoonBanner
+        title={__("Advanced schema coming soon!", "foundhint-local-seo")}
+        description={__(
+          "More schema types and finer control over your markup are on the way. Your business markup is already published.",
           "foundhint-local-seo",
         )}
       />

@@ -7,8 +7,10 @@
 
 namespace FHINT\App\Google\Push;
 
+use FHINT\App\Business\BookingLinks;
 use FHINT\App\Business\BusinessRepository;
 use FHINT\App\Core\Logger;
+use FHINT\App\Google\AttributeCatalog;
 use FHINT\App\Google\Client;
 use FHINT\App\Google\Connection;
 use FHINT\App\Google\GoogleLocationRepository;
@@ -45,7 +47,7 @@ class Publisher {
 	/**
 	 * Every field a plan compares, and the flags that say what may be edited.
 	 */
-	const READ_MASK = 'name,languageCode,title,phoneNumbers,categories,websiteUri,regularHours,specialHours,profile,serviceItems,metadata';
+	const READ_MASK = 'name,languageCode,title,phoneNumbers,categories,websiteUri,regularHours,specialHours,profile,openInfo,serviceArea,serviceItems,metadata';
 
 	/**
 	 * Work out what a publish would send.
@@ -353,7 +355,13 @@ class Publisher {
 			$id      = substr( $raw, $position + strlen( 'attributes/' ) );
 			$network = array_search( $id, GoogleFormat::SOCIAL_ATTRIBUTES, true );
 
-			return false !== $network ? 'social.' . $network : 'attribute.' . $id;
+			if ( false !== $network ) {
+				return 'social.' . $network;
+			}
+
+			$booking = array_search( $id, BookingLinks::ATTRIBUTES, true );
+
+			return false !== $booking ? 'booking.' . $booking : 'attribute.' . $id;
 		}
 
 		$mask = str_replace( '_', '', $raw );
@@ -363,6 +371,8 @@ class Publisher {
 			'title'               => 'name',
 			'websiteuri'          => 'website',
 			'phonenumbers'        => 'phone',
+			'openinfo'            => 'opening_date',
+			'servicearea'         => 'service_area',
 			'categories'          => 'categories',
 			'regularhours'        => 'hours',
 			'specialhours'        => 'special_hours',
@@ -397,12 +407,17 @@ class Publisher {
 		// A listing is sent the categories of its own location.
 		$categories = LocationCategories::resolve( $selected, $business );
 		$details    = LocationDetails::resolve( $selected, $business );
+		$google     = Profile::google_location();
 
 		return array(
 			'name'                 => $details['name'],
 			'description'          => $details['description'],
 			'website'              => (string) $nap['website'],
 			'phone'                => (string) $nap['phone'],
+			'additional_phones'    => LocationDetails::additional_phones( $selected, $business ),
+			'opening_date'         => $details['opening_date'],
+			// Every location keeps its own area, like its address.
+			'service_area'         => $selected && is_array( $selected['service_area'] ) ? $selected['service_area'] : array(),
 			'primary_category'     => $categories['primary_category'],
 			'primary_category_id'  => $categories['primary_category_id'],
 			'secondary_categories' => $categories['secondary_categories'],
@@ -410,6 +425,10 @@ class Publisher {
 			'special_rows'         => SpecialHoursRepository::for_location( $location ),
 			'services'             => ServiceRepository::all( array( 'location_id' => LocationDetails::services_list( $selected ) ) ),
 			'social_profiles'      => LocationDetails::social( $selected, $business ),
+			'booking_links'        => LocationDetails::booking( $selected, $business ),
+			// Which booking links Google offers this listing; null when its
+			// menu has not been read, and then nothing is held back.
+			'booking_offered'      => $google ? AttributeCatalog::offers( (string) $google['location_name'], array_values( BookingLinks::ATTRIBUTES ) ) : null,
 			'attributes'           => $location ? LocationAttributeRepository::for_location( $location ) : array(),
 		);
 	}

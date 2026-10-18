@@ -10,6 +10,7 @@ namespace FHINT\App\Profile\Sections;
 use FHINT\App\Business\Business;
 use FHINT\App\Business\BusinessRepository;
 use FHINT\App\Business\DescriptionHistoryRepository;
+use FHINT\App\Business\OpeningDate;
 use FHINT\App\Core\ValidationResult;
 use FHINT\App\Location\LocationCategories;
 use FHINT\App\Location\LocationDetails;
@@ -20,7 +21,7 @@ use WP_Error;
 defined( 'ABSPATH' ) || exit;
 
 /**
- * Name, categories, description, website and phone.
+ * Name, categories, description, website, phone and opening date.
  *
  * The fields carry the same names here as on `/business`, deliberately: a
  * validation error is keyed by field, and one vocabulary means the message
@@ -40,6 +41,8 @@ class Info {
 		'description',
 		'website',
 		'phone',
+		'additional_phones',
+		'opening_date',
 	);
 
 	/**
@@ -65,6 +68,12 @@ class Info {
 			'description'          => $details['description'],
 			'website'              => $details['website'],
 			'phone'                => $details['phone'],
+			// Up to two more numbers, in order: Google's `additionalPhones`.
+			'additional_phones'    => LocationDetails::additional_phones( $location, $business ),
+			// The location's country, for the phone fields' country code.
+			'country'              => $location ? (string) $location['country'] : '',
+			// `YYYY-MM`: kept to the month, as Google shows it ("Opened March 2014").
+			'opening_date'         => OpeningDate::for_screen( $details['opening_date'] ),
 			// Google's own id for the listing. Read-only: it is shown because
 			// directories ask for it, and it only exists once a listing is mapped.
 			'cid'                  => $google && isset( $google['cid'] ) ? (string) $google['cid'] : '',
@@ -90,10 +99,19 @@ class Info {
 			$current ? $current : Business::blank(),
 			LocationCategories::resolve( $location, $current ),
 			LocationDetails::resolve( $location, $current ),
+			array( 'additional_phones' => LocationDetails::additional_phones( $location, $current ) ),
 			$changes
 		);
 
 		$validation = Business::validate( $merged );
+
+		// The opening date is not a field of the business entity — on the
+		// business it is `founding_date` — so it is cleaned and checked here.
+		$opening = array_key_exists( 'opening_date', $fields ) ? OpeningDate::sanitize( $fields['opening_date'] ) : null;
+
+		if ( null !== $opening ) {
+			$validation->merge( OpeningDate::validate( $opening ) );
+		}
 
 		if ( ! $validation->is_valid() ) {
 			return $validation;
@@ -104,6 +122,16 @@ class Info {
 		// are left alone, so saving a second listing never rewrites the first.
 		if ( LocationCategories::kept_on_location( $location ) ) {
 			$own = LocationDetails::to_columns( $changes );
+
+			if ( null !== $opening ) {
+				$own['opening_date'] = $opening;
+			}
+
+			// A list of its own from the first save, even an empty one, so a
+			// number removed on this branch is not replaced by the business's.
+			if ( array_key_exists( 'additional_phones', $changes ) ) {
+				$own['additional_phones'] = $changes['additional_phones'];
+			}
 
 			// The three category fields are written together even when one was
 			// sent: a location with extra categories and no main one would fall
@@ -125,12 +153,18 @@ class Info {
 			$changes = array_diff_key(
 				$changes,
 				array_flip( LocationCategories::FIELDS ),
-				LocationDetails::COLUMNS
+				LocationDetails::COLUMNS,
+				array( 'additional_phones' => true )
 			);
 
 			if ( ! $changes ) {
 				return true;
 			}
+		}
+
+		// The primary location's opening date is the business's founding date.
+		if ( null !== $opening ) {
+			$changes['founding_date'] = $opening;
 		}
 
 		$saved = BusinessRepository::save( $changes );

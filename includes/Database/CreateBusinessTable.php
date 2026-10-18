@@ -42,11 +42,19 @@ defined( 'ABSPATH' ) || exit;
  * @column logo_url             Resolved logo URL. Kept alongside the attachment id so an
  *                              external logo works without a media library entry.
  * @column phone                Primary contact number. Locations may override it.
+ * @column additional_phones    JSON array of up to two more numbers, in order —
+ *                              Google's `phoneNumbers.additionalPhones`. NULL or
+ *                              empty means none. The primary location's list.
  * @column email                Primary contact email.
  * @column website              Primary website URL.
  * @column price_range          schema.org priceRange indicator, e.g. '$$'.
  * @column founding_date        ISO 8601 date (YYYY-MM-DD) the business was founded.
  * @column social_profiles      JSON object of network => profile URL, emitted as sameAs.
+ * @column booking_links        JSON object: `appointment` (URL), `text_messaging`
+ *                              (international number, `+8801712345678`) and
+ *                              `whatsapp` (wa.me link) — Google's `url_appointment`,
+ *                              `url_text_messaging` and `url_whatsapp`. The
+ *                              primary location's set.
  * @column created_at           Row creation timestamp, UTC.
  * @column updated_at           Last write timestamp, UTC.
  */
@@ -75,11 +83,13 @@ class CreateBusinessTable {
 	logo_attachment_id bigint(20) unsigned NOT NULL default 0,
 	logo_url varchar(500) NOT NULL default '',
 	phone varchar(50) NOT NULL default '',
+	additional_phones longtext NULL,
 	email varchar(191) NOT NULL default '',
 	website varchar(500) NOT NULL default '',
 	price_range varchar(20) NOT NULL default '',
 	founding_date date NULL,
 	social_profiles longtext NULL,
+	booking_links longtext NULL,
 	created_at datetime NULL,
 	updated_at datetime NULL,
 	PRIMARY KEY  (id),

@@ -7,12 +7,16 @@
 
 namespace FHINT\App\Google;
 
+use FHINT\App\Business\AdditionalPhones;
+use FHINT\App\Business\BookingLinks;
 use FHINT\App\Business\BusinessRepository;
+use FHINT\App\Business\OpeningDate;
 use FHINT\App\Location\LocationCategories;
 use FHINT\App\Location\LocationDetails;
 use FHINT\App\Location\LocationRepository;
 use FHINT\App\Location\OpeningHours;
 use FHINT\App\Location\OpeningHoursRepository;
+use FHINT\App\Location\ServiceArea;
 use FHINT\App\Nap\Nap;
 use FHINT\App\Service\ServiceRepository;
 use WP_Error;
@@ -52,28 +56,32 @@ class Import {
 	 * `readMask` is required by the Business Information API, and asking for
 	 * less than is imported would leave fields silently blank.
 	 */
-	const READ_MASK = 'title,storefrontAddress,phoneNumbers,websiteUri,regularHours,profile,latlng,categories,serviceItems';
+	const READ_MASK = 'title,storefrontAddress,serviceArea,phoneNumbers,websiteUri,regularHours,profile,openInfo,latlng,categories,serviceItems';
 
 	/** What can be imported, in the order the screen lists it. */
 	const FIELDS = array(
 		'name',
 		'description',
+		'opening_date',
 		'business_type',
 		'categories',
 		'phone',
+		'additional_phones',
 		'website',
 		'social',
+		'booking',
 		'address',
 		'coordinates',
+		'service_area',
 		'hours',
 		'services',
 	);
 
 	/** Fields belonging to the business rather than to one of its locations. */
-	const BUSINESS_FIELDS = array( 'name', 'description', 'business_type', 'categories', 'phone', 'website', 'social' );
+	const BUSINESS_FIELDS = array( 'name', 'description', 'opening_date', 'business_type', 'categories', 'phone', 'additional_phones', 'website', 'social', 'booking' );
 
 	/** Fields that are the location's own. */
-	const LOCATION_FIELDS = array( 'address', 'coordinates', 'hours' );
+	const LOCATION_FIELDS = array( 'address', 'coordinates', 'service_area', 'hours' );
 
 	/**
 	 * The guided import, as the steps a person watches go by.
@@ -84,10 +92,10 @@ class Import {
 	 * pin" is two fields here and one line there.
 	 */
 	const STEPS = array(
-		'identity' => array( 'name', 'description' ),
+		'identity' => array( 'name', 'description', 'opening_date' ),
 		'category' => array( 'categories', 'business_type' ),
-		'address'  => array( 'address', 'coordinates' ),
-		'contact'  => array( 'phone', 'website', 'social' ),
+		'address'  => array( 'address', 'coordinates', 'service_area' ),
+		'contact'  => array( 'phone', 'additional_phones', 'website', 'social', 'booking' ),
 		'hours'    => array( 'hours' ),
 		'services' => array( 'services' ),
 	);
@@ -492,7 +500,7 @@ class Import {
 			// business as well would make the second shop's number answer
 			// for the first. So are its name, description and categories:
 			// all of them are written to the branch itself in write_location().
-			if ( ! $is_primary && in_array( $key, array( 'name', 'description', 'phone', 'website', 'categories', 'social' ), true ) ) {
+			if ( ! $is_primary && in_array( $key, array( 'name', 'description', 'opening_date', 'phone', 'additional_phones', 'website', 'categories', 'social', 'booking' ), true ) ) {
 				continue;
 			}
 
@@ -506,6 +514,24 @@ class Import {
 				$changes['primary_category_id']  = $value['primary']['id'];
 				$changes['secondary_categories'] = $value['additional'];
 				$written[]                       = $key;
+				continue;
+			}
+
+			if ( 'booking' === $key ) {
+				$business = BusinessRepository::get();
+
+				// Merged, not replaced, as for the social links: a link set here
+				// that Google does not hold is still the owner's.
+				$changes['booking_links'] = array_merge( BookingLinks::complete( $business ? $business['booking_links'] : array() ), $value );
+				$written[]                = $key;
+				continue;
+			}
+
+			if ( 'opening_date' === $key ) {
+				// The business calls the primary location's opening date its
+				// founding date.
+				$changes['founding_date'] = $value;
+				$written[]                = $key;
 				continue;
 			}
 
@@ -552,7 +578,7 @@ class Import {
 		// the branch. The primary location's are the business's and were
 		// written there.
 		if ( ! $is_primary ) {
-			foreach ( array( 'name' => 'business_name', 'description' => 'description' ) as $key => $column ) {
+			foreach ( array( 'name' => 'business_name', 'description' => 'description', 'opening_date' => 'opening_date' ) as $key => $column ) {
 				if ( in_array( $key, $chosen, true ) ) {
 					$changes[ $column ] = $fields[ $key ]['theirs_raw'];
 					$written[]          = $key;
@@ -570,6 +596,16 @@ class Import {
 			$written[]                  = 'social';
 		}
 
+		if ( ! $is_primary && in_array( 'booking', $chosen, true ) ) {
+			$location = isset( $location ) ? $location : LocationRepository::find( (int) $location_id );
+
+			$changes['booking_links'] = array_merge(
+				BookingLinks::complete( $location && is_array( $location['booking_links'] ) ? $location['booking_links'] : array() ),
+				$fields['booking']['theirs_raw']
+			);
+			$written[]                = 'booking';
+		}
+
 		if ( ! $is_primary && in_array( 'categories', $chosen, true ) ) {
 			$changes['primary_category']     = $fields['categories']['theirs_raw']['primary']['name'];
 			$changes['primary_category_id']  = $fields['categories']['theirs_raw']['primary']['id'];
@@ -582,6 +618,22 @@ class Import {
 			$written[] = 'address';
 		}
 
+		// Google's places replace those it gave before; a place typed here
+		// (no place id) is Google's to know nothing of, and is kept.
+		if ( in_array( 'service_area', $chosen, true ) ) {
+			$location = isset( $location ) && $location ? $location : LocationRepository::find( (int) $location_id );
+			$typed    = array();
+
+			foreach ( $location && is_array( $location['service_area'] ) ? $location['service_area'] : array() as $place ) {
+				if ( '' === (string) $place['place_id'] ) {
+					$typed[] = $place;
+				}
+			}
+
+			$changes['service_area'] = ServiceArea::sanitize( array_merge( $fields['service_area']['theirs_raw'], $typed ) );
+			$written[]               = 'service_area';
+		}
+
 		if ( in_array( 'coordinates', $chosen, true ) ) {
 			$changes['latitude']  = $fields['coordinates']['theirs_raw']['latitude'];
 			$changes['longitude'] = $fields['coordinates']['theirs_raw']['longitude'];
@@ -592,6 +644,13 @@ class Import {
 			if ( in_array( $key, $chosen, true ) ) {
 				$changes[ $key ] = $fields[ $key ]['theirs_raw'];
 			}
+		}
+
+		// A branch's extra numbers are its own; the primary location's are
+		// the business's and were written there.
+		if ( ! $is_primary && in_array( 'additional_phones', $chosen, true ) ) {
+			$changes['additional_phones'] = $fields['additional_phones']['theirs_raw'];
+			$written[]                    = 'additional_phones';
 		}
 
 		if ( $changes ) {
@@ -769,6 +828,23 @@ class Import {
 
 				return self::describe( $key, $our_text, $their_text, $theirs['coordinates'], $available );
 
+			case 'service_area':
+				$their_places = $theirs['service_area'];
+				$location     = ! empty( $nap['location_id'] ) ? LocationRepository::find( (int) $nap['location_id'] ) : null;
+				$our_places   = $location && is_array( $location['service_area'] ) ? $location['service_area'] : array();
+				$names        = static function ( array $places ) {
+					return implode( ', ', array_column( $places, 'name' ) );
+				};
+
+				return self::describe(
+					$key,
+					$names( $our_places ),
+					$names( $their_places ),
+					$their_places,
+					(bool) $their_places,
+					ServiceArea::signature( ServiceArea::place_infos( $their_places ) ) !== ServiceArea::signature( ServiceArea::place_infos( $our_places ) )
+				);
+
 			case 'hours':
 				$available  = ! empty( $theirs['hours'] );
 				$their_text = $available ? self::hours_summary( $theirs['hours'] ) : '';
@@ -860,6 +936,65 @@ class Import {
 					$their_categories,
 					$available,
 					$available && self::categories_signature( $their_categories ) !== self::categories_signature( $our_categories )
+				);
+
+			case 'booking':
+				$their_links = $theirs['booking'];
+				$our_links   = LocationDetails::booking(
+					! empty( $nap['location_id'] ) ? LocationRepository::find( (int) $nap['location_id'] ) : null,
+					BusinessRepository::get()
+				);
+				$differs     = false;
+
+				foreach ( $their_links as $field => $link ) {
+					if ( ! BookingLinks::same( $field, $our_links[ $field ], BookingLinks::to_google( $field, $link ) ) ) {
+						$differs = true;
+					}
+				}
+
+				return self::describe(
+					$key,
+					implode( ', ', array_keys( array_filter( $our_links ) ) ),
+					implode( ', ', array_keys( $their_links ) ),
+					$their_links,
+					(bool) $their_links,
+					$differs
+				);
+
+			case 'additional_phones':
+				// One list, compared as numbers in any order, with what this
+				// listing's own location shows.
+				$their_phones = $theirs['additional_phones'];
+				$our_phones   = LocationDetails::additional_phones(
+					! empty( $nap['location_id'] ) ? LocationRepository::find( (int) $nap['location_id'] ) : null,
+					BusinessRepository::get()
+				);
+
+				return self::describe(
+					$key,
+					implode( ', ', $our_phones ),
+					implode( ', ', $their_phones ),
+					$their_phones,
+					(bool) $their_phones,
+					$their_phones && ! AdditionalPhones::same( $our_phones, $their_phones )
+				);
+
+			case 'opening_date':
+				// Compared to the month, with what this listing's own location
+				// shows: a branch with none of its own shows the business's.
+				$their_date = (string) $theirs['opening_date'];
+				$our_date   = LocationDetails::resolve(
+					! empty( $nap['location_id'] ) ? LocationRepository::find( (int) $nap['location_id'] ) : null,
+					BusinessRepository::get()
+				)['opening_date'];
+
+				return self::describe(
+					$key,
+					OpeningDate::for_screen( $our_date ),
+					OpeningDate::for_screen( $their_date ),
+					$their_date,
+					'' !== $their_date,
+					'' !== $their_date && ! OpeningDate::same_month( $our_date, $their_date )
 				);
 
 			case 'business_type':

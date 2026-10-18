@@ -718,4 +718,158 @@ check(
 	'and a different payload has a different one, so a stale plan can be refused'
 );
 
+// -- Opening date ------------------------------------------------------------
+
+$fhint_opened = array(
+	'openInfo' => array(
+		'status'      => 'OPEN',
+		'openingDate' => array( 'year' => 2014, 'month' => 3, 'day' => 15 ),
+	),
+);
+
+$fhint_plan = Plan::make( fhint_local( array( 'opening_date' => '2016-07-01' ) ), fhint_google( $fhint_opened ) );
+$fhint_step = fhint_step( $fhint_plan, Plan::STEP_LOCATION );
+
+check( in_array( 'openInfo.openingDate', $fhint_step['mask'], true ), 'a different opening date is sent' );
+check( ! in_array( 'openInfo', $fhint_step['mask'], true ), 'naming only the date, so the open or closed status is never touched' );
+check_same( array( 'year' => 2016, 'month' => 7 ), $fhint_step['payload']['openInfo']['openingDate'], 'as a year and a month, with no day' );
+check( ! isset( $fhint_step['payload']['openInfo']['status'] ), 'and nothing else of openInfo' );
+
+$fhint_plan = Plan::make( fhint_local( array( 'opening_date' => '2014-03-01' ) ), fhint_google( $fhint_opened ) );
+check( in_array( 'opening_date', $fhint_plan['unchanged'], true ), "the same month is unchanged, though Google's has a day" );
+
+$fhint_plan = Plan::make( fhint_local( array( 'opening_date' => '' ) ), fhint_google( $fhint_opened ) );
+check( null !== fhint_skipped( $fhint_plan, 'opening_date' ), 'no date here is skipped, never sent as a clear' );
+
+check_same( 'opening_date', FHINT\App\Google\Push\Publisher::field_for( 'openInfo.openingDate' ), "Google's refusal of the date is put on the date" );
+
+// -- Additional phone numbers ------------------------------------------------
+
+$fhint_numbers = array( 'phoneNumbers' => array( 'primaryPhone' => '(512) 555-0134', 'additionalPhones' => array( '(512) 555-0100' ) ) );
+
+// Only the extra numbers differ: sent with Google's own main number.
+$fhint_step = fhint_step( Plan::make( fhint_local( array( 'additional_phones' => array( '(512) 555-0177' ) ) ), fhint_google( $fhint_numbers ) ), Plan::STEP_LOCATION );
+
+check_same(
+	array( 'additionalPhones' => array( '(512) 555-0177' ), 'primaryPhone' => '(512) 555-0134' ),
+	$fhint_step['payload']['phoneNumbers'],
+	"new extra numbers are sent with Google's main number, so it is not dropped"
+);
+check_same( 1, count( array_keys( $fhint_step['mask'], 'phoneNumbers', true ) ), 'as one field to Google' );
+
+// Both differ: still one field, both changes listed.
+$fhint_step = fhint_step( Plan::make( fhint_local( array( 'phone' => '(512) 555-0111', 'additional_phones' => array( '(512) 555-0177' ) ) ), fhint_google( $fhint_numbers ) ), Plan::STEP_LOCATION );
+
+check_same( 1, count( array_keys( $fhint_step['mask'], 'phoneNumbers', true ) ), 'a new main number and new extra ones are still one field' );
+check_same( array( 'phone', 'additional_phones' ), array_values( array_intersect( array_column( $fhint_step['fields'], 'field' ), array( 'phone', 'additional_phones' ) ) ), 'and both changes are shown' );
+
+$fhint_plan = Plan::make( fhint_local( array( 'additional_phones' => array( '+1 512 555 0100' ) ) ), fhint_google( $fhint_numbers ) );
+check( in_array( 'additional_phones', $fhint_plan['unchanged'], true ), 'the same extra numbers, written differently, are unchanged' );
+
+$fhint_plan = Plan::make( fhint_local( array( 'additional_phones' => array() ) ), fhint_google( $fhint_numbers ) );
+check( null !== fhint_skipped( $fhint_plan, 'additional_phones' ), 'none here is skipped, never sent as a clear' );
+
+// -- Booking links -----------------------------------------------------------
+
+$fhint_google_links = array(
+	'attributes' => array(
+		array( 'name' => 'locations/1/attributes/url_whatsapp', 'valueType' => 'URL', 'uriValues' => array( array( 'uri' => 'https://wa.me/8801712345678' ) ) ),
+	),
+);
+
+$fhint_booking = array(
+	'booking_links'   => array(
+		'appointment'    => 'https://book.example.com',
+		'text_messaging' => '+8801712345678',
+		'whatsapp'       => 'https://wa.me/8801712345678',
+	),
+	'booking_offered' => array(
+		'url_appointment'    => false,
+		'url_text_messaging' => true,
+		'url_whatsapp'       => true,
+	),
+);
+
+$fhint_plan = Plan::make( fhint_local( $fhint_booking ), fhint_google(), $fhint_google_links );
+$fhint_step = fhint_step( $fhint_plan, Plan::STEP_ATTRIBUTES );
+
+check( in_array( 'attributes/url_text_messaging', $fhint_step['mask'], true ), 'a new texting number is sent' );
+check( in_array( array( 'uri' => 'sms:+8801712345678' ), array_column( array_filter( $fhint_step['payload']['attributes'], static function ( $a ) { return 'attributes/url_text_messaging' === $a['name']; } ), 'uriValues' )[0], true ), 'as an sms: link' );
+check( in_array( 'booking.whatsapp', $fhint_plan['unchanged'], true ), 'the WhatsApp link Google already has is unchanged' );
+check( ! in_array( 'attributes/url_appointment', $fhint_step['mask'], true ), 'an appointment link Google does not offer this listing is not sent' );
+check_same( 'not_on_google', fhint_skipped( $fhint_plan, 'booking.appointment' )['reason'] ?? null, 'it is skipped, and says why' );
+
+$fhint_plan = Plan::make( fhint_local( array_merge( $fhint_booking, array( 'booking_offered' => null ) ) ), fhint_google(), $fhint_google_links );
+check( in_array( 'attributes/url_appointment', fhint_step( $fhint_plan, Plan::STEP_ATTRIBUTES )['mask'], true ), 'with the menu never read, nothing is held back' );
+
+$fhint_plan = Plan::make( fhint_local( array( 'booking_links' => array() ) ), fhint_google(), $fhint_google_links );
+check( null !== fhint_skipped( $fhint_plan, 'booking.whatsapp' ), 'no link here is skipped, never sent as a clear' );
+
+check_same( 'booking.text_messaging', FHINT\App\Google\Push\Publisher::field_for( 'attributes/url_text_messaging' ), "Google's refusal of a booking link is put on that link" );
+
+// -- Service area ------------------------------------------------------------
+
+$fhint_area_google = array(
+	'serviceArea' => array(
+		'businessType' => 'CUSTOMER_AND_BUSINESS_LOCATION',
+		'regionCode'   => 'US',
+		'places'       => array(
+			'placeInfos' => array(
+				array( 'placeName' => 'Austin, TX', 'placeId' => 'ChIJ-austin' ),
+				array( 'placeName' => 'Round Rock, TX', 'placeId' => 'ChIJ-round' ),
+			),
+		),
+	),
+);
+
+// The same places, plus one typed here: unchanged on Google, the typed one
+// skipped and named.
+$fhint_plan = Plan::make(
+	fhint_local(
+		array(
+			'service_area' => array(
+				array( 'name' => 'Round Rock, TX', 'place_id' => 'ChIJ-round' ),
+				array( 'name' => 'Austin, TX', 'place_id' => 'ChIJ-austin' ),
+				array( 'name' => 'Cedar Park, TX', 'place_id' => '' ),
+			),
+		)
+	),
+	fhint_google( $fhint_area_google )
+);
+
+check( in_array( 'service_area', $fhint_plan['unchanged'], true ), 'the same places in another order are unchanged' );
+check_same( array( 'Cedar Park, TX' ), fhint_skipped( $fhint_plan, 'service_area' )['google'] ?? null, 'a place typed here is skipped, by name' );
+check_same( 'no_place_id', fhint_skipped( $fhint_plan, 'service_area' )['reason'] ?? null, 'because Google needs a place id' );
+
+// One of Google's removed here: the rest are sent, Google's type kept.
+$fhint_step = fhint_step(
+	Plan::make( fhint_local( array( 'service_area' => array( array( 'name' => 'Austin, TX', 'place_id' => 'ChIJ-austin' ) ) ) ), fhint_google( $fhint_area_google ) ),
+	Plan::STEP_LOCATION
+);
+
+check( in_array( 'serviceArea', $fhint_step['mask'], true ), 'a place removed here is sent as a change' );
+check_same(
+	array(
+		'businessType' => 'CUSTOMER_AND_BUSINESS_LOCATION',
+		'places'       => array( 'placeInfos' => array( array( 'placeName' => 'Austin, TX', 'placeId' => 'ChIJ-austin' ) ) ),
+		'regionCode'   => 'US',
+	),
+	$fhint_step['payload']['serviceArea'],
+	"with the places left and Google's business type and region"
+);
+
+// Only typed places here: nothing sent, never a clear.
+$fhint_plan = Plan::make( fhint_local( array( 'service_area' => array( array( 'name' => 'Cedar Park, TX', 'place_id' => '' ) ) ) ), fhint_google( $fhint_area_google ) );
+check( ! in_array( 'serviceArea', fhint_step( $fhint_plan, Plan::STEP_LOCATION )['mask'] ?? array(), true ), "typed places alone never clear Google's area" );
+check_same(
+	array( 'no_place_id' ),
+	array_values( array_column( array_filter( $fhint_plan['skipped'], static function ( $entry ) { return 'service_area' === $entry['field']; } ), 'reason' ) ),
+	'and the area is skipped once, for the one true reason'
+);
+
+$fhint_plan = Plan::make( fhint_local( array( 'service_area' => array() ) ), fhint_google( $fhint_area_google ) );
+check( null !== fhint_skipped( $fhint_plan, 'service_area' ), 'and no area here is skipped, not sent as a clear' );
+
+check_same( 'service_area', FHINT\App\Google\Push\Publisher::field_for( 'serviceArea' ), "Google's refusal of the area is put on the area" );
+
 finish( 'Publish plan' );

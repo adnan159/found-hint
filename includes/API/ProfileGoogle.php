@@ -58,7 +58,7 @@ class ProfileGoogle extends AbstractController {
 				array(
 					'methods'             => WP_REST_Server::CREATABLE,
 					'callback'            => array( $this, 'refresh' ),
-					'permission_callback' => array( $this, 'permissions_check' ),
+					'permission_callback' => array( $this, 'google_write_check' ),
 					'args'                => $this->args( $location ),
 				),
 			)
@@ -71,7 +71,7 @@ class ProfileGoogle extends AbstractController {
 				array(
 					'methods'             => WP_REST_Server::CREATABLE,
 					'callback'            => array( $this, 'open_listing' ),
-					'permission_callback' => array( $this, 'permissions_check' ),
+					'permission_callback' => array( $this, 'google_write_check' ),
 					'args'                => $this->args(
 						array(
 							'location_name' => array(
@@ -92,7 +92,7 @@ class ProfileGoogle extends AbstractController {
 				array(
 					'methods'             => WP_REST_Server::CREATABLE,
 					'callback'            => array( $this, 'add_photo' ),
-					'permission_callback' => array( $this, 'permissions_check' ),
+					'permission_callback' => array( $this, 'google_write_check' ),
 					'args'                => $this->args(
 						array_merge(
 							$location,
@@ -116,7 +116,7 @@ class ProfileGoogle extends AbstractController {
 				array(
 					'methods'             => WP_REST_Server::DELETABLE,
 					'callback'            => array( $this, 'remove_photo' ),
-					'permission_callback' => array( $this, 'permissions_check' ),
+					'permission_callback' => array( $this, 'google_write_check' ),
 					'args'                => $this->args( $location ),
 				),
 			)
@@ -129,7 +129,7 @@ class ProfileGoogle extends AbstractController {
 				array(
 					'methods'             => WP_REST_Server::CREATABLE,
 					'callback'            => array( $this, 'publish_photo' ),
-					'permission_callback' => array( $this, 'permissions_check' ),
+					'permission_callback' => array( $this, 'google_write_check' ),
 					'args'                => $this->args( $location ),
 				),
 			)

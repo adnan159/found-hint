@@ -54,7 +54,7 @@ class Profile extends AbstractController {
 				array(
 					'methods'             => 'POST, PUT, PATCH',
 					'callback'            => array( $this, 'update_item' ),
-					'permission_callback' => array( $this, 'permissions_check' ),
+					'permission_callback' => array( $this, 'google_write_check' ),
 					'args'                => $this->args(
 						array(
 							'section'     => array(

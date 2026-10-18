@@ -119,6 +119,20 @@ class Connection {
 	}
 
 	/**
+	 * Whether a Google account is linked to this site at all.
+	 *
+	 * The business details belong to a Google Business Profile, so they are
+	 * shown and changed only while one is linked. "Needs reconnect" still
+	 * counts: the account is there, only its permission is short, and
+	 * hiding the owner's details over that would look like data loss.
+	 *
+	 * @return bool
+	 */
+	public static function is_linked() {
+		return Tokens::exists();
+	}
+
+	/**
 	 * The coarse connection status.
 	 *
 	 * @return string

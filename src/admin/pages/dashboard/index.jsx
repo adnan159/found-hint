@@ -17,7 +17,9 @@ import {
 } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Skeleton } from "@/components/ui/skeleton";
+import ComingSoonBanner from "@/components/ComingSoonBanner";
 import PageHeader from "@/components/PageHeader";
+import useSelectedLocation from "@/hooks/useSelectedLocation";
 import SectionCard from "@/components/SectionCard";
 import GetStarted, { useGetStartedState } from "./components/GetStarted";
 import GoogleCard from "./components/GoogleCard";
@@ -25,7 +27,7 @@ import ScoreCard from "./components/ScoreCard";
 import { useGetBusinessQuery } from "@/store/api/businessApi";
 import { useGetDashboardQuery } from "@/store/api/dashboardApi";
 import { useGetLocationsQuery } from "@/store/api/locationsApi";
-import { useGetServicesQuery } from "@/store/api/servicesApi";
+import { useGetProfileQuery } from "@/store/api/profileApi";
 
 /**
  * The dashboard.
@@ -42,62 +44,70 @@ export default function DashboardPage() {
     useGetBusinessQuery();
   const { data: locationsData, isLoading: loadingLocations } =
     useGetLocationsQuery();
-  const { data: servicesData, isLoading: loadingServices } =
-    useGetServicesQuery();
   // Refetched whenever the dashboard is opened: whether the score is out of
   // date depends on edits made on other screens, and a cached "up to date"
   // would be exactly the silent staleness this card exists to prevent.
-  const { data: dashboard, isLoading: loadingDashboard } = useGetDashboardQuery(
-    undefined,
-    { refetchOnMountOrArgChange: true },
-  );
+  // The dashboard is per location: the one chosen in the bar at the top of
+  // every page, else the main location.
+  const { locationId, ready } = useSelectedLocation();
+  const { currentData: dashboard, isFetching: fetchingDashboard } =
+    useGetDashboardQuery(locationId, {
+      refetchOnMountOrArgChange: true,
+      skip: !ready,
+    });
+  const loadingDashboard = !ready || (fetchingDashboard && !dashboard);
+  // The location's own details, as the Business profile shows them: its
+  // name, phone, website, address, hours and its own services.
+  const { currentData: profile, isFetching: loadingProfile } =
+    useGetProfileQuery(locationId, { skip: !ready });
 
   const business = businessData?.business;
   const { show: showGetStarted, isLoading: loadingGetStarted } =
-    useGetStartedState(business);
+    useGetStartedState();
 
   const isLoading =
     loadingBusiness ||
     loadingLocations ||
-    loadingServices ||
     loadingDashboard ||
+    (loadingProfile && !profile) ||
     // Waited for too, so a fresh site never flashes an empty dashboard
     // before the introduction replaces it.
     loadingGetStarted;
 
-  const locations = locationsData?.locations ?? [];
-  const services = servicesData?.services ?? [];
-  const primary = locations.find((item) => item.is_primary) ?? locations[0];
+  const info = profile?.sections?.info ?? {};
+  const address = profile?.sections?.address ?? {};
+  const hours = profile?.sections?.hours ?? {};
+  const services = profile?.sections?.services?.items ?? [];
 
   const steps = [
     {
       id: "business",
       label: __("Add your business name", "foundhint-local-seo"),
-      done: Boolean(business?.name),
+      done: Boolean(info.name),
       to: "/business",
     },
     {
       id: "contact",
       label: __("Add a phone number or email", "foundhint-local-seo"),
-      done: Boolean(business?.phone || business?.email),
+      done: Boolean(info.phone || business?.email),
       to: "/business",
     },
     {
       id: "website",
       label: __("Add your website", "foundhint-local-seo"),
-      done: Boolean(business?.website),
+      done: Boolean(info.website),
       to: "/business",
     },
     {
       id: "location",
       label: __("Add your address", "foundhint-local-seo"),
-      done: Boolean(primary?.address_line_1 && primary?.city),
+      done: Boolean(address.address_line_1 && address.city),
       to: "/business?tab=address",
     },
     {
       id: "hours",
       label: __("Set your opening hours", "foundhint-local-seo"),
-      done: Boolean(primary?.opening_hours?.has_any_hours),
+      done: Boolean(hours.opening_hours?.has_any_hours),
       to: "/business?tab=hours",
     },
     {
@@ -142,6 +152,14 @@ export default function DashboardPage() {
         title={__("Dashboard", "foundhint-local-seo")}
         description={__(
           "What you have told FoundHint about your business so far.",
+          "foundhint-local-seo",
+        )}
+      />
+
+      <ComingSoonBanner
+        title={__("Advanced dashboard coming soon!", "foundhint-local-seo")}
+        description={__(
+          "Deeper insights into how customers find you are on the way. Everything here keeps working in the meantime.",
           "foundhint-local-seo",
         )}
       />
@@ -272,7 +290,7 @@ export default function DashboardPage() {
           value={sprintf(
             /* translators: %d: number of services. */
             __("%d added", "foundhint-local-seo"),
-            servicesData?.total ?? 0,
+            services.length,
           )}
           to="/business?tab=services"
         />

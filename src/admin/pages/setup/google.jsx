@@ -29,10 +29,11 @@ import { useMoveOnboardingMutation } from "@/store/api/onboardingApi";
  * the Business Profile.
  */
 const STEP_LABELS = {
-  identity: () => __("Business name and description", "foundhint-local-seo"),
+  identity: () =>
+    __("Business name, description and opening date", "foundhint-local-seo"),
   category: () => __("Category", "foundhint-local-seo"),
   address: () => __("Address and map pin", "foundhint-local-seo"),
-  contact: () => __("Phone and website", "foundhint-local-seo"),
+  contact: () => __("Phone numbers and website", "foundhint-local-seo"),
   hours: () => __("Opening hours", "foundhint-local-seo"),
   services: () => __("Services", "foundhint-local-seo"),
 };

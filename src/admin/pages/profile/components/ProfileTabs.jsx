@@ -33,6 +33,8 @@ const TAB_STATUS_MARKS = {
  * @param {Function} props.onSave    Save one section, by id.
  * @param {Function} props.onDiscard Drop one section's edits, by id.
  * @param {boolean}  props.disabled  Whether a save is under way.
+ * @param {boolean}  props.locked    No Google account: every field is
+ *                                   read-only. The tabs still switch.
  */
 export function ProfileTabs({
   tabs,
@@ -40,6 +42,7 @@ export function ProfileTabs({
   onSave,
   onDiscard,
   disabled,
+  locked = false,
   initialTab,
 }) {
   // A link can name the tab to open on (`#/business?tab=hours`); anything
@@ -87,19 +90,27 @@ export function ProfileTabs({
 
       {tabs.map(({ id, icon, label, content, saveLabel, ...extra }) => (
         <TabsContent key={id} value={id} keepMounted>
-          <Section
-            id={id}
-            icon={icon}
-            title={label}
-            state={getSectionState(id)}
-            saveLabel={saveLabel}
-            onSave={saveLabel ? () => onSave(id) : undefined}
-            onDiscard={() => onDiscard(id)}
-            disabled={disabled}
-            {...extra}
+          {/* A disabled fieldset disables every control inside it — inputs,
+              selects, switches and save buttons — in one place, with the
+              browser keeping them out of reach of keyboard and mouse. */}
+          <fieldset
+            disabled={locked}
+            className="fhint:m-0 fhint:min-w-0 fhint:border-0 fhint:p-0 fhint:disabled:opacity-70"
           >
-            {content}
-          </Section>
+            <Section
+              id={id}
+              icon={icon}
+              title={label}
+              state={getSectionState(id)}
+              saveLabel={saveLabel}
+              onSave={saveLabel ? () => onSave(id) : undefined}
+              onDiscard={() => onDiscard(id)}
+              disabled={disabled}
+              {...extra}
+            >
+              {content}
+            </Section>
+          </fieldset>
         </TabsContent>
       ))}
     </Tabs>

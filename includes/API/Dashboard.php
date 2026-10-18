@@ -8,6 +8,7 @@
 namespace FHINT\API;
 
 use FHINT\App\Audit\AuditRepository;
+use FHINT\App\Location\LocationRepository;
 use FHINT\App\Audit\Runner;
 use FHINT\App\Audit\Trend;
 use WP_REST_Server;
@@ -53,6 +54,15 @@ class Dashboard extends AbstractController {
 					'methods'             => WP_REST_Server::READABLE,
 					'callback'            => array( $this, 'get_item' ),
 					'permission_callback' => array( $this, 'permissions_check' ),
+					'args'                => $this->args(
+						array(
+							'location_id' => array(
+								'type'    => 'integer',
+								'minimum' => 0,
+								'default' => 0,
+							),
+						)
+					),
 				),
 			)
 		);
@@ -62,24 +72,40 @@ class Dashboard extends AbstractController {
 	 * The dashboard's figures.
 	 *
 	 * @param \WP_REST_Request $request Request.
-	 * @return \WP_REST_Response
+	 * @return \WP_REST_Response|\WP_Error
 	 */
 	public function get_item( $request ) {
+		$location_id = (int) $request->get_param( 'location_id' );
+
+		if ( $location_id && ! LocationRepository::find( $location_id ) ) {
+			return $this->not_found( 'location' );
+		}
+
 		return $this->envelope(
 			array(
-				'score' => self::score_summary( time() ),
-			)
+				'score' => self::score_summary( time(), $location_id ),
+			),
+			array( 'location_id' => $location_id )
 		);
 	}
 
 	/**
 	 * The health score card's figures, from the latest stored run.
 	 *
-	 * @param int $now Current Unix time.
+	 * @param int $now         Current Unix time.
+	 * @param int $location_id The location the card is for, 0 for the primary one.
 	 * @return array
 	 */
-	public static function score_summary( $now ) {
-		$latest = AuditRepository::latest();
+	public static function score_summary( $now, $location_id = 0 ) {
+		$location = $location_id ? LocationRepository::find( (int) $location_id ) : LocationRepository::primary();
+		$latest   = AuditRepository::latest( AuditRepository::ids_for( $location ) );
+
+		// The primary location stands for the business: a site whose only
+		// runs were for another location still shows one there. A named
+		// location shows its own runs and nothing else.
+		if ( ! $latest && ! $location_id ) {
+			$latest = AuditRepository::latest();
+		}
 
 		if ( ! $latest ) {
 			return array(

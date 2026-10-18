@@ -324,6 +324,13 @@ class LocationRepository {
 		$record['description']          = isset( $row['description'] ) ? (string) $row['description'] : '';
 		$social                         = isset( $row['social_profiles'] ) ? json_decode( (string) $row['social_profiles'], true ) : null;
 		$record['social_profiles']      = is_array( $social ) ? $social : null;
+		$phones                         = isset( $row['additional_phones'] ) ? json_decode( (string) $row['additional_phones'], true ) : null;
+		$record['additional_phones']    = is_array( $phones ) ? $phones : null;
+		$booking                        = isset( $row['booking_links'] ) ? json_decode( (string) $row['booking_links'], true ) : null;
+		$record['booking_links']        = is_array( $booking ) ? $booking : null;
+		$area                           = isset( $row['service_area'] ) ? json_decode( (string) $row['service_area'], true ) : null;
+		$record['service_area']         = is_array( $area ) ? $area : array();
+		$record['opening_date']         = isset( $row['opening_date'] ) && $row['opening_date'] ? (string) $row['opening_date'] : '';
 
 		return $record;
 	}
@@ -358,6 +365,12 @@ class LocationRepository {
 			'primary_category'     => isset( $record['primary_category'] ) ? (string) $record['primary_category'] : '',
 			'primary_category_id'  => isset( $record['primary_category_id'] ) ? (string) $record['primary_category_id'] : '',
 			'secondary_categories' => wp_json_encode( isset( $record['secondary_categories'] ) && is_array( $record['secondary_categories'] ) ? array_values( $record['secondary_categories'] ) : array() ),
+			// NULL until the location has numbers of its own; see the table docblock.
+			'additional_phones'    => isset( $record['additional_phones'] ) && is_array( $record['additional_phones'] ) ? wp_json_encode( array_values( $record['additional_phones'] ) ) : null,
+			'service_area'         => isset( $record['service_area'] ) && is_array( $record['service_area'] ) && $record['service_area'] ? wp_json_encode( array_values( $record['service_area'] ) ) : null,
+			'booking_links'        => isset( $record['booking_links'] ) && is_array( $record['booking_links'] ) ? wp_json_encode( $record['booking_links'] ) : null,
+			// NULL, not '', for "use the business's": a DATE column has no empty.
+			'opening_date'         => isset( $record['opening_date'] ) && '' !== (string) $record['opening_date'] ? (string) $record['opening_date'] : null,
 		);
 	}
 }

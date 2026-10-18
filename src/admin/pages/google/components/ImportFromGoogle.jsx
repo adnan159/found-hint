@@ -48,10 +48,14 @@ function fieldLabel(key) {
       return __("Address", "foundhint-local-seo");
     case "phone":
       return __("Phone", "foundhint-local-seo");
+    case "additional_phones":
+      return __("Additional phone numbers", "foundhint-local-seo");
     case "website":
       return __("Website", "foundhint-local-seo");
     case "description":
       return __("Description", "foundhint-local-seo");
+    case "opening_date":
+      return __("Opening date", "foundhint-local-seo");
     case "hours":
       return __("Opening hours", "foundhint-local-seo");
     case "categories":
@@ -60,10 +64,14 @@ function fieldLabel(key) {
       return __("Business type", "foundhint-local-seo");
     case "social":
       return __("Social profiles", "foundhint-local-seo");
+    case "booking":
+      return __("Booking and chat links", "foundhint-local-seo");
     case "services":
       return __("Services", "foundhint-local-seo");
     case "coordinates":
       return __("Map position", "foundhint-local-seo");
+    case "service_area":
+      return __("Service area", "foundhint-local-seo");
     default:
       return key;
   }

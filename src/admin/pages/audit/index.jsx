@@ -9,7 +9,9 @@ import { Progress } from "@/components/ui/progress";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Spinner } from "@/components/ui/spinner";
 import NoticeBar from "@/components/NoticeBar";
+import ComingSoonBanner from "@/components/ComingSoonBanner";
 import PageHeader from "@/components/PageHeader";
+import useSelectedLocation from "@/hooks/useSelectedLocation";
 import RequestError from "@/components/RequestError";
 import SectionCard from "@/components/SectionCard";
 import {
@@ -141,7 +143,16 @@ function Findings({ issues, onFix, onIgnore, busyId }) {
 }
 
 export default function AuditPage() {
-  const { data, isLoading, error } = useGetAuditQuery();
+  // The audit is per location: the one chosen here or elsewhere, else the
+  // main location.
+  // The location chosen in the bar at the top of every page.
+  const { locationId, ready } = useSelectedLocation();
+  const {
+    currentData: data,
+    isFetching,
+    error,
+  } = useGetAuditQuery(locationId, { skip: !ready });
+  const isLoading = !ready || (isFetching && !data);
   const [runAudit, { isLoading: isRunning, error: runError }] =
     useRunAuditMutation();
   const [fixIssue] = useFixIssueMutation();
@@ -165,7 +176,7 @@ export default function AuditPage() {
 
   const onRun = async () => {
     try {
-      await runAudit(0).unwrap();
+      await runAudit(locationId).unwrap();
       toast.success(__("Audit finished.", "foundhint-local-seo"));
     } catch {
       // Shown inline.
@@ -226,6 +237,13 @@ export default function AuditPage() {
           title={__("SEO audit", "foundhint-local-seo")}
           actions={runButton}
         />
+        <ComingSoonBanner
+          title={__("Advanced SEO audit coming soon!", "foundhint-local-seo")}
+          description={__(
+            "More checks and step-by-step fixes are on the way.",
+            "foundhint-local-seo",
+          )}
+        />
         <RequestError error={error ?? runError} />
         <Empty>
           <EmptyTitle>{__("No audit yet", "foundhint-local-seo")}</EmptyTitle>
@@ -250,6 +268,14 @@ export default function AuditPage() {
           formatWhen(audit.completed_at),
         )}
         actions={runButton}
+      />
+
+      <ComingSoonBanner
+        title={__("Advanced SEO audit coming soon!", "foundhint-local-seo")}
+        description={__(
+          "More checks and step-by-step fixes are on the way.",
+          "foundhint-local-seo",
+        )}
       />
 
       <RequestError error={error ?? runError} />

@@ -7,8 +7,12 @@
 
 namespace FHINT\App\Google;
 
+use FHINT\App\Business\AdditionalPhones;
+use FHINT\App\Business\BookingLinks;
 use FHINT\App\Business\Business;
+use FHINT\App\Business\OpeningDate;
 use FHINT\App\Location\DayOfWeek;
+use FHINT\App\Location\ServiceArea;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -63,14 +67,22 @@ class ImportMapper {
 		return array(
 			'name'          => self::text( $payload, 'title' ),
 			'description'   => isset( $payload['profile']['description'] ) ? (string) $payload['profile']['description'] : '',
+			// Stored form, the first of the month; '' when the listing has none.
+			'opening_date'  => OpeningDate::from_google( isset( $payload['openInfo']['openingDate'] ) ? $payload['openInfo']['openingDate'] : null ),
 			'phone'         => isset( $payload['phoneNumbers']['primaryPhone'] ) ? (string) $payload['phoneNumbers']['primaryPhone'] : '',
+			'additional_phones' => AdditionalPhones::from_google( isset( $payload['phoneNumbers'] ) ? $payload['phoneNumbers'] : null ),
 			'website'       => isset( $payload['websiteUri'] ) ? (string) $payload['websiteUri'] : '',
 			'business_type' => self::business_type( $payload ),
 			'category'      => self::category_name( $payload ),
 			'categories'    => self::categories( $payload ),
 			'social'        => self::social( $attributes ),
+			// The appointment link, texting number and WhatsApp link Google
+			// holds — attributes, read in the same request as the social links.
+			'booking'       => BookingLinks::from_google( $attributes ),
 			'address'       => self::address( $payload ),
 			'coordinates'   => self::coordinates( $payload ),
+			// Each `{ name, place_id }`, as Google names the places.
+			'service_area'  => ServiceArea::from_google( isset( $payload['serviceArea'] ) ? $payload['serviceArea'] : null ),
 			'hours'         => self::hours( $payload ),
 			'services'      => self::services( $payload ),
 		);

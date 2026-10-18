@@ -1446,3 +1446,271 @@ Both are tabs of the Business profile now, so their sidebar rows and screens
 links point at the tabs. The `/locations` and `/services` REST routes stay —
 the dashboard, the plan line and the setup wizard still read them. The
 opening-hours editor the setup wizard uses moved to `pages/setup/components/`.
+
+## Step 37 — Reviews follow the selected location
+
+The Reviews screen shows one location's reviews, never every location's: it
+opens on the location last chosen in the Business profile's switcher (kept in
+this browser by `src/admin/lib/selectedLocation.js`), else the main
+location's listing. "All locations" is gone, and **Read from Google** reads
+only the listing on screen. Choosing a listing on Reviews also becomes the
+Business profile's location. `/reviews/state` `locations[]` now carries each
+listing's `location_id`.
+
+## Step 38 — Audit and schema screens per location
+
+`GET /audits` takes `location_id` and answers that location's latest run and
+history (`AuditRepository::latest()` / `history()` take location ids;
+`ids_for()` folds location-0 runs into the primary's). `GET /schema` refuses
+an unknown location. Both screens carry a `LocationPicker`
+(`src/admin/components/`) backed by `useSelectedLocation()`, which shares the
+remembered location with the Business profile and Reviews. Running the audit
+audits the location on screen. The dashboard stays on the primary location.
+
+## Step 39 — Dashboard per location
+
+`GET /dashboard` takes `location_id`; a named location shows only its own
+audit, the primary falls back to any. The screen has the shared
+`LocationPicker`; its setup checklist and services count come from that
+location's `GET /profile`. The Google card, the Business completeness and the
+Locations count stay site-wide. `useSelectedLocation()` now returns `ready`,
+and the dashboard, audit and schema screens wait for it, so the main
+location's figures are never fetched and shown for a moment first.
+
+## Step 40 — One location bar on every screen
+
+The Business page's header (name, logo, rating, **Switch location**) moved to
+`components/location-bar/` and is rendered once by the root layout, above
+every screen except setup. The selection lives in a
+`SelectedLocationProvider` context, so switching in the bar moves the
+Dashboard, Business, Reviews, Audit and Schema screens together; the
+per-screen `LocationPicker` is gone. The Business page registers a guard
+that confirms before a switch discards unsaved edits. The logo square shows
+the listing's Google logo, or two capital initials when there is none.
+
+## Step 41 — Replying to reviews
+
+Each review on the Reviews screen can be answered from here: **Reply** opens
+a box, **Post on Google** sends it, and an existing reply has **Edit** and
+**Delete** (which asks first). `PUT /reviews/{review_id}/reply` posts or
+replaces the reply, `DELETE` removes it — `App\Review\ReviewReply`, through
+new `Client::put()` / `Client::delete()` on Google's v4 reply endpoint.
+
+The stored reply changes only after Google accepts, so the screen never
+shows a reply the public cannot see. The reply is plain text, at most 4,096
+**bytes** (Google's measure, so Bengali or emoji count more than one each),
+checked on the server with per-field codes `review.reply.required` /
+`review.reply.too_long` and counted down live in the box. Deleting a reply
+Google no longer has succeeds and clears the stale copy. Smoke
+(`reviews.php`) covers the validation and the request Google receives;
+`database.php` covers the full save/refuse/delete paths and the routes with
+Google answered in-process.
+
+## Step 42 — Google is required
+
+With no Google account linked (`Connection::is_linked()`, i.e. tokens stored;
+"needs reconnect" counts as linked):
+
+- **Nothing is shown.** `GET /profile` returns every section in its usual
+  shape with the values emptied (`Profile::blank()`), so stored details never
+  reach the browser; `meta.google.linked` is `false`. Nothing is deleted —
+  linking again brings it all back.
+- **Nothing can be changed.** The 16 routes that write business details use
+  `AbstractController::google_write_check()` and answer
+  `409 fhint_google_required`. The Business tabs and the details form sit in
+  a disabled `<fieldset>` under a Connect Google prompt (`GoogleRequired`);
+  the top location bar is hidden.
+- **No skipping setup.** The dashboard is the Get Started introduction
+  whenever no account is linked, without "Skip to dashboard"; Option B's
+  "Fill in my business details" link (a dead end now) is gone. The old
+  `#/setup` wizard's skip button is removed too.
+
+`rest-routes.php` proves every write route is guarded and every read is not;
+`database.php` proves the empty read, the refused writes and that the data
+survives.
+
+## Step 43 — Google Maps on the Address tab
+
+The address map is now Google's own embed (`google.com/maps?q=…&output=embed`,
+no API key) in place of Leaflet and OpenStreetMap tiles; `leaflet` is removed
+from the bundle (about 140 KB). It centres on the location's coordinates
+when it has them; Google does not always send a pin (FoundHint's listing has
+none), so without one it searches for the business by **name and address**,
+which finds the listing itself. "Open in Maps" follows the same rule. The
+frame sends no referrer. Declared in `readme.txt` under External services.
+
+## Step 44 — Opening date
+
+The Info tab has **Opening date**, a month field. Google keeps it per
+listing as `openInfo.openingDate` (`{ year, month, day }`, day optional) and
+shows "Opened March 2014"; this plugin keeps it **to the month**
+(`App\Business\OpeningDate`): stored on the first of the month, shown as
+`YYYY-MM`, sent as year + month with no day, compared by month so a day
+Google holds is never "changed". Up to one year ahead, as Google allows.
+
+- **Stored** per location like name/phone/website: the main location's is
+  the business's existing `founding_date`; any other location has the new
+  `locations.opening_date` (DB 0.12.0), NULL = the business's
+  (`LocationDetails::BUSINESS_KEYS` maps the name).
+- **Read** by the import's `identity` step and by opening a listing
+  (`openInfo` added to the read masks), and by *Refresh from Google* — only
+  into an empty date, primary location included.
+- **Sent** by *Send to Google*: the plan names only `openInfo.openingDate`,
+  so the open/closed status is never touched; no date here is skipped,
+  never a clear.
+
+On the live listings Google holds a date only for the pet shop (11 Oct 2025 →
+2025-10); FoundHint's listing has none.
+
+## Step 45 — Additional phone numbers
+
+The Info tab lists **Additional phone numbers** under the main one: up to
+two, one box each with a remove button, "+ Add a phone number", and an
+"x of 2 used" count (`info/AdditionalPhonesField.jsx`). Google keeps them as
+`phoneNumbers.additionalPhones` beside `primaryPhone`.
+
+- **Rules** (`App\Business\AdditionalPhones`): blanks and repeats dropped,
+  comparing numbers the way a publish does (`GoogleFormat::same_phone`, so
+  "+1 512 555 0199" repeats "(512) 555-0199"); at most two
+  (`business.additional_phones.too_many`); each a phone
+  (`business.phone.invalid` on `additional_phones.N`) and not the main
+  number again (`business.additional_phones.same_as_main`). A list that is
+  too long is refused, never cut.
+- **Stored** like the social links: the business's new `additional_phones`
+  (JSON) for the main location; a location's own `additional_phones`, NULL
+  = the business's, a list (even empty) = its own (DB 0.13.0). Also
+  accepted by `/business`.
+- **Read** by the import's `contact` step, opening a listing, and *Refresh
+  from Google* — only when nothing is held here.
+- **Sent** with the main number: `phoneNumbers` is one field to Google, so
+  the plan sends both sides in one mask entry, each side keeping Google's
+  value when only the other changed; none here is skipped, never a clear.
+
+Neither live listing has extra numbers on Google yet.
+
+## Step 46 — Booking
+
+A **Booking** tab after Social Links with three options — Google's *Book*
+and *Chat* buttons, all link attributes on the listing:
+
+| Option | Google attribute | Sent as |
+|---|---|---|
+| Book an appointment link | `url_appointment` | the link |
+| Texting number | `url_text_messaging` | `sms:+8801712345678` |
+| WhatsApp link | `url_whatsapp` | `https://wa.me/…` |
+
+Formats from Google's own guide
+(developers.google.com/my-business/content/whatsapp-text).
+
+- **Rules** (`App\Business\BookingLinks`): links must be http(s) with a real
+  host; the texting number is stored international (`+` and 8–15 digits);
+  WhatsApp must point at wa.me / whatsapp.com. Text that is not a link is
+  kept as typed and refused — `esc_url_raw()` would otherwise turn "not a
+  link" into a valid-looking `http://not%20a%20link`.
+- **Stored** like the social links: `booking_links` JSON on the business and
+  on a location (NULL = the business's), DB 0.14.0. New profile section
+  `booking`, between `social` and `attributes`.
+- **Offered per listing.** Google does not give every listing all three
+  (the pet shop has no appointment link). `AttributeCatalog::offers()`
+  reads the stored menu; the screen notes a field Google does not offer,
+  and the publish plan skips it (`not_on_google`) rather than send a
+  request Google would refuse. An unread menu holds nothing back.
+- **Read** by the import's `contact` step, opening a listing and *Refresh
+  from Google* (only when none are held here); **sent** in the attributes
+  step, each link its own attribute.
+- **Texting number UI**: a country code picker (235 countries, names from
+  `Intl.DisplayNames` in the admin's language, starting on the location's
+  country) and the number. A national number drops its trunk 0 (except on
+  Italy's plan); one written with + or 00 is taken whole.
+
+Neither live listing has booking links on Google yet.
+
+## Step 47 — Booking moved into Social Links
+
+The booking links are no longer a tab of their own: the Social Links tab has
+a **Booking and messaging** group between "Shown on your Google profile" and
+"Directories and review sites", drawn as the same cards (icon, name, status
+tag, input). `LinkCard` grew optional `meta`, `icon`, `stateOf`,
+`badMessage`, `note` and a `children` render for the texting number's
+country-code picker; `social/BookingCards.jsx` holds the three. The WhatsApp
+card uses the Simple Icons WhatsApp mark.
+
+Server side the `booking` profile section is gone; `social` reads
+`booking_links`, `booking_offered` and `country` and saves `booking_links`
+and/or `social_profiles`, checking both before writing either. The client
+model is `{ profiles, booking }` and sends only the part that changed, so a
+new Facebook link never gives a branch its own booking set by accident.
+
+## Step 48 — Country codes on every phone number
+
+The main phone number and each additional number now use the same control
+as the booking texting number: a country picker and the number. It is one
+shared component, `components/PhoneNumberInput.jsx` (BookingCards' private
+copy is gone), with `info/PhoneField.jsx` laying out the main number and
+`AdditionalPhonesField` using it per row. A number edited there comes out
+international (`+8801518984873`); a stored national number (Google's
+`01518-984873`) is shown under the location's country — `info.country` is
+new in the Info read — and left untouched until edited, so opening the form
+changes nothing. No server rule changed: international numbers already pass
+`Validator::is_phone`, and "same as the main number" and the publish plan
+already compare with or without the country code.
+
+## Step 49 — Service area
+
+After the map on the Address tab: the places a location serves, as chips,
+"x of 20 used" (`address/ServiceAreaField.jsx`). Stored per location, like
+the address — `locations.service_area` JSON (DB 0.15.0), each
+`{ name, place_id }`.
+
+**Google requires a place id for every place** (`serviceArea.places.placeInfos`,
+`placeId` required, max 20), and only the Places API — which needs a key
+this plugin does not hold — can find one. So (`App\Location\ServiceArea`):
+
+- places read from Google keep their ids and are sent back; the plan
+  compares by id and sends the list whole, keeping Google's `businessType`
+  and `regionCode` (a removal here is a removal there);
+- a place typed here has no id: kept, drawn dashed and labelled "website
+  only", published as `areaServed`, and skipped on publish with the new
+  reason `no_place_id`. A malformed id is dropped, never trimmed into a
+  made-up one;
+- typed places alone never clear Google's area.
+
+The service area saves even when the address is locked by a mapped listing
+(only address fields are refused), and the address is validated only when
+it changes. Read by the import's `address` step, opening a listing and
+*Refresh from Google* (only into an empty area); the website markup names
+every place as schema.org `areaServed`. Live: the pet shop's 7 places came
+across with their ids, and its publish plan shows the area unchanged;
+FoundHint's listing has none.
+
+## Step 50 — Photos tab redesigned
+
+To the design: three cards in a row — **Logo** (a square dashed drop zone
+on a tinted panel), **Cover photo** (a wide dashed zone) and **Add photos to
+your gallery** (a tinted dashed card, upload icon, "Choose photos" pill) —
+then a dashed "Your Google photos will appear here" card when there is
+nothing yet. Each zone says "Your logo / or browse files", opens the file
+picker, and now also takes files **dropped** onto it (`Picker` gained
+`droppable`; one slot takes the first of several). With a photo, the zone
+shows it with its status tag and an **Upload another** button appears; the
+gallery card's button becomes "Add more photos". Dropped files go through
+the same add action and server checks as chosen ones. Corners are explicit
+(`rounded-[12px]`): the theme's base radius is 0, so `rounded-xl` would
+render square.
+
+## Step 51 — "Coming soon" banners, and the notice colours restored
+
+`components/ComingSoonBanner.jsx` — a sparkle icon, a bold title, a "Coming
+soon" tag and one line of what is coming — sits under the page title on the
+Dashboard ("Advanced dashboard coming soon!"; the ordinary dashboard, not
+the first-run introduction), Schema ("Advanced schema coming soon!") and SEO
+audit ("Advanced SEO audit coming soon!", on both the empty and the results
+screen). A plain `<aside>`, not a live region: it never changes.
+
+**Fixed on the way:** `--notice`, `--notice-border` and `--notice-foreground`
+had lost their values in the tooltip commit (2f7595c), so every
+`bg-notice` / `border-notice-border` — the plan-limit `NoticeBar`, the
+location bar's initials tile, the "Add a phone number" button — rendered
+transparent with a near-black outline. Restored in `:root` from 12a12c2
+(`#fff1eb`, `#ffc9af`, `#8a3b12`), with a comment saying what breaks without
+them.

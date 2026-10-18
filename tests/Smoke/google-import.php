@@ -452,4 +452,30 @@ check_same( 320.0, $held[0]['price'], 'and its price, read from the service item
 check_same( 'free_form', $held[1]['google_item_type'], 'a service the owner wrote is remembered as free-form' );
 check_same( '', $held[1]['google_service_type_id'], 'and has no type id' );
 
+// -- Opening date ------------------------------------------------------------
+
+check_same(
+	'2014-03-01',
+	mapped( array( 'openInfo' => array( 'status' => 'OPEN', 'openingDate' => array( 'year' => 2014, 'month' => 3, 'day' => 15 ) ) ) )['opening_date'],
+	"the listing's opening date is read from openInfo, to the month"
+);
+check_same( '', mapped()['opening_date'], 'a listing with no opening date gives none' );
+check( false !== strpos( FHINT\App\Google\Import::READ_MASK, 'openInfo' ), 'and the import asks Google for it' );
+check( in_array( 'opening_date', FHINT\App\Google\Import::STEPS['identity'], true ), 'in the step with the name and description' );
+
+check_same(
+	array( '01700-000002', '01700-000003' ),
+	mapped( array( 'phoneNumbers' => array( 'primaryPhone' => '01700-000001', 'additionalPhones' => array( '01700-000002', '01700-000003' ) ) ) )['additional_phones'],
+	"the listing's extra numbers are read beside the main one"
+);
+check( in_array( 'additional_phones', FHINT\App\Google\Import::STEPS['contact'], true ), 'in the contact step, with the main number' );
+
+check_same(
+	array( array( 'name' => 'Austin, TX', 'place_id' => 'ChIJ-austin' ) ),
+	mapped( array( 'serviceArea' => array( 'businessType' => 'CUSTOMER_AND_BUSINESS_LOCATION', 'places' => array( 'placeInfos' => array( array( 'placeName' => 'Austin, TX', 'placeId' => 'ChIJ-austin' ) ) ) ) ) )['service_area'],
+	"the listing's service area is read with Google's place ids"
+);
+check( false !== strpos( FHINT\App\Google\Import::READ_MASK, 'serviceArea' ), 'and the import asks Google for it' );
+check( in_array( 'service_area', FHINT\App\Google\Import::STEPS['address'], true ), 'in the address step' );
+
 finish( 'Google import' );

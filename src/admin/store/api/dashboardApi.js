@@ -1,4 +1,4 @@
-import { baseApi } from "./baseApi";
+import { baseApi, withQuery } from "./baseApi";
 
 /**
  * GET /dashboard.
@@ -9,7 +9,11 @@ import { baseApi } from "./baseApi";
 export const dashboardApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
     getDashboard: builder.query({
-      query: () => "/dashboard",
+      // One location's figures; 0 (the default) is the main location's.
+      query: (locationId = 0) =>
+        locationId
+          ? withQuery("/dashboard", { location_id: locationId })
+          : "/dashboard",
       transformResponse: (response) => response?.data ?? null,
       providesTags: ["Audit"],
     }),

@@ -7,6 +7,8 @@
 
 namespace FHINT\App\Location;
 
+use FHINT\App\Business\BookingLinks;
+
 defined( 'ABSPATH' ) || exit;
 
 /**
@@ -28,10 +30,20 @@ class LocationDetails {
 
 	/** Field as the profile names it => column on the location. */
 	const COLUMNS = array(
-		'name'        => 'business_name',
-		'description' => 'description',
-		'phone'       => 'phone',
-		'website'     => 'website',
+		'name'         => 'business_name',
+		'description'  => 'description',
+		'phone'        => 'phone',
+		'website'      => 'website',
+		'opening_date' => 'opening_date',
+	);
+
+	/**
+	 * Fields the business stores under another name. The opening date is
+	 * the business's `founding_date`: for the primary location they are one
+	 * date, and schema.org and the business record already call it that.
+	 */
+	const BUSINESS_KEYS = array(
+		'opening_date' => 'founding_date',
 	);
 
 	/**
@@ -39,7 +51,7 @@ class LocationDetails {
 	 *
 	 * @param array|null $location Location row, or null for none.
 	 * @param array|null $business Business row.
-	 * @return array{name:string, description:string, phone:string, website:string}
+	 * @return array{name:string, description:string, phone:string, website:string, opening_date:string}
 	 */
 	public static function resolve( $location, $business ) {
 		$own      = LocationCategories::kept_on_location( $location );
@@ -48,10 +60,11 @@ class LocationDetails {
 
 		foreach ( self::COLUMNS as $field => $column ) {
 			$value = $own && isset( $location[ $column ] ) ? trim( (string) $location[ $column ] ) : '';
+			$key   = isset( self::BUSINESS_KEYS[ $field ] ) ? self::BUSINESS_KEYS[ $field ] : $field;
 
 			$details[ $field ] = '' !== $value
 				? (string) $location[ $column ]
-				: ( isset( $business[ $field ] ) ? (string) $business[ $field ] : '' );
+				: ( isset( $business[ $key ] ) ? (string) $business[ $key ] : '' );
 		}
 
 		return $details;
@@ -61,7 +74,7 @@ class LocationDetails {
 	 * Profile fields as the location columns they are stored in.
 	 *
 	 * @param array $changes Fields keyed as the profile names them.
-	 * @return array Only the four fields, keyed by column.
+	 * @return array Only these fields, keyed by column.
 	 */
 	public static function to_columns( array $changes ) {
 		$columns = array();
@@ -78,7 +91,7 @@ class LocationDetails {
 	/**
 	 * The social links in force for a location.
 	 *
-	 * Unlike the four fields above, the links are one set: once a location
+	 * Unlike the fields above, the links are one set: once a location
 	 * has saved links of its own (even all empty), the whole set is its own.
 	 * Merging network by network would bring back a link the owner removed.
 	 *
@@ -93,6 +106,43 @@ class LocationDetails {
 
 		return is_array( $business ) && isset( $business['social_profiles'] ) && is_array( $business['social_profiles'] )
 			? $business['social_profiles']
+			: array();
+	}
+
+	/**
+	 * The booking links in force for a location: one set, like the social
+	 * links — NULL on the location means the business's.
+	 *
+	 * @param array|null $location Location row, or null for none.
+	 * @param array|null $business Business row.
+	 * @return array<string,string> Every field, '' for none.
+	 */
+	public static function booking( $location, $business ) {
+		if ( LocationCategories::kept_on_location( $location ) && isset( $location['booking_links'] ) && is_array( $location['booking_links'] ) ) {
+			return BookingLinks::complete( $location['booking_links'] );
+		}
+
+		return BookingLinks::complete( is_array( $business ) && isset( $business['booking_links'] ) ? $business['booking_links'] : array() );
+	}
+
+	/**
+	 * The extra phone numbers in force for a location.
+	 *
+	 * One list, like the social links: NULL on the location means "use the
+	 * business's"; once it has a list of its own — even an empty one — that
+	 * list is what it shows, so a number removed here stays removed.
+	 *
+	 * @param array|null $location Location row, or null for none.
+	 * @param array|null $business Business row.
+	 * @return string[]
+	 */
+	public static function additional_phones( $location, $business ) {
+		if ( LocationCategories::kept_on_location( $location ) && isset( $location['additional_phones'] ) && is_array( $location['additional_phones'] ) ) {
+			return array_values( $location['additional_phones'] );
+		}
+
+		return is_array( $business ) && isset( $business['additional_phones'] ) && is_array( $business['additional_phones'] )
+			? array_values( $business['additional_phones'] )
 			: array();
 	}
 

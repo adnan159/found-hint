@@ -7,8 +7,10 @@
 
 namespace FHINT\API;
 
+use FHINT\App\Review\ReviewReply;
 use FHINT\App\Review\ReviewSync;
 use FHINT\App\Review\Reviews as ReviewService;
+use FHINT\App\Core\ValidationResult;
 use WP_REST_Server;
 
 defined( 'ABSPATH' ) || exit;
@@ -18,8 +20,8 @@ defined( 'ABSPATH' ) || exit;
  *
  * The split matters: `GET /reviews` and `GET /reviews/state` read rows and
  * never touch the network, so a screen opens at the speed of the database.
- * Only `POST /reviews/sync` contacts Google, and only because somebody asked
- * it to.
+ * Only `POST /reviews/sync` and the reply routes contact Google, and only
+ * because somebody asked them to.
  */
 class Reviews extends AbstractController {
 
@@ -114,6 +116,36 @@ class Reviews extends AbstractController {
 				),
 			)
 		);
+
+		register_rest_route(
+			$this->namespace,
+			// Google's review ids are URL-safe base64: letters, digits, - and _.
+			'/reviews/(?P<review_id>[A-Za-z0-9_-]+)/reply',
+			array(
+				array(
+					'methods'             => 'PUT',
+					'callback'            => array( $this, 'save_reply' ),
+					'permission_callback' => array( $this, 'permissions_check' ),
+					'args'                => $this->args(
+						array(
+							'comment' => array(
+								'type'              => 'string',
+								'required'          => true,
+								// Cleaned and checked by ReviewReply, so an empty or
+								// over-long reply gets the per-field codes the form
+								// attaches to its textarea.
+								'sanitize_callback' => array( ReviewReply::class, 'sanitize' ),
+							),
+						)
+					),
+				),
+				array(
+					'methods'             => WP_REST_Server::DELETABLE,
+					'callback'            => array( $this, 'delete_reply' ),
+					'permission_callback' => array( $this, 'permissions_check' ),
+				),
+			)
+		);
 	}
 
 	/**
@@ -165,5 +197,41 @@ class Reviews extends AbstractController {
 			$result,
 			array( 'state' => ReviewService::state( (string) $request->get_param( 'location_name' ) ) )
 		);
+	}
+
+	/**
+	 * Post or replace the owner's reply to a review, on Google.
+	 *
+	 * @param \WP_REST_Request $request Request.
+	 * @return \WP_REST_Response|\WP_Error
+	 */
+	public function save_reply( $request ) {
+		$result = ReviewReply::save( (string) $request['review_id'], $request->get_param( 'comment' ) );
+
+		if ( $result instanceof ValidationResult ) {
+			return $this->validation_error( $result );
+		}
+
+		if ( is_wp_error( $result ) ) {
+			return $result;
+		}
+
+		return $this->envelope( $result, array( 'state' => ReviewService::state( $result['location_name'] ) ) );
+	}
+
+	/**
+	 * Remove the owner's reply to a review, on Google.
+	 *
+	 * @param \WP_REST_Request $request Request.
+	 * @return \WP_REST_Response|\WP_Error
+	 */
+	public function delete_reply( $request ) {
+		$result = ReviewReply::delete( (string) $request['review_id'] );
+
+		if ( is_wp_error( $result ) ) {
+			return $result;
+		}
+
+		return $this->envelope( $result, array( 'state' => ReviewService::state( $result['location_name'] ) ) );
 	}
 }

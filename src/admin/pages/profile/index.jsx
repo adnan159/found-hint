@@ -1,12 +1,11 @@
 import RequestError from "@/components/RequestError";
+import GoogleRequired from "@/components/GoogleRequired";
 import { Skeleton } from "@/components/ui/skeleton";
-import { errorMessage } from "@/lib/errors";
-import {
-  useGetProfileQuery,
-  useOpenGoogleListingMutation,
-} from "@/store/api/profileApi";
+import { useLocationSelection } from "@/context/SelectedLocation";
+import useSelectedLocation from "@/hooks/useSelectedLocation";
+import { useGetProfileQuery } from "@/store/api/profileApi";
 import { __ } from "@wordpress/i18n";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useSearchParams } from "react-router";
 import ProfileHeader from "./components/ProfileHeader";
 import ProfileTabs from "./components/ProfileTabs";
@@ -30,10 +29,31 @@ import buildProfileTabs from "./tabs";
  * each tab holds in `tabs.jsx`.
  */
 export function Profile() {
-  // Which location is on screen lives in the address, so a reload or a
-  // shared link opens the same branch. No value means the primary one.
+  // The location is the one chosen in the bar at the top of every page. A
+  // link may name one (`?location=2`); it is taken as the choice and then
+  // dropped from the address, so the bar stays in charge.
   const [params, setParams] = useSearchParams();
-  const locationId = Math.max(0, Number(params.get("location")) || 0);
+  const { locationId, ready } = useSelectedLocation();
+  const { select, registerGuard } = useLocationSelection();
+  const linkedLocation = Math.max(0, Number(params.get("location")) || 0);
+
+  useEffect(() => {
+    if (!linkedLocation) {
+      return;
+    }
+
+    select(linkedLocation);
+    setParams(
+      (current) => {
+        const next = new URLSearchParams(current);
+
+        next.delete("location");
+
+        return next;
+      },
+      { replace: true },
+    );
+  }, [linkedLocation, select, setParams]);
 
   // `currentData`, not `data`: while another location loads, `data` would
   // still be the previous one's, and an edit made in that moment would be
@@ -43,85 +63,79 @@ export function Profile() {
     error,
     isFetching,
     refetch,
-  } = useGetProfileQuery(locationId);
-  const isLoading = isFetching && !data;
+  } = useGetProfileQuery(locationId, {
+    skip: !ready || Boolean(linkedLocation),
+  });
+  const isLoading = !ready || (isFetching && !data);
   const [publishing, setPublishing] = useState(false);
 
   const sections = data?.sections;
   const meta = data?.meta ?? {};
+
   const google = meta.google ?? {};
+  // With no Google account linked the server sends every section empty and
+  // refuses saves; the screen locks its fields to match.
+  const locked = google.linked === false;
 
   const drafts = useProfileDrafts(sections, locationId);
   const { isDirty, isSaving } = drafts;
   const googleRead = useGoogleRead({
     locationId,
     google,
-    ready: Boolean(data) && !isFetching && !isDirty,
+    // No automatic read from Google while there is no Google to read.
+    ready: Boolean(data) && !isFetching && !isDirty && !locked,
   });
 
-  const [openListing, { isLoading: isOpeningListing }] =
-    useOpenGoogleListingMutation();
-  const [switchError, setSwitchError] = useState("");
+  // Edits belong to the location they were made on. A switch made in the
+  // bar while there are unsaved edits asks first, and discards them if the
+  // answer is yes; carrying them across would save one branch's hours onto
+  // another.
+  const dirtyRef = useRef(false);
+  const discardRef = useRef(() => {});
 
-  const goToLocation = (id) => {
-    drafts.discardAllSections();
-    googleRead.markLocationSwitch(id);
-    setParams(id ? { location: String(id) } : {});
-  };
+  dirtyRef.current = isDirty;
+  discardRef.current = drafts.discardAllSections;
 
-  /**
-   * Switch to an entry of the switcher: a location here, or a Google listing
-   * that has no location yet — which is given one first.
-   */
-  const switchLocation = async (entry) => {
-    if (
-      !entry ||
-      (entry.locationId && entry.locationId === meta.location?.id)
-    ) {
-      return;
+  useEffect(
+    () =>
+      registerGuard(() => {
+        if (!dirtyRef.current) {
+          return true;
+        }
+
+        if (
+          !window.confirm(
+            __(
+              "You have unsaved changes for this location. Switch and discard them?",
+              "foundhint-local-seo",
+            ),
+          )
+        ) {
+          return false;
+        }
+
+        discardRef.current();
+
+        return true;
+      }),
+    [registerGuard],
+  );
+
+  // Arriving at another location reads its listing from Google once.
+  const previousLocation = useRef(locationId);
+
+  useEffect(() => {
+    if (previousLocation.current !== locationId) {
+      previousLocation.current = locationId;
+      googleRead.markLocationSwitch(locationId);
     }
-
-    // Edits belong to the location they were made on. Carrying them across
-    // would save one branch's hours onto another.
-    if (
-      isDirty &&
-      !window.confirm(
-        __(
-          "You have unsaved changes for this location. Switch and discard them?",
-          "foundhint-local-seo",
-        ),
-      )
-    ) {
-      return;
-    }
-
-    setSwitchError("");
-
-    if (entry.locationId) {
-      goToLocation(entry.locationId);
-      return;
-    }
-
-    try {
-      const opened = await openListing({
-        locationName: entry.locationName,
-      }).unwrap();
-
-      goToLocation(opened.location_id);
-    } catch (failure) {
-      setSwitchError(errorMessage(failure));
-    }
-  };
+  });
 
   const header = (
     <ProfileHeader
-      info={sections?.info}
       meta={data?.meta}
-      onSwitch={switchLocation}
-      switching={isOpeningListing}
-      switchError={switchError}
       onPublish={() => setPublishing(true)}
-      publishDisabled={isDirty || isSaving}
+      publishDisabled={locked || isDirty || isSaving}
       publishHint={
         isDirty
           ? __("Save your changes first.", "foundhint-local-seo")
@@ -169,14 +183,18 @@ export function Profile() {
     <div className="fhint:flex fhint:flex-col fhint:gap-4">
       {header}
 
-      <SyncStatus
-        google={google}
-        isBusy={isFetching}
-        notice={googleRead.refreshNotice}
-        isRefreshing={googleRead.isRefreshing}
-        disabled={isSaving}
-        onRefresh={googleRead.refreshFromGoogle}
-      />
+      {locked ? (
+        <GoogleRequired />
+      ) : (
+        <SyncStatus
+          google={google}
+          isBusy={isFetching}
+          notice={googleRead.refreshNotice}
+          isRefreshing={googleRead.isRefreshing}
+          disabled={isSaving}
+          onRefresh={googleRead.refreshFromGoogle}
+        />
+      )}
 
       <ProfileTabs
         tabs={tabs}
@@ -184,6 +202,7 @@ export function Profile() {
         onSave={drafts.saveSection}
         onDiscard={drafts.discardSection}
         disabled={isSaving}
+        locked={locked}
         initialTab={params.get("tab") ?? ""}
       />
 

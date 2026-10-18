@@ -39,6 +39,52 @@ const MESSAGES = {
       "Your description has a web link in it. Google does not allow links here, so please remove it.",
       "foundhint-local-seo",
     ),
+  "business.additional_phones.too_many": () =>
+    __(
+      "Google keeps up to two numbers besides the main one.",
+      "foundhint-local-seo",
+    ),
+  "business.additional_phones.same_as_main": () =>
+    __(
+      "That is your main number. Add a different one here.",
+      "foundhint-local-seo",
+    ),
+  "booking.appointment.invalid": () =>
+    __(
+      "Enter the full web address of your booking page, starting with https://",
+      "foundhint-local-seo",
+    ),
+  "booking.text_messaging.invalid": () =>
+    __(
+      "Choose the country code and enter the mobile number.",
+      "foundhint-local-seo",
+    ),
+  "booking.whatsapp.invalid": () =>
+    __(
+      "Enter your WhatsApp link, such as https://wa.me/8801712345678",
+      "foundhint-local-seo",
+    ),
+  "service_area.too_many": () =>
+    __(
+      "Google keeps up to 20 places in a service area.",
+      "foundhint-local-seo",
+    ),
+  "service_area.name.too_long": () =>
+    __("A place name can be 150 characters at most.", "foundhint-local-seo"),
+  "opening_date.invalid": () =>
+    __("Enter the month you opened, such as 2014-03.", "foundhint-local-seo"),
+  "opening_date.too_far": () =>
+    __(
+      "Google accepts an opening date up to one year ahead.",
+      "foundhint-local-seo",
+    ),
+  "review.reply.required": () =>
+    __("Write a reply before posting it.", "foundhint-local-seo"),
+  "review.reply.too_long": () =>
+    __(
+      "That reply is too long for Google. Shorten it and try again.",
+      "foundhint-local-seo",
+    ),
   "special_hours.date.invalid": () =>
     __("Choose a real date for this day.", "foundhint-local-seo"),
   "special_hours.date.duplicate": () =>
@@ -317,6 +363,11 @@ export function errorMessage(error) {
       __("Add your business details first.", "foundhint-local-seo"),
     fhint_location_not_found: () =>
       __("That location no longer exists.", "foundhint-local-seo"),
+    fhint_review_not_found: () =>
+      __(
+        "That review is no longer stored here. Read your reviews from Google again.",
+        "foundhint-local-seo",
+      ),
     fhint_service_not_found: () =>
       __("That service no longer exists.", "foundhint-local-seo"),
     fhint_save_failed: () =>

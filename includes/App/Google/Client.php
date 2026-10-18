@@ -94,6 +94,32 @@ class Client {
 	}
 
 	/**
+	 * PUT a JSON body to a Google API URL, as the connected account.
+	 *
+	 * Used where Google replaces one thing whole — the owner's reply to a
+	 * review is created and edited by the same PUT.
+	 *
+	 * @param string $url   Absolute URL.
+	 * @param array  $query Query parameters.
+	 * @param array  $body  Request body, sent as JSON.
+	 * @return array|WP_Error Decoded response body.
+	 */
+	public static function put( $url, array $query, array $body ) {
+		return self::write( 'PUT', $url, $query, $body );
+	}
+
+	/**
+	 * DELETE a Google API resource, as the connected account.
+	 *
+	 * @param string $url   Absolute URL.
+	 * @param array  $query Query parameters.
+	 * @return array|WP_Error Decoded response body, usually empty.
+	 */
+	public static function delete( $url, array $query = array() ) {
+		return self::write( 'DELETE', $url, $query, null );
+	}
+
+	/**
 	 * POST a file's bytes to a Google upload URL.
 	 *
 	 * The body is the file itself, not JSON, and a photo can take longer to
@@ -122,7 +148,7 @@ class Client {
 	/**
 	 * A write, with one retry when Google rejects the token.
 	 *
-	 * @param string     $method PATCH or POST.
+	 * @param string     $method PATCH, POST, PUT or DELETE.
 	 * @param string     $url    Absolute URL.
 	 * @param array      $query  Query parameters.
 	 * @param array|null $body   Body sent as JSON.
@@ -175,7 +201,7 @@ class Client {
 	 * @param string     $url    Absolute URL.
 	 * @param array      $query  Query parameters.
 	 * @param string     $token  Access token.
-	 * @param string     $method GET, PATCH or POST.
+	 * @param string     $method GET, PATCH, POST, PUT or DELETE.
 	 * @param array|null $body   Body for a write, sent as JSON.
 	 * @param array|null $raw    `{ body, type }` to send bytes instead of JSON.
 	 * @return array|WP_Error
@@ -195,6 +221,11 @@ class Client {
 
 		if ( 'GET' === $method ) {
 			$response = wp_remote_get( $url, $args );
+		} elseif ( 'DELETE' === $method ) {
+			// A delete names its resource in the URL and carries no body.
+			$args['method'] = $method;
+
+			$response = wp_remote_request( $url, $args );
 		} elseif ( is_array( $raw ) ) {
 			$args['method']                  = $method;
 			$args['timeout']                 = 60;

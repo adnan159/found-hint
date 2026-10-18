@@ -179,6 +179,40 @@ class ReviewRepository {
 	}
 
 	/**
+	 * Record the owner's reply to one review, or clear it.
+	 *
+	 * Written only after Google has accepted the change, so the row still
+	 * says what Google holds — this table stays a copy, never a draft.
+	 *
+	 * @param string      $review_id  Google review id.
+	 * @param string      $comment    The reply, or '' when it was removed.
+	 * @param string|null $replied_at When Google stamped the reply, UTC; null when removed.
+	 * @return bool
+	 */
+	public static function set_reply( $review_id, $comment, $replied_at ) {
+		global $wpdb;
+
+		if ( ! self::table_exists() || '' === (string) $review_id ) {
+			return false;
+		}
+
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+		$updated = $wpdb->update(
+			Tables::name( Tables::REVIEWS ),
+			array(
+				'reply_comment' => (string) $comment,
+				'replied_at'    => $replied_at ? (string) $replied_at : null,
+				'updated_at'    => current_time( 'mysql', true ),
+			),
+			array( 'review_id' => (string) $review_id )
+		);
+
+		// Not "rows changed": a reply saved twice in one second changes
+		// nothing and is still a success. The caller looked the review up first.
+		return false !== $updated;
+	}
+
+	/**
 	 * Rating summary for a location, or for everything when none is given.
 	 *
 	 * The average is computed from rows that carry a rating: Google sends

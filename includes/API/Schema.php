@@ -72,11 +72,16 @@ class Schema extends AbstractController {
 	 * The graph, plus everything needed to explain it.
 	 *
 	 * @param \WP_REST_Request $request Request.
-	 * @return \WP_REST_Response
+	 * @return \WP_REST_Response|\WP_Error
 	 */
 	public function get_item( $request ) {
 		$location_id = (int) $request->get_param( 'location_id' );
-		$nap         = Nap::resolve( $location_id );
+
+		if ( $location_id && ! \FHINT\App\Location\LocationRepository::find( $location_id ) ) {
+			return $this->not_found( 'location' );
+		}
+
+		$nap = Nap::resolve( $location_id );
 
 		// Straight from the cache, so the preview is the same bytes the
 		// front end publishes rather than a second rendering that could

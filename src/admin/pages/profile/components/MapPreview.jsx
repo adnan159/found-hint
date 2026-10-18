@@ -1,75 +1,76 @@
-import { useEffect, useRef } from "react";
-import L from "leaflet";
-import "leaflet/dist/leaflet.css";
+import { __ } from "@wordpress/i18n";
 
 /**
- * A small map with the listing's pin on it.
+ * A Google map of the location.
  *
- * The map library is bundled with the plugin. The map *tiles* are not — a
- * map of the world cannot be — and are fetched from OpenStreetMap by the
- * browser of whoever is looking at this screen; that is declared in the
- * plugin's readme under External services. Nothing about the business is
- * sent beyond which squares of the map are being looked at.
+ * Google's own embed, in a frame, so the map is the one customers see in
+ * Search and Maps. It needs no API key. The page is loaded by the browser of
+ * whoever is looking at this screen — declared in the readme under External
+ * services — and only on this admin screen, never on a visitor-facing page.
  *
- * It is a picture of where the pin is, not a control: the pin cannot be
- * dragged, because the position is Google's and is read from the listing.
- * Scroll-wheel zoom is off so the page scrolls past it.
+ * It centres on the pin when the location has one. Without one — Google
+ * does not always send coordinates for a listing — it searches for the
+ * business by name and address, which finds the listing itself rather than
+ * just the street. Either way it is a picture of where Google has the
+ * business, not a control: the position is Google's.
+ *
+ * @param {Object} props
+ * @param {?number|string} props.latitude  Pin latitude, if any.
+ * @param {?number|string} props.longitude Pin longitude, if any.
+ * @param {string}         props.query     Name and address, for no pin.
+ * @param {string}         props.label     What the map shows, for its title.
  */
-export function MapPreview({ latitude, longitude, label }) {
-  const node = useRef(null);
+export function MapPreview({ latitude, longitude, query, label }) {
+  const place = mapQuery({ latitude, longitude, query });
 
-  useEffect(() => {
-    if (!node.current) {
-      return undefined;
-    }
+  if (!place) {
+    return null;
+  }
 
-    const center = [Number(latitude), Number(longitude)];
-    const map = L.map(node.current, { scrollWheelZoom: false }).setView(
-      center,
-      15,
-    );
-
-    L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
-      maxZoom: 19,
-      attribution:
-        '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">OpenStreetMap</a> contributors',
-    }).addTo(map);
-
-    // A drawn circle rather than Leaflet's image marker: it needs no image
-    // file, and it is the pin the design shows.
-    const pin = L.circleMarker(center, {
-      radius: 9,
-      color: "#ffffff",
-      weight: 3,
-      fillColor: "#ff6b35",
-      fillOpacity: 1,
-    }).addTo(map);
-
-    if (label) {
-      // As text, never as HTML: the label is the business's own name.
-      pin.bindTooltip(document.createTextNode(label).textContent ?? "");
-    }
-
-    // The section may have been collapsed when the map was made; measure
-    // again once it has a size.
-    const settle = window.setTimeout(() => map.invalidateSize(), 150);
-
-    return () => {
-      window.clearTimeout(settle);
-      map.remove();
-    };
-  }, [latitude, longitude, label]);
+  const src = `https://www.google.com/maps?${new URLSearchParams({
+    q: place,
+    z: "16",
+    output: "embed",
+  })}`;
 
   return (
-    <div
-      ref={node}
-      role="img"
-      aria-label={label}
-      // Its own stacking context, so the map's layers stay under the page's
-      // save bar and dialogs instead of floating over them.
-      className="fhint:relative fhint:z-0 fhint:isolate fhint:h-[260px] fhint:w-full fhint:border fhint:border-border fhint:bg-muted"
+    <iframe
+      src={src}
+      title={label || __("Map of your location", "foundhint-local-seo")}
+      loading="lazy"
+      // Google's page learns it was framed by this admin screen and no more:
+      // no path, so no screen name or location id goes with it.
+      referrerPolicy="no-referrer"
+      className="fhint:block fhint:h-[260px] fhint:w-full fhint:border fhint:border-border fhint:bg-muted"
     />
   );
+}
+
+/**
+ * What to ask Google Maps for: the pin when there is one, else the business
+ * by name and address, else nothing to show.
+ *
+ * @param {Object} where
+ * @return {string}
+ */
+export function mapQuery({ latitude, longitude, query }) {
+  const lat = Number(latitude);
+  const lng = Number(longitude);
+  const hasPin =
+    latitude !== null &&
+    latitude !== undefined &&
+    latitude !== "" &&
+    longitude !== null &&
+    longitude !== undefined &&
+    longitude !== "" &&
+    Number.isFinite(lat) &&
+    Number.isFinite(lng);
+
+  if (hasPin) {
+    return `${lat},${lng}`;
+  }
+
+  return String(query ?? "").trim();
 }
 
 export default MapPreview;

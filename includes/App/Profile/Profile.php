@@ -7,8 +7,10 @@
 
 namespace FHINT\App\Profile;
 
+use FHINT\App\Business\BookingLinks;
 use FHINT\App\Business\Business;
 use FHINT\App\Business\BusinessRepository;
+use FHINT\App\Core\Limits;
 use FHINT\App\Core\ValidationResult;
 use FHINT\App\Google\AttributeCatalog;
 use FHINT\App\Google\Categories;
@@ -16,6 +18,8 @@ use FHINT\App\Google\Connection;
 use FHINT\App\Google\GoogleLocationRepository;
 use FHINT\App\Location\Location;
 use FHINT\App\Location\LocationRepository;
+use FHINT\App\Location\OpeningHours;
+use FHINT\App\Location\SpecialHours;
 use FHINT\App\Review\ReviewRepository;
 use WP_Error;
 
@@ -106,9 +110,84 @@ class Profile {
 			$sections[ $id ] = call_user_func( array( $class, 'read' ) );
 		}
 
+		// With no Google account linked the details are not shown at all:
+		// the screen gets every section in its usual shape, with nothing in
+		// it, so stored values never reach the browser.
+		if ( ! Connection::is_linked() ) {
+			$sections = self::blank( $sections );
+		}
+
 		return array(
 			'sections' => $sections,
 			'meta'     => self::meta(),
+		);
+	}
+
+	/**
+	 * Every section as read, with its values emptied.
+	 *
+	 * What describes the form stays — which social networks there are, the
+	 * attribute definitions, the plan limit — so the screen still draws its
+	 * fields; only what the owner entered or Google sent goes.
+	 *
+	 * @param array $sections Sections as read.
+	 * @return array
+	 */
+	private static function blank( array $sections ) {
+		$info = $sections['info'];
+
+		foreach ( $info as $key => $value ) {
+			$info[ $key ] = is_array( $value ) ? array() : '';
+		}
+
+		$address = $sections['address'];
+
+		foreach ( $address as $key => $value ) {
+			if ( is_string( $value ) ) {
+				$address[ $key ] = '';
+			}
+		}
+
+		$address['latitude']     = null;
+		$address['longitude']    = null;
+		$address['locked']       = false;
+		$address['service_area'] = array();
+
+		$social = $sections['social'];
+
+		$social['social_profiles'] = array_fill_keys( $social['networks'], '' );
+		$social['same_as']         = array();
+		$social['booking_links']   = BookingLinks::complete( array() );
+
+		return array(
+			'info'       => $info,
+			'address'    => $address,
+			'hours'      => array(
+				'location_id'   => $sections['hours']['location_id'],
+				'timezone'      => '',
+				'opening_hours' => OpeningHours::to_payload( array() ),
+				'special_hours' => SpecialHours::to_payload( array() ),
+			),
+			'social'     => $social,
+			'attributes' => array_merge( $sections['attributes'], array( 'values' => array() ) ),
+			'services'   => array_merge(
+				$sections['services'],
+				array(
+					'items'        => array(),
+					'limits'       => Limits::report( Limits::SERVICES, 0 ),
+					'google_types' => array(),
+				)
+			),
+			'media'      => array_merge(
+				$sections['media'],
+				array(
+					'logo'    => null,
+					'cover'   => null,
+					'gallery' => array(),
+					'pending' => array(),
+					'count'   => 0,
+				)
+			),
 		);
 	}
 
@@ -162,9 +241,11 @@ class Profile {
 			// Every listing on the Google account, imported or not, so the
 			// switcher can offer the ones that have no location here yet.
 			'listings'  => ListingOpener::listings(),
-			'reviews'   => $google ? self::reviews( (string) $google['location_name'] ) : null,
+			'reviews'   => $google && Connection::is_linked() ? self::reviews( (string) $google['location_name'] ) : null,
 			'google'    => array(
 				'status'    => Connection::status(),
+				// False locks the screen: no Google account, no details.
+				'linked'    => Connection::is_linked(),
 				'connected' => Connection::STATUS_CONNECTED === Connection::status(),
 				'mapped'    => null !== $google,
 				'location'  => $google ? (string) $google['location_name'] : '',

@@ -99,6 +99,10 @@ class Location {
 			'primary_category'     => '',
 			'primary_category_id'  => '',
 			'secondary_categories' => array(),
+			'additional_phones'    => null,
+			'booking_links'        => null,
+			'service_area'         => array(),
+			'opening_date'         => '',
 			'created_at'        => '',
 			'updated_at'        => '',
 		);

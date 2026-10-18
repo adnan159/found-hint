@@ -35,7 +35,7 @@ const PILLARS = [
   },
 ];
 
-export function WelcomeStep({ onStart, onSkipToDashboard }) {
+export function WelcomeStep({ onStart }) {
   return (
     <div className="fhint:flex fhint:flex-col fhint:gap-7">
       <div className="fhint:flex fhint:flex-col fhint:gap-5">
@@ -49,9 +49,6 @@ export function WelcomeStep({ onStart, onSkipToDashboard }) {
         <div className="fhint:flex fhint:flex-wrap fhint:gap-2.5">
           <Button size="lg" onClick={onStart}>
             {__("Get started", "foundhint-local-seo")}
-          </Button>
-          <Button size="lg" variant="outline" onClick={onSkipToDashboard}>
-            {__("Skip to dashboard", "foundhint-local-seo")}
           </Button>
         </div>
       </div>

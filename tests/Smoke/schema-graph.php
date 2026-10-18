@@ -630,4 +630,23 @@ $graph = \FHINT\App\Schema\SchemaCache::graph( 0 );
 
 check( ! isset( $graph['@graph'][0]['@type'] ) || 'Cached' !== $graph['@graph'][0]['@type'], 'a moved stamp rebuilds rather than serving the old graph' );
 
+// -- Service area --------------------------------------------------------------
+
+$node = business_node( Graph::from_parts( nap( array( 'service_area' => array( 'Austin, TX', 'Round Rock, TX' ) ) ) ) );
+
+check_same(
+	array(
+		array( '@type' => 'Place', 'name' => 'Austin, TX' ),
+		array( '@type' => 'Place', 'name' => 'Round Rock, TX' ),
+	),
+	isset( $node['areaServed'] ) ? $node['areaServed'] : null,
+	'the places served are published as areaServed, in order'
+);
+
+$node = business_node( Graph::from_parts( nap( array( 'service_area' => array() ) ) ) );
+check( ! isset( $node['areaServed'] ), 'no service area, no areaServed' );
+
+$node = business_node( Graph::from_parts( nap() ) );
+check( ! isset( $node['areaServed'] ), 'nor for a NAP that has no service area at all' );
+
 finish( 'Schema graph' );

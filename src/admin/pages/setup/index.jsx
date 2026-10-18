@@ -120,10 +120,7 @@ export default function SetupPage() {
       onDismiss={() => leave("dismiss")}
     >
       {current === "welcome" ? (
-        <WelcomeStep
-          onStart={() => complete("welcome")}
-          onSkipToDashboard={() => leave("dismiss")}
-        />
+        <WelcomeStep onStart={() => complete("welcome")} />
       ) : null}
 
       {current === "business" ? (

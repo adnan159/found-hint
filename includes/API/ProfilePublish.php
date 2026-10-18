@@ -52,7 +52,7 @@ class ProfilePublish extends AbstractController {
 				array(
 					'methods'             => WP_REST_Server::CREATABLE,
 					'callback'            => array( $this, 'plan' ),
-					'permission_callback' => array( $this, 'permissions_check' ),
+					'permission_callback' => array( $this, 'google_write_check' ),
 					'args'                => $this->args( array( 'location_id' => Profile::location_arg() ) ),
 				),
 			)
@@ -65,7 +65,7 @@ class ProfilePublish extends AbstractController {
 				array(
 					'methods'             => WP_REST_Server::CREATABLE,
 					'callback'            => array( $this, 'step' ),
-					'permission_callback' => array( $this, 'permissions_check' ),
+					'permission_callback' => array( $this, 'google_write_check' ),
 					'args'                => $this->args(
 						array(
 							'step'          => array(

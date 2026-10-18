@@ -163,6 +163,8 @@ GET /profile?location_id=2
       "description": "Shokher Tola 80Tk Pet Shop Mirpur is your trusted local pet store offering a complete range of quality pet food, accessories and grooming items.",
       "website": "https://shokhertola80taka.com/",
       "phone": "01335-521022",
+      "additional_phones": ["01335-521023"],
+      "opening_date": "2025-10",
       "cid": "9451307654072888532",
       "history": [
         { "id": 3, "description": "An earlier wording.", "source": "user", "created_at": "2026-10-10 09:12:44" }
@@ -398,6 +400,7 @@ GET /profile?location_id=2
 | `locations` | array | Every location here, main one first |
 | `listings` | array | Every listing on the Google account, imported or not. `location_id` is the location it belongs to, `0` = no location here yet. |
 | `reviews` | object \| null | Rating of this location's Google listing. `null` = no listing or no reviews read. |
+| `google.linked` | bool | A Google account is linked ("needs reconnect" counts). **`false` = every section is empty and saving is refused — lock every field and show a Connect Google prompt.** |
 | `google.connected` | bool | Signed in to Google |
 | `google.mapped` | bool | **This location** has a Google listing. Use this — not `connected` — to enable Refresh / Send / Upload. |
 | `google.synced_at` | string \| null | When the listing was last read |
@@ -493,10 +496,45 @@ descriptions, newest first).
     "secondary_categories": ["gcid:pet_sitter", "gcid:pet_groomer"],
     "description": "Your trusted local pet store in Mirpur for food, accessories and grooming.",
     "website": "https://shokhertola80taka.com/",
-    "phone": "01335-521022"
+    "phone": "01335-521022",
+    "additional_phones": ["01335-521023"],
+    "opening_date": "2025-10"
   }
 }
 ```
+
+**Phone numbers take a country code.** `phone`, each `additional_phones`
+entry and the booking `text_messaging` number all use one control: a
+country picker and the number (`src/admin/components/PhoneNumberInput.jsx`,
+splitting and joining through `src/admin/lib/callingCodes.js`). A number
+edited there is sent in international form, `+8801518984873`; a number
+stored in national form (as Google returns it, `01518-984873`) is shown
+under `info.country` — the location's country, now in the Info read — and
+left as it is until edited. The server accepts either form, and compares
+numbers by their digits with or without the country code.
+
+**`additional_phones`** is a list of up to **two** numbers besides `phone`,
+in order — Google's `phoneNumbers.additionalPhones`. Send the whole list
+(`[]` removes them all); empty entries and repeats are dropped, a repeat
+being the same number however it is written. Errors:
+`fields.additional_phones` = `business.additional_phones.too_many`, and per
+box `fields["additional_phones.N"]` = `business.phone.invalid` or
+`business.additional_phones.same_as_main`. The main location's list is the
+business's; another location's is its own from its first save (even empty)
+and shows the business's until then. Read by the import's `contact` step and
+by *Refresh from Google* (only when there are none here); sent with the main
+number as one `phoneNumbers` change, each side keeping Google's value when
+only the other changed.
+
+**`opening_date`** is a month, `YYYY-MM` — what `<input type="month">` reads
+and writes; send `""` to clear it. It is kept to the month, as Google shows
+it ("Opened October 2025"), and may be at most a year ahead. Errors on
+`fields.opening_date`: `opening_date.invalid` (not a real month) and
+`opening_date.too_far` (more than a year ahead). The main location's date is
+the business's founding date; another location keeps its own and shows the
+business's until it has one. Google's date is read by the import's
+`identity` step and by *Refresh from Google* (only into an empty date), and
+sent by *Send to Google* as `openInfo.openingDate` — year and month, no day.
 
 **Response `200`**
 
@@ -513,6 +551,8 @@ descriptions, newest first).
     "description": "Your trusted local pet store in Mirpur for food, accessories and grooming.",
     "website": "https://shokhertola80taka.com/",
     "phone": "01335-521022",
+    "additional_phones": ["01335-521023"],
+    "opening_date": "2025-10",
     "cid": "9451307654072888532",
     "history": [
       { "id": 4, "description": "Your trusted local pet store in Mirpur for food, accessories and grooming.", "source": "user", "created_at": "2026-10-12 06:41:10" }
@@ -640,6 +680,49 @@ So: make the inputs read-only, show the notice, link to
   for `null`, not for falsiness. Draw the map only when both are numbers.
 
 ---
+
+#### Service area (same `address` section)
+
+Shown after the map: the places this location serves, as chips, at most
+**20** (Google's limit). Read on `data.address`:
+
+```json
+{
+  "service_area": [
+    { "name": "Mirpur-1, Dhaka, Bangladesh", "place_id": "ChIJ3SnOb-nAVTcRTeapq1GezWw" },
+    { "name": "Uttara, Dhaka", "place_id": "" }
+  ],
+  "service_area_max": 20
+}
+```
+
+**`place_id`** is Google's id for the region. Google *requires* it for every
+place, and only Google's Places API can name one — so:
+
+- a place read from Google has a `place_id` and is sent back on *Send to
+  Google*; removing it here and publishing removes it there;
+- a place **typed here** has `place_id: ""`. It is kept, and published on
+  the website as `areaServed`, but never sent to Google. Mark it (the screen
+  uses a dashed outline plus the words "website only"); *Send to Google*
+  lists it under skipped with reason `no_place_id`.
+
+**Save** — `PATCH /profile`, `section: "address"`, with the whole list. A
+typed place can be sent as a plain name:
+
+```json
+{ "section": "address", "fields": { "service_area": [
+  { "name": "Mirpur-1, Dhaka, Bangladesh", "place_id": "ChIJ3SnOb-nAVTcRTeapq1GezWw" },
+  "Uttara, Dhaka"
+] } }
+```
+
+The service area can be saved **even when the address is locked** (a mapped
+listing): send it on its own, without address fields. Blanks and repeats
+(by name, ignoring case and spacing) are dropped. Errors:
+`fields.service_area` → `service_area.too_many`; per chip
+`fields["service_area.N"]` → `service_area.name.too_long` (over 150
+characters). Read from Google by the import's `address` step and by
+*Refresh from Google* (only into an empty area).
 
 ### 5.3 Section `hours` — Business Hours
 
@@ -837,6 +920,69 @@ saves its own. Once it has saved links — even all empty — the whole set is
 its own, so removing a link there does not bring the business's back.
 
 ---
+
+#### Booking links (same `social` section)
+
+The Social Links tab has a **Booking and messaging** group between "Shown on
+your Google profile" and "Directories and review sites", drawn as the same
+cards. Google keeps all three as link attributes and shows them as the
+**Book** and **Chat** buttons. They are saved with the social links, as a
+separate field, so they never go into `sameAs`.
+
+| Field | Google attribute | Stored as | Sent to Google as |
+|---|---|---|---|
+| `appointment` | `url_appointment` | `https://…` | the same link |
+| `text_messaging` | `url_text_messaging` | international number, `+8801712345678` | `sms:+8801712345678` |
+| `whatsapp` | `url_whatsapp` | `https://wa.me/8801712345678` | the same link |
+
+**Read** — extra keys on `data.social`:
+
+```json
+{
+  "booking_links": {
+    "appointment": "",
+    "text_messaging": "+8801712345678",
+    "whatsapp": "https://wa.me/8801712345678"
+  },
+  "booking_offered": { "appointment": false, "text_messaging": true, "whatsapp": true },
+  "country": "BD"
+}
+```
+
+`booking_offered` says which of the three Google offers **this listing**
+(from its attribute menu, read by *Refresh from Google*): `false` = not
+offered — kept but never sent, so say so on the card; `null` = not known
+yet, treat as offered. `country` is the location's country, for the texting
+number's country code picker to start on.
+
+**Save** — send `booking_links` with or without `social_profiles`; send only
+the part that changed:
+
+```json
+{
+  "section": "social",
+  "fields": {
+    "booking_links": {
+      "appointment": "https://book.example.com/foundhint",
+      "text_messaging": "+8801712345678",
+      "whatsapp": "https://wa.me/8801712345678"
+    }
+  }
+}
+```
+
+Send the whole set; `""` clears one. Both parts are checked before either
+is written. The texting number must be international — `+`, then 8–15
+digits; build it from the picked country and the number
+(`src/admin/lib/callingCodes.js`, `joinNumber()`). Errors on `fields`:
+`booking_links.appointment` → `booking.appointment.invalid`,
+`booking_links.text_messaging` → `booking.text_messaging.invalid`,
+`booking_links.whatsapp` → `booking.whatsapp.invalid` (not a wa.me or
+whatsapp.com link). The main location's set is the business's; another
+location keeps its own set from its first save and shows the business's
+until then. Read from Google by the import's `contact` step and by *Refresh
+from Google* (only when none are held here); sent by *Send to Google* in the
+attributes step.
 
 ### 5.5 Section `attributes` — Attributes
 
@@ -1667,6 +1813,20 @@ whose `location_id` is `0` (on the Google account, not set up here yet). A
 listing that has a location is that location — list it once. **Show the menu
 when there is more than one entry**, so an account with two listings can
 switch even if only one has been imported. Mark the not-yet-set-up ones.
+
+**One bar, every screen**
+
+The bar with the name, rating and **Switch location** sits at the top of
+every admin screen (not on setup), not only the Business page. One choice
+drives them all: Dashboard, Business, Reviews, Audit and Schema read the
+same selected location, remembered in `localStorage` under
+`fhint:selected-location` (`0` = main). The Business page asks before a
+switch throws away unsaved edits.
+
+The square on the left shows the location's logo
+(`sections.media.logo.url`, from Google). With no logo it shows the first
+letter of the first two words of the name in capitals — "Pet Shop" → `PS`;
+a one-word name uses its first two letters — "FoundHint" → `FO`.
 
 **Choosing a listing that has no location yet** — `POST /profile/listing`
 

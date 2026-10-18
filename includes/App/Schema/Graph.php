@@ -333,6 +333,19 @@ class Graph {
 			);
 		}
 
+		// The places served, as schema.org's areaServed. Every place is named,
+		// including one typed here that Google could not be sent.
+		if ( ! empty( $nap['service_area'] ) ) {
+			$node['areaServed'] = array();
+
+			foreach ( $nap['service_area'] as $place ) {
+				$node['areaServed'][] = array(
+					'@type' => 'Place',
+					'name'  => (string) $place,
+				);
+			}
+		}
+
 		$hours = self::opening_hours( $nap );
 
 		if ( $hours ) {
