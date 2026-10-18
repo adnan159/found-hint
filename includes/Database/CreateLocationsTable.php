@@ -100,6 +100,15 @@ defined( 'ABSPATH' ) || exit;
  *                           `business_name`. Only a location that is not the
  *                           primary one keeps its own; Google holds it per
  *                           listing as `openInfo.openingDate`.
+ * @column google_location_name The Google listing this location is, e.g.
+ *                           'locations/495652196029249217' — the location's own
+ *                           memory of the link, kept here because the link
+ *                           table (`google_locations`) is emptied on disconnect.
+ *                           When the listings are read again after a reconnect,
+ *                           each re-links to the location that remembers it,
+ *                           so an import updates that location instead of
+ *                           creating a second one. Empty when never linked or
+ *                           deliberately unlinked.
  * @column created_at        Row creation timestamp, UTC.
  * @column updated_at        Last write timestamp, UTC.
  */
@@ -145,6 +154,7 @@ class CreateLocationsTable {
 	booking_links longtext NULL,
 	service_area longtext NULL,
 	opening_date date NULL,
+	google_location_name varchar(191) NOT NULL default '',
 	created_at datetime NULL,
 	updated_at datetime NULL,
 	PRIMARY KEY  (id),
@@ -152,6 +162,7 @@ class CreateLocationsTable {
 	KEY wordpress_post_id (wordpress_post_id),
 	KEY status (status),
 	KEY country_city (country,city),
+	KEY google_location_name (google_location_name),
 	KEY created_at (created_at),
 	KEY updated_at (updated_at)
 ) {$charset_collate};";

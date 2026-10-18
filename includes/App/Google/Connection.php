@@ -297,7 +297,9 @@ class Connection {
 		// The stored profiles describe an account nobody is signed in to any
 		// more, and the mappings point at places this site can no longer
 		// see. Keeping them would leave the mapping screen showing links it
-		// cannot act on.
+		// cannot act on. Each location still remembers its own listing
+		// (`locations.google_location_name`), so reconnecting the same
+		// account links them again rather than importing duplicates.
 		GoogleLocationRepository::truncate();
 
 		Logger::log(

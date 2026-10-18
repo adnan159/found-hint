@@ -489,4 +489,60 @@ check_same( 'handoff-xyz', $exchange['handoff'], 'with the handoff from the redi
 
 $GLOBALS['__filters']['fhint_connect_url'] = array();
 
+// -- A revoked grant through FoundHint's connect service --------------------
+//
+// The service answers WordPress-REST style, `{ code, message }`, not Google's
+// `{ error }`. Reading only `error` missed `invalid_grant`: the dead
+// connection stayed stored and every request failed with Google's raw
+// "Token has been expired or revoked." This is the shape the live service
+// returns.
+
+reset_google();
+Tokens::save(
+	array(
+		'access_token'  => 'access-1',
+		'refresh_token' => 'refresh-1',
+		'expires_in'    => -10,
+		'scope'         => OAuth::SCOPE_BUSINESS,
+	),
+	array( 'source' => 'connect' )
+);
+
+check( ConnectService::configured() && 'connect' === Tokens::all()['source'], 'a connection made through the connect service refreshes through it' );
+
+queue_http(
+	400,
+	array(
+		'code'    => 'invalid_grant',
+		'message' => 'Token has been expired or revoked.',
+		'data'    => array( 'status' => 400 ),
+	)
+);
+
+$result = Connection::access_token();
+
+check( $result instanceof WP_Error, "the service's invalid_grant returns an error" );
+check_same( 'Google has withdrawn this connection. Connect again.', $result instanceof WP_Error ? $result->get_error_message() : null, "in the plugin's words, not Google's raw text" );
+check( ! Tokens::exists(), 'and the dead connection is cleared' );
+check_same( Connection::STATUS_DISCONNECTED, Connection::status(), 'so the screens ask to connect again' );
+
+// Any other refusal from the service keeps the connection.
+reset_google();
+Tokens::save(
+	array(
+		'access_token'  => 'access-1',
+		'refresh_token' => 'refresh-1',
+		'expires_in'    => -10,
+		'scope'         => OAuth::SCOPE_BUSINESS,
+	),
+	array( 'source' => 'connect' )
+);
+
+queue_http( 429, array( 'code' => 'rate_limited', 'message' => 'Slow down.' ) );
+
+$result = Connection::access_token();
+
+check_same( "FoundHint's connect service is busy. Try again in a minute.", $result instanceof WP_Error ? $result->get_error_message() : null, 'a busy service is named as busy' );
+check( Tokens::exists(), 'and does not cost the connection' );
+
 finish( 'Google Business Profile' );

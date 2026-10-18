@@ -91,6 +91,60 @@ class LocationRepository {
 	}
 
 	/**
+	 * The location that remembers being a given Google listing.
+	 *
+	 * @param string $location_name Google location resource name.
+	 * @return array|null
+	 */
+	public static function find_by_google_location_name( $location_name ) {
+		global $wpdb;
+
+		$location_name = (string) $location_name;
+
+		if ( '' === $location_name || ! Tables::exists( Tables::LOCATIONS ) ) {
+			return null;
+		}
+
+		$table = Tables::name( Tables::LOCATIONS );
+
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+		$row = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$table} WHERE google_location_name = %s ORDER BY id ASC LIMIT 1", $location_name ), ARRAY_A );
+
+		return $row ? self::hydrate( $row ) : null;
+	}
+
+	/**
+	 * Record, or clear, which Google listing a location is.
+	 *
+	 * Written straight to the column: this is bookkeeping for the link, not
+	 * an edit of the location, so it neither validates nor stamps the
+	 * location as changed. A listing is one location's at a time, so it is
+	 * cleared from any other first.
+	 *
+	 * @param int    $id            Location id.
+	 * @param string $location_name Google resource name, or '' to forget.
+	 * @return void
+	 */
+	public static function remember_google_listing( $id, $location_name ) {
+		global $wpdb;
+
+		if ( ! Tables::exists( Tables::LOCATIONS ) ) {
+			return;
+		}
+
+		$table         = Tables::name( Tables::LOCATIONS );
+		$location_name = (string) $location_name;
+
+		if ( '' !== $location_name ) {
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+			$wpdb->update( $table, array( 'google_location_name' => '' ), array( 'google_location_name' => $location_name ) );
+		}
+
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+		$wpdb->update( $table, array( 'google_location_name' => $location_name ), array( 'id' => (int) $id ) );
+	}
+
+	/**
 	 * The location used when a single place is needed — schema, the dashboard.
 	 *
 	 * @return array|null
@@ -367,6 +421,7 @@ class LocationRepository {
 			'secondary_categories' => wp_json_encode( isset( $record['secondary_categories'] ) && is_array( $record['secondary_categories'] ) ? array_values( $record['secondary_categories'] ) : array() ),
 			// NULL until the location has numbers of its own; see the table docblock.
 			'additional_phones'    => isset( $record['additional_phones'] ) && is_array( $record['additional_phones'] ) ? wp_json_encode( array_values( $record['additional_phones'] ) ) : null,
+			'google_location_name' => isset( $record['google_location_name'] ) ? (string) $record['google_location_name'] : '',
 			'service_area'         => isset( $record['service_area'] ) && is_array( $record['service_area'] ) && $record['service_area'] ? wp_json_encode( array_values( $record['service_area'] ) ) : null,
 			'booking_links'        => isset( $record['booking_links'] ) && is_array( $record['booking_links'] ) ? wp_json_encode( $record['booking_links'] ) : null,
 			// NULL, not '', for "use the business's": a DATE column has no empty.

@@ -1630,6 +1630,101 @@ update_option( 'fhint_google_tokens', $fhint_tokens );
 ReviewRepository::truncate();
 check_same( 0, ReviewRepository::count(), 'truncate clears the table' );
 
+// -- Disconnect and reconnect the same account ------------------------------
+//
+// A disconnect empties google_locations. Reconnecting must link each listing
+// back to its own location, not import a second copy of the business.
+
+$fhint_listing_row = static function ( $location_name, $title ) {
+	return array(
+		'account_name'       => 'accounts/reconnect',
+		'location_name'      => $location_name,
+		'title'              => $title,
+		'store_code'         => '',
+		'address'            => '',
+		'phone'              => '',
+		'website'            => '',
+		'verification_state' => 'OK',
+		'payload'            => array(),
+	);
+};
+
+$fhint_kept_listings = GoogleLocationRepository::all();
+$fhint_shop          = LocationRepository::create(
+	array(
+		'business_id'    => (int) BusinessRepository::get()['id'],
+		'name'           => 'Reconnect Shop',
+		'address_line_1' => '1 Reconnect Road',
+		'city'           => 'Dhaka',
+		'country'        => 'BD',
+	)
+);
+
+GoogleLocationRepository::upsert( $fhint_listing_row( 'locations/reconnect-1', 'Reconnect Shop' ) );
+GoogleLocationRepository::map( 'locations/reconnect-1', (int) $fhint_shop['id'] );
+
+check_same( 'locations/reconnect-1', LocationRepository::find( (int) $fhint_shop['id'] )['google_location_name'], 'linking a listing records it on the location too' );
+
+// Editing the location must not lose the memory: update() writes every column.
+LocationRepository::update( (int) $fhint_shop['id'], array( 'phone' => '01700-123456' ) );
+check_same( 'locations/reconnect-1', LocationRepository::find( (int) $fhint_shop['id'] )['google_location_name'], 'and an edit to the location keeps it' );
+
+$fhint_count_before = LocationRepository::count();
+
+// What a disconnect does, then what a reconnect does.
+GoogleLocationRepository::truncate();
+GoogleLocationRepository::upsert( $fhint_listing_row( 'locations/reconnect-1', 'Reconnect Shop' ) );
+
+check_same( (int) $fhint_shop['id'], (int) GoogleLocationRepository::find_by_location_name( 'locations/reconnect-1' )['fhint_location_id'], 'after a disconnect, reading the listing again links it back to its location' );
+check_same( $fhint_count_before, LocationRepository::count(), 'with no new location made' );
+
+// Unlinking on purpose is the one thing that makes a location forget.
+GoogleLocationRepository::unmap( 'locations/reconnect-1' );
+check_same( '', LocationRepository::find( (int) $fhint_shop['id'] )['google_location_name'], 'unlinking on purpose clears the memory' );
+
+GoogleLocationRepository::truncate();
+GoogleLocationRepository::upsert( $fhint_listing_row( 'locations/reconnect-1', 'Reconnect Shop' ) );
+check_same( 0, (int) GoogleLocationRepository::find_by_location_name( 'locations/reconnect-1' )['fhint_location_id'], 'so an unlinked listing is not linked back by a reconnect' );
+
+// A listing is one location's: linking it elsewhere moves the memory.
+$fhint_other = LocationRepository::create(
+	array(
+		'business_id'    => (int) BusinessRepository::get()['id'],
+		'name'           => 'Other Shop',
+		'address_line_1' => '2 Reconnect Road',
+		'city'           => 'Dhaka',
+		'country'        => 'BD',
+	)
+);
+
+GoogleLocationRepository::map( 'locations/reconnect-1', (int) $fhint_shop['id'] );
+GoogleLocationRepository::map( 'locations/reconnect-1', (int) $fhint_other['id'] );
+check_same( '', LocationRepository::find( (int) $fhint_shop['id'] )['google_location_name'], 'a listing linked to another location is forgotten by the first' );
+check_same( 'locations/reconnect-1', LocationRepository::find( (int) $fhint_other['id'] )['google_location_name'], 'and remembered by the second' );
+
+// The backfill for links made before the memory existed.
+global $wpdb;
+$wpdb->update( Tables::name( Tables::LOCATIONS ), array( 'google_location_name' => '' ), array( 'id' => (int) $fhint_other['id'] ) );
+
+$fhint_migrate = new ReflectionMethod( FHINT\Installer::class, 'remember_google_listings' );
+$fhint_migrate->setAccessible( true );
+$fhint_migrate->invoke( null );
+
+check_same( 'locations/reconnect-1', LocationRepository::find( (int) $fhint_other['id'] )['google_location_name'], 'the migration gives an already-linked location its memory' );
+
+// Leave the table as the later sections expect it.
+LocationRepository::delete( (int) $fhint_shop['id'] );
+LocationRepository::delete( (int) $fhint_other['id'] );
+GoogleLocationRepository::truncate();
+
+foreach ( $fhint_kept_listings as $fhint_kept ) {
+	GoogleLocationRepository::upsert( $fhint_kept );
+
+	if ( (int) $fhint_kept['fhint_location_id'] > 0 ) {
+		GoogleLocationRepository::map( $fhint_kept['location_name'], (int) $fhint_kept['fhint_location_id'] );
+	}
+}
+
 // -- Cascades --------------------------------------------------------------
 
 check_same( 4, count( OpeningHoursRepository::for_location( $location_id ) ), 'all four period rows are there before the delete' );

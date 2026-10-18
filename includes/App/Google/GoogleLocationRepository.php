@@ -7,6 +7,8 @@
 
 namespace FHINT\App\Google;
 
+use FHINT\App\Location\LocationRepository;
+
 use FHINT\Database\Tables;
 
 defined( 'ABSPATH' ) || exit;
@@ -115,7 +117,11 @@ class GoogleLocationRepository {
 			return false !== $wpdb->update( $table, $row, array( 'id' => (int) $existing['id'] ) );
 		}
 
-		$row['fhint_location_id'] = 0;
+		// A listing read for the first time — or again, after a disconnect
+		// emptied this table — goes back to the location that remembers it,
+		// so a reconnect does not turn one shop into two.
+		$remembered               = LocationRepository::find_by_google_location_name( $data['location_name'] );
+		$row['fhint_location_id'] = $remembered ? (int) $remembered['id'] : 0;
 		$row['created_at']        = $now;
 
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
@@ -195,7 +201,7 @@ class GoogleLocationRepository {
 		);
 
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
-		return false !== $wpdb->update(
+		$mapped = false !== $wpdb->update(
 			$table,
 			array(
 				'fhint_location_id' => (int) $fhint_location_id,
@@ -203,6 +209,14 @@ class GoogleLocationRepository {
 			),
 			array( 'location_name' => (string) $location_name )
 		);
+
+		// The location keeps its own note of the link, which a disconnect
+		// does not clear.
+		if ( $mapped ) {
+			LocationRepository::remember_google_listing( (int) $fhint_location_id, (string) $location_name );
+		}
+
+		return $mapped;
 	}
 
 	/**
@@ -215,6 +229,13 @@ class GoogleLocationRepository {
 		global $wpdb;
 
 		$table = Tables::name( Tables::GOOGLE_LOCATIONS );
+
+		// Unlinking on purpose is the one time the location forgets.
+		$linked = self::find_by_location_name( $location_name );
+
+		if ( $linked && (int) $linked['fhint_location_id'] > 0 ) {
+			LocationRepository::remember_google_listing( (int) $linked['fhint_location_id'], '' );
+		}
 
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		return false !== $wpdb->update(

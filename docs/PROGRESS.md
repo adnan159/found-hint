@@ -1714,3 +1714,43 @@ location bar's initials tile, the "Add a phone number" button — rendered
 transparent with a near-black outline. Restored in `:root` from 12a12c2
 (`#fff1eb`, `#ffc9af`, `#8a3b12`), with a comment saying what breaks without
 them.
+
+## Step 52 — Reconnecting no longer duplicates locations
+
+**Bug:** disconnecting empties `google_locations` (the listing → location
+links), so after reconnecting the same account the import could not tell
+which location each listing was. With more than one location it could not
+guess either, and created new ones — every reconnect doubled the business.
+
+**Fix:** each location now remembers its own listing in
+`locations.google_location_name` (DB 0.16.0, keyed). It is written by
+`GoogleLocationRepository::map()` (moved, if the listing was another
+location's), cleared only by a deliberate `unmap()`, and untouched by a
+disconnect. When a listing is stored for the first time — including after a
+disconnect — `upsert()` links it straight back to the location that
+remembers it, so the import updates that location. A one-off migration
+(`Installer::remember_google_listings()`) copies existing links into the new
+column; it only fills empty memories. Integration tests replay link →
+disconnect → reconnect, deliberate unlinking, moving a listing and the
+migration; each part mutation-tested.
+
+**Dev data repaired** (with the owner's go-ahead): the reconnect had made
+copies #3 (FoundHint) and #4 (pet shop). The listings were re-linked to #1
+and #2 and the copies deleted with their photos, attributes, services and
+hours (nothing had been edited on them; a JSON backup was taken first). A
+refresh then confirmed FoundHint's opening date (Sep 2026) from Google.
+
+## Step 53 — "Token has been expired or revoked." handled
+
+That text is Google's own, for a refresh token it no longer honours
+(`invalid_grant`). On the OAuth route the plugin already caught it, cleared
+the dead connection and said "Google has expired or withdrawn this
+connection. Connect again to restore it." On the **connect-service** route
+it did not: the service answers `{ code, message }` (WordPress-REST style),
+`ConnectService::post()` read only `error`, so `invalid_grant` was never
+seen — Google's raw message reached the screen, and the dead tokens stayed
+stored, so the site kept claiming to be connected and every Google request
+failed the same way until a manual disconnect/reconnect. `post()` now reads
+`code` (then `error`). Smoke tests use the live service's real response
+shape; reverting the fix fails four checks. Verified against the live
+service with a fake refresh token (no real connection touched).

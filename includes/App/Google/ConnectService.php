@@ -301,7 +301,18 @@ class ConnectService {
 			return $decoded;
 		}
 
-		$code = isset( $decoded['error'] ) ? (string) $decoded['error'] : 'fhint_connect_failed';
+		// The service answers WordPress-REST style, `{ code, message }`;
+		// `error` is read too, for Google's own shape passed through. Missing
+		// the code is not cosmetic: an `invalid_grant` that goes unread leaves
+		// a dead connection stored, and every request after it fails with
+		// Google's raw "Token has been expired or revoked."
+		if ( isset( $decoded['code'] ) && is_string( $decoded['code'] ) && '' !== $decoded['code'] ) {
+			$code = $decoded['code'];
+		} elseif ( isset( $decoded['error'] ) && is_string( $decoded['error'] ) && '' !== $decoded['error'] ) {
+			$code = $decoded['error'];
+		} else {
+			$code = 'fhint_connect_failed';
+		}
 
 		return new WP_Error(
 			'fhint_connect_failed',

@@ -108,6 +108,35 @@ class Installer {
 		Tokens::encrypt_stored();
 
 		self::drop_old_service_slug_key();
+		self::remember_google_listings();
+	}
+
+	/**
+	 * Give every linked location its own memory of its Google listing.
+	 *
+	 * DB 0.16.0 added `locations.google_location_name`, written whenever a
+	 * listing is linked from then on. Links made before it exist only in
+	 * `google_locations`, which a disconnect empties — so they are copied
+	 * across once, while they still exist. Only into an empty memory, so
+	 * it costs one query on a site that is already up to date.
+	 *
+	 * @return void
+	 */
+	private static function remember_google_listings() {
+		global $wpdb;
+
+		if ( ! Tables::exists( Tables::LOCATIONS ) || ! Tables::exists( Tables::GOOGLE_LOCATIONS ) ) {
+			return;
+		}
+
+		$locations = Tables::name( Tables::LOCATIONS );
+		$google    = Tables::name( Tables::GOOGLE_LOCATIONS );
+
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+		$wpdb->query(
+			// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+			"UPDATE {$locations} l INNER JOIN {$google} g ON g.fhint_location_id = l.id SET l.google_location_name = g.location_name WHERE l.google_location_name = '' AND g.fhint_location_id > 0"
+		);
 	}
 
 	/**

@@ -102,6 +102,8 @@ class Location {
 			'additional_phones'    => null,
 			'booking_links'        => null,
 			'service_area'         => array(),
+			// Set only through GoogleLocationRepository::map()/unmap().
+			'google_location_name' => '',
 			'opening_date'         => '',
 			'created_at'        => '',
 			'updated_at'        => '',
