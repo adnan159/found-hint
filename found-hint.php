@@ -1,8 +1,8 @@
 <?php
 /**
- * Plugin Name:       FoundHint — Local SEO & Schema for Google Business Profile
+ * Plugin Name:       FoundHint – Complete Local SEO, Schema, GMB Multi-Location & Reviews Management
  * Plugin URI:        https://foundhint.com/local-seo/
- * Description:       Local SEO command center — business profile, locations, schema, audits, Google Business Profile and ranking, all from one place.
+ * Description:       Local SEO WordPress plugin to manage business info, locations, schema, audits, and Google Business Profile from one simple dashboard.
  * Version:           0.1.0
  * Requires at least: 6.4
  * Requires PHP:      7.4

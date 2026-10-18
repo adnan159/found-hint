@@ -1754,3 +1754,19 @@ failed the same way until a manual disconnect/reconnect. `post()` now reads
 `code` (then `error`). Smoke tests use the live service's real response
 shape; reverting the fix fails four checks. Verified against the live
 service with a fake refresh token (no real connection touched).
+
+## Step 54 — readme.txt to WordPress.org standard
+
+`readme.txt` rewritten from the product description doc (Claude Docs,
+"FoundHint – Local SEO WordPress Plugin Description"), in WordPress.org's
+format: title "FoundHint – Complete Local SEO, Schema, GMB Multi-Location &
+Reviews Management", 133-character short description, 5 tags, Description /
+Installation / FAQ / Screenshots / Changelog / Upgrade Notice, and the
+External services and Bundled resources sections kept (External services now
+also names reviews, replies, service area, booking links and opening date).
+Every feature was checked against the code: what exists is described as it
+works today; what does not is marked *(Coming soon)* — 21 items, including
+the fix workflow's preview-and-confirm step, which the doc promises but the
+plugin does not have (a fix applies on its button and the audit re-runs).
+The plugin header's name and description now match the readme. The doc's
+Free/Pro split is not reflected yet; that decision is deferred.

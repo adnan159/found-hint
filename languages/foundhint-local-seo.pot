@@ -379,27 +379,27 @@ msgstr ""
 msgid "FoundHint\\'s connect service could not be reached. Please try again in a moment."
 msgstr ""
 
-#: includes/App/Google/ConnectService.php:329
+#: includes/App/Google/ConnectService.php:340
 msgid "Google has withdrawn this connection. Connect again."
 msgstr ""
 
-#: includes/App/Google/ConnectService.php:331
+#: includes/App/Google/ConnectService.php:342
 msgid "FoundHint\\'s connect service is busy. Try again in a minute."
 msgstr ""
 
-#: includes/App/Google/ConnectService.php:333
+#: includes/App/Google/ConnectService.php:344
 msgid "That sign-in has already been completed or has expired. Start again."
 msgstr ""
 
-#: includes/App/Google/ConnectService.php:338
+#: includes/App/Google/ConnectService.php:349
 msgid "The connect service refused this site\\'s return address. Check the site address in Settings → General."
 msgstr ""
 
-#: includes/App/Google/ConnectService.php:340
+#: includes/App/Google/ConnectService.php:351
 msgid "The connect service needs this site to be served over https before it can connect."
 msgstr ""
 
-#: includes/App/Google/ConnectService.php:347
+#: includes/App/Google/ConnectService.php:358
 msgid "FoundHint\\'s connect service refused the request."
 msgstr ""
 
@@ -419,23 +419,23 @@ msgstr ""
 msgid "Google did not return an authorization code."
 msgstr ""
 
-#: includes/App/Google/Connection.php:271 includes/App/Google/Connection.php:408
+#: includes/App/Google/Connection.php:271 includes/App/Google/Connection.php:410
 msgid "Connected to Google Business Profile."
 msgstr ""
 
-#: includes/App/Google/Connection.php:308
+#: includes/App/Google/Connection.php:310
 msgid "Disconnected from Google Business Profile."
 msgstr ""
 
-#: includes/App/Google/Connection.php:309
+#: includes/App/Google/Connection.php:311
 msgid "Disconnected locally; Google did not confirm the revocation."
 msgstr ""
 
-#: includes/App/Google/Connection.php:330
+#: includes/App/Google/Connection.php:332
 msgid "Connect your Google account first."
 msgstr ""
 
-#: includes/App/Google/Connection.php:360
+#: includes/App/Google/Connection.php:362
 msgid "Google rejected the stored grant; the connection was cleared."
 msgstr ""
 
