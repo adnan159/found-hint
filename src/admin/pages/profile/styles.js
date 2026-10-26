@@ -1,0 +1,54 @@
+/**
+ * Class strings shared by the profile's sections.
+ *
+ * Measured from the design: 13px bold labels, 12.5px help text, inputs with
+ * a 1px rule and 10px/12px padding, square corners throughout. Kept here so
+ * seven sections read as one screen and a change to a field's look is made
+ * once.
+ *
+ * Padding on the inputs is marked important because WordPress's admin
+ * stylesheet sets `padding: 0 12px` on url, tel, number, date and time inputs
+ * with a selector a utility class cannot outrank.
+ *
+ * Every interactive class carries a visible focus state — the design shows
+ * none because it was never tabbed through.
+ */
+
+const FOCUS =
+  "fhint:outline-none fhint:focus-visible:ring-2 fhint:focus-visible:ring-ring fhint:focus-visible:ring-offset-1";
+
+export const label = "fhint:text-[13px] fhint:font-bold";
+
+export const help =
+  "fhint:text-[12.5px] fhint:leading-normal fhint:text-muted-strong";
+
+export const errorText =
+  "fhint:text-[12.5px] fhint:font-semibold fhint:text-destructive";
+
+export const input = `fhint:w-full fhint:min-w-0 fhint:border fhint:border-input fhint:bg-card fhint:px-3! fhint:py-2.5! fhint:text-sm fhint:text-foreground fhint:placeholder:text-muted-foreground fhint:read-only:bg-muted fhint:read-only:text-muted-strong fhint:aria-invalid:border-destructive ${FOCUS}`;
+
+export const smallInput = `fhint:border fhint:border-input fhint:bg-card fhint:px-[7px]! fhint:py-[5px]! fhint:text-[12.5px] fhint:text-foreground fhint:aria-invalid:border-destructive ${FOCUS}`;
+
+// The bordered white button used for secondary actions inside a section.
+export const quietButton = `fhint:inline-flex fhint:cursor-pointer fhint:items-center fhint:gap-1.5 fhint:border fhint:border-input fhint:bg-card fhint:px-[11px] fhint:py-[7px] fhint:text-[12.5px] fhint:font-extrabold fhint:text-foreground fhint:no-underline fhint:disabled:cursor-not-allowed fhint:disabled:text-muted-foreground ${FOCUS}`;
+
+export const primaryButton = `fhint:inline-flex fhint:cursor-pointer fhint:items-center fhint:gap-1.5 fhint:border-0 fhint:bg-primary fhint:px-[13px] fhint:py-2 fhint:text-[12.5px] fhint:font-extrabold fhint:text-primary-foreground fhint:disabled:cursor-not-allowed fhint:disabled:bg-border fhint:disabled:text-muted-foreground ${FOCUS}`;
+
+export const linkButton = `fhint:cursor-pointer fhint:border-0 fhint:bg-transparent fhint:p-0 fhint:text-[12.5px] fhint:font-extrabold fhint:text-foreground fhint:underline ${FOCUS}`;
+
+// The small uppercase tag beside a title or a name.
+export const tag =
+  "fhint:px-1.5 fhint:py-0.5 fhint:text-[10px] fhint:font-extrabold fhint:tracking-[0.07em] fhint:uppercase";
+
+export const tagTones = {
+  ok: "fhint:bg-[#E8F3ED] fhint:text-success",
+  bad: "fhint:bg-[#FBE9E6] fhint:text-destructive",
+  quiet: "fhint:bg-background fhint:text-muted-strong",
+  accent: "fhint:bg-notice fhint:text-notice-foreground",
+};
+
+// The pill beside a section title: "6 DAYS OPEN", "3 OF 5 USED".
+export const chip =
+  "fhint:px-[7px] fhint:py-[3px] fhint:text-[11.5px] fhint:font-extrabold fhint:tracking-[0.06em] fhint:uppercase";
+
+export const focus = FOCUS;

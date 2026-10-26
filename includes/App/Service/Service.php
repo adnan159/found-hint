@@ -51,6 +51,8 @@ class Service {
 			'url',
 			'status',
 			'sort_order',
+			'google_item_type',
+			'google_service_type_id',
 		);
 	}
 
@@ -63,6 +65,9 @@ class Service {
 		return array(
 			'id'                  => 0,
 			'business_id'         => 0,
+			// Whose list: 0 = the business's own (the primary location's).
+			// Set by the profile and the import, never by a client.
+			'location_id'         => 0,
 			'name'                => '',
 			'slug'                => '',
 			'description'         => '',
@@ -71,6 +76,8 @@ class Service {
 			'price'               => null,
 			'currency'            => '',
 			'url'                 => '',
+			'google_item_type'    => '',
+			'google_service_type_id' => '',
 			'status'              => self::STATUS_ACTIVE,
 			'sort_order'          => 0,
 			'created_at'          => '',

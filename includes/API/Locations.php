@@ -74,7 +74,7 @@ class Locations extends AbstractController {
 				array(
 					'methods'             => WP_REST_Server::CREATABLE,
 					'callback'            => array( $this, 'create_item' ),
-					'permission_callback' => array( $this, 'permissions_check' ),
+					'permission_callback' => array( $this, 'google_write_check' ),
 					'args'                => $this->write_args(),
 				),
 			)
@@ -92,13 +92,13 @@ class Locations extends AbstractController {
 				array(
 					'methods'             => 'POST, PUT, PATCH',
 					'callback'            => array( $this, 'update_item' ),
-					'permission_callback' => array( $this, 'permissions_check' ),
+					'permission_callback' => array( $this, 'google_write_check' ),
 					'args'                => $this->write_args(),
 				),
 				array(
 					'methods'             => WP_REST_Server::DELETABLE,
 					'callback'            => array( $this, 'delete_item' ),
-					'permission_callback' => array( $this, 'permissions_check' ),
+					'permission_callback' => array( $this, 'google_write_check' ),
 				),
 			)
 		);

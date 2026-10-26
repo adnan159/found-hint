@@ -1,0 +1,263 @@
+<?php
+/**
+ * Reading Google's reviews into FoundHint's shapes.
+ *
+ * Run with plain PHP: `php tests/Smoke/reviews.php`.
+ *
+ * This is the translation layer and the one rule the screens share. A wrong
+ * answer here is not a cosmetic bug: a star rating read as zero drags an
+ * honest average down, an anonymous reviewer's name kept is somebody's
+ * privacy, and a reply mistaken for absent tells an owner they have ignored
+ * a customer they already answered.
+ *
+ * Storing, paging and pruning need a database and are covered in
+ * tests/Integration/database.php.
+ *
+ * @package FoundHint
+ */
+
+require __DIR__ . '/bootstrap.php';
+
+use FHINT\App\Google\Client;
+use FHINT\App\Google\Credentials;
+use FHINT\App\Google\OAuth;
+use FHINT\App\Google\Tokens;
+use FHINT\App\Review\ReviewMapper;
+use FHINT\App\Review\ReviewReply;
+use FHINT\App\Review\Reviews;
+
+echo "Reviews\n";
+
+/**
+ * A Google review, with overrides merged in.
+ *
+ * @param array $overrides Fields to replace.
+ * @return array
+ */
+function fhint_review( array $overrides = array() ) {
+	return array_merge(
+		array(
+			'reviewId'   => 'rev-1',
+			'reviewer'   => array(
+				'displayName'     => 'Asha Rahman',
+				'profilePhotoUrl' => 'https://lh3.googleusercontent.com/a/photo',
+			),
+			'starRating' => 'FIVE',
+			'comment'    => 'Fixed my boiler the same afternoon.',
+			'createTime' => '2026-09-14T09:12:00.123456Z',
+			'updateTime' => '2026-09-14T09:12:00.123456Z',
+		),
+		$overrides
+	);
+}
+
+/**
+ * Map one review with the usual location and account.
+ *
+ * @param array $overrides Fields to replace.
+ * @return array|null
+ */
+function fhint_map( array $overrides = array() ) {
+	return ReviewMapper::from_google( fhint_review( $overrides ), 'locations/42', 'accounts/7' );
+}
+
+// ── star ratings ────────────────────────────────────────────────────────
+
+check_same( 5, ReviewMapper::stars( 'FIVE' ), 'FIVE is five stars' );
+check_same( 4, ReviewMapper::stars( 'FOUR' ), 'FOUR is four stars' );
+check_same( 3, ReviewMapper::stars( 'THREE' ), 'THREE is three stars' );
+check_same( 2, ReviewMapper::stars( 'TWO' ), 'TWO is two stars' );
+check_same( 1, ReviewMapper::stars( 'ONE' ), 'ONE is one star' );
+check_same( 5, ReviewMapper::stars( 'five' ), 'the star word is read case-insensitively' );
+
+// The important one: unspecified must not become one star. Counting it as
+// the lowest rating would invent a bad review nobody wrote.
+check_same( 0, ReviewMapper::stars( 'STAR_RATING_UNSPECIFIED' ), 'an unspecified rating is 0, not 1' );
+check_same( 0, ReviewMapper::stars( '' ), 'a missing rating is 0' );
+check_same( 0, ReviewMapper::stars( 'SIX' ), 'a rating word nobody has heard of is 0' );
+
+// Customer photos: read from reviewMediaItems, Google's image host only,
+// with the size suffix swapped for the full photo.
+$fhint_thumb  = 'https://lh3.googleusercontent.com/grass-cs/ABC-123=k-no';
+$fhint_photos = ReviewMapper::photos(
+	array(
+		'reviewMediaItems' => array(
+			array( 'thumbnailUrl' => $fhint_thumb ),
+			array( 'thumbnailUrl' => 'https://evil.example.com/x.jpg' ),
+			array( 'thumbnailUrl' => 'http://lh3.googleusercontent.com/insecure=k-no' ),
+			array( 'thumbnailUrl' => 'https://lh3.googleusercontent.com.evil.example/x=k-no' ),
+			array( 'nothing' => 'here' ),
+			'not an array',
+		),
+	)
+);
+check_same( 1, count( $fhint_photos ), 'only https photos on Google\'s image host are kept' );
+check_same( $fhint_thumb, $fhint_photos[0]['thumb'], 'the thumbnail is the address Google sent' );
+check_same( 'https://lh3.googleusercontent.com/grass-cs/ABC-123=s1600', $fhint_photos[0]['full'], 'the full photo swaps the size suffix' );
+check_same(
+	'https://lh3.googleusercontent.com/p/ABC=s1600',
+	ReviewMapper::photos( array( 'reviewMediaItems' => array( array( 'thumbnailUrl' => 'https://lh3.googleusercontent.com/p/ABC' ) ) ) )[0]['full'],
+	'an address with no size suffix gets one'
+);
+check_same( array(), ReviewMapper::photos( array() ), 'a review without photos has none' );
+check_same( array(), ReviewMapper::photos( array( 'reviewMediaItems' => 'junk' ) ), 'a malformed photo list is ignored' );
+
+// ── timestamps ──────────────────────────────────────────────────────────
+
+check_same(
+	'2026-09-14 09:12:00',
+	ReviewMapper::datetime( '2026-09-14T09:12:00.123456Z' ),
+	'an RFC 3339 time with fractional seconds becomes a MySQL datetime'
+);
+check_same(
+	'2026-09-14 09:12:00',
+	ReviewMapper::datetime( '2026-09-14T09:12:00Z' ),
+	'an RFC 3339 time without fractional seconds works too'
+);
+// Google sends UTC; storage is UTC. An offset must be converted, not kept,
+// or reviews from one timezone sort wrongly against another.
+check_same(
+	'2026-09-14 09:12:00',
+	ReviewMapper::datetime( '2026-09-14T15:12:00+06:00' ),
+	'an offset time is converted to UTC rather than stored as written'
+);
+check_same( null, ReviewMapper::datetime( '' ), 'an empty time is null, not the epoch' );
+check_same( null, ReviewMapper::datetime( 'whenever' ), 'an unparseable time is null' );
+
+// ── one review ──────────────────────────────────────────────────────────
+
+$mapped = fhint_map();
+
+check_same( 'rev-1', $mapped['review_id'], 'the review id is carried' );
+check_same( 'locations/42', $mapped['location_name'], 'the location is recorded' );
+check_same( 'accounts/7', $mapped['account_name'], 'the account is recorded' );
+check_same( 'Asha Rahman', $mapped['reviewer_name'], 'the reviewer is named' );
+check_same( 5, $mapped['star_rating'], 'the rating is a number' );
+check_same( 'Fixed my boiler the same afternoon.', $mapped['comment'], 'the comment is carried' );
+check_same( '2026-09-14 09:12:00', $mapped['reviewed_at'], 'the review date is converted' );
+check_same( '', $mapped['reply_comment'], 'an unanswered review has an empty reply, not null' );
+check_same( null, $mapped['replied_at'], 'an unanswered review has no reply date' );
+check( is_array( $mapped['payload'] ), 'the raw payload is kept for fields no column covers' );
+
+// A rating with no words is a normal review, not a broken one.
+check_same( '', fhint_map( array( 'comment' => '' ) )['comment'], 'a rating with no comment maps cleanly' );
+check_same( 4, fhint_map( array( 'starRating' => 'FOUR', 'comment' => '' ) )['star_rating'], 'and keeps its rating' );
+
+// ── the review id is the one thing nothing works without ────────────────
+
+check_same( null, fhint_map( array( 'reviewId' => '' ) ), 'a review with no id is refused' );
+check_same( null, ReviewMapper::from_google( array(), 'locations/42', 'accounts/7' ), 'an empty payload is refused' );
+
+// ── anonymity ───────────────────────────────────────────────────────────
+
+$anon = fhint_map(
+	array(
+		'reviewer' => array(
+			'displayName'     => 'Asha Rahman',
+			'profilePhotoUrl' => 'https://lh3.googleusercontent.com/a/photo',
+			'isAnonymous'     => true,
+		),
+	)
+);
+
+check( $anon['is_anonymous'], 'an anonymous reviewer is flagged' );
+check_same( '', $anon['reviewer_name'], 'an anonymous reviewer keeps no name, even when Google sends one' );
+check_same( '', $anon['reviewer_photo'], 'an anonymous reviewer keeps no photo' );
+
+// ── replies ─────────────────────────────────────────────────────────────
+
+$answered = fhint_map(
+	array(
+		'reviewReply' => array(
+			'comment'    => 'Thank you, Asha — glad we could help.',
+			'updateTime' => '2026-09-15T11:00:00Z',
+		),
+	)
+);
+
+check_same( 'Thank you, Asha — glad we could help.', $answered['reply_comment'], 'the reply is carried' );
+check_same( '2026-09-15 11:00:00', $answered['replied_at'], 'the reply date is converted' );
+
+// ── needs_reply, the rule two screens and an audit rule share ───────────
+
+check( Reviews::needs_reply( array( 'reply_comment' => '' ) ), 'an empty reply needs one' );
+check( Reviews::needs_reply( array() ), 'a missing reply field needs one' );
+// Whitespace is not an answer. An owner who typed a space has not replied.
+check( Reviews::needs_reply( array( 'reply_comment' => "  \n " ) ), 'a whitespace-only reply still needs one' );
+check( ! Reviews::needs_reply( array( 'reply_comment' => 'Thanks!' ) ), 'a real reply does not need another' );
+
+// ── a page of reviews ───────────────────────────────────────────────────
+
+$page = ReviewMapper::from_page(
+	array(
+		'reviews' => array(
+			fhint_review( array( 'reviewId' => 'a' ) ),
+			fhint_review( array( 'reviewId' => '' ) ),
+			'not an array',
+			fhint_review( array( 'reviewId' => 'b' ) ),
+		),
+	),
+	'locations/42',
+	'accounts/7'
+);
+
+check_same( 2, count( $page ), 'a page drops entries that cannot be identified' );
+check_same( 'a', $page[0]['review_id'], 'and keeps the ones that can, in order' );
+check_same( 'b', $page[1]['review_id'], 'including the one after the bad entry' );
+
+check_same( array(), ReviewMapper::from_page( array(), 'locations/42', 'accounts/7' ), 'a response with no reviews is an empty list' );
+check_same(
+	array(),
+	ReviewMapper::from_page( array( 'reviews' => 'nonsense' ), 'locations/42', 'accounts/7' ),
+	'a response whose reviews are not a list is an empty list'
+);
+
+
+// ── replying ────────────────────────────────────────────────────────────
+
+check_same( 'Thanks for coming in!', ReviewReply::sanitize( "  <b>Thanks</b> for coming in!  " ), 'a reply is plain text, trimmed' );
+check_same( "Thank you.\n\nSee you soon.", ReviewReply::sanitize( "Thank you.\n\nSee you soon." ), 'and keeps its paragraphs' );
+check_same( '', ReviewReply::sanitize( array( 'x' ) ), 'anything but a string is an empty reply' );
+
+check_same( array( 'comment' => array( 'review.reply.required' ) ), ReviewReply::validate( '' )->errors(), 'an empty reply is refused, on the comment field' );
+check( ReviewReply::validate( str_repeat( 'a', 4096 ) )->is_valid(), 'a reply of exactly 4,096 bytes is allowed' );
+check_same( array( 'comment' => array( 'review.reply.too_long' ) ), ReviewReply::validate( str_repeat( 'a', 4097 ) )->errors(), 'one byte more is too long' );
+
+// Google counts bytes. 1,366 Bengali letters are 4,098 bytes: short in
+// characters, too long for Google, and refused here rather than there.
+check( ! ReviewReply::validate( str_repeat( 'ক', 1366 ) )->is_valid(), 'the limit is counted in bytes, not characters' );
+
+// ── what Google is sent ─────────────────────────────────────────────────
+
+$GLOBALS['__options']       = array();
+$GLOBALS['__http_queue']    = array();
+$GLOBALS['__http_requests'] = array();
+
+Credentials::save( 'client-id', 'client-secret' );
+Tokens::save(
+	array(
+		'access_token'  => 'access-1',
+		'refresh_token' => 'refresh-1',
+		'expires_in'    => 3600,
+		'scope'         => OAuth::SCOPE_BUSINESS,
+	)
+);
+
+queue_http( 200, array( 'comment' => 'Thank you!' ) );
+$reply = Client::put( 'https://mybusiness.googleapis.com/v4/accounts/7/locations/42/reviews/rev-1/reply', array(), array( 'comment' => 'Thank you!' ) );
+$sent  = $GLOBALS['__http_requests'][0];
+
+check_same( 'PUT', $sent['method'], 'a reply is sent with PUT' );
+check_same( '{"comment":"Thank you!"}', $sent['args']['body'], 'with the reply as its JSON body' );
+check_same( 'application/json', $sent['args']['headers']['Content-Type'], 'marked as JSON' );
+check_same( 'Thank you!', $reply['comment'], "and Google's answer comes back decoded" );
+
+queue_http( 200, '' );
+Client::delete( 'https://mybusiness.googleapis.com/v4/accounts/7/locations/42/reviews/rev-1/reply' );
+$sent = $GLOBALS['__http_requests'][1];
+
+check_same( 'DELETE', $sent['method'], 'a reply is removed with DELETE' );
+check( ! isset( $sent['args']['body'] ), 'which carries no body' );
+
+
+finish( 'Reviews' );

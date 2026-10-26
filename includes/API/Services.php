@@ -73,7 +73,7 @@ class Services extends AbstractController {
 				array(
 					'methods'             => WP_REST_Server::CREATABLE,
 					'callback'            => array( $this, 'create_item' ),
-					'permission_callback' => array( $this, 'permissions_check' ),
+					'permission_callback' => array( $this, 'google_write_check' ),
 					'args'                => $this->write_args(),
 				),
 			)
@@ -86,7 +86,7 @@ class Services extends AbstractController {
 				array(
 					'methods'             => WP_REST_Server::CREATABLE,
 					'callback'            => array( $this, 'reorder' ),
-					'permission_callback' => array( $this, 'permissions_check' ),
+					'permission_callback' => array( $this, 'google_write_check' ),
 					'args'                => $this->args(
 						array(
 							'ids' => array(
@@ -112,13 +112,13 @@ class Services extends AbstractController {
 				array(
 					'methods'             => 'POST, PUT, PATCH',
 					'callback'            => array( $this, 'update_item' ),
-					'permission_callback' => array( $this, 'permissions_check' ),
+					'permission_callback' => array( $this, 'google_write_check' ),
 					'args'                => $this->write_args(),
 				),
 				array(
 					'methods'             => WP_REST_Server::DELETABLE,
 					'callback'            => array( $this, 'delete_item' ),
-					'permission_callback' => array( $this, 'permissions_check' ),
+					'permission_callback' => array( $this, 'google_write_check' ),
 				),
 			)
 		);
@@ -280,7 +280,7 @@ class Services extends AbstractController {
 		if ( ! $updated ) {
 			return new WP_Error(
 				'fhint_nothing_to_reorder',
-				__( 'None of those services belong to this business.', 'found-hint' ),
+				__( 'None of those services belong to this business.', 'foundhint-local-seo' ),
 				array( 'status' => 400 )
 			);
 		}
@@ -324,6 +324,11 @@ class Services extends AbstractController {
 					'enum' => ServiceEntity::statuses(),
 				),
 				'sort_order'          => array( 'type' => 'integer' ),
+				'google_item_type'    => array(
+					'type' => 'string',
+					'enum' => array( '', 'structured', 'free_form' ),
+				),
+				'google_service_type_id' => array( 'type' => 'string' ),
 			)
 		);
 	}

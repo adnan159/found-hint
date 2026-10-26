@@ -7,6 +7,7 @@
 
 namespace FHINT;
 
+use FHINT\App\Google\Tokens;
 use FHINT\App\Core\Settings;
 use FHINT\Database\Tables;
 
@@ -62,7 +63,12 @@ class Installer {
 		// one that matters most: a plugin updated by file replacement never
 		// fires activation, and a half-restored backup can lose a table
 		// without changing the version option. Both self-repair here.
-		if ( get_option( 'fhint_version' ) !== FHINT_VERSION || Tables::missing() ) {
+		//
+		// The schema has a version of its own because it changes more often
+		// than the plugin's: a column added between releases has to reach a
+		// site that is already on this plugin version, and comparing only the
+		// plugin version would never run dbDelta for it.
+		if ( get_option( 'fhint_version' ) !== FHINT_VERSION || get_option( 'fhint_db_version' ) !== FHINT_DB_VERSION || Tables::missing() ) {
 			self::init();
 		}
 
@@ -95,7 +101,70 @@ class Installer {
 	 * @return void
 	 */
 	private static function maybe_run_migrations() {
-		// No tables exist yet — nothing to migrate. See Database::create_tables().
+		// Tokens stored before this plugin encrypted them stay readable, so
+		// nothing breaks — but they stay in plain text until something
+		// rewrites them, which for a working connection might be months.
+		// This rewrites them once, and costs a single option read after that.
+		Tokens::encrypt_stored();
+
+		self::drop_old_service_slug_key();
+		self::remember_google_listings();
+	}
+
+	/**
+	 * Give every linked location its own memory of its Google listing.
+	 *
+	 * DB 0.16.0 added `locations.google_location_name`, written whenever a
+	 * listing is linked from then on. Links made before it exist only in
+	 * `google_locations`, which a disconnect empties — so they are copied
+	 * across once, while they still exist. Only into an empty memory, so
+	 * it costs one query on a site that is already up to date.
+	 *
+	 * @return void
+	 */
+	private static function remember_google_listings() {
+		global $wpdb;
+
+		if ( ! Tables::exists( Tables::LOCATIONS ) || ! Tables::exists( Tables::GOOGLE_LOCATIONS ) ) {
+			return;
+		}
+
+		$locations = Tables::name( Tables::LOCATIONS );
+		$google    = Tables::name( Tables::GOOGLE_LOCATIONS );
+
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+		$wpdb->query(
+			// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+			"UPDATE {$locations} l INNER JOIN {$google} g ON g.fhint_location_id = l.id SET l.google_location_name = g.location_name WHERE l.google_location_name = '' AND g.fhint_location_id > 0"
+		);
+	}
+
+	/**
+	 * Remove the services table's old unique key on (business, slug).
+	 *
+	 * Slugs became unique per list — per location — in DB 0.11.0, under a
+	 * new key. dbDelta adds the new key but never drops the old one, which
+	 * would go on refusing two locations a service with the same name.
+	 * Checked against the live table first, so it runs once.
+	 *
+	 * @return void
+	 */
+	private static function drop_old_service_slug_key() {
+		global $wpdb;
+
+		if ( ! Tables::exists( Tables::SERVICES ) ) {
+			return;
+		}
+
+		$table = Tables::name( Tables::SERVICES );
+
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+		$exists = $wpdb->get_var( $wpdb->prepare( "SHOW INDEX FROM {$table} WHERE Key_name = %s", 'business_slug' ) );
+
+		if ( $exists ) {
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.SchemaChange, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+			$wpdb->query( "ALTER TABLE {$table} DROP INDEX business_slug" );
+		}
 	}
 
 	/**
@@ -120,6 +189,8 @@ class Installer {
 		} else {
 			update_option( 'fhint_version', FHINT_VERSION );
 		}
+
+		update_option( 'fhint_db_version', FHINT_DB_VERSION );
 
 		if ( ! get_option( 'fhint_first_install_time' ) ) {
 			add_option( 'fhint_first_install_time', time() );

@@ -34,8 +34,11 @@ class Limits {
 	 */
 	public static function defaults() {
 		return array(
-			self::LOCATIONS => 1,
-			self::SERVICES  => 5,
+			// 0 is unlimited. A business with two shops is an ordinary small
+			// business, and importing its Google profiles creates one
+			// location each — a cap of 1 would block that on the way in.
+			self::LOCATIONS => 0,
+			self::SERVICES  => 0,
 		);
 	}
 

@@ -12,9 +12,9 @@ The PHP side is a flat set of top-level **modules**, each a thin dispatcher
 class with a static `init()` owning one subdirectory of classes. The admin
 is a Vite-built React SPA mounted on a single WordPress admin page.
 
-The data layer (business, locations, opening hours, services) and its REST
-API are built. The audit engine, schema output and the admin screens are
-not — see `docs/PROGRESS.md` for exactly what is done and what is next.
+The data layer (business, locations, opening hours, services), its REST API
+and the admin screens for all of it are built. The audit engine and schema
+output are not — see `docs/PROGRESS.md` for exactly what is done and next.
 
 The sibling `local-seo` plugin in this same directory is the reference for
 the *product*: its `docs/DATABASE.md`, `API.md` and `FEATURES.md` describe
@@ -35,17 +35,42 @@ composer lint:fix           # vendor/bin/phpcbf — auto-fix what's mechanically
 ```
 
 ```bash
-php tests/Smoke/domain-logic.php    # validation, hours parsing, limits, redaction — no DB
-php tests/Smoke/schema-format.php   # dbDelta formatting rules on every table definition
-php tests/Smoke/rest-routes.php     # every route is registered and guarded
+php tests/Smoke/domain-logic.php       # validation, hours parsing, limits, redaction
+php tests/Smoke/schema-format.php      # dbDelta formatting rules on every definition
+php tests/Smoke/rest-routes.php        # every route is registered and guarded
+php tests/Smoke/onboarding.php         # the guided-setup position store
+php tests/Smoke/google.php             # the OAuth handshake
+php tests/Smoke/google-profiles.php    # profile sync and mapping rules
+php tests/Smoke/schema-graph.php       # the JSON-LD graph and who publishes it
+php tests/Smoke/audit.php              # the rule set, scoring and the registry
+php tests/Smoke/dashboard.php          # the score trend and what the card may claim
+php tests/Smoke/google-refresh.php     # categories, attributes and photos read from a listing
 ```
 
 The smoke suites run on plain PHP against stubbed WordPress
 (`tests/Smoke/bootstrap.php`), so a failure is a real logic bug rather than
-an environment problem. They cover what can be proved without a database;
-**anything touching `$wpdb` still needs a real WordPress install**, and the
-repositories have not yet been exercised against one — see
-`docs/PROGRESS.md`.
+an environment problem. They cover what can be proved without a database.
+
+**Anything touching `$wpdb` is proved separately, against a real one:**
+
+```bash
+docker exec foundhunt_app php \
+  /var/www/html/wp-content/plugins/found-hint/tests/Integration/database.php
+```
+
+The site is `foundhunt_app` in Docker — `http://localhost:8100`, phpMyAdmin
+on `:8101`. That suite covers dbDelta idempotency, every repository round
+trip, the cascades, plan limits and capability denial. **It runs against
+its own tables**: it swaps `$wpdb->prefix`, since `Tables::name()` reads the
+prefix at call time, then drops them and restores the options it stamped.
+Keep it that way — a verification suite that eats the developer's own data
+gets run once and then never again.
+
+Two rules divide cleanly between them, and it is worth knowing which owns
+which: the **two-space `PRIMARY KEY  (id)`** rule is static
+(`schema-format`), because it causes no repeated `ALTER` and MySQL cannot
+reveal it; a **wrong column type** is only visible against MySQL, and
+`database.php` prints dbDelta's own explanation when it finds one.
 
 When you add a test, mutate the code it covers and confirm the test fails.
 A test that passes against broken code is worse than no test, because it
@@ -216,8 +241,11 @@ Filter the required capability with `fhint_manage_capability`.
 | Build | Vite (`vite.admin.config.js`) via `@kucrut/vite-for-wp` |
 
 One real WordPress admin page (`Admin\Menu`, slug `fhint`) mounts the SPA
-into `#fhint-app`; every sub-page is a hash route. Submenu entries point at
-`fhint#/route` — **keep `Menu.php`'s submenu list and `routes.jsx` in sync**.
+into `#fhint-app`; every sub-page is a hash route. **WordPress shows one
+FoundHint menu entry and no submenus** — clicking it opens the dashboard,
+and the plugin's own sidebar is the navigation. Adding a screen means a
+route in `routes.jsx` and an entry in the sidebar; do not add
+`add_submenu_page()` calls back.
 
 ### Rules
 
@@ -262,10 +290,19 @@ into `#fhint-app`; every sub-page is a hash route. Submenu entries point at
   peer range still tops out at ESLint 9 while this project is on 10. Without
   it the shadcn CLI cannot install anything — it shells out to `npm install`
   and dies on the conflict.
-- A clean `npm run build` does **not** prove a new component works: nothing
-  imports these yet, so Vite tree-shakes them out entirely. To check them,
-  import them somewhere and render — building an SSR entry and running it in
-  Node catches both compile and runtime errors without a browser.
+- A clean `npm run build` does **not** prove a component works: Vite
+  tree-shakes anything unimported, and a build never executes a component.
+  Build an SSR entry and run it in Node to catch compile *and* runtime
+  errors without a browser — and load the real bundle in a browser against
+  a mocked API before calling a screen done. The select bug below survived
+  a clean build, a clean lint and a passing SSR render.
+- **Never pass `undefined` as a controlled component's value.** Base UI
+  treats `undefined` as "uncontrolled" on first render and then ignores the
+  real value when it arrives, so a saved value shows as the placeholder
+  forever. Use `null` for "nothing selected": `value={x || null}`.
+- **Base UI selects need `items`** (`[{ value, label }]`) on the root for
+  the trigger to show a label without the popup being opened, since the
+  options live in a portal that is not mounted until then.
 
 ## Brand
 

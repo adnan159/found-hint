@@ -1,0 +1,183 @@
+import { __, _n, sprintf } from "@wordpress/i18n";
+import { cn } from "cn";
+import { ExternalLinkIcon, StarIcon } from "lucide-react";
+import { Link } from "react-router";
+import LocationSwitcher, { switcherEntries } from "./LocationSwitcher";
+import { thumb } from "@/pages/profile/components/photos/lib";
+import { pillButton } from "./styles";
+import { HeaderActionsSlot } from "@/context/HeaderActions";
+
+/**
+ * Which business and which location the screen is showing.
+ *
+ * The name line reads "Business, Location" when a location has a name of
+ * its own, and the business name alone when it does not — a single-location
+ * business usually names its only location after itself, and saying the same
+ * words twice helps nobody.
+ *
+ * "Switch location" is drawn when there is anything else to switch to: another
+ * location here, or another listing on the Google account. The design's notification bell and account avatar are not drawn:
+ * nothing produces notifications yet, and WordPress's own toolbar already
+ * shows who is signed in.
+ *
+ * This is the row that lines up with the sidebar's logo block: same height,
+ * same rule.
+ */
+/**
+ * Up to two capital letters standing in for a missing logo: the first
+ * letter of the first two words, or the first two letters of a one-word name.
+ *
+ * @param {string} name Business name.
+ * @return {string}
+ */
+export function initials(name) {
+  const words = String(name ?? "")
+    .split(/\s+/)
+    .filter((word) => /[\p{L}\p{N}]/u.test(word))
+    .map((word) => word.replace(/^[^\p{L}\p{N}]+/u, ""));
+
+  if (!words.length) {
+    return "";
+  }
+
+  const letters =
+    words.length > 1
+      ? [...words[0]][0] + [...words[1]][0]
+      : [...words[0]].slice(0, 2).join("");
+
+  return letters.toUpperCase();
+}
+
+export function BusinessBar({
+  info,
+  meta,
+  logo,
+  onSwitch,
+  switching,
+  switchError,
+}) {
+  const location = meta?.location;
+  // The locations here and every other listing on the Google account: an
+  // account with two listings can switch between them before either has
+  // been imported.
+  const entries = switcherEntries(meta?.locations, meta?.listings);
+  const reviews = meta?.reviews;
+  const cid = info?.cid ?? "";
+
+  const business = info?.name ?? "";
+  const place =
+    location?.name && location.name !== business ? location.name : "";
+  const name =
+    [business, place].filter(Boolean).join(", ") ||
+    __("Your business", "foundhint-local-seo");
+  const detail = [info?.primary_category, location?.address]
+    .filter(Boolean)
+    .join("  ·  ");
+
+  return (
+    <div className="fhint:box-border fhint:flex fhint:min-h-[68px] fhint:flex-wrap fhint:items-center fhint:gap-x-4 fhint:gap-y-3 fhint:border-b fhint:border-b-divider fhint:bg-card fhint:px-4 fhint:py-2.5">
+      {/* The listing's own logo from Google; without one, its initials. */}
+      <span
+        aria-hidden="true"
+        className="fhint:grid fhint:size-11 fhint:flex-none fhint:place-items-center fhint:overflow-hidden fhint:rounded-xl fhint:border fhint:border-border fhint:bg-notice fhint:text-[15px] fhint:font-extrabold fhint:tracking-[0.02em] fhint:text-notice-foreground"
+      >
+        {logo?.url ? (
+          <img
+            src={thumb(logo.url, 96)}
+            alt=""
+            width={44}
+            height={44}
+            referrerPolicy="no-referrer"
+            className="fhint:size-full fhint:bg-card fhint:object-cover"
+          />
+        ) : (
+          initials(name)
+        )}
+      </span>
+      <div className="fhint:min-w-[180px] fhint:flex-1">
+        <p className="fhint:m-0 fhint:truncate fhint:text-[16px] fhint:leading-tight fhint:font-extrabold fhint:tracking-[-0.01em]">
+          {name}
+        </p>
+        {detail ? (
+          <p className="fhint:m-0 fhint:truncate fhint:text-[13px] fhint:text-muted-strong">
+            {detail}
+          </p>
+        ) : null}
+      </div>
+
+      <div className="fhint:flex fhint:flex-wrap fhint:items-center fhint:gap-2">
+        {reviews ? (
+          <Link
+            to="/reviews"
+            className={cn(
+              pillButton,
+              "fhint:border-[#F0D9AE] fhint:bg-[#FBF0DE] fhint:text-[#7a4a05] fhint:hover:bg-[#F7E6C8]",
+            )}
+          >
+            <StarIcon
+              aria-hidden="true"
+              className="fhint:size-3.5 fhint:fill-current"
+            />
+            <span className="fhint:font-extrabold">
+              <span className="fhint:sr-only">
+                {__("Rated", "foundhint-local-seo")}{" "}
+              </span>
+              {Number(reviews.average).toFixed(1)}
+              <span className="fhint:sr-only">
+                {" "}
+                {__("out of 5", "foundhint-local-seo")}
+              </span>
+            </span>
+            <span className="fhint:font-semibold">
+              ·{" "}
+              {sprintf(
+                /* translators: %d: number of reviews. */
+                _n(
+                  "%d review",
+                  "%d reviews",
+                  reviews.count,
+                  "foundhint-local-seo",
+                ),
+                reviews.count,
+              )}
+            </span>
+          </Link>
+        ) : null}
+
+        {/* The screen below can add its own buttons here — Reviews' Sync. */}
+        <HeaderActionsSlot />
+
+        {entries.length > 1 ? (
+          <LocationSwitcher
+            entries={entries}
+            location={location}
+            onSwitch={onSwitch}
+            busy={switching}
+          />
+        ) : null}
+
+        {cid ? (
+          <a
+            href={`https://maps.google.com/?cid=${encodeURIComponent(cid)}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className={pillButton}
+          >
+            <ExternalLinkIcon aria-hidden="true" className="fhint:size-3.5" />
+            {__("View on Google", "foundhint-local-seo")}
+          </a>
+        ) : null}
+      </div>
+      {switchError ? (
+        <p
+          role="alert"
+          className="fhint:m-0 fhint:w-full fhint:text-[13px] fhint:font-semibold fhint:text-destructive"
+        >
+          {switchError}
+        </p>
+      ) : null}
+    </div>
+  );
+}
+
+export default BusinessBar;

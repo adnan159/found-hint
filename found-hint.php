@@ -1,16 +1,16 @@
 <?php
 /**
- * Plugin Name:       FoundHint
- * Plugin URI:        https://www.foundhint.com/
- * Description:       Local SEO command center — business profile, locations, schema, audits, Google Business Profile and ranking, all from one place.
- * Version:           0.1.0
+ * Plugin Name:       FoundHint – Complete Local SEO, Schema, GMB Multi-Location & Reviews Management
+ * Plugin URI:        https://foundhint.com/local-seo/
+ * Description:       Local SEO WordPress plugin to manage business info, locations, schema, audits, and Google Business Profile from one simple dashboard.
+ * Version:           1.0.0
  * Requires at least: 6.4
  * Requires PHP:      7.4
  * Author:            FoundHint
- * Author URI:        https://www.foundhint.com/
+ * Author URI:        https://foundhint.com/about/
  * License:           GPL-2.0-or-later
  * License URI:       https://www.gnu.org/licenses/gpl-2.0.html
- * Text Domain:       found-hint
+ * Text Domain:       foundhint-local-seo
  * Domain Path:       /languages
  *
  * @package FoundHint
@@ -79,8 +79,8 @@ final class FHINT {
 	 * @return void
 	 */
 	public function define_constants() {
-		define( 'FHINT_VERSION', '0.1.0' );
-		define( 'FHINT_DB_VERSION', '0.1.0' );
+		define( 'FHINT_VERSION', '1.0.0' );
+		define( 'FHINT_DB_VERSION', '0.17.0' );
 		define( 'FHINT_MIN_PHP', '7.4' );
 		define( 'FHINT_SETTINGS_NAME', 'fhint_settings' );
 		define( 'FHINT_FILE', __FILE__ );
@@ -143,6 +143,8 @@ final class FHINT {
 		FHINT\Installer::check_update();
 		FHINT\Database::init();
 		FHINT\API::init();
+		FHINT\Google::init();
+		FHINT\Audit::init();
 		FHINT\Frontend::init();
 
 		if ( is_admin() ) {
@@ -170,7 +172,7 @@ final class FHINT {
 			esc_html(
 				sprintf(
 					/* translators: 1: required PHP version, 2: current PHP version */
-					__( 'FoundHint requires PHP %1$s or higher. This site is running PHP %2$s.', 'found-hint' ),
+					__( 'FoundHint requires PHP %1$s or higher. This site is running PHP %2$s.', 'foundhint-local-seo' ),
 					FHINT_MIN_PHP,
 					PHP_VERSION
 				)

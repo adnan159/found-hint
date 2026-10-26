@@ -37,25 +37,71 @@ class Database {
 	 * Create all custom plugin tables using dbDelta.
 	 *
 	 * Safe to run on every activation/update — dbDelta only applies changes.
-	 * Empty for now; add Database\Create<Name>Table::up( $prefix, $cc )
-	 * calls here as each table is designed.
+	 * Add Database\Create<Name>Table::up( $prefix, $cc ) calls here as each
+	 * table is designed.
 	 *
-	 * @return void
+	 * @return array Everything dbDelta changed; empty on an up-to-date
+	 *               database.
 	 */
 	public static function create_tables() {
 		require_once ABSPATH . 'wp-admin/includes/upgrade.php';
 
 		global $wpdb;
-		$prefix = $wpdb->prefix;
-		$cc     = $wpdb->get_charset_collate();
+		$prefix  = $wpdb->prefix;
+		$cc      = $wpdb->get_charset_collate();
+		$changes = array();
 
-		Database\CreateBusinessTable::up( $prefix, $cc );
-		Database\CreateLocationsTable::up( $prefix, $cc );
-		Database\CreateLocationHoursTable::up( $prefix, $cc );
-		Database\CreateServicesTable::up( $prefix, $cc );
-		Database\CreateAuditsTable::up( $prefix, $cc );
-		Database\CreateAuditIssuesTable::up( $prefix, $cc );
-		Database\CreateLogsTable::up( $prefix, $cc );
+		$changes = array_merge( $changes, Database\CreateBusinessTable::up( $prefix, $cc ) );
+		$changes = array_merge( $changes, Database\CreateLocationsTable::up( $prefix, $cc ) );
+		$changes = array_merge( $changes, Database\CreateLocationHoursTable::up( $prefix, $cc ) );
+		$changes = array_merge( $changes, Database\CreateServicesTable::up( $prefix, $cc ) );
+		$changes = array_merge( $changes, Database\CreateAuditsTable::up( $prefix, $cc ) );
+		$changes = array_merge( $changes, Database\CreateAuditIssuesTable::up( $prefix, $cc ) );
+		$changes = array_merge( $changes, Database\CreateLogsTable::up( $prefix, $cc ) );
+		$changes = array_merge( $changes, Database\CreateGoogleLocationsTable::up( $prefix, $cc ) );
+		$changes = array_merge( $changes, Database\CreateReviewsTable::up( $prefix, $cc ) );
+		$changes = array_merge( $changes, Database\CreateSpecialHoursTable::up( $prefix, $cc ) );
+		$changes = array_merge( $changes, Database\CreateLocationAttributesTable::up( $prefix, $cc ) );
+		$changes = array_merge( $changes, Database\CreateMediaTable::up( $prefix, $cc ) );
+		$changes = array_merge( $changes, Database\CreateDescriptionHistoryTable::up( $prefix, $cc ) );
+		$changes = array_merge( $changes, Database\CreateGoogleReferenceTable::up( $prefix, $cc ) );
+
+		// The Places lookup was removed in 0.4.0: its table and its scheduled
+		// event are cleared here rather than left behind on sites that ran an
+		// earlier version.
+		self::clear_legacy_places();
+
+		// Returned so the change set can be asserted empty against a
+		// database that is already up to date. dbDelta re-issuing the same
+		// ALTER on every request is invisible without this.
+		return $changes;
+	}
+
+	/**
+	 * Remove what the Places lookup left behind.
+	 *
+	 * Its table, its stored API key and its daily event: a feature removed
+	 * from the code is not removed from a site that already ran it.
+	 *
+	 * @return void
+	 */
+	private static function clear_legacy_places() {
+		global $wpdb;
+
+		$table = $wpdb->prefix . 'fhint_place_links';
+
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+		$wpdb->query( "DROP TABLE IF EXISTS {$table}" );
+
+		delete_option( 'fhint_places_credentials' );
+
+		// An event whose handler no longer exists would fire forever against
+		// nothing, once a day, on every site that ran the old version.
+		$scheduled = wp_next_scheduled( 'fhint_places_expire_coordinates' );
+
+		if ( $scheduled ) {
+			wp_unschedule_event( $scheduled, 'fhint_places_expire_coordinates' );
+		}
 	}
 
 	/**

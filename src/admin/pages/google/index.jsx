@@ -1,0 +1,656 @@
+import { useEffect, useRef, useState } from "react";
+import { __, sprintf } from "@wordpress/i18n";
+import {
+  CheckIcon,
+  ChevronDownIcon,
+  CopyIcon,
+  ExternalLinkIcon,
+} from "lucide-react";
+import { toast } from "sonner";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Button } from "@/components/ui/button";
+import {
+  Field,
+  FieldDescription,
+  FieldGroup,
+  FieldLabel,
+} from "@/components/ui/field";
+import { Input } from "@/components/ui/input";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Spinner } from "@/components/ui/spinner";
+import NoticeBar from "@/components/NoticeBar";
+import GoogleSignInButton from "@/components/GoogleSignInButton";
+import PageHeader from "@/components/PageHeader";
+import RequestError from "@/components/RequestError";
+import SectionCard from "@/components/SectionCard";
+import {
+  useDisconnectGoogleMutation,
+  useGetGoogleProfilesQuery,
+  useGetGoogleQuery,
+  useSaveGoogleCredentialsMutation,
+  useStartGoogleConnectMutation,
+} from "@/store/api/googleApi";
+import BusinessProfiles from "./components/BusinessProfiles";
+import ImportFromGoogle from "./components/ImportFromGoogle";
+import LocationMapping from "./components/LocationMapping";
+
+/**
+ * The Google Business Profile connection.
+ *
+ * Two steps, shown in order, because the second cannot be done before the
+ * first: register an OAuth client in Google Cloud, then sign in with it.
+ * The screen never displays a secret — the server has no route that returns
+ * one, so there is nothing here to accidentally render.
+ */
+const GOOGLE_CONSOLE_URL = "https://console.cloud.google.com/apis/credentials";
+
+function StatusLine({ state }) {
+  const connected = state.status === "connected";
+  const needsReconnect = state.status === "needs_reconnect";
+
+  if (connected || needsReconnect) {
+    return (
+      <div className="fhint:flex fhint:flex-wrap fhint:items-center fhint:gap-2">
+        <span
+          className={
+            connected
+              ? "fhint:inline-flex fhint:items-center fhint:gap-1.5 fhint:bg-success fhint:px-2 fhint:py-1 fhint:text-[11px] fhint:font-extrabold fhint:tracking-[0.1em] fhint:text-success-foreground fhint:uppercase"
+              : "fhint:inline-flex fhint:items-center fhint:gap-1.5 fhint:bg-notice fhint:px-2 fhint:py-1 fhint:text-[11px] fhint:font-extrabold fhint:tracking-[0.1em] fhint:text-notice-foreground fhint:uppercase"
+          }
+        >
+          {connected ? (
+            <CheckIcon aria-hidden="true" data-icon="inline-start" />
+          ) : null}
+          {connected
+            ? __("Connected", "foundhint-local-seo")
+            : __("Needs reconnecting", "foundhint-local-seo")}
+        </span>
+        {state.account_email ? (
+          <span className="fhint:text-[13px] fhint:text-muted-strong">
+            {sprintf(
+              /* translators: %s: the Google account email address. */
+              __("as %s", "foundhint-local-seo"),
+              state.account_email,
+            )}
+          </span>
+        ) : null}
+      </div>
+    );
+  }
+
+  return (
+    <span className="fhint:inline-flex fhint:items-center fhint:bg-muted fhint:px-2 fhint:py-1 fhint:text-[11px] fhint:font-extrabold fhint:tracking-[0.1em] fhint:text-muted-strong fhint:uppercase">
+      {__("Not connected", "foundhint-local-seo")}
+    </span>
+  );
+}
+
+function RedirectUri({ value }) {
+  const [copied, setCopied] = useState(false);
+
+  const copy = async () => {
+    try {
+      await navigator.clipboard.writeText(value);
+      setCopied(true);
+      window.setTimeout(() => setCopied(false), 2000);
+    } catch {
+      // Clipboard access can be refused; the value is selectable on screen,
+      // so there is nothing to recover from.
+      toast.error(
+        __(
+          "Could not copy. Select the address instead.",
+          "foundhint-local-seo",
+        ),
+      );
+    }
+  };
+
+  return (
+    <div className="fhint:flex fhint:flex-wrap fhint:items-center fhint:gap-2">
+      <code className="fhint:min-w-0 fhint:flex-1 fhint:overflow-x-auto fhint:border fhint:border-border fhint:bg-muted fhint:px-3 fhint:py-2 fhint:text-[12.5px] fhint:whitespace-nowrap">
+        {value}
+      </code>
+      <Button type="button" variant="outline" onClick={copy}>
+        {copied ? (
+          <CheckIcon data-icon="inline-start" />
+        ) : (
+          <CopyIcon data-icon="inline-start" />
+        )}
+        {copied
+          ? __("Copied", "foundhint-local-seo")
+          : __("Copy", "foundhint-local-seo")}
+      </Button>
+    </div>
+  );
+}
+
+export default function GooglePage() {
+  // Refetched on every mount rather than served from cache. The connection
+  // state is read one-shot on the server — a failure notice is handed over
+  // once and deleted — so a cached copy would replay a failure that was
+  // dealt with long ago every time the screen was reopened.
+  const {
+    data: state,
+    isLoading,
+    fulfilledTimeStamp,
+  } = useGetGoogleQuery(undefined, {
+    refetchOnMountOrArgChange: true,
+  });
+  const [
+    saveCredentials,
+    { isLoading: isSavingCredentials, error: saveError },
+  ] = useSaveGoogleCredentialsMutation();
+  const [startConnect, { isLoading: isConnecting, error: connectError }] =
+    useStartGoogleConnectMutation();
+  const [disconnect, { isLoading: isDisconnecting }] =
+    useDisconnectGoogleMutation();
+  const { data: overview } = useGetGoogleProfilesQuery();
+
+  const [form, setForm] = useState({ client_id: "", client_secret: "" });
+
+  // Held locally once seen, so the refetch that follows does not pull the
+  // message out from under the person reading it.
+  //
+  // Only ever taken from a read that finished *after this screen opened*.
+  // On a remount RTK Query serves the cached state before it refetches, and
+  // that cached copy still carries a notice the server has already handed
+  // over and deleted — trusting it replays a failure the operator dealt
+  // with a visit ago. Comparing against mount time is what separates "the
+  // server just told us" from "this was in the cache", which no flag on the
+  // query can express: the cached render is not loading, not fetching and
+  // not stale as far as the hook is concerned.
+  const openedAt = useRef(Date.now());
+  const [notice, setNotice] = useState(null);
+
+  useEffect(() => {
+    if (state?.notice && fulfilledTimeStamp >= openedAt.current) {
+      setNotice(state.notice);
+    }
+  }, [state, fulfilledTimeStamp]);
+
+  if (isLoading || !state) {
+    return (
+      <>
+        <PageHeader
+          title={__("Google Business Profile", "foundhint-local-seo")}
+        />
+        <Skeleton className="fhint:h-[60vh] fhint:w-full" />
+      </>
+    );
+  }
+
+  const connected =
+    state.status === "connected" || state.status === "needs_reconnect";
+
+  const onSaveCredentials = async (event) => {
+    event.preventDefault();
+
+    try {
+      await saveCredentials({
+        client_id: form.client_id.trim(),
+        client_secret: form.client_secret.trim(),
+      }).unwrap();
+
+      // The secret is write-only and is never sent back, so the field is
+      // cleared rather than left holding a value the server may not have.
+      setForm({ client_id: "", client_secret: "" });
+      toast.success(__("Google client saved.", "foundhint-local-seo"));
+    } catch {
+      // Shown inline by RequestError.
+    }
+  };
+
+  const onConnect = async () => {
+    // Without a stored Google client there is nowhere to send anyone. The
+    // field that fixes that is on this same screen, so the button points at
+    // it — elsewhere the shared hook navigates here for the same reason. A
+    // button that is simply dead reads as a broken one.
+    if (!state.configured) {
+      const field = document.getElementById("google-client-id");
+
+      field?.scrollIntoView({ block: "center", behavior: "smooth" });
+      field?.focus({ preventScroll: true });
+
+      return;
+    }
+
+    try {
+      const result = await startConnect().unwrap();
+
+      if (result?.authorize_url) {
+        // A full navigation, not a popup: this is Google's own sign-in page
+        // and it must be unmistakably Google's, in the address bar the
+        // person already trusts.
+        window.location.assign(result.authorize_url);
+      }
+    } catch {
+      // Shown inline by RequestError.
+    }
+  };
+
+  const onDisconnect = async () => {
+    try {
+      const result = await disconnect().unwrap();
+
+      toast.success(
+        result && false === result.revoked
+          ? __(
+              "Disconnected here. Google did not confirm, so check your Google account's connected apps.",
+              "foundhint-local-seo",
+            )
+          : __("Disconnected from Google.", "foundhint-local-seo"),
+      );
+    } catch {
+      toast.error(__("Could not disconnect.", "foundhint-local-seo"));
+    }
+  };
+
+  return (
+    <>
+      <PageHeader
+        title={__("Google Business Profile", "foundhint-local-seo")}
+        description={__(
+          "Connect the Google account that manages your business, so FoundHint can see how Google shows you today.",
+          "foundhint-local-seo",
+        )}
+        actions={<StatusLine state={state} />}
+      />
+
+      <RequestError error={saveError ?? connectError} />
+
+      {notice ? (
+        <Alert variant="destructive" role="alert">
+          <AlertTitle>
+            {__("That did not work", "foundhint-local-seo")}
+          </AlertTitle>
+          <AlertDescription>{notice.message}</AlertDescription>
+        </Alert>
+      ) : null}
+
+      {state.status === "needs_reconnect" ? (
+        <NoticeBar>
+          {__(
+            "This connection is missing permission to manage your business profile. Connect again and accept all the requested permissions.",
+            "foundhint-local-seo",
+          )}
+        </NoticeBar>
+      ) : null}
+
+      {/* One thing, not a card inside a card. Collapsed by default because a
+          site connected through FoundHint's connect service needs no Google
+          client of its own; it stays for agencies that want their own Cloud
+          project and quota, and as a way back in if the service is ever
+          unreachable. A site that has already saved a client sees the
+          ordinary section instead — nothing is hidden from somebody relying
+          on it. */}
+      {state.connect_service && !state.client_id_hint ? (
+        <details
+          id="google-client"
+          className="fhint:group fhint:scroll-mt-6 fhint:border fhint:border-border fhint:bg-card"
+        >
+          <summary className="fhint:flex fhint:cursor-pointer fhint:list-none fhint:items-center fhint:justify-between fhint:gap-4 fhint:px-[22px] fhint:py-4 fhint:font-heading fhint:text-[13px] fhint:font-extrabold fhint:tracking-[0.1em] fhint:uppercase fhint:group-open:border-b-2 fhint:group-open:border-b-divider fhint:[&::-webkit-details-marker]:hidden">
+            {__("Advanced: use your own Google client", "foundhint-local-seo")}
+            <ChevronDownIcon
+              aria-hidden="true"
+              className="fhint:size-4 fhint:shrink-0 fhint:text-sidebar-chevron fhint:transition-transform fhint:group-open:rotate-180"
+            />
+          </summary>
+
+          <div className="fhint:flex fhint:flex-col fhint:gap-5 fhint:px-[22px] fhint:py-5">
+            <p className="fhint:m-0 fhint:max-w-[76ch] fhint:text-[13px] fhint:text-muted-strong">
+              {__(
+                "You do not need this. FoundHint signs you in through its own Google client, and your data and quota stay yours either way. Enter a client from your own Google Cloud project only if you want this site to use that project — once saved, it is used instead of FoundHint's.",
+                "foundhint-local-seo",
+              )}
+            </p>
+
+            <FieldGroup>
+              <Field>
+                <FieldLabel>
+                  {__("Redirect URI", "foundhint-local-seo")}
+                </FieldLabel>
+                <RedirectUri value={state.redirect_uri} />
+                <FieldDescription>
+                  {__(
+                    "Add this to your OAuth client in Google Cloud under Authorised redirect URIs, exactly as shown. A mismatch here is the usual reason a first connection fails.",
+                    "foundhint-local-seo",
+                  )}
+                </FieldDescription>
+              </Field>
+
+              <Field>
+                <FieldLabel htmlFor="google-client-id">
+                  {__("Client ID", "foundhint-local-seo")}
+                </FieldLabel>
+                <Input
+                  id="google-client-id"
+                  value={form.client_id}
+                  autoComplete="off"
+                  onChange={(event) =>
+                    setForm((current) => ({
+                      ...current,
+                      client_id: event.target.value,
+                    }))
+                  }
+                  placeholder={
+                    state.client_id_hint ||
+                    "1234567890-abc.apps.googleusercontent.com"
+                  }
+                />
+                <FieldDescription>
+                  {state.client_id_hint
+                    ? sprintf(
+                        /* translators: %s: the start of the stored client id. */
+                        __(
+                          "Currently %s — leave blank to keep it.",
+                          "foundhint-local-seo",
+                        ),
+                        state.client_id_hint,
+                      )
+                    : __(
+                        "From your OAuth client in Google Cloud.",
+                        "foundhint-local-seo",
+                      )}
+                </FieldDescription>
+              </Field>
+
+              <Field>
+                <FieldLabel htmlFor="google-client-secret">
+                  {__("Client secret", "foundhint-local-seo")}
+                </FieldLabel>
+                <Input
+                  id="google-client-secret"
+                  type="password"
+                  autoComplete="new-password"
+                  value={form.client_secret}
+                  onChange={(event) =>
+                    setForm((current) => ({
+                      ...current,
+                      client_secret: event.target.value,
+                    }))
+                  }
+                />
+                <FieldDescription>
+                  {state.configured
+                    ? __(
+                        "A secret is stored. It is never shown again — leave this blank to keep it, or paste a new one to replace it.",
+                        "foundhint-local-seo",
+                      )
+                    : __(
+                        "Stored on your site and never shown again once saved.",
+                        "foundhint-local-seo",
+                      )}
+                </FieldDescription>
+              </Field>
+            </FieldGroup>
+
+            <div className="fhint:mt-5 fhint:flex fhint:flex-wrap fhint:items-center fhint:gap-2.5">
+              <Button
+                type="button"
+                onClick={onSaveCredentials}
+                disabled={isSavingCredentials}
+              >
+                {isSavingCredentials ? (
+                  <Spinner data-icon="inline-start" />
+                ) : null}
+                {__("Save client", "foundhint-local-seo")}
+              </Button>
+              <Button
+                variant="outline"
+                render={
+                  <a
+                    href={GOOGLE_CONSOLE_URL}
+                    target="_blank"
+                    rel="noreferrer noopener"
+                  />
+                }
+              >
+                <ExternalLinkIcon data-icon="inline-start" />
+                {__("Open Google Cloud credentials", "foundhint-local-seo")}
+              </Button>
+            </div>
+          </div>
+        </details>
+      ) : (
+        <SectionCard
+          id="google-client"
+          title={__("Google client", "foundhint-local-seo")}
+          description={__(
+            "This site uses your own Google Cloud project, so your data and your quota stay yours.",
+            "foundhint-local-seo",
+          )}
+        >
+          <FieldGroup>
+            <Field>
+              <FieldLabel>
+                {__("Redirect URI", "foundhint-local-seo")}
+              </FieldLabel>
+              <RedirectUri value={state.redirect_uri} />
+              <FieldDescription>
+                {__(
+                  "Add this to your OAuth client in Google Cloud under Authorised redirect URIs, exactly as shown. A mismatch here is the usual reason a first connection fails.",
+                  "foundhint-local-seo",
+                )}
+              </FieldDescription>
+            </Field>
+
+            <Field>
+              <FieldLabel htmlFor="google-client-id">
+                {__("Client ID", "foundhint-local-seo")}
+              </FieldLabel>
+              <Input
+                id="google-client-id"
+                value={form.client_id}
+                autoComplete="off"
+                onChange={(event) =>
+                  setForm((current) => ({
+                    ...current,
+                    client_id: event.target.value,
+                  }))
+                }
+                placeholder={
+                  state.client_id_hint ||
+                  "1234567890-abc.apps.googleusercontent.com"
+                }
+              />
+              <FieldDescription>
+                {state.client_id_hint
+                  ? sprintf(
+                      /* translators: %s: the start of the stored client id. */
+                      __(
+                        "Currently %s — leave blank to keep it.",
+                        "foundhint-local-seo",
+                      ),
+                      state.client_id_hint,
+                    )
+                  : __(
+                      "From your OAuth client in Google Cloud.",
+                      "foundhint-local-seo",
+                    )}
+              </FieldDescription>
+            </Field>
+
+            <Field>
+              <FieldLabel htmlFor="google-client-secret">
+                {__("Client secret", "foundhint-local-seo")}
+              </FieldLabel>
+              <Input
+                id="google-client-secret"
+                type="password"
+                autoComplete="new-password"
+                value={form.client_secret}
+                onChange={(event) =>
+                  setForm((current) => ({
+                    ...current,
+                    client_secret: event.target.value,
+                  }))
+                }
+              />
+              <FieldDescription>
+                {state.configured
+                  ? __(
+                      "A secret is stored. It is never shown again — leave this blank to keep it, or paste a new one to replace it.",
+                      "foundhint-local-seo",
+                    )
+                  : __(
+                      "Stored on your site and never shown again once saved.",
+                      "foundhint-local-seo",
+                    )}
+              </FieldDescription>
+            </Field>
+          </FieldGroup>
+
+          <div className="fhint:mt-5 fhint:flex fhint:flex-wrap fhint:items-center fhint:gap-2.5">
+            <Button
+              type="button"
+              onClick={onSaveCredentials}
+              disabled={isSavingCredentials}
+            >
+              {isSavingCredentials ? (
+                <Spinner data-icon="inline-start" />
+              ) : null}
+              {__("Save client", "foundhint-local-seo")}
+            </Button>
+            <Button
+              variant="outline"
+              render={
+                <a
+                  href={GOOGLE_CONSOLE_URL}
+                  target="_blank"
+                  rel="noreferrer noopener"
+                />
+              }
+            >
+              <ExternalLinkIcon data-icon="inline-start" />
+              {__("Open Google Cloud credentials", "foundhint-local-seo")}
+            </Button>
+          </div>
+        </SectionCard>
+      )}
+
+      <SectionCard
+        id="google-connection"
+        title={__("Connection", "foundhint-local-seo")}
+        description={__(
+          "Sign in with the Google account that manages your business.",
+          "foundhint-local-seo",
+        )}
+      >
+        {/* The prototype's trust line, kept word for word: it is the
+            sentence that answers the question people actually have when a
+            plugin asks them to sign in to Google. */}
+        <p className="fhint:max-w-[76ch] fhint:text-[13.5px] fhint:text-muted-strong">
+          {__(
+            "You sign in on Google's own page. FoundHint never sees your password, and nothing on your profile changes without your confirmation.",
+            "foundhint-local-seo",
+          )}
+        </p>
+
+        {connected ? (
+          <dl className="fhint:mt-5 fhint:flex fhint:flex-col fhint:gap-2 fhint:text-[13px]">
+            <div className="fhint:flex fhint:gap-2">
+              <dt className="fhint:font-bold">
+                {__("Account", "foundhint-local-seo")}
+              </dt>
+              <dd className="fhint:text-muted-strong">
+                {state.account_email || __("Unknown", "foundhint-local-seo")}
+              </dd>
+            </div>
+            <div className="fhint:flex fhint:gap-2">
+              <dt className="fhint:font-bold">
+                {__("Permissions", "foundhint-local-seo")}
+              </dt>
+              <dd className="fhint:text-muted-strong">
+                {state.can_manage_profile
+                  ? __(
+                      "Can manage your business profile",
+                      "foundhint-local-seo",
+                    )
+                  : __(
+                      "Cannot manage your business profile",
+                      "foundhint-local-seo",
+                    )}
+              </dd>
+            </div>
+          </dl>
+        ) : null}
+
+        <div className="fhint:mt-5 fhint:flex fhint:flex-wrap fhint:items-center fhint:gap-2.5">
+          <GoogleSignInButton
+            onClick={onConnect}
+            disabled={isConnecting}
+            isBusy={isConnecting}
+            describedBy={
+              state.configured ? undefined : "fhint-google-needs-client"
+            }
+            label={
+              connected
+                ? __("Reconnect with Google", "foundhint-local-seo")
+                : __("Continue with Google", "foundhint-local-seo")
+            }
+          />
+
+          {connected ? (
+            <AlertDialog>
+              <AlertDialogTrigger
+                render={<Button variant="outline" disabled={isDisconnecting} />}
+              >
+                {__("Disconnect", "foundhint-local-seo")}
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>
+                    {__("Disconnect from Google?", "foundhint-local-seo")}
+                  </AlertDialogTitle>
+                  <AlertDialogDescription>
+                    {__(
+                      "FoundHint will stop reading your Google Business Profile. Nothing on your Google profile changes, and your business details here are untouched. You can connect again at any time.",
+                      "foundhint-local-seo",
+                    )}
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>
+                    {__("Keep connected", "foundhint-local-seo")}
+                  </AlertDialogCancel>
+                  <AlertDialogAction onClick={onDisconnect}>
+                    {__("Disconnect", "foundhint-local-seo")}
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+          ) : null}
+        </div>
+
+        {!state.configured ? (
+          <p
+            id="fhint-google-needs-client"
+            className="fhint:mt-4 fhint:text-[13px] fhint:text-muted-strong"
+          >
+            {__(
+              "Add your Google client ID and secret above first — this button will take you to them.",
+              "foundhint-local-seo",
+            )}
+          </p>
+        ) : null}
+      </SectionCard>
+
+      <BusinessProfiles overview={overview} isConnected={connected} />
+      <LocationMapping overview={overview} isConnected={connected} />
+      {/* Last, because it needs a mapping: you choose which Google profile
+          is this location before its values can be brought across. */}
+      <ImportFromGoogle isConnected={connected} />
+    </>
+  );
+}

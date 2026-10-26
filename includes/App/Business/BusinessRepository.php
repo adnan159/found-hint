@@ -26,7 +26,7 @@ class BusinessRepository {
 	 *
 	 * @var string[]
 	 */
-	private static $json_columns = array( 'secondary_categories', 'social_profiles' );
+	private static $json_columns = array( 'secondary_categories', 'social_profiles', 'additional_phones', 'booking_links' );
 
 	/**
 	 * The business profile, or null when none has been created yet.
@@ -143,13 +143,23 @@ class BusinessRepository {
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		$wpdb->query( 'START TRANSACTION' );
 
-		$locations = Tables::name( Tables::LOCATIONS );
-		$hours     = Tables::name( Tables::LOCATION_HOURS );
-		$services  = Tables::name( Tables::SERVICES );
-		$table     = Tables::name( Tables::BUSINESS );
+		$locations  = Tables::name( Tables::LOCATIONS );
+		$hours      = Tables::name( Tables::LOCATION_HOURS );
+		$special    = Tables::name( Tables::SPECIAL_HOURS );
+		$attributes = Tables::name( Tables::LOCATION_ATTRIBUTES );
+		$media      = Tables::name( Tables::MEDIA );
+		$history    = Tables::name( Tables::DESCRIPTION_HISTORY );
+		$services   = Tables::name( Tables::SERVICES );
+		$table      = Tables::name( Tables::BUSINESS );
 
 		// phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 		$wpdb->query( $wpdb->prepare( "DELETE h FROM {$hours} h INNER JOIN {$locations} l ON l.id = h.location_id WHERE l.business_id = %d", $id ) );
+		// Everything else keyed to one of this business's locations. There
+		// are no foreign keys, so a row left behind here is left for good.
+		$wpdb->query( $wpdb->prepare( "DELETE s FROM {$special} s INNER JOIN {$locations} l ON l.id = s.location_id WHERE l.business_id = %d", $id ) );
+		$wpdb->query( $wpdb->prepare( "DELETE a FROM {$attributes} a INNER JOIN {$locations} l ON l.id = a.location_id WHERE l.business_id = %d", $id ) );
+		$wpdb->query( $wpdb->prepare( "DELETE m FROM {$media} m INNER JOIN {$locations} l ON l.id = m.location_id WHERE l.business_id = %d", $id ) );
+		$wpdb->query( $wpdb->prepare( "DELETE FROM {$history} WHERE business_id = %d", $id ) );
 		$wpdb->query( $wpdb->prepare( "DELETE FROM {$locations} WHERE business_id = %d", $id ) );
 		$wpdb->query( $wpdb->prepare( "DELETE FROM {$services} WHERE business_id = %d", $id ) );
 		$deleted = $wpdb->query( $wpdb->prepare( "DELETE FROM {$table} WHERE id = %d", $id ) );
@@ -221,6 +231,7 @@ class BusinessRepository {
 			'legal_name'         => (string) $record['legal_name'],
 			'business_type'      => (string) $record['business_type'],
 			'primary_category'   => (string) $record['primary_category'],
+			'primary_category_id' => (string) $record['primary_category_id'],
 			'description'        => (string) $record['description'],
 			'logo_attachment_id' => (int) $record['logo_attachment_id'],
 			'logo_url'           => (string) $record['logo_url'],

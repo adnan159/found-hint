@@ -91,6 +91,60 @@ class LocationRepository {
 	}
 
 	/**
+	 * The location that remembers being a given Google listing.
+	 *
+	 * @param string $location_name Google location resource name.
+	 * @return array|null
+	 */
+	public static function find_by_google_location_name( $location_name ) {
+		global $wpdb;
+
+		$location_name = (string) $location_name;
+
+		if ( '' === $location_name || ! Tables::exists( Tables::LOCATIONS ) ) {
+			return null;
+		}
+
+		$table = Tables::name( Tables::LOCATIONS );
+
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+		$row = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$table} WHERE google_location_name = %s ORDER BY id ASC LIMIT 1", $location_name ), ARRAY_A );
+
+		return $row ? self::hydrate( $row ) : null;
+	}
+
+	/**
+	 * Record, or clear, which Google listing a location is.
+	 *
+	 * Written straight to the column: this is bookkeeping for the link, not
+	 * an edit of the location, so it neither validates nor stamps the
+	 * location as changed. A listing is one location's at a time, so it is
+	 * cleared from any other first.
+	 *
+	 * @param int    $id            Location id.
+	 * @param string $location_name Google resource name, or '' to forget.
+	 * @return void
+	 */
+	public static function remember_google_listing( $id, $location_name ) {
+		global $wpdb;
+
+		if ( ! Tables::exists( Tables::LOCATIONS ) ) {
+			return;
+		}
+
+		$table         = Tables::name( Tables::LOCATIONS );
+		$location_name = (string) $location_name;
+
+		if ( '' !== $location_name ) {
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+			$wpdb->update( $table, array( 'google_location_name' => '' ), array( 'google_location_name' => $location_name ) );
+		}
+
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+		$wpdb->update( $table, array( 'google_location_name' => $location_name ), array( 'id' => (int) $id ) );
+	}
+
+	/**
 	 * The location used when a single place is needed — schema, the dashboard.
 	 *
 	 * @return array|null
@@ -249,6 +303,8 @@ class LocationRepository {
 		$wpdb->query( 'START TRANSACTION' );
 
 		OpeningHoursRepository::delete_for_location( $id );
+		SpecialHoursRepository::delete_for_location( $id );
+		LocationAttributeRepository::delete_for_location( $id );
 
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 		$deleted = $wpdb->query( $wpdb->prepare( "DELETE FROM {$table} WHERE id = %d", $id ) );
@@ -274,6 +330,12 @@ class LocationRepository {
 
 		Logger::info( 'location', 'location.deleted', 'Location deleted.', array( 'location_id' => $id ) );
 		BusinessRepository::stamp_data_changed();
+
+		// Anything holding a reference to this location gets a chance to let
+		// go. A hook rather than a direct call: this repository must not
+		// have to know which modules exist, and the Google mapping is one of
+		// several things that will eventually need this.
+		do_action( 'fhint_location_deleted', $id );
 
 		return true;
 	}
@@ -310,6 +372,20 @@ class LocationRepository {
 		$record['latitude']          = ( null === $row['latitude'] || '' === $row['latitude'] ) ? null : (float) $row['latitude'];
 		$record['longitude']         = ( null === $row['longitude'] || '' === $row['longitude'] ) ? null : (float) $row['longitude'];
 
+		$categories                     = isset( $row['secondary_categories'] ) ? json_decode( (string) $row['secondary_categories'], true ) : null;
+		$record['secondary_categories'] = is_array( $categories ) ? $categories : array();
+		$record['business_name']        = isset( $row['business_name'] ) ? (string) $row['business_name'] : '';
+		$record['description']          = isset( $row['description'] ) ? (string) $row['description'] : '';
+		$social                         = isset( $row['social_profiles'] ) ? json_decode( (string) $row['social_profiles'], true ) : null;
+		$record['social_profiles']      = is_array( $social ) ? $social : null;
+		$phones                         = isset( $row['additional_phones'] ) ? json_decode( (string) $row['additional_phones'], true ) : null;
+		$record['additional_phones']    = is_array( $phones ) ? $phones : null;
+		$booking                        = isset( $row['booking_links'] ) ? json_decode( (string) $row['booking_links'], true ) : null;
+		$record['booking_links']        = is_array( $booking ) ? $booking : null;
+		$area                           = isset( $row['service_area'] ) ? json_decode( (string) $row['service_area'], true ) : null;
+		$record['service_area']         = is_array( $area ) ? $area : array();
+		$record['opening_date']         = isset( $row['opening_date'] ) && $row['opening_date'] ? (string) $row['opening_date'] : '';
+
 		return $record;
 	}
 
@@ -336,6 +412,20 @@ class LocationRepository {
 			'timezone'       => (string) $record['timezone'],
 			'status'         => (string) $record['status'],
 			'is_primary'     => ! empty( $record['is_primary'] ) ? 1 : 0,
+			'business_name'        => isset( $record['business_name'] ) ? (string) $record['business_name'] : '',
+			'description'          => isset( $record['description'] ) ? (string) $record['description'] : '',
+			// NULL until the location has links of its own; see the table docblock.
+			'social_profiles'      => isset( $record['social_profiles'] ) && is_array( $record['social_profiles'] ) ? wp_json_encode( $record['social_profiles'] ) : null,
+			'primary_category'     => isset( $record['primary_category'] ) ? (string) $record['primary_category'] : '',
+			'primary_category_id'  => isset( $record['primary_category_id'] ) ? (string) $record['primary_category_id'] : '',
+			'secondary_categories' => wp_json_encode( isset( $record['secondary_categories'] ) && is_array( $record['secondary_categories'] ) ? array_values( $record['secondary_categories'] ) : array() ),
+			// NULL until the location has numbers of its own; see the table docblock.
+			'additional_phones'    => isset( $record['additional_phones'] ) && is_array( $record['additional_phones'] ) ? wp_json_encode( array_values( $record['additional_phones'] ) ) : null,
+			'google_location_name' => isset( $record['google_location_name'] ) ? (string) $record['google_location_name'] : '',
+			'service_area'         => isset( $record['service_area'] ) && is_array( $record['service_area'] ) && $record['service_area'] ? wp_json_encode( array_values( $record['service_area'] ) ) : null,
+			'booking_links'        => isset( $record['booking_links'] ) && is_array( $record['booking_links'] ) ? wp_json_encode( $record['booking_links'] ) : null,
+			// NULL, not '', for "use the business's": a DATE column has no empty.
+			'opening_date'         => isset( $record['opening_date'] ) && '' !== (string) $record['opening_date'] ? (string) $record['opening_date'] : null,
 		);
 	}
 }

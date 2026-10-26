@@ -54,6 +54,34 @@ $expected = array(
 	'fhint/v1/services/(?P<id>\d+)',
 	'fhint/v1/settings',
 	'fhint/v1/logs',
+	'fhint/v1/onboarding',
+	'fhint/v1/profile',
+	'fhint/v1/profile/google/refresh',
+	'fhint/v1/profile/listing',
+	'fhint/v1/profile/media',
+	'fhint/v1/profile/media/(?P<id>\d+)',
+	'fhint/v1/profile/media/(?P<id>\d+)/publish',
+	'fhint/v1/profile/publish/plan',
+	'fhint/v1/profile/publish/step',
+	'fhint/v1/google',
+	'fhint/v1/google/credentials',
+	'fhint/v1/google/connect',
+	'fhint/v1/google/profiles',
+	'fhint/v1/google/mapping',
+	'fhint/v1/google/import',
+	'fhint/v1/google/import/preview',
+	'fhint/v1/google/import/steps',
+	'fhint/v1/google/import/step',
+	'fhint/v1/google/categories',
+	'fhint/v1/reviews',
+	'fhint/v1/reviews/state',
+	'fhint/v1/reviews/sync',
+	'fhint/v1/reviews/(?P<review_id>[A-Za-z0-9_-]+)/reply',
+	'fhint/v1/schema',
+	'fhint/v1/audits',
+	'fhint/v1/dashboard',
+	'fhint/v1/audits/issues/(?P<id>\\d+)',
+	'fhint/v1/audits/issues/(?P<id>\\d+)/fix',
 );
 
 foreach ( $expected as $route ) {
@@ -99,6 +127,64 @@ check( in_array( 'GET', $methods_seen['fhint/v1/business'], true ), 'business is
 check( in_array( 'DELETE', $methods_seen['fhint/v1/locations/(?P<id>\d+)'], true ), 'a location can be deleted' );
 check( in_array( 'DELETE', $methods_seen['fhint/v1/logs'], true ), 'logs can be purged' );
 
+// The business details are a Google Business Profile's: every route that
+// changes them needs a linked Google account, checked on the server, and no
+// route that only reads them does — a read with none linked answers empty.
+$details_routes = '#^fhint/v1/(business|locations|services|profile)(/|$)#';
+$write_guarded  = 0;
+
+foreach ( $routes as $route => $endpoints ) {
+	if ( ! preg_match( $details_routes, $route ) ) {
+		continue;
+	}
+
+	foreach ( $endpoints as $endpoint ) {
+		if ( ! is_array( $endpoint ) || ! isset( $endpoint['methods'] ) ) {
+			continue;
+		}
+
+		$guard = is_array( $endpoint['permission_callback'] ) ? $endpoint['permission_callback'][1] : '';
+
+		if ( 'GET' === $endpoint['methods'] ) {
+			check_same( 'permissions_check', $guard, "{$route} [GET]: reading does not need Google" );
+			continue;
+		}
+
+		check_same( 'google_write_check', $guard, "{$route} [{$endpoint['methods']}]: changing needs Google" );
+		$write_guarded++;
+	}
+}
+
+check_same( 16, $write_guarded, 'all sixteen routes that change the business details are guarded' );
+
+// And the guard itself: no linked account, no write.
+$business_write = $routes['fhint/v1/business'][1]['permission_callback'];
+
+$GLOBALS['__options'] = array();
+$refused              = call_user_func( $business_write );
+
+check( is_wp_error( $refused ) && 'fhint_google_required' === $refused->get_error_code(), 'with no Google account linked, a write is refused' );
+check_same( 409, is_wp_error( $refused ) ? $refused->get_error_data()['status'] : null, 'as a conflict the screen can explain' );
+
+FHINT\App\Google\Tokens::save(
+	array(
+		'access_token'  => 'access-1',
+		'refresh_token' => 'refresh-1',
+		'expires_in'    => 3600,
+	)
+);
+
+check_same( true, call_user_func( $business_write ), 'with one linked, it is allowed' );
+
+$GLOBALS['__options'] = array();
+
+// A reply is written with PUT — Google's own verb, since the same call
+// creates and replaces it — and removed with DELETE.
+$reply_route = 'fhint/v1/reviews/(?P<review_id>[A-Za-z0-9_-]+)/reply';
+check( in_array( 'PUT', $methods_seen[ $reply_route ], true ), 'a review reply is written with PUT' );
+check( in_array( 'DELETE', $methods_seen[ $reply_route ], true ), 'and removed with DELETE' );
+check( ! empty( $routes[ $reply_route ][0]['args']['comment']['required'] ), 'writing a reply requires its comment' );
+
 // Reordering takes the complete new order, so it needs the ids argument.
 $reorder_args = $routes['fhint/v1/services/reorder'][0]['args'];
 check( isset( $reorder_args['ids'] ), 'reorder declares an ids argument' );
@@ -119,5 +205,10 @@ check_same(
 	$location_args['status']['enum'],
 	'the location status enum comes from the entity'
 );
+
+// Every import route reaches Google, so each is a POST: a GET would spend the
+// project's quota for anyone who opened the screen.
+check_same( array( 'POST' ), $methods_seen['fhint/v1/google/import'], 'an import is a POST' );
+check_same( array( 'POST' ), $methods_seen['fhint/v1/google/import/preview'], 'and so is its preview' );
 
 finish( 'REST routes' );

@@ -33,17 +33,28 @@ defined( 'ABSPATH' ) || exit;
  *                              or a subtype such as 'Restaurant', 'Dentist', 'Store'.
  * @column primary_category     The main category the business trades under, in the
  *                              operator's own words (e.g. "Grocery Store").
+ * @column primary_category_id Google's id for that category, e.g. 'gcid:dentist'.
+ *                          Google accepts ids, not the names people read, so a
+ *                          push needs this and the display name both.
  * @column secondary_categories JSON array of additional categories.
  * @column description          Short description used for schema and location pages.
  * @column logo_attachment_id   WP media attachment id for the logo, 0 when a raw URL is used.
  * @column logo_url             Resolved logo URL. Kept alongside the attachment id so an
  *                              external logo works without a media library entry.
  * @column phone                Primary contact number. Locations may override it.
+ * @column additional_phones    JSON array of up to two more numbers, in order —
+ *                              Google's `phoneNumbers.additionalPhones`. NULL or
+ *                              empty means none. The primary location's list.
  * @column email                Primary contact email.
  * @column website              Primary website URL.
  * @column price_range          schema.org priceRange indicator, e.g. '$$'.
  * @column founding_date        ISO 8601 date (YYYY-MM-DD) the business was founded.
  * @column social_profiles      JSON object of network => profile URL, emitted as sameAs.
+ * @column booking_links        JSON object: `appointment` (URL), `text_messaging`
+ *                              (international number, `+8801712345678`) and
+ *                              `whatsapp` (wa.me link) — Google's `url_appointment`,
+ *                              `url_text_messaging` and `url_whatsapp`. The
+ *                              primary location's set.
  * @column created_at           Row creation timestamp, UTC.
  * @column updated_at           Last write timestamp, UTC.
  */
@@ -54,7 +65,8 @@ class CreateBusinessTable {
 	 *
 	 * @param string $prefix          Database table prefix.
 	 * @param string $charset_collate Charset/collation clause.
-	 * @return void
+	 * @return array Whatever dbDelta changed — empty when the table was
+	 *               already up to date, which is the idempotency check.
 	 */
 	public static function up( $prefix, $charset_collate ) {
 		$table = $prefix . 'fhint_' . Tables::BUSINESS;
@@ -65,16 +77,19 @@ class CreateBusinessTable {
 	legal_name varchar(255) NOT NULL default '',
 	business_type varchar(100) NOT NULL default '',
 	primary_category varchar(150) NOT NULL default '',
+	primary_category_id varchar(100) NOT NULL default '',
 	secondary_categories longtext NULL,
 	description text NULL,
 	logo_attachment_id bigint(20) unsigned NOT NULL default 0,
 	logo_url varchar(500) NOT NULL default '',
 	phone varchar(50) NOT NULL default '',
+	additional_phones longtext NULL,
 	email varchar(191) NOT NULL default '',
 	website varchar(500) NOT NULL default '',
 	price_range varchar(20) NOT NULL default '',
 	founding_date date NULL,
 	social_profiles longtext NULL,
+	booking_links longtext NULL,
 	created_at datetime NULL,
 	updated_at datetime NULL,
 	PRIMARY KEY  (id),
@@ -83,6 +98,6 @@ class CreateBusinessTable {
 	KEY updated_at (updated_at)
 ) {$charset_collate};";
 
-		dbDelta( $sql );
+		return dbDelta( $sql );
 	}
 }

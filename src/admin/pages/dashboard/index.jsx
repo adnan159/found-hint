@@ -1,25 +1,321 @@
-import { __ } from "@wordpress/i18n";
+import { __, sprintf } from "@wordpress/i18n";
+import {
+  ArrowRightIcon,
+  BriefcaseBusinessIcon,
+  CheckIcon,
+  MapPinIcon,
+  WrenchIcon,
+} from "lucide-react";
+import { Link } from "react-router";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Progress } from "@/components/ui/progress";
+import { Skeleton } from "@/components/ui/skeleton";
+import ComingSoonBanner from "@/components/ComingSoonBanner";
+import PageHeader from "@/components/PageHeader";
+import useSelectedLocation from "@/hooks/useSelectedLocation";
+import SectionCard from "@/components/SectionCard";
+import GetStarted, { useGetStartedState } from "./components/GetStarted";
+import GoogleCard from "./components/GoogleCard";
+import ScoreCard from "./components/ScoreCard";
+import { useGetBusinessQuery } from "@/store/api/businessApi";
+import { useGetDashboardQuery } from "@/store/api/dashboardApi";
+import { useGetLocationsQuery } from "@/store/api/locationsApi";
+import { useGetProfileQuery } from "@/store/api/profileApi";
 
 /**
- * Placeholder. Real layout: Local SEO Health Score, Setup Progress, GBP
- * connect card, "Fix First" issue, Locations table, Quick Actions, Recent
- * Activity — see project memory (FoundHint UI prototype) and
- * docs/NAVIGATION.md for the full card-by-card spec.
+ * The dashboard.
+ *
+ * The health score is the stored result of the last audit, read through
+ * `GET /dashboard`, which never measures. The prototype also shows a ranking
+ * grid and a performance panel; those have no engine behind them yet, and a
+ * card showing an invented number is worse than no card — it would be
+ * indistinguishable from a real reading and nobody would know not to trust
+ * it.
  */
-const Dashboard = () => {
-  return (
-    <div className="fhint:space-y-2">
-      <h1 className="fhint:text-xl fhint:font-semibold">
-        {__("Dashboard", "found-hint")}
-      </h1>
-      <p className="fhint:text-muted-foreground fhint:text-sm">
-        {__(
-          "Scaffold page — content lands as each module is built.",
-          "found-hint",
-        )}
-      </p>
-    </div>
-  );
-};
+export default function DashboardPage() {
+  const { data: businessData, isLoading: loadingBusiness } =
+    useGetBusinessQuery();
+  const { data: locationsData, isLoading: loadingLocations } =
+    useGetLocationsQuery();
+  // Refetched whenever the dashboard is opened: whether the score is out of
+  // date depends on edits made on other screens, and a cached "up to date"
+  // would be exactly the silent staleness this card exists to prevent.
+  // The dashboard is per location: the one chosen in the bar at the top of
+  // every page, else the main location.
+  const { locationId, ready } = useSelectedLocation();
+  const { currentData: dashboard, isFetching: fetchingDashboard } =
+    useGetDashboardQuery(locationId, {
+      refetchOnMountOrArgChange: true,
+      skip: !ready,
+    });
+  const loadingDashboard = !ready || (fetchingDashboard && !dashboard);
+  // The location's own details, as the Business profile shows them: its
+  // name, phone, website, address, hours and its own services.
+  const { currentData: profile, isFetching: loadingProfile } =
+    useGetProfileQuery(locationId, { skip: !ready });
 
-export default Dashboard;
+  const business = businessData?.business;
+  const { show: showGetStarted, isLoading: loadingGetStarted } =
+    useGetStartedState();
+
+  const isLoading =
+    loadingBusiness ||
+    loadingLocations ||
+    loadingDashboard ||
+    (loadingProfile && !profile) ||
+    // Waited for too, so a fresh site never flashes an empty dashboard
+    // before the introduction replaces it.
+    loadingGetStarted;
+
+  const info = profile?.sections?.info ?? {};
+  const address = profile?.sections?.address ?? {};
+  const hours = profile?.sections?.hours ?? {};
+  const services = profile?.sections?.services?.items ?? [];
+
+  const steps = [
+    {
+      id: "business",
+      label: __("Add your business name", "foundhint-local-seo"),
+      done: Boolean(info.name),
+      to: "/business",
+    },
+    {
+      id: "contact",
+      label: __("Add a phone number or email", "foundhint-local-seo"),
+      done: Boolean(info.phone || business?.email),
+      to: "/business",
+    },
+    {
+      id: "website",
+      label: __("Add your website", "foundhint-local-seo"),
+      done: Boolean(info.website),
+      to: "/business",
+    },
+    {
+      id: "location",
+      label: __("Add your address", "foundhint-local-seo"),
+      done: Boolean(address.address_line_1 && address.city),
+      to: "/business?tab=address",
+    },
+    {
+      id: "hours",
+      label: __("Set your opening hours", "foundhint-local-seo"),
+      done: Boolean(hours.opening_hours?.has_any_hours),
+      to: "/business?tab=hours",
+    },
+    {
+      id: "services",
+      label: __("List what you offer", "foundhint-local-seo"),
+      done: services.length > 0,
+      to: "/business?tab=services",
+    },
+  ];
+
+  const doneCount = steps.filter((step) => step.done).length;
+  const percent = Math.round((doneCount / steps.length) * 100);
+
+  if (isLoading) {
+    return (
+      <>
+        <PageHeader title={__("Dashboard", "foundhint-local-seo")} />
+        <div className="fhint:grid fhint:gap-4 fhint:lg:grid-cols-3">
+          <Skeleton className="fhint:h-80 fhint:w-full" />
+          <Skeleton className="fhint:h-80 fhint:w-full" />
+          <Skeleton className="fhint:h-80 fhint:w-full" />
+        </div>
+        <div className="fhint:grid fhint:gap-4 fhint:md:grid-cols-3">
+          {[0, 1, 2].map((card) => (
+            <Skeleton key={card} className="fhint:h-36 fhint:w-full" />
+          ))}
+        </div>
+      </>
+    );
+  }
+
+  // A fresh site has no score to read and nothing to summarise, so the
+  // introduction is the screen rather than a banner above a row of empty
+  // cards. Skipping dismisses it and this renders the dashboard instead.
+  if (showGetStarted) {
+    return <GetStarted />;
+  }
+
+  return (
+    <>
+      <PageHeader
+        title={__("Dashboard", "foundhint-local-seo")}
+        description={__(
+          "What you have told FoundHint about your business so far.",
+          "foundhint-local-seo",
+        )}
+      />
+
+      <ComingSoonBanner
+        title={__("Advanced dashboard coming soon!", "foundhint-local-seo")}
+        description={__(
+          "Deeper insights into how customers find you are on the way. Everything here keeps working in the meantime.",
+          "foundhint-local-seo",
+        )}
+      />
+
+      {/* Score and setup side by side, as in the prototype's top row. The
+          score leads: once a site is set up it is the figure people come
+          back for, and on a new site the setup checklist beside it is the
+          obvious next step. */}
+      {/* No `items-start`: the three cards stretch to the tallest, so the
+          row reads as one band rather than three ragged blocks. */}
+      <div className="fhint:grid fhint:gap-4 fhint:lg:grid-cols-3">
+        <ScoreCard summary={dashboard?.score} />
+
+        {/* The setup checklist stays useful afterwards as a summary. Styling
+          follows the prototype — a large percentage, a square 8px bar, and
+          rows that are never struck through when done. */}
+        <SectionCard
+          title={__("Setup progress", "foundhint-local-seo")}
+          action={
+            <span className="fhint:text-[13px] fhint:text-muted-strong">
+              {sprintf(
+                /* translators: 1: number of completed steps, 2: total steps. */
+                __("%1$d of %2$d steps done", "foundhint-local-seo"),
+                doneCount,
+                steps.length,
+              )}
+            </span>
+          }
+        >
+          <div className="fhint:flex fhint:flex-col fhint:gap-4">
+            <div className="fhint:flex fhint:items-baseline fhint:gap-3">
+              <span className="fhint:font-heading fhint:text-[40px] fhint:leading-none fhint:font-extrabold">
+                {sprintf(
+                  /* translators: %d: percentage of setup completed. */
+                  __("%d%%", "foundhint-local-seo"),
+                  percent,
+                )}
+              </span>
+            </div>
+
+            <Progress
+              value={percent}
+              aria-label={__("Setup progress", "foundhint-local-seo")}
+            />
+
+            <ul className="fhint:flex fhint:flex-col">
+              {steps.map((step) => (
+                <li
+                  key={step.id}
+                  className="fhint:flex fhint:items-center fhint:gap-3 fhint:border-b fhint:border-b-border fhint:py-2.5 fhint:last:border-b-0"
+                >
+                  <span
+                    aria-hidden="true"
+                    className={
+                      step.done
+                        ? "fhint:flex fhint:size-[17px] fhint:shrink-0 fhint:items-center fhint:justify-center fhint:bg-success fhint:text-success-foreground"
+                        : "fhint:flex fhint:size-[17px] fhint:shrink-0 fhint:items-center fhint:justify-center fhint:bg-muted fhint:ring-1 fhint:ring-border"
+                    }
+                  >
+                    {step.done ? <CheckIcon className="fhint:size-3" /> : null}
+                  </span>
+
+                  <span
+                    className={
+                      step.done
+                        ? "fhint:text-[13px] fhint:font-medium fhint:text-muted-strong"
+                        : "fhint:text-[13px] fhint:font-bold"
+                    }
+                  >
+                    {step.label}
+                    <span className="fhint:sr-only">
+                      {step.done
+                        ? __(" — done", "foundhint-local-seo")
+                        : __(" — still to do", "foundhint-local-seo")}
+                    </span>
+                  </span>
+
+                  {!step.done ? (
+                    <Link
+                      to={step.to}
+                      className="fhint:ml-auto fhint:text-[12px] fhint:font-extrabold fhint:text-link-accent fhint:no-underline fhint:hover:underline"
+                    >
+                      {__("Do this", "foundhint-local-seo")}
+                      <ArrowRightIcon
+                        aria-hidden="true"
+                        className="fhint:ml-1 fhint:inline fhint:size-3"
+                      />
+                    </Link>
+                  ) : null}
+                </li>
+              ))}
+            </ul>
+          </div>
+        </SectionCard>
+
+        {/* The third column of the prototype's top row. */}
+        <GoogleCard />
+      </div>
+
+      <div className="fhint:grid fhint:gap-4 fhint:md:grid-cols-3">
+        <StatCard
+          icon={BriefcaseBusinessIcon}
+          label={__("Business", "foundhint-local-seo")}
+          value={
+            business?.completeness != null
+              ? sprintf(
+                  /* translators: %d: percentage of the profile that is filled in. */
+                  __("%d%% complete", "foundhint-local-seo"),
+                  business.completeness,
+                )
+              : __("Not started", "foundhint-local-seo")
+          }
+          to="/business"
+        />
+        <StatCard
+          icon={MapPinIcon}
+          label={__("Locations", "foundhint-local-seo")}
+          value={sprintf(
+            /* translators: %d: number of locations. */
+            __("%d added", "foundhint-local-seo"),
+            locationsData?.total ?? 0,
+          )}
+          to="/business?tab=address"
+        />
+        <StatCard
+          icon={WrenchIcon}
+          label={__("Services", "foundhint-local-seo")}
+          value={sprintf(
+            /* translators: %d: number of services. */
+            __("%d added", "foundhint-local-seo"),
+            services.length,
+          )}
+          to="/business?tab=services"
+        />
+      </div>
+    </>
+  );
+}
+
+function StatCard({ icon: Icon, label, value, to }) {
+  return (
+    <Card>
+      <CardHeader>
+        <CardDescription className="fhint:flex fhint:items-center fhint:gap-2 fhint:text-[11px] fhint:font-extrabold fhint:tracking-[0.08em] fhint:uppercase">
+          <Icon aria-hidden="true" className="fhint:size-3.5" />
+          {label}
+        </CardDescription>
+        <CardTitle className="fhint:font-heading fhint:text-[19px] fhint:font-extrabold fhint:text-balance">
+          {value}
+        </CardTitle>
+      </CardHeader>
+      <CardContent>
+        <Button variant="outline" size="sm" render={<Link to={to} />}>
+          {__("Manage", "foundhint-local-seo")}
+        </Button>
+      </CardContent>
+    </Card>
+  );
+}

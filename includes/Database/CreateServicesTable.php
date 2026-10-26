@@ -28,6 +28,11 @@ defined( 'ABSPATH' ) || exit;
  *
  * @column id                  Auto-increment primary key.
  * @column business_id         FK → fhint_business.id.
+ * @column location_id         Whose list this service is on. 0 = the business's
+ *                             own list, which the primary location shows. Any
+ *                             other location keeps a list of its own — two
+ *                             Google listings can be two kinds of business.
+ *                             Slugs are unique within one list.
  * @column name                Service name as displayed. Required.
  * @column slug                URL-safe identifier, unique within the business.
  *                             Collisions are resolved by suffixing (-2, -3).
@@ -40,6 +45,12 @@ defined( 'ABSPATH' ) || exit;
  * @column url                 Link to a page describing this service.
  * @column status              active | inactive. Inactive services are kept but
  *                             excluded from schema and public output.
+ * @column google_item_type Which shape Google wants for this service:
+ *                          'structured' when it matches a service Google already
+ *                          publishes for the category, 'free_form' otherwise.
+ *                          Empty means it has never been offered to Google.
+ * @column google_service_type_id The structured id, e.g. 'job_type_id:teeth_whitening'.
+ *                          Only meaningful when google_item_type is 'structured'.
  * @column sort_order          Manual display order, resequenced as a block by the
  *                             reorder endpoint so two services can't share a position.
  * @column created_at          Row creation timestamp, UTC.
@@ -52,7 +63,8 @@ class CreateServicesTable {
 	 *
 	 * @param string $prefix          Database table prefix.
 	 * @param string $charset_collate Charset/collation clause.
-	 * @return void
+	 * @return array Whatever dbDelta changed — empty when the table was
+	 *               already up to date, which is the idempotency check.
 	 */
 	public static function up( $prefix, $charset_collate ) {
 		$table = $prefix . 'fhint_' . Tables::SERVICES;
@@ -60,6 +72,7 @@ class CreateServicesTable {
 		$sql = "CREATE TABLE {$table} (
 	id bigint(20) unsigned NOT NULL auto_increment,
 	business_id bigint(20) unsigned NOT NULL default 0,
+	location_id bigint(20) unsigned NOT NULL default 0,
 	name varchar(255) NOT NULL default '',
 	slug varchar(200) NOT NULL default '',
 	description text NULL,
@@ -68,19 +81,22 @@ class CreateServicesTable {
 	price decimal(18,4) NULL,
 	currency char(3) NOT NULL default '',
 	url varchar(500) NOT NULL default '',
+	google_item_type varchar(32) NOT NULL default '',
+	google_service_type_id varchar(150) NOT NULL default '',
 	status varchar(32) NOT NULL default 'active',
 	sort_order int(11) NOT NULL default 0,
 	created_at datetime NULL,
 	updated_at datetime NULL,
 	PRIMARY KEY  (id),
-	UNIQUE KEY business_slug (business_id,slug),
+	UNIQUE KEY business_location_slug (business_id,location_id,slug),
 	KEY business_id (business_id),
+	KEY location_id (location_id),
 	KEY status (status),
 	KEY sort_order (sort_order),
 	KEY created_at (created_at),
 	KEY updated_at (updated_at)
 ) {$charset_collate};";
 
-		dbDelta( $sql );
+		return dbDelta( $sql );
 	}
 }

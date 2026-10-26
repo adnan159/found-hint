@@ -1,0 +1,1244 @@
+<?php
+/**
+ * Bringing a Google Business Profile into FoundHint.
+ *
+ * @package FoundHint
+ */
+
+namespace FHINT\App\Google;
+
+use FHINT\App\Business\AdditionalPhones;
+use FHINT\App\Business\BookingLinks;
+use FHINT\App\Business\BusinessRepository;
+use FHINT\App\Business\OpeningDate;
+use FHINT\App\Location\LocationCategories;
+use FHINT\App\Location\LocationDetails;
+use FHINT\App\Location\LocationRepository;
+use FHINT\App\Location\OpeningHours;
+use FHINT\App\Location\OpeningHoursRepository;
+use FHINT\App\Location\ServiceArea;
+use FHINT\App\Nap\Nap;
+use FHINT\App\Service\ServiceRepository;
+use WP_Error;
+
+defined( 'ABSPATH' ) || exit;
+
+/**
+ * Reads one Google profile and offers it, field by field.
+ *
+ * **Nothing is written without being chosen.** `preview()` reads Google and
+ * returns both sides; `apply()` writes only the fields it is handed. An
+ * import that silently replaced a phone number somebody had corrected here
+ * would be worse than no import at all.
+ *
+ * Which fields are *suggested* follows one rule: **empty here wins, filled
+ * here is left alone.** A blank field has nothing to lose; a field that
+ * already differs is the operator's decision, because FoundHint cannot know
+ * which of the two is out of date.
+ *
+ * **A site with nothing in it is the ordinary first run**, not an error:
+ * with no business and no location, Google's profile becomes both. Each
+ * Google profile keeps its own FoundHint location, so a business with
+ * several branches imports them one after another instead of overwriting
+ * itself.
+ */
+class Import {
+
+	/** One location, read fresh. */
+	const LOCATION_URL = 'https://mybusinessbusinessinformation.googleapis.com/v1/%s';
+
+	/** Social links are attributes, not fields, so they cost a second call. */
+	const ATTRIBUTES_URL = 'https://mybusinessbusinessinformation.googleapis.com/v1/%s/attributes';
+
+	/**
+	 * Fields to ask Google for.
+	 *
+	 * `readMask` is required by the Business Information API, and asking for
+	 * less than is imported would leave fields silently blank.
+	 */
+	const READ_MASK = 'title,storefrontAddress,serviceArea,phoneNumbers,websiteUri,regularHours,profile,openInfo,latlng,categories,serviceItems';
+
+	/** What can be imported, in the order the screen lists it. */
+	const FIELDS = array(
+		'name',
+		'description',
+		'opening_date',
+		'business_type',
+		'categories',
+		'phone',
+		'additional_phones',
+		'website',
+		'social',
+		'booking',
+		'address',
+		'coordinates',
+		'service_area',
+		'hours',
+		'services',
+	);
+
+	/** Fields belonging to the business rather than to one of its locations. */
+	const BUSINESS_FIELDS = array( 'name', 'description', 'opening_date', 'business_type', 'categories', 'phone', 'additional_phones', 'website', 'social', 'booking' );
+
+	/** Fields that are the location's own. */
+	const LOCATION_FIELDS = array( 'address', 'coordinates', 'service_area', 'hours' );
+
+	/**
+	 * The guided import, as the steps a person watches go by.
+	 *
+	 * Each step is one request, so the screen can tick them off as they
+	 * land instead of showing a spinner over all six. A step is a group of
+	 * the fields above that mean one thing to an owner: "address and map
+	 * pin" is two fields here and one line there.
+	 */
+	const STEPS = array(
+		'identity' => array( 'name', 'description', 'opening_date' ),
+		'category' => array( 'categories', 'business_type' ),
+		'address'  => array( 'address', 'coordinates', 'service_area' ),
+		'contact'  => array( 'phone', 'additional_phones', 'website', 'social', 'booking' ),
+		'hours'    => array( 'hours' ),
+		'services' => array( 'services' ),
+	);
+
+	/** How long one read of Google may serve the steps of one import. */
+	const READ_TTL = 120;
+
+	/**
+	 * Whether read() may answer from the copy an earlier step stored.
+	 *
+	 * @var bool
+	 */
+	private static $reuse_read = false;
+
+	/**
+	 * Run one step of the guided import.
+	 *
+	 * Six steps would be six reads of the same listing, two requests each,
+	 * against a quota every site shares. So the first step reads Google and
+	 * keeps the answer for two minutes, and the steps after it use that.
+	 * The copy is held on the server, never taken from the browser — which
+	 * is the property an import must keep: what is written is what Google
+	 * said, not what a client sent.
+	 *
+	 * @param string $step          One of the STEPS keys.
+	 * @param string $location_name Google profile to import from.
+	 * @return array|WP_Error The step's outcome.
+	 */
+	public static function step( $step, $location_name = '' ) {
+		$step = (string) $step;
+
+		if ( ! isset( self::STEPS[ $step ] ) ) {
+			return new WP_Error(
+				'fhint_import_unknown_step',
+				__( 'That is not a step of the import.', 'foundhint-local-seo' ),
+				array( 'status' => 400 )
+			);
+		}
+
+		$steps = array_keys( self::STEPS );
+
+		// The first step always asks Google afresh, so an import started
+		// now never runs on what an import started earlier was told.
+		self::$reuse_read = $steps[0] !== $step;
+
+		$result = self::apply( self::STEPS[ $step ], $location_name );
+
+		self::$reuse_read = false;
+
+		if ( is_wp_error( $result ) ) {
+			return $result;
+		}
+
+		if ( $result['applied'] ) {
+			$status = 'imported';
+		} elseif ( count( $result['skipped'] ) === count( self::STEPS[ $step ] ) ) {
+			// Google holds nothing for this step. Not a failure, and worth
+			// saying differently from "done".
+			$status = 'empty';
+		} else {
+			$status = 'unchanged';
+		}
+
+		return array(
+			'step'        => $step,
+			'status'      => $status,
+			'applied'     => $result['applied'],
+			'skipped'     => $result['skipped'],
+			'location_id' => $result['location_id'],
+			'next'        => self::next_step( $step ),
+		);
+	}
+
+	/**
+	 * The steps in order, for a screen to list before any has run.
+	 *
+	 * @return array[] Each `{ id, fields }`.
+	 */
+	public static function steps() {
+		$steps = array();
+
+		foreach ( self::STEPS as $id => $fields ) {
+			$steps[] = array(
+				'id'     => $id,
+				'fields' => $fields,
+			);
+		}
+
+		return $steps;
+	}
+
+	/**
+	 * The step after a given one, or '' at the end.
+	 *
+	 * @param string $step Step id.
+	 * @return string
+	 */
+	private static function next_step( $step ) {
+		$steps    = array_keys( self::STEPS );
+		$position = array_search( $step, $steps, true );
+
+		return false !== $position && isset( $steps[ $position + 1 ] ) ? $steps[ $position + 1 ] : '';
+	}
+
+	/**
+	 * Read Google and show both sides.
+	 *
+	 * @param string $location_name Google profile to read. Empty uses the one
+	 *                              already mapped, or the only one there is.
+	 * @return array|WP_Error
+	 */
+	public static function preview( $location_name = '' ) {
+		$profile = self::profile( $location_name );
+
+		if ( is_wp_error( $profile ) ) {
+			return $profile;
+		}
+
+		$theirs = self::read( $profile['location_name'] );
+
+		if ( is_wp_error( $theirs ) ) {
+			return $theirs;
+		}
+
+		$location = self::location_for( $profile );
+		$business = BusinessRepository::get();
+		$nap      = Nap::resolve( $location ? (int) $location['id'] : 0 );
+
+		return array(
+			'location_name'    => $profile['location_name'],
+			'profile_title'    => $profile['title'],
+			'location_id'      => $location ? (int) $location['id'] : 0,
+			// Said plainly on the screen, so nothing appears unannounced.
+			'creates_business' => ! $business,
+			'creates_location' => ! $location,
+			'fields'           => self::compare( $theirs, $nap ),
+			'read_at'          => current_time( 'mysql', true ),
+		);
+	}
+
+	/**
+	 * Write the chosen fields.
+	 *
+	 * Google is read again rather than trusting what the browser sends back:
+	 * a preview may be minutes old, and what is written should be what
+	 * Google holds now, not something a client could have edited in between.
+	 *
+	 * @param array  $keys          Field keys to import.
+	 * @param string $location_name Google profile to import from.
+	 * @return array|WP_Error What was written.
+	 */
+	public static function apply( array $keys, $location_name = '' ) {
+		$preview = self::preview( $location_name );
+
+		if ( is_wp_error( $preview ) ) {
+			return $preview;
+		}
+
+		$fields = array();
+
+		foreach ( $preview['fields'] as $field ) {
+			$fields[ $field['key'] ] = $field;
+		}
+
+		$chosen  = array_values( array_intersect( self::FIELDS, array_map( 'strval', $keys ) ) );
+		$skipped = array();
+
+		foreach ( $chosen as $key ) {
+			// A field Google does not hold is skipped rather than blanking
+			// what is here: an import should never take a value away.
+			if ( empty( $fields[ $key ]['available'] ) ) {
+				$skipped[] = $key;
+			}
+		}
+
+		$chosen   = array_values( array_diff( $chosen, $skipped ) );
+		$business = self::ensure_business( $fields );
+
+		if ( is_wp_error( $business ) ) {
+			return $business;
+		}
+
+		$location = self::ensure_location( $preview, $fields );
+
+		if ( is_wp_error( $location ) ) {
+			return $location;
+		}
+
+		$applied = array_merge(
+			self::write_business( $fields, $chosen, (bool) $location['is_primary'] ),
+			self::write_location( $fields, $chosen, (int) $location['id'], (bool) $location['is_primary'] ),
+			self::write_services( $fields, $chosen, LocationDetails::services_list( $location ) )
+		);
+
+		return array(
+			'applied'          => array_values( array_intersect( self::FIELDS, $applied ) ),
+			'skipped'          => $skipped,
+			'location_id'      => (int) $location['id'],
+			'created_business' => (bool) $preview['creates_business'],
+			'created_location' => (bool) $preview['creates_location'],
+			'imported_at'      => current_time( 'mysql', true ),
+		);
+	}
+
+	/**
+	 * Which Google profile this import reads.
+	 *
+	 * A profile already mapped to a location decides it; otherwise an
+	 * explicit choice does. A site with exactly one profile needs no choice
+	 * at all — asking somebody to pick from a list of one is a question with
+	 * no information in it.
+	 *
+	 * @param string $location_name Google profile asked for.
+	 * @return array|WP_Error Stored Google location row.
+	 */
+	private static function profile( $location_name ) {
+		$location_name = trim( (string) $location_name );
+
+		if ( '' !== $location_name ) {
+			$chosen = GoogleLocationRepository::find_by_location_name( $location_name );
+
+			if ( ! $chosen ) {
+				return new WP_Error(
+					'fhint_import_unknown_profile',
+					__( 'That Google profile is not one this site has read. Read your profiles again.', 'foundhint-local-seo' ),
+					array( 'status' => 404 )
+				);
+			}
+
+			return $chosen;
+		}
+
+		$profiles = GoogleLocationRepository::all();
+
+		if ( ! $profiles ) {
+			return new WP_Error(
+				'fhint_import_no_profiles',
+				__( 'Read your Google profiles first, under Business profiles.', 'foundhint-local-seo' ),
+				array( 'status' => 409 )
+			);
+		}
+
+		if ( 1 === count( $profiles ) ) {
+			return $profiles[0];
+		}
+
+		foreach ( $profiles as $profile ) {
+			if ( (int) $profile['fhint_location_id'] > 0 ) {
+				return $profile;
+			}
+		}
+
+		return new WP_Error(
+			'fhint_import_choose_profile',
+			__( 'Choose which Google profile to import from.', 'foundhint-local-seo' ),
+			array( 'status' => 409 )
+		);
+	}
+
+	/**
+	 * The FoundHint location this profile belongs to, if there is one.
+	 *
+	 * A profile keeps its own location, so a second profile imports into a
+	 * second location rather than overwriting the first.
+	 *
+	 * @param array $profile Stored Google location row.
+	 * @return array|null
+	 */
+	private static function location_for( array $profile ) {
+		if ( (int) $profile['fhint_location_id'] > 0 ) {
+			$location = LocationRepository::find( (int) $profile['fhint_location_id'] );
+
+			if ( $location ) {
+				return $location;
+			}
+		}
+
+		// Nothing mapped yet: a site with one location and no other profile
+		// claiming it means this profile is that location.
+		$locations = LocationRepository::all();
+
+		if ( 1 === count( $locations ) && ! GoogleLocationRepository::find_by_fhint_location( (int) $locations[0]['id'] ) ) {
+			return $locations[0];
+		}
+
+		return null;
+	}
+
+	/**
+	 * Create the business when the site has none.
+	 *
+	 * @param array $fields Compared fields, keyed.
+	 * @return array|WP_Error The business.
+	 */
+	private static function ensure_business( array $fields ) {
+		$business = BusinessRepository::get();
+
+		if ( $business ) {
+			return $business;
+		}
+
+		// A business needs a name, and Google's title is the only candidate.
+		if ( empty( $fields['name']['available'] ) ) {
+			return new WP_Error(
+				'fhint_import_no_name',
+				__( 'Google holds no business name for this profile, so there is nothing to create a business from.', 'foundhint-local-seo' ),
+				array( 'status' => 409 )
+			);
+		}
+
+		$created = BusinessRepository::save( array( 'name' => $fields['name']['theirs_raw'] ) );
+
+		if ( ! $created ) {
+			return new WP_Error(
+				'fhint_import_business_failed',
+				__( 'The business could not be created.', 'foundhint-local-seo' ),
+				array( 'status' => 500 )
+			);
+		}
+
+		return $created;
+	}
+
+	/**
+	 * Find or create the location this profile imports into.
+	 *
+	 * @param array $preview The preview this apply is working from.
+	 * @param array $fields  Compared fields, keyed.
+	 * @return array|WP_Error The location.
+	 */
+	private static function ensure_location( array $preview, array $fields ) {
+		if ( $preview['location_id'] ) {
+			$location = LocationRepository::find( (int) $preview['location_id'] );
+
+			if ( $location ) {
+				GoogleLocationRepository::map( $preview['location_name'], (int) $location['id'] );
+
+				return $location;
+			}
+		}
+
+		if ( empty( $fields['address']['available'] ) ) {
+			return new WP_Error(
+				'fhint_import_no_address',
+				__( 'Google holds no address for this profile, so there is nothing to create a location from.', 'foundhint-local-seo' ),
+				array( 'status' => 409 )
+			);
+		}
+
+		$business = BusinessRepository::get();
+
+		$data = array_merge(
+			$fields['address']['theirs_raw'],
+			array(
+				'business_id' => (int) $business['id'],
+				'name'        => $preview['profile_title'],
+				// The first location is the primary one; later imports are
+				// branches of the same business.
+				'is_primary'  => ! LocationRepository::all(),
+			)
+		);
+
+		if ( ! empty( $fields['phone']['available'] ) ) {
+			$data['phone'] = $fields['phone']['theirs_raw'];
+		}
+
+		if ( ! empty( $fields['website']['available'] ) ) {
+			$data['website'] = $fields['website']['theirs_raw'];
+		}
+
+		$location = LocationRepository::create( $data );
+
+		if ( ! $location || empty( $location['id'] ) ) {
+			return new WP_Error(
+				'fhint_import_create_failed',
+				__( 'The location could not be created from Google\'s address.', 'foundhint-local-seo' ),
+				array( 'status' => 500 )
+			);
+		}
+
+		// Mapped straight away, so a second import updates this location
+		// rather than making another one.
+		GoogleLocationRepository::map( $preview['location_name'], (int) $location['id'] );
+
+		return $location;
+	}
+
+	/**
+	 * Write the fields the business owns.
+	 *
+	 * @param array $fields     Compared fields, keyed.
+	 * @param array $chosen     Field keys being imported.
+	 * @param bool  $is_primary Whether this profile is the primary location.
+	 * @return array Keys written.
+	 */
+	private static function write_business( array $fields, array $chosen, $is_primary = true ) {
+		$changes = array();
+		$written = array();
+
+		foreach ( array_intersect( self::BUSINESS_FIELDS, $chosen ) as $key ) {
+			// A branch's phone and website are its own. Writing them to the
+			// business as well would make the second shop's number answer
+			// for the first. So are its name, description and categories:
+			// all of them are written to the branch itself in write_location().
+			if ( ! $is_primary && in_array( $key, array( 'name', 'description', 'opening_date', 'phone', 'additional_phones', 'website', 'categories', 'social', 'booking' ), true ) ) {
+				continue;
+			}
+
+			$value = $fields[ $key ]['theirs_raw'];
+
+			if ( 'categories' === $key ) {
+				// Stored as Google named them, id and all: the id is what a
+				// later publish sends back, and a category picked here from
+				// the search is stored in exactly this shape.
+				$changes['primary_category']     = $value['primary']['name'];
+				$changes['primary_category_id']  = $value['primary']['id'];
+				$changes['secondary_categories'] = $value['additional'];
+				$written[]                       = $key;
+				continue;
+			}
+
+			if ( 'booking' === $key ) {
+				$business = BusinessRepository::get();
+
+				// Merged, not replaced, as for the social links: a link set here
+				// that Google does not hold is still the owner's.
+				$changes['booking_links'] = array_merge( BookingLinks::complete( $business ? $business['booking_links'] : array() ), $value );
+				$written[]                = $key;
+				continue;
+			}
+
+			if ( 'opening_date' === $key ) {
+				// The business calls the primary location's opening date its
+				// founding date.
+				$changes['founding_date'] = $value;
+				$written[]                = $key;
+				continue;
+			}
+
+			if ( 'social' === $key ) {
+				$business = BusinessRepository::get();
+				$current  = $business && is_array( $business['social_profiles'] ) ? $business['social_profiles'] : array();
+
+				// Merged, not replaced: a network the operator filled in here
+				// that Google does not know about is still theirs.
+				$changes['social_profiles'] = array_merge( $current, $value );
+				$written[]                  = $key;
+				continue;
+			}
+
+			$changes[ $key ] = $value;
+			$written[]       = $key;
+		}
+
+		if ( $changes ) {
+			BusinessRepository::save( $changes );
+		}
+
+		return $written;
+	}
+
+	/**
+	 * Write the fields a location owns.
+	 *
+	 * Phone and website are written in both places: the business is where
+	 * they are read from by default, and the location keeps its own copy so
+	 * a second branch can differ from the first.
+	 *
+	 * @param array $fields      Compared fields, keyed.
+	 * @param array $chosen      Field keys being imported.
+	 * @param int   $location_id Location to write to.
+	 * @param bool  $is_primary  Whether that location is the primary one.
+	 * @return array Keys written.
+	 */
+	private static function write_location( array $fields, array $chosen, $location_id, $is_primary = true ) {
+		$changes = array();
+		$written = array();
+
+		// A branch's listing has its own categories, and they are kept on
+		// the branch. The primary location's are the business's and were
+		// written there.
+		if ( ! $is_primary ) {
+			foreach ( array( 'name' => 'business_name', 'description' => 'description', 'opening_date' => 'opening_date' ) as $key => $column ) {
+				if ( in_array( $key, $chosen, true ) ) {
+					$changes[ $column ] = $fields[ $key ]['theirs_raw'];
+					$written[]          = $key;
+				}
+			}
+		}
+
+		if ( ! $is_primary && in_array( 'social', $chosen, true ) ) {
+			$location = LocationRepository::find( (int) $location_id );
+			$current  = $location && is_array( $location['social_profiles'] ) ? $location['social_profiles'] : array();
+
+			// Merged, not replaced, as for the business: a network the owner
+			// filled in here that Google does not know about is still theirs.
+			$changes['social_profiles'] = array_merge( $current, $fields['social']['theirs_raw'] );
+			$written[]                  = 'social';
+		}
+
+		if ( ! $is_primary && in_array( 'booking', $chosen, true ) ) {
+			$location = isset( $location ) ? $location : LocationRepository::find( (int) $location_id );
+
+			$changes['booking_links'] = array_merge(
+				BookingLinks::complete( $location && is_array( $location['booking_links'] ) ? $location['booking_links'] : array() ),
+				$fields['booking']['theirs_raw']
+			);
+			$written[]                = 'booking';
+		}
+
+		if ( ! $is_primary && in_array( 'categories', $chosen, true ) ) {
+			$changes['primary_category']     = $fields['categories']['theirs_raw']['primary']['name'];
+			$changes['primary_category_id']  = $fields['categories']['theirs_raw']['primary']['id'];
+			$changes['secondary_categories'] = $fields['categories']['theirs_raw']['additional'];
+			$written[]                       = 'categories';
+		}
+
+		if ( in_array( 'address', $chosen, true ) ) {
+			$changes   = array_merge( $changes, $fields['address']['theirs_raw'] );
+			$written[] = 'address';
+		}
+
+		// Google's places replace those it gave before; a place typed here
+		// (no place id) is Google's to know nothing of, and is kept.
+		if ( in_array( 'service_area', $chosen, true ) ) {
+			$location = isset( $location ) && $location ? $location : LocationRepository::find( (int) $location_id );
+			$typed    = array();
+
+			foreach ( $location && is_array( $location['service_area'] ) ? $location['service_area'] : array() as $place ) {
+				if ( '' === (string) $place['place_id'] ) {
+					$typed[] = $place;
+				}
+			}
+
+			$changes['service_area'] = ServiceArea::sanitize( array_merge( $fields['service_area']['theirs_raw'], $typed ) );
+			$written[]               = 'service_area';
+		}
+
+		if ( in_array( 'coordinates', $chosen, true ) ) {
+			$changes['latitude']  = $fields['coordinates']['theirs_raw']['latitude'];
+			$changes['longitude'] = $fields['coordinates']['theirs_raw']['longitude'];
+			$written[]            = 'coordinates';
+		}
+
+		foreach ( array( 'phone', 'website' ) as $key ) {
+			if ( in_array( $key, $chosen, true ) ) {
+				$changes[ $key ] = $fields[ $key ]['theirs_raw'];
+			}
+		}
+
+		// A branch's extra numbers are its own; the primary location's are
+		// the business's and were written there.
+		if ( ! $is_primary && in_array( 'additional_phones', $chosen, true ) ) {
+			$changes['additional_phones'] = $fields['additional_phones']['theirs_raw'];
+			$written[]                    = 'additional_phones';
+		}
+
+		if ( $changes ) {
+			LocationRepository::update( $location_id, $changes );
+		}
+
+		if ( in_array( 'hours', $chosen, true ) ) {
+			$rows = OpeningHours::parse( $fields['hours']['theirs_raw'] );
+
+			if ( $rows ) {
+				OpeningHoursRepository::replace( $location_id, $rows );
+				$written[] = 'hours';
+			}
+		}
+
+		return $written;
+	}
+
+	/**
+	 * Add services this site does not have yet.
+	 *
+	 * Matched by name rather than replaced wholesale: an operator may have
+	 * written their own description or price, and re-importing should not
+	 * throw that away.
+	 *
+	 * @param array $fields Compared fields, keyed.
+	 * @param array $chosen Field keys being imported.
+	 * @param int   $list   The list to add to: 0 for the business's, or a
+	 *                      location's own.
+	 * @return array Keys written.
+	 */
+	private static function write_services( array $fields, array $chosen, $list = 0 ) {
+		if ( ! in_array( 'services', $chosen, true ) ) {
+			return array();
+		}
+
+		$existing = array();
+
+		foreach ( ServiceRepository::all( array( 'location_id' => (int) $list ) ) as $service ) {
+			$existing[ strtolower( trim( $service['name'] ) ) ] = true;
+		}
+
+		$added = 0;
+
+		foreach ( $fields['services']['theirs_raw'] as $service ) {
+			if ( isset( $existing[ strtolower( trim( $service['name'] ) ) ] ) ) {
+				continue;
+			}
+
+			$created = ServiceRepository::create(
+				array(
+					'name'                   => $service['name'],
+					'description'            => $service['description'],
+					'price'                  => $service['price'],
+					'currency'               => $service['currency'],
+					'google_item_type'       => isset( $service['google_item_type'] ) ? $service['google_item_type'] : '',
+					'google_service_type_id' => isset( $service['google_service_type_id'] ) ? $service['google_service_type_id'] : '',
+					'location_id'            => (int) $list,
+				)
+			);
+
+			if ( $created ) {
+				$added++;
+			}
+		}
+
+		return $added ? array( 'services' ) : array();
+	}
+
+	/**
+	 * Read one location from Google, with its attributes.
+	 *
+	 * @param string $location_name Google resource name, e.g. `locations/123`.
+	 * @return array|WP_Error Normalised values.
+	 */
+	private static function read( $location_name ) {
+		$cache_key = 'fhint_import_read_' . md5( (string) $location_name );
+
+		if ( self::$reuse_read ) {
+			$cached = get_transient( $cache_key );
+
+			if ( is_array( $cached ) ) {
+				return $cached;
+			}
+		}
+
+		$theirs = self::read_fresh( $location_name );
+
+		if ( ! is_wp_error( $theirs ) ) {
+			set_transient( $cache_key, $theirs, self::READ_TTL );
+		}
+
+		return $theirs;
+	}
+
+	/**
+	 * Ask Google for one location and its attributes.
+	 *
+	 * @param string $location_name Google resource name, e.g. `locations/123`.
+	 * @return array|WP_Error Normalised values.
+	 */
+	private static function read_fresh( $location_name ) {
+		// The resource name carries its own slash and must reach Google
+		// unencoded — it is a path, not a parameter.
+		$response = Client::get(
+			sprintf( self::LOCATION_URL, (string) $location_name ),
+			array( 'readMask' => self::READ_MASK )
+		);
+
+		if ( is_wp_error( $response ) ) {
+			return $response;
+		}
+
+		// Social links live here and nowhere else. A profile with none, or a
+		// refusal on this one call, must not fail the whole import —
+		// everything else is still worth having.
+		$attributes = Client::get( sprintf( self::ATTRIBUTES_URL, (string) $location_name ) );
+
+		return ImportMapper::from_google( $response, is_wp_error( $attributes ) ? array() : $attributes );
+	}
+
+	/**
+	 * Both sides, field by field.
+	 *
+	 * @param array $theirs Normalised Google values.
+	 * @param array $nap    Resolved FoundHint values.
+	 * @return array[]
+	 */
+	private static function compare( array $theirs, array $nap ) {
+		$fields = array();
+
+		foreach ( self::FIELDS as $key ) {
+			$fields[] = self::field( $key, $theirs, $nap );
+		}
+
+		return $fields;
+	}
+
+	/**
+	 * One compared field.
+	 *
+	 * `theirs_raw` is what would be written; `ours` and `theirs` are for
+	 * reading on screen.
+	 *
+	 * @param string $key    Field key.
+	 * @param array  $theirs Normalised Google values.
+	 * @param array  $nap    Resolved FoundHint values.
+	 * @return array
+	 */
+	private static function field( $key, array $theirs, array $nap ) {
+		switch ( $key ) {
+			case 'address':
+				$their_address = $theirs['address'];
+				$available     = '' !== trim( $their_address['address_line_1'] . $their_address['city'] . $their_address['postal_code'] );
+				$their_text    = implode( ', ', array_filter( array_values( $their_address ) ) );
+				$our_text      = isset( $nap['address']['formatted'] ) ? (string) $nap['address']['formatted'] : '';
+				$differs       = self::address_key( $their_address ) !== self::address_key(
+					array(
+						'address_line_1' => isset( $nap['address']['line_1'] ) ? $nap['address']['line_1'] : '',
+						'city'           => isset( $nap['address']['city'] ) ? $nap['address']['city'] : '',
+						'postal_code'    => isset( $nap['address']['postal'] ) ? $nap['address']['postal'] : '',
+					)
+				);
+
+				return self::describe( $key, $our_text, $their_text, $their_address, $available, $differs );
+
+			case 'coordinates':
+				$available  = (bool) $theirs['coordinates']['has_both'];
+				$their_text = $available
+					? $theirs['coordinates']['latitude'] . ', ' . $theirs['coordinates']['longitude']
+					: '';
+				$our_text   = ! empty( $nap['coordinates']['has_both'] )
+					? $nap['coordinates']['latitude'] . ', ' . $nap['coordinates']['longitude']
+					: '';
+
+				return self::describe( $key, $our_text, $their_text, $theirs['coordinates'], $available );
+
+			case 'service_area':
+				$their_places = $theirs['service_area'];
+				$location     = ! empty( $nap['location_id'] ) ? LocationRepository::find( (int) $nap['location_id'] ) : null;
+				$our_places   = $location && is_array( $location['service_area'] ) ? $location['service_area'] : array();
+				$names        = static function ( array $places ) {
+					return implode( ', ', array_column( $places, 'name' ) );
+				};
+
+				return self::describe(
+					$key,
+					$names( $our_places ),
+					$names( $their_places ),
+					$their_places,
+					(bool) $their_places,
+					ServiceArea::signature( ServiceArea::place_infos( $their_places ) ) !== ServiceArea::signature( ServiceArea::place_infos( $our_places ) )
+				);
+
+			case 'hours':
+				$available  = ! empty( $theirs['hours'] );
+				$their_text = $available ? self::hours_summary( $theirs['hours'] ) : '';
+				$our_text   = ! empty( $nap['hours']['period_count'] ) ? __( 'Already set', 'foundhint-local-seo' ) : '';
+				$differs    = $available && self::hours_signature( $theirs['hours'] ) !== self::stored_hours_signature( $nap );
+
+				return self::describe( $key, $our_text, $their_text, $theirs['hours'], $available, $differs );
+
+			case 'social':
+				$available  = ! empty( $theirs['social'] );
+				$their_text = $available ? implode( ', ', array_keys( $theirs['social'] ) ) : '';
+				$ours       = isset( $nap['social_profiles'] ) && is_array( $nap['social_profiles'] ) ? $nap['social_profiles'] : array();
+				$our_text   = $ours ? implode( ', ', array_keys( $ours ) ) : '';
+				$differs    = false;
+
+				foreach ( $theirs['social'] as $network => $url ) {
+					if ( ! isset( $ours[ $network ] ) || $ours[ $network ] !== $url ) {
+						$differs = true;
+					}
+				}
+
+				return self::describe( $key, $our_text, $their_text, $theirs['social'], $available, $differs );
+
+			case 'services':
+				$available = ! empty( $theirs['services'] );
+				$names     = array();
+
+				foreach ( $theirs['services'] as $service ) {
+					$names[] = $service['name'];
+				}
+
+				$their_text = $available
+					? sprintf(
+						/* translators: 1: number of services Google lists, 2: the first few names. */
+						__( '%1$d from Google: %2$s', 'foundhint-local-seo' ),
+						count( $names ),
+						implode( ', ', array_slice( $names, 0, 3 ) ) . ( count( $names ) > 3 ? '…' : '' )
+					)
+					: '';
+
+				$services_list = LocationDetails::services_list( ! empty( $nap['location_id'] ) ? LocationRepository::find( (int) $nap['location_id'] ) : null );
+				$count         = ServiceRepository::count( $services_list );
+				$our_text = $count
+					? sprintf(
+						/* translators: %d: how many services this site already has. */
+						_n( '%d service', '%d services', $count, 'foundhint-local-seo' ),
+						$count
+					)
+					: '';
+
+				$have = array();
+
+				foreach ( ServiceRepository::all( array( 'location_id' => $services_list ) ) as $service ) {
+					$have[ strtolower( trim( $service['name'] ) ) ] = true;
+				}
+
+				$missing = 0;
+
+				foreach ( $names as $service_name ) {
+					if ( ! isset( $have[ strtolower( trim( $service_name ) ) ] ) ) {
+						$missing++;
+					}
+				}
+
+				return self::describe( $key, $our_text, $their_text, $theirs['services'], $available, $missing > 0 );
+
+			case 'categories':
+				$their_categories = $theirs['categories'];
+				$available        = null !== $their_categories['primary'];
+				// Compared with what this listing's own location shows.
+				$ours             = LocationCategories::resolve(
+					! empty( $nap['location_id'] ) ? LocationRepository::find( (int) $nap['location_id'] ) : null,
+					BusinessRepository::get()
+				);
+				$our_categories   = array(
+					'primary'    => '' !== $ours['primary_category']
+						? array(
+							'id'   => $ours['primary_category_id'],
+							'name' => $ours['primary_category'],
+						)
+						: null,
+					'additional' => $ours['secondary_categories'],
+				);
+
+				return self::describe(
+					$key,
+					self::categories_text( $our_categories ),
+					$available ? self::categories_text( $their_categories ) : '',
+					$their_categories,
+					$available,
+					$available && self::categories_signature( $their_categories ) !== self::categories_signature( $our_categories )
+				);
+
+			case 'booking':
+				$their_links = $theirs['booking'];
+				$our_links   = LocationDetails::booking(
+					! empty( $nap['location_id'] ) ? LocationRepository::find( (int) $nap['location_id'] ) : null,
+					BusinessRepository::get()
+				);
+				$differs     = false;
+
+				foreach ( $their_links as $field => $link ) {
+					if ( ! BookingLinks::same( $field, $our_links[ $field ], BookingLinks::to_google( $field, $link ) ) ) {
+						$differs = true;
+					}
+				}
+
+				return self::describe(
+					$key,
+					implode( ', ', array_keys( array_filter( $our_links ) ) ),
+					implode( ', ', array_keys( $their_links ) ),
+					$their_links,
+					(bool) $their_links,
+					$differs
+				);
+
+			case 'additional_phones':
+				// One list, compared as numbers in any order, with what this
+				// listing's own location shows.
+				$their_phones = $theirs['additional_phones'];
+				$our_phones   = LocationDetails::additional_phones(
+					! empty( $nap['location_id'] ) ? LocationRepository::find( (int) $nap['location_id'] ) : null,
+					BusinessRepository::get()
+				);
+
+				return self::describe(
+					$key,
+					implode( ', ', $our_phones ),
+					implode( ', ', $their_phones ),
+					$their_phones,
+					(bool) $their_phones,
+					$their_phones && ! AdditionalPhones::same( $our_phones, $their_phones )
+				);
+
+			case 'opening_date':
+				// Compared to the month, with what this listing's own location
+				// shows: a branch with none of its own shows the business's.
+				$their_date = (string) $theirs['opening_date'];
+				$our_date   = LocationDetails::resolve(
+					! empty( $nap['location_id'] ) ? LocationRepository::find( (int) $nap['location_id'] ) : null,
+					BusinessRepository::get()
+				)['opening_date'];
+
+				return self::describe(
+					$key,
+					OpeningDate::for_screen( $our_date ),
+					OpeningDate::for_screen( $their_date ),
+					$their_date,
+					'' !== $their_date,
+					'' !== $their_date && ! OpeningDate::same_month( $our_date, $their_date )
+				);
+
+			case 'business_type':
+				$available  = '' !== $theirs['business_type'];
+				$their_text = $available
+					? sprintf(
+						/* translators: 1: Google's category name, 2: the schema.org type it maps to. */
+						__( '%1$s → %2$s', 'foundhint-local-seo' ),
+						$theirs['category'],
+						$theirs['business_type']
+					)
+					: '';
+				$our_text   = isset( $nap['business_type'] ) ? (string) $nap['business_type'] : '';
+				// Compared as types, not as the label: the screen shows
+				// "Pet store → PetStore", and that arrow is not a difference.
+				$differs    = $available && $our_text !== $theirs['business_type'];
+
+				return self::describe( $key, $our_text, $their_text, $theirs['business_type'], $available, $differs );
+		}
+
+		$their_value = isset( $theirs[ $key ] ) ? (string) $theirs[ $key ] : '';
+		$our_value   = isset( $nap[ $key ] ) ? (string) $nap[ $key ] : '';
+		$available   = '' !== trim( $their_value );
+
+		return self::describe( $key, $our_value, $their_value, $their_value, $available );
+	}
+
+	/**
+	 * Categories as one readable line: the main one, then the rest.
+	 *
+	 * @param array $categories `{ primary, additional }`.
+	 * @return string
+	 */
+	private static function categories_text( array $categories ) {
+		if ( empty( $categories['primary'] ) ) {
+			return '';
+		}
+
+		$names = array();
+
+		foreach ( $categories['additional'] as $category ) {
+			if ( is_array( $category ) && isset( $category['name'] ) ) {
+				$names[] = (string) $category['name'];
+			}
+		}
+
+		if ( ! $names ) {
+			return (string) $categories['primary']['name'];
+		}
+
+		return sprintf(
+			/* translators: 1: the main category, 2: a list of the additional categories. */
+			__( '%1$s, plus %2$s', 'foundhint-local-seo' ),
+			(string) $categories['primary']['name'],
+			implode( ', ', $names )
+		);
+	}
+
+	/**
+	 * Categories reduced to something two sides can be compared by.
+	 *
+	 * By id where there is one, since the same category is worded differently
+	 * from one language to the next; the additional ones are sorted, because
+	 * their order means nothing.
+	 *
+	 * @param array $categories `{ primary, additional }`.
+	 * @return string
+	 */
+	private static function categories_signature( array $categories ) {
+		$key = static function ( $category ) {
+			if ( ! is_array( $category ) ) {
+				return '';
+			}
+
+			return ! empty( $category['id'] ) ? (string) $category['id'] : 'name:' . strtolower( isset( $category['name'] ) ? (string) $category['name'] : '' );
+		};
+
+		$additional = array_map( $key, $categories['additional'] );
+
+		sort( $additional );
+
+		return $key( $categories['primary'] ) . '|' . implode( ',', $additional );
+	}
+
+	/**
+	 * Assemble a field, including whether to suggest it.
+	 *
+	 * @param string $key        Field key.
+	 * @param string $ours       Our value, for reading.
+	 * @param string $theirs     Google's value, for reading.
+	 * @param mixed  $theirs_raw Google's value, for writing.
+	 * @param bool   $available  Whether Google holds anything.
+	 * @return array
+	 */
+	private static function describe( $key, $ours, $theirs, $theirs_raw, $available, $differs = null ) {
+		$empty_here = '' === trim( (string) $ours );
+
+		// Text fields compare as text. Everything else — hours, services,
+		// social links — is summarised on screen, and two summaries saying
+		// different words is not a difference, so those pass their own
+		// answer in rather than being guessed at from the labels.
+		if ( null === $differs ) {
+			$differs = ! $empty_here && trim( (string) $ours ) !== trim( (string) $theirs );
+		}
+
+		$differs = ! $empty_here && (bool) $differs;
+
+		// Said out loud because it decides what a tick costs: a business
+		// field is shared by every location, so importing a branch's name
+		// would rename the whole business.
+		if ( in_array( $key, self::BUSINESS_FIELDS, true ) ) {
+			$scope = 'business';
+		} elseif ( 'services' === $key ) {
+			$scope = 'services';
+		} else {
+			$scope = 'location';
+		}
+
+		return array(
+			'key'        => $key,
+			'scope'      => $scope,
+			'ours'       => (string) $ours,
+			'theirs'     => (string) $theirs,
+			'theirs_raw' => $theirs_raw,
+			'available'  => (bool) $available,
+			'empty_here' => $empty_here,
+			'differs'    => $differs,
+			// Empty here and Google has it: nothing to lose, so it is ticked.
+			// Anything already filled in is the operator's call.
+			'suggested'  => (bool) $available && $empty_here,
+		);
+	}
+
+	/**
+	 * A street, town and postcode, reduced to something comparable.
+	 *
+	 * Formatting, punctuation and case differ between any two sources; a
+	 * different doorway does not.
+	 *
+	 * @param array $address Address parts.
+	 * @return string
+	 */
+	private static function address_key( array $address ) {
+		$parts = array(
+			isset( $address['address_line_1'] ) ? $address['address_line_1'] : '',
+			isset( $address['city'] ) ? $address['city'] : '',
+			isset( $address['postal_code'] ) ? $address['postal_code'] : '',
+		);
+
+		$key = strtolower( preg_replace( '/[^\p{L}\p{N}]+/u', '', implode( '', $parts ) ) );
+
+		return (string) $key;
+	}
+
+	/**
+	 * Google's week, as one comparable string.
+	 *
+	 * @param array $hours Payload-shaped hours.
+	 * @return string
+	 */
+	private static function hours_signature( array $hours ) {
+		$periods = isset( $hours['periods'] ) ? $hours['periods'] : array();
+		$parts   = array();
+
+		foreach ( $periods as $period ) {
+			$parts[] = self::period_signature( $period );
+		}
+
+		sort( $parts );
+
+		return implode( '|', $parts );
+	}
+
+	/**
+	 * This site's week, as the same comparable string.
+	 *
+	 * @param array $nap Resolved FoundHint values.
+	 * @return string
+	 */
+	private static function stored_hours_signature( array $nap ) {
+		$days  = isset( $nap['hours']['days'] ) && is_array( $nap['hours']['days'] ) ? $nap['hours']['days'] : array();
+		$parts = array();
+
+		foreach ( $days as $day ) {
+			if ( empty( $day['configured'] ) ) {
+				continue;
+			}
+
+			foreach ( $day['periods'] as $period ) {
+				$period['day_of_week'] = $day['day_of_week'];
+				$parts[]               = self::period_signature( $period );
+			}
+		}
+
+		sort( $parts );
+
+		return implode( '|', $parts );
+	}
+
+	/**
+	 * One period, as text that can be compared across both shapes.
+	 *
+	 * @param array $period Period row.
+	 * @return string
+	 */
+	private static function period_signature( array $period ) {
+		$day = isset( $period['day_of_week'] ) ? (int) $period['day_of_week'] : 0;
+
+		if ( ! empty( $period['is_closed'] ) ) {
+			return $day . ':closed';
+		}
+
+		if ( ! empty( $period['is_24h'] ) ) {
+			return $day . ':24h';
+		}
+
+		return $day . ':' . substr( (string) $period['open_time'], 0, 5 ) . '-' . substr( (string) $period['close_time'], 0, 5 );
+	}
+
+	/**
+	 * Opening hours as one readable line.
+	 *
+	 * @param array $hours Payload-shaped hours.
+	 * @return string
+	 */
+	private static function hours_summary( array $hours ) {
+		$periods = isset( $hours['periods'] ) ? $hours['periods'] : array();
+		$open    = 0;
+		$closed  = 0;
+
+		foreach ( $periods as $period ) {
+			if ( ! empty( $period['is_closed'] ) ) {
+				$closed++;
+				continue;
+			}
+
+			$open++;
+		}
+
+		return sprintf(
+			/* translators: 1: number of days with opening times, 2: number of closed days. */
+			__( '%1$d days with hours, %2$d closed', 'foundhint-local-seo' ),
+			$open,
+			$closed
+		);
+	}
+}

@@ -49,7 +49,7 @@ class Business extends AbstractController {
 				array(
 					'methods'             => 'POST, PUT, PATCH',
 					'callback'            => array( $this, 'update_item' ),
-					'permission_callback' => array( $this, 'permissions_check' ),
+					'permission_callback' => array( $this, 'google_write_check' ),
 					'args'                => $this->write_args(),
 				),
 			)
@@ -154,6 +154,7 @@ class Business extends AbstractController {
 				'legal_name'           => array( 'type' => 'string' ),
 				'business_type'        => array( 'type' => 'string' ),
 				'primary_category'     => array( 'type' => 'string' ),
+				'primary_category_id'  => array( 'type' => 'string' ),
 				'secondary_categories' => array( 'type' => array( 'array', 'string' ) ),
 				'description'          => array( 'type' => 'string' ),
 				'logo_attachment_id'   => array(
@@ -162,11 +163,16 @@ class Business extends AbstractController {
 				),
 				'logo_url'             => array( 'type' => 'string' ),
 				'phone'                => array( 'type' => 'string' ),
+				'additional_phones'    => array(
+					'type'  => 'array',
+					'items' => array( 'type' => 'string' ),
+				),
 				'email'                => array( 'type' => 'string' ),
 				'website'              => array( 'type' => 'string' ),
 				'price_range'          => array( 'type' => 'string' ),
 				'founding_date'        => array( 'type' => 'string' ),
 				'social_profiles'      => array( 'type' => 'object' ),
+				'booking_links'        => array( 'type' => 'object' ),
 			)
 		);
 	}

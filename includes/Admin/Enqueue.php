@@ -7,6 +7,9 @@
 
 namespace FHINT\Admin;
 
+use FHINT\App\Business\Business;
+use FHINT\App\Location\Location;
+use FHINT\App\Service\Service;
 use FHINT\Libs\Assets;
 
 defined( 'ABSPATH' ) || exit;
@@ -15,8 +18,8 @@ defined( 'ABSPATH' ) || exit;
  * Enqueues the admin-side React SPA bundle (Vite build) and its Tailwind CSS.
  *
  * Gated on the exact WP-assigned hook suffix for our own top-level page
- * (`toplevel_page_` . Menu::SLUG — the standard suffix WordPress assigns
- * when the first submenu shares the top-level slug, see Menu.php) so this
+ * (`toplevel_page_` . Menu::SLUG — the suffix `add_menu_page()` assigns to
+ * a top-level page, see Menu.php) so this
  * bundle never appears on any other admin page or the front end.
  * wp_localize_script exposes PHP data to the React app as window.FHINT,
  * read directly by src/admin/store/api/baseApi.js.
@@ -74,6 +77,17 @@ class Enqueue {
 
 		wp_localize_script( self::SCRIPT_HANDLE, self::LOCALIZE_OBJ_NAME, self::bootstrap_data() );
 
+		// Without this every __() in the React app silently stays English:
+		// WordPress has no way to know which script carries which text
+		// domain, so a translation file is loaded for nobody.
+		if ( function_exists( 'wp_set_script_translations' ) ) {
+			wp_set_script_translations(
+				self::SCRIPT_HANDLE,
+				'foundhint-local-seo',
+				FHINT_PATH . 'languages'
+			);
+		}
+
 		if ( function_exists( 'wp_enqueue_media' ) ) {
 			wp_enqueue_media();
 		}
@@ -95,8 +109,15 @@ class Enqueue {
 	/**
 	 * First-paint bootstrap data for the React app.
 	 *
-	 * Never put secrets here — it lands in page source. Extend this array as
-	 * new pages need bootstrap data (business/location ids, limits, etc.).
+	 * Never put secrets here — it lands in page source.
+	 *
+	 * `reference` carries the option lists the forms need to render their
+	 * selects. They live here rather than in a REST response because they
+	 * are static for the request and the same on every screen, so shipping
+	 * them with the page avoids a round trip before a form can paint. They
+	 * must come from the server rather than being duplicated in JavaScript:
+	 * the business type list is filterable (`fhint_business_types`), and a
+	 * hardcoded copy would let the form offer a type the server rejects.
 	 *
 	 * @return array
 	 */
@@ -106,6 +127,29 @@ class Enqueue {
 			'rest_nonce' => wp_create_nonce( 'wp_rest' ),
 			'plugin_url' => FHINT_URL,
 			'version'    => FHINT_VERSION,
+			'reference'  => array(
+				'business_types'    => Business::types(),
+				'location_statuses' => Location::statuses(),
+				'service_statuses'  => Service::statuses(),
+				'timezones'         => timezone_identifiers_list(),
+				'currency'          => self::default_currency(),
+			),
 		);
+	}
+
+	/**
+	 * A sensible default currency for new services.
+	 *
+	 * WordPress has no currency setting of its own, so this only offers a
+	 * starting point the operator can change; the value is never forced.
+	 *
+	 * @return string
+	 */
+	private static function default_currency() {
+		if ( function_exists( 'get_woocommerce_currency' ) ) {
+			return (string) get_woocommerce_currency();
+		}
+
+		return '';
 	}
 }

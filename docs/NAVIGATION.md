@@ -28,9 +28,10 @@ FoundHint
 
 This is a subset of the full proposed tree — Landing Pages, Ranking Grid,
 Performance, and a standalone Recommendations screen are proposed but not
-yet wired into `Menu.php` or `routes.jsx`. Add them together in both places
-(the WP submenu entry and the `react-router` route) as those modules get
-built — they must stay in sync, per CLAUDE.md.
+yet built. The tree lives in the plugin's own sidebar
+(`src/admin/layouts/root/components/Sidebar.jsx`) and `routes.jsx`;
+WordPress itself shows a single FoundHint menu entry with no submenus,
+which opens the dashboard.
 
 ## Free/Pro gating pattern (from the prototype, apply when Pro exists)
 

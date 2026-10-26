@@ -302,13 +302,16 @@ check( isset( $svc->errors()['currency'] ), 'a non-ISO currency is rejected' );
 
 // -- Limits ----------------------------------------------------------------
 
-check_same( 1, Limits::get( Limits::LOCATIONS ), 'free allows one location' );
-check_same( 5, Limits::get( Limits::SERVICES ), 'free allows five services' );
+// A business with branches is an ordinary small business, and importing its
+// Google profiles creates a location each, so neither is capped. 0 is
+// unlimited.
+check_same( 0, Limits::get( Limits::LOCATIONS ), 'locations are not capped' );
+check_same( 0, Limits::get( Limits::SERVICES ), 'and neither are services' );
 check( Limits::can_add( Limits::LOCATIONS, 0 ), 'the first location is allowed' );
-check( ! Limits::can_add( Limits::LOCATIONS, 1 ), 'a second location is refused' );
+check( Limits::can_add( Limits::LOCATIONS, 50 ), 'and so is the fifty-first' );
 
-// Raising a limit must be a filter, not a code change — this is what stops a
-// Pro tier having to rewrite core.
+// Capping is still a filter, not a code change — which is what lets a plan
+// impose one without rewriting core.
 add_filter(
 	'fhint_limits',
 	static function ( $limits ) {
@@ -316,8 +319,8 @@ add_filter(
 		return $limits;
 	}
 );
-check_same( 5, Limits::get( Limits::LOCATIONS ), 'the limits filter raises the ceiling' );
-check( Limits::can_add( Limits::LOCATIONS, 1 ), 'a second location is allowed once filtered' );
+check_same( 5, Limits::get( Limits::LOCATIONS ), 'the limits filter can impose a ceiling' );
+check( ! Limits::can_add( Limits::LOCATIONS, 5 ), 'which is then enforced' );
 
 $report = Limits::report( Limits::LOCATIONS, 2 );
 check_same( 3, $report['remaining'], 'the limit report counts what is left' );
@@ -339,5 +342,155 @@ check_same( '[redacted]', $redacted['client_secret'], 'redacts a client secret' 
 check_same( '[redacted]', $redacted['Authorization'], 'redacts regardless of case' );
 check_same( 'not a secret', $redacted['monkey'], 'does not redact a word merely containing "key"' );
 check_same( 'a@b.com', $redacted['google']['account'], 'leaves non-secret values intact' );
+
+// -- Opening date ------------------------------------------------------------
+//
+// Kept to the month, as Google shows it: stored on the first of the month,
+// shown as YYYY-MM, sent to Google as a year and a month with no day.
+
+use FHINT\App\Business\OpeningDate;
+
+$fhint_now = gmmktime( 12, 0, 0, 10, 18, 2026 );
+
+check_same( '2014-03-01', OpeningDate::sanitize( '2014-03' ), 'a month from the month field is stored on its first day' );
+check_same( '2014-03-01', OpeningDate::sanitize( '2014-03-15' ), 'a full date is kept to its month' );
+check_same( '', OpeningDate::sanitize( '  ' ), 'blank is no date' );
+check_same( 'March 2014', OpeningDate::sanitize( 'March 2014' ), 'text that is not a date is kept as sent, for validation to name' );
+check_same( '2014-02-30', OpeningDate::sanitize( '2014-02-30' ), 'and so is a day that does not exist' );
+
+check( OpeningDate::validate( '' )->is_valid(), 'no date is allowed' );
+check( OpeningDate::validate( '2014-03-01', $fhint_now )->is_valid(), 'a past month is allowed' );
+check_same( array( 'opening_date' => array( 'opening_date.invalid' ) ), OpeningDate::validate( 'March 2014', $fhint_now )->errors(), 'a value that is not a month is refused' );
+check_same( array( 'opening_date' => array( 'opening_date.invalid' ) ), OpeningDate::validate( '2014-13-01', $fhint_now )->errors(), 'and so is month 13' );
+check_same( array( 'opening_date' => array( 'opening_date.invalid' ) ), OpeningDate::validate( '0999-01-01', $fhint_now )->errors(), 'and a year before 1000' );
+
+// Google takes a date up to a year ahead, for a business about to open.
+check( OpeningDate::validate( '2027-10-01', $fhint_now )->is_valid(), 'a month exactly a year ahead is allowed' );
+check_same( array( 'opening_date' => array( 'opening_date.too_far' ) ), OpeningDate::validate( '2027-11-01', $fhint_now )->errors(), 'one month more is too far ahead' );
+
+check_same( '2014-03', OpeningDate::for_screen( '2014-03-01' ), 'the screen shows a month' );
+check_same( '', OpeningDate::for_screen( null ), 'and nothing for no date' );
+
+check_same( '2014-03-01', OpeningDate::from_google( array( 'year' => 2014, 'month' => 3, 'day' => 15 ) ), "Google's date is kept to the month" );
+check_same( '2014-03-01', OpeningDate::from_google( array( 'year' => 2014, 'month' => 3 ) ), 'including one with no day' );
+check_same( '', OpeningDate::from_google( array( 'year' => 2014 ) ), 'a year alone is not enough' );
+check_same( '', OpeningDate::from_google( array( 'year' => 2014, 'month' => 13 ) ), 'nor is a month that does not exist' );
+check_same( '', OpeningDate::from_google( null ), 'and no date is no date' );
+
+check_same( array( 'year' => 2014, 'month' => 3 ), OpeningDate::to_google( '2014-03-01' ), 'sent to Google as a year and a month, with no day' );
+check_same( array(), OpeningDate::to_google( '' ), 'and nothing is sent for no date' );
+
+check( OpeningDate::same_month( '2014-03-01', '2014-03-15' ), 'two days in one month are the same month' );
+check( ! OpeningDate::same_month( '2014-03-01', '2014-04-01' ), 'two months are not' );
+
+// -- Additional phone numbers ------------------------------------------------
+
+use FHINT\App\Business\AdditionalPhones;
+
+check_same( array( '(512) 555-0199', '01700-000002' ), AdditionalPhones::sanitize( array( ' (512) 555-0199 ', '', '+1 512 555 0199', '01700-000002' ) ), 'blanks and repeats are dropped, the order kept, however a number is written' );
+check_same( array(), AdditionalPhones::sanitize( 'not a list' ), 'anything but a list is no numbers' );
+check_same( array( 'a', 'b', 'c' ), AdditionalPhones::sanitize( array( 'a', 'b', 'c' ) ), 'a list that is too long is kept whole, for validation to refuse' );
+
+check( AdditionalPhones::validate( array( '(512) 555-0199', '01700-000002' ), '(512) 555-0148' )->is_valid(), 'two real numbers beside a different main one are allowed' );
+check_same( array( 'additional_phones' => array( 'business.additional_phones.too_many' ) ), AdditionalPhones::validate( array( '01700-000001', '01700-000002', '01700-000003' ) )->errors(), 'a third is too many — Google keeps two' );
+check_same( array( 'additional_phones.1' => array( 'business.phone.invalid' ) ), AdditionalPhones::validate( array( '01700-000001', 'call us' ) )->errors(), 'a number that is not one is refused on its own box' );
+check_same( array( 'additional_phones.0' => array( 'business.additional_phones.same_as_main' ) ), AdditionalPhones::validate( array( '+1 512 555 0148' ), '(512) 555-0148' )->errors(), 'and so is the main number again, written differently' );
+
+check_same( array( '01700-000002' ), AdditionalPhones::from_google( array( 'primaryPhone' => '01700-000001', 'additionalPhones' => array( '01700-000002' ) ) ), "Google's extra numbers are read without the main one" );
+check_same( array(), AdditionalPhones::from_google( array( 'primaryPhone' => '01700-000001' ) ), 'a listing with none gives none' );
+
+check( AdditionalPhones::same( array( '(512) 555-0199', '01700-000002' ), array( '01700 000002', '+1 512 555 0199' ) ), 'two lists of the same numbers are the same, in any order and format' );
+check( ! AdditionalPhones::same( array( '01700-000002' ), array( '01700-000002', '01700-000003' ) ), 'one number more is not' );
+
+// -- Booking links -----------------------------------------------------------
+
+use FHINT\App\Business\BookingLinks;
+
+$fhint_links = BookingLinks::sanitize(
+	array(
+		'appointment'    => ' https://book.example.com/foundhint ',
+		'text_messaging' => '+880 1712-345678',
+		'whatsapp'       => 'https://wa.me/8801712345678',
+		'unknown'        => 'dropped',
+	)
+);
+
+check_same(
+	array(
+		'appointment'    => 'https://book.example.com/foundhint',
+		'text_messaging' => '+8801712345678',
+		'whatsapp'       => 'https://wa.me/8801712345678',
+	),
+	$fhint_links,
+	'links are cleaned, the texting number to + and digits, an unknown key dropped'
+);
+check( BookingLinks::validate( $fhint_links )->is_valid(), 'and they are all allowed' );
+check( BookingLinks::validate( BookingLinks::sanitize( array() ) )->is_valid(), 'no links at all are allowed' );
+check_same( 'not a link', BookingLinks::sanitize( array( 'appointment' => 'not a link' ) )['appointment'], 'text that is not a link is kept as typed, not turned into one' );
+
+check_same( array( 'booking_links.appointment' => array( 'booking.appointment.invalid' ) ), BookingLinks::validate( array( 'appointment' => 'not a link' ) )->errors(), 'an appointment link must be a web address' );
+check_same( array( 'booking_links.appointment' => array( 'booking.appointment.invalid' ) ), BookingLinks::validate( array( 'appointment' => 'https://localhost' ) )->errors(), 'with a real host name' );
+check_same( array( 'booking_links.text_messaging' => array( 'booking.text_messaging.invalid' ) ), BookingLinks::validate( BookingLinks::sanitize( array( 'text_messaging' => '01712345678' ) ) )->errors(), 'a texting number needs its country code' );
+check_same( array( 'booking_links.text_messaging' => array( 'booking.text_messaging.invalid' ) ), BookingLinks::validate( array( 'text_messaging' => '+1234' ) )->errors(), 'and enough digits' );
+check_same( array( 'booking_links.whatsapp' => array( 'booking.whatsapp.invalid' ) ), BookingLinks::validate( array( 'whatsapp' => 'https://example.com/chat' ) )->errors(), 'a WhatsApp link must go to WhatsApp' );
+check( BookingLinks::validate( array( 'whatsapp' => 'https://api.whatsapp.com/send?phone=8801712345678' ) )->is_valid(), 'api.whatsapp.com counts' );
+
+check_same( 'sms:+8801712345678', BookingLinks::to_google( 'text_messaging', '+8801712345678' ), 'the texting number is sent as an sms: link, as Google documents' );
+check_same( 'https://wa.me/1', BookingLinks::to_google( 'whatsapp', 'https://wa.me/1' ), 'other links are sent as they are' );
+
+check_same(
+	array( 'text_messaging' => '+8801712345678', 'whatsapp' => 'https://wa.me/8801712345678' ),
+	BookingLinks::from_google(
+		array(
+			'attributes' => array(
+				array( 'name' => 'attributes/url_text_messaging', 'uriValues' => array( array( 'uri' => 'sms:+8801712345678' ) ) ),
+				array( 'name' => 'attributes/url_whatsapp', 'uriValues' => array( array( 'uri' => 'https://wa.me/8801712345678' ) ) ),
+				array( 'name' => 'attributes/url_facebook', 'uriValues' => array( array( 'uri' => 'https://facebook.com/x' ) ) ),
+				array( 'name' => 'attributes/url_appointment', 'uriValues' => array() ),
+			),
+		)
+	),
+	"Google's links are read without the sms: prefix, and only the three booking ones"
+);
+
+check( BookingLinks::same( 'text_messaging', '+8801712345678', 'sms:01712345678' ), 'a texting number Google holds nationally is the same number' );
+check( BookingLinks::same( 'whatsapp', 'https://wa.me/1', 'http://wa.me/1/' ), 'links compare as addresses' );
+
+// -- Service area ------------------------------------------------------------
+
+use FHINT\App\Location\ServiceArea;
+
+$fhint_area = ServiceArea::sanitize(
+	array(
+		'Austin, TX',
+		array( 'name' => 'Round Rock, TX', 'place_id' => 'ChIJ-round_rock' ),
+		'  austin,   tx ',
+		'',
+		array( 'name' => 'Cedar Park, TX', 'place_id' => 'bad id!*' ),
+	)
+);
+
+check_same(
+	array(
+		array( 'name' => 'Austin, TX', 'place_id' => '' ),
+		array( 'name' => 'Round Rock, TX', 'place_id' => 'ChIJ-round_rock' ),
+		array( 'name' => 'Cedar Park, TX', 'place_id' => '' ),
+	),
+	$fhint_area,
+	'places are names with an optional place id; blanks and repeats dropped, ignoring case and spacing, and an id that is not one dropped'
+);
+check( ServiceArea::validate( $fhint_area )->is_valid(), 'and they are allowed' );
+check_same( array( 'service_area' => array( 'service_area.too_many' ) ), ServiceArea::validate( ServiceArea::sanitize( array_map( static function ( $i ) { return 'Place ' . $i; }, range( 1, 21 ) ) ) )->errors(), 'a 21st place is too many — Google keeps 20' );
+check( ServiceArea::validate( ServiceArea::sanitize( array_map( static function ( $i ) { return 'Place ' . $i; }, range( 1, 20 ) ) ) )->is_valid(), 'twenty is allowed' );
+check_same( array( 'service_area.0' => array( 'service_area.name.too_long' ) ), ServiceArea::validate( ServiceArea::sanitize( array( str_repeat( 'a', 151 ) ) ) )->errors(), 'a name over 150 characters is refused on its own chip' );
+
+check_same(
+	array( array( 'name' => 'Austin, TX', 'place_id' => 'ChIJ-austin' ) ),
+	ServiceArea::from_google( array( 'businessType' => 'CUSTOMER_AND_BUSINESS_LOCATION', 'places' => array( 'placeInfos' => array( array( 'placeName' => 'Austin, TX', 'placeId' => 'ChIJ-austin' ) ) ) ) ),
+	"Google's places are read with their ids"
+);
+check_same( array(), ServiceArea::from_google( null ), 'a listing with no service area gives none' );
+check_same( array( array( 'placeName' => 'Round Rock, TX', 'placeId' => 'ChIJ-round_rock' ) ), ServiceArea::place_infos( $fhint_area ), 'only places with an id can go to Google' );
+check_same( array( 'Austin, TX', 'Cedar Park, TX' ), ServiceArea::typed_only( $fhint_area ), 'a place typed here, with no id, cannot' );
 
 finish( 'Domain logic' );

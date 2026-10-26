@@ -42,7 +42,8 @@ class CreateLogsTable {
 	 *
 	 * @param string $prefix          Database table prefix.
 	 * @param string $charset_collate Charset/collation clause.
-	 * @return void
+	 * @return array Whatever dbDelta changed — empty when the table was
+	 *               already up to date, which is the idempotency check.
 	 */
 	public static function up( $prefix, $charset_collate ) {
 		$table = $prefix . 'fhint_' . Tables::LOGS;
@@ -68,6 +69,6 @@ class CreateLogsTable {
 	KEY created_at (created_at)
 ) {$charset_collate};";
 
-		dbDelta( $sql );
+		return dbDelta( $sql );
 	}
 }

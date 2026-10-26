@@ -7,8 +7,18 @@
 
 namespace FHINT;
 
+use FHINT\API\Audits;
 use FHINT\API\Business;
+use FHINT\API\Dashboard;
+use FHINT\API\Google;
+use FHINT\API\GoogleCategories;
 use FHINT\API\Locations;
+use FHINT\API\Onboarding;
+use FHINT\API\Profile;
+use FHINT\API\ProfileGoogle;
+use FHINT\API\ProfilePublish;
+use FHINT\API\Reviews;
+use FHINT\API\Schema;
 use FHINT\API\Services;
 use FHINT\API\Settings;
 
@@ -36,8 +46,18 @@ class API {
 	 * @return void
 	 */
 	public static function init() {
+		Audits::init();
 		Business::init();
+		Dashboard::init();
+		Google::init();
+		GoogleCategories::init();
 		Locations::init();
+		Onboarding::init();
+		Profile::init();
+		ProfileGoogle::init();
+		ProfilePublish::init();
+		Reviews::init();
+		Schema::init();
 		Services::init();
 		Settings::init();
 	}
