@@ -5,6 +5,7 @@ import { useGetBusinessQuery } from "@/store/api/businessApi";
 import { useGetLocationsQuery } from "@/store/api/locationsApi";
 import { useGetServicesQuery } from "@/store/api/servicesApi";
 import { SelectedLocationProvider } from "@/context/SelectedLocation";
+import { HeaderActionsProvider } from "@/context/HeaderActions";
 import { _n, sprintf } from "@wordpress/i18n";
 import { Outlet } from "react-router";
 import Sidebar from "./components/Sidebar";
@@ -49,16 +50,18 @@ export const RootLayout = () => {
     <TooltipProvider delay={100}>
       {/* One location for every screen; the bar at the top switches it. */}
       <SelectedLocationProvider>
-        <div className="fhint:flex fhint:min-h-[calc(100vh-32px)] fhint:border-t fhint:border-t-border fhint:bg-background fhint:font-sans fhint:text-foreground">
-          <Sidebar counts={counts} />
-          <main className="fhint:min-w-0 fhint:flex-1">
-            <LocationBar />
-            <div className="fhint:mx-auto fhint:flex fhint:flex-col fhint:gap-6 fhint:px-4 fhint:py-6">
-              <Outlet />
-            </div>
-          </main>
-          <Toaster position="bottom-right" richColors />
-        </div>
+        <HeaderActionsProvider>
+          <div className="fhint:flex fhint:min-h-[calc(100vh-32px)] fhint:border-t fhint:border-t-border fhint:bg-background fhint:font-sans fhint:text-foreground">
+            <Sidebar counts={counts} />
+            <main className="fhint:min-w-0 fhint:flex-1">
+              <LocationBar />
+              <div className="fhint:mx-auto fhint:flex fhint:flex-col fhint:gap-6 fhint:px-4 fhint:py-6">
+                <Outlet />
+              </div>
+            </main>
+            <Toaster position="bottom-right" richColors />
+          </div>
+        </HeaderActionsProvider>
       </SelectedLocationProvider>
     </TooltipProvider>
   );

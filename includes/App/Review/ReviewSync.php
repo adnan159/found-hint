@@ -154,9 +154,10 @@ class ReviewSync {
 		} while ( '' !== $token && $pages < self::MAX_PAGES );
 
 		// A review Google no longer returns has been deleted or taken down.
-		// Leaving it behind would keep it in a count the owner is judged on,
-		// and would show them a review that no longer exists anywhere.
-		ReviewRepository::delete_for_location( $location_name, $seen );
+		// It is kept, marked removed, so the owner can still see it — but out
+		// of every count and average, which must not judge them on a review
+		// that no longer exists anywhere.
+		ReviewRepository::mark_removed_for_location( $location_name, $seen );
 
 		return count( $seen );
 	}

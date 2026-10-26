@@ -13,16 +13,28 @@ import { baseApi, withQuery } from "./baseApi";
  */
 export const reviewsApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
+    // One page of a location's reviews, filtered. `rating` 0 is any;
+    // `replied` '' | 'replied' | 'not_replied'; `status` 'all' | 'live' |
+    // 'edited' | 'removed' ('' leaves removed reviews out); `perPage` 0
+    // returns every match, which is what the CSV export asks for.
     getReviews: builder.query({
       query: ({
         locationName = "",
         unanswered = false,
+        rating = 0,
+        replied = "",
+        status = "",
+        search = "",
         perPage = 20,
         offset = 0,
       } = {}) =>
         withQuery("/reviews", {
           location_name: locationName,
           unanswered: unanswered ? 1 : 0,
+          rating,
+          replied,
+          status,
+          search,
           per_page: perPage,
           offset,
         }),
@@ -79,6 +91,7 @@ export const reviewsApi = baseApi.injectEndpoints({
 
 export const {
   useGetReviewsQuery,
+  useLazyGetReviewsQuery,
   useGetReviewStateQuery,
   useSyncReviewsMutation,
   useSaveReviewReplyMutation,

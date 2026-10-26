@@ -19,6 +19,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import BrandCheckbox from "@/components/BrandCheckbox";
 import RequestError from "@/components/RequestError";
 import SectionCard from "@/components/SectionCard";
 import {
@@ -288,16 +289,14 @@ export function ImportFromGoogle({ isConnected }) {
                   return (
                     <TableRow key={field.key}>
                       <TableCell>
-                        <input
+                        <BrandCheckbox
                           id={inputId}
-                          type="checkbox"
-                          className="fhint:size-4 fhint:cursor-pointer fhint:accent-primary fhint:disabled:cursor-not-allowed"
                           checked={Boolean(chosen[field.key])}
                           disabled={!field.available}
-                          onChange={(event) =>
+                          onCheckedChange={(on) =>
                             setChosen((current) => ({
                               ...current,
-                              [field.key]: event.target.checked,
+                              [field.key]: Boolean(on),
                             }))
                           }
                         />

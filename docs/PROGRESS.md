@@ -1770,3 +1770,64 @@ the fix workflow's preview-and-confirm step, which the doc promises but the
 plugin does not have (a fix applies on its button and the audit re-runs).
 The plugin header's name and description now match the readme. The doc's
 Free/Pro split is not reflected yet; that decision is deferred.
+
+## Step 55 — Reviews screen redesigned
+
+To the "FoundHint Reviews" design; "At a glance" and "Every review" (and
+their menu entries) are gone.
+
+**Built (real):**
+- **Filters** — rating, reply status, review status (live / edited /
+  removed by reviewer) and search (name or words, debounced), server-side
+  (`ReviewRepository::where()`; `%`/`_` matched literally).
+- **Pagination** — 10 per page by default (10/25/50/100), "Showing x to y of
+  N", Previous / pages / Next; a filter or location change goes back to page
+  1 and clears the selection.
+- **Reviewer photos** — Google sends `profilePhotoUrl` for every review and
+  it was stored but never drawn; now shown (no referrer), initials fallback.
+- **Removed reviews** — a sync no longer deletes a review Google stopped
+  returning: `reviews.removed_at` (DB 0.17.0) marks it, it stays readable
+  under "Removed by reviewer", is excluded from counts/averages/"waiting",
+  and cannot be replied to (409 `fhint_review_removed`, checked before any
+  request to Google). It revives if Google returns it.
+- **Edited** — `updateTime` more than 60 s after `createTime`
+  (`EDIT_GRACE_SECONDS`): replies do not move `updateTime`, and Google
+  stamps some untouched reviews seconds late.
+- **Reply dialog** — review quoted, quick templates for the rating, a
+  working **Built-in reply** (per-rating text, placeholders filled, first
+  name tidied), byte counter /4,096, Publish / Update; edit and delete
+  (confirmed) from the card.
+- **Sync reviews** in the top bar, via a new header-actions slot
+  (`context/HeaderActions.jsx`) any screen can portal buttons into.
+- **Export CSV** — the filtered set (or the selection), UTF-8 with BOM,
+  formula-leading cells neutralised.
+
+**Drawn, not yet working:** auto-reply banner + Set up dialog (coming soon,
+Save disabled), AI suggestion (coming soon), reply templates card + editor
+(Pro: sample templates, insertable placeholders, Save/Import disabled),
+bulk actions, email alerts and AI reply history (coming soon).
+
+Verified on the real built bundle against a mocked API built from the live
+site's own REST responses (the browser pane was logged out): filters,
+paging, statuses, reply publish, sync, dialogs and the export file.
+Integration: 651 checks; each new rule mutation-tested.
+
+## Step 56 — Customer photos on reviews
+
+Google sends the photos a customer attached as `reviewMediaItems[].thumbnailUrl`;
+they were stored in the review's `payload` but never read.
+
+- `ReviewMapper::photos()` reads them — `https` on `*.googleusercontent.com`
+  only — and gives each a `full` address (size suffix → `=s1600`).
+  `ReviewRepository::to_array()` adds `photos` to every review. No schema
+  change: the data was already stored.
+- `ReviewPhotos` shows 80px thumbnails under the comment (no referrer, a
+  photo that fails to load is dropped); a click opens it large in the
+  Reviews dialog frame, with Previous / Next when there are several, and
+  falls back to the thumbnail if the large size will not load.
+
+Smoke: 6 new checks (host filter, suffix swap, junk input); integration:
+the listing carries photos. Both mutation-tested. Verified on the real
+bundle against re-captured REST data: the pet-shop review shows its photo
+(384×512 thumbnail, 900×1200 in the viewer).
+

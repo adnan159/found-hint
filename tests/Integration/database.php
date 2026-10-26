@@ -1376,6 +1376,20 @@ check_same( 5, $stored['star_rating'], 'the rating round-trips' );
 check_same( 'Same-day repair.', $stored['comment'], 'the comment round-trips' );
 check_same( '2026-09-14 09:12:00', $stored['reviewed_at'], 'the review date round-trips' );
 check( null === $stored['replied_at'], 'an unanswered review stores no reply date' );
+check_same( array(), $stored['photos'], 'a review without photos lists none' );
+
+// Customer photos are read back out of the stored Google response.
+ReviewRepository::upsert(
+	fhint_review_row(
+		array(
+			'review_id' => 'rev-photo',
+			'payload'   => array( 'reviewMediaItems' => array( array( 'thumbnailUrl' => 'https://lh3.googleusercontent.com/grass-cs/P1=k-no' ) ) ),
+		)
+	)
+);
+$fhint_listed = array_values( array_filter( ReviewRepository::all(), function ( $row ) { return 'rev-photo' === $row['review_id']; } ) );
+check_same( 'https://lh3.googleusercontent.com/grass-cs/P1=s1600', $fhint_listed[0]['photos'][0]['full'] ?? '', 'the listing carries a review\'s photos' );
+$GLOBALS['wpdb']->delete( FHINT\Database\Tables::name( FHINT\Database\Tables::REVIEWS ), array( 'review_id' => 'rev-photo' ) );
 
 // Upserting on Google's id is what keeps a re-read from multiplying rows.
 ReviewRepository::upsert( fhint_review_row( array( 'reply_comment' => 'Thank you!' ) ) );
@@ -1431,6 +1445,109 @@ $listing = ReviewService::listing();
 check_same( 1, count( $listing['items'] ), 'the listing returns the stored review' );
 check( $listing['items'][0]['needs_reply'], 'and marks it as needing a reply' );
 check_same( 1, $listing['total'], 'with a total that ignores paging' );
+
+// -- Filtering, paging, edited and removed reviews ----------------------------
+
+ReviewRepository::truncate();
+
+$fhint_reviews = array(
+	array( 'review_id' => 'f-1', 'reviewer_name' => 'Priya Natarajan', 'star_rating' => 5, 'comment' => 'Seen by 9:30, great team.', 'reply_comment' => '', 'reviewed_at' => '2026-09-30 08:00:00', 'review_updated_at' => '2026-09-30 08:00:00' ),
+	array( 'review_id' => 'f-2', 'reviewer_name' => 'Marcus Thompson', 'star_rating' => 4, 'comment' => 'Parking is tricky.', 'reply_comment' => 'Thanks Marcus!', 'reviewed_at' => '2026-09-26 08:00:00', 'review_updated_at' => '2026-09-26 08:00:00' ),
+	array( 'review_id' => 'f-3', 'reviewer_name' => 'Dana Whitfield', 'star_rating' => 2, 'comment' => 'Waited 40 minutes.', 'reply_comment' => '', 'reviewed_at' => '2026-09-21 08:00:00', 'review_updated_at' => '2026-09-25 10:00:00' ),
+	// Updated six seconds after it was written: not an edit.
+	array( 'review_id' => 'f-4', 'reviewer_name' => 'Mim Nila', 'star_rating' => 5, 'comment' => '', 'reply_comment' => '', 'reviewed_at' => '2026-09-20 08:00:00', 'review_updated_at' => '2026-09-20 08:00:06' ),
+	array( 'review_id' => 'f-5', 'reviewer_name' => 'Gone Reviewer', 'star_rating' => 1, 'comment' => 'Rude staff.', 'reply_comment' => '', 'reviewed_at' => '2026-09-10 08:00:00', 'review_updated_at' => '2026-09-10 08:00:00' ),
+);
+
+foreach ( $fhint_reviews as $fhint_review ) {
+	ReviewRepository::upsert( fhint_review_row( $fhint_review ) );
+}
+
+// A sync that no longer sees f-5: kept, marked removed.
+check_same( 1, ReviewRepository::mark_removed_for_location( 'locations/1', array( 'f-1', 'f-2', 'f-3', 'f-4' ) ), 'a review Google no longer returns is marked removed' );
+check( null !== ReviewRepository::find( 'f-5' ), 'and kept, not deleted' );
+check_same( 0, ReviewRepository::mark_removed_for_location( 'locations/1', array( 'f-1', 'f-2', 'f-3', 'f-4' ) ), 'marking again changes nothing, so its first date stays' );
+
+check_same( 4, ReviewRepository::count(), 'a removed review is left out of the count' );
+check_same( 4.0, ReviewRepository::summary()['average'], 'and out of the average (5, 4, 2, 5 — not the removed 1)' );
+check_same( 3, ReviewRepository::summary()['unanswered'], 'and out of "waiting on a reply" (three live ones unanswered, not four)' );
+
+$fhint_ids = static function ( array $args ) {
+	return array_column( ReviewRepository::all( $args ), 'review_id' );
+};
+
+check_same( array( 'f-1', 'f-4' ), $fhint_ids( array( 'rating' => 5 ) ), 'the rating filter keeps one star rating' );
+check_same( array( 'f-2' ), $fhint_ids( array( 'replied' => 'replied' ) ), 'reply status: replied' );
+check_same( array( 'f-1', 'f-3', 'f-4' ), $fhint_ids( array( 'replied' => 'not_replied' ) ), 'reply status: not replied' );
+check_same( array( 'f-3' ), $fhint_ids( array( 'status' => 'edited' ) ), 'edited: changed more than a minute after it was written' );
+check_same( array( 'f-1', 'f-2', 'f-4' ), $fhint_ids( array( 'status' => 'live' ) ), 'live: neither edited nor removed — six seconds is not an edit' );
+check_same( array( 'f-5' ), $fhint_ids( array( 'status' => 'removed' ) ), 'removed: only the removed one' );
+check_same( 5, count( $fhint_ids( array( 'status' => 'all' ) ) ), 'any status, for the list, includes the removed one' );
+check_same( array( 'f-2' ), $fhint_ids( array( 'search' => 'parking' ) ), 'search finds words in the review' );
+check_same( array( 'f-3' ), $fhint_ids( array( 'search' => 'whitfield' ) ), 'and in the reviewer name' );
+check_same( array(), $fhint_ids( array( 'search' => '_' ) ), 'a _ in a search is matched as text, not as a wildcard that matches everything' );
+check_same( array( 'f-3' ), $fhint_ids( array( 'rating' => 2, 'replied' => 'not_replied', 'status' => 'edited', 'search' => 'waited' ) ), 'filters combine' );
+
+$fhint_page = ReviewService::listing( array( 'status' => 'all', 'per_page' => 2, 'offset' => 2 ) );
+check_same( array( 'f-3', 'f-4' ), array_column( $fhint_page['items'], 'review_id' ), 'paging returns the second page, newest first' );
+check_same( 5, $fhint_page['total'], 'with the total of every match, for "Showing 3 to 4 of 5"' );
+check_same( 2, ReviewService::listing( array( 'rating' => 5, 'per_page' => 1 ) )['total'], 'the total follows the filters' );
+
+$fhint_present = array_column( ReviewService::listing( array( 'status' => 'all' ) )['items'], null, 'review_id' );
+check_same( 'edited', $fhint_present['f-3']['status'], 'a review says it was edited' );
+check_same( 'live', $fhint_present['f-4']['status'], 'or that it is live' );
+check_same( 'removed', $fhint_present['f-5']['status'], 'or removed' );
+check( ! $fhint_present['f-5']['needs_reply'], 'and a removed review is not waiting on a reply' );
+
+// Back on Google: live again.
+ReviewRepository::upsert( fhint_review_row( $fhint_reviews[4] ) );
+check( null === ReviewRepository::find( 'f-5' )['removed_at'], 'a removed review Google returns again is live again' );
+check_same( 5, ReviewRepository::count(), 'and counted again' );
+
+// A removed review cannot be replied to, and Google is never asked.
+ReviewRepository::mark_removed_for_location( 'locations/1', array( 'f-1', 'f-2', 'f-3', 'f-4' ) );
+$fhint_http_before = did_action( 'http_api_debug' );
+$fhint_result      = FHINT\App\Review\ReviewReply::save( 'f-5', 'Sorry to hear that.' );
+check( is_wp_error( $fhint_result ) && 'fhint_review_removed' === $fhint_result->get_error_code(), 'replying to a removed review is refused' );
+check_same( 409, is_wp_error( $fhint_result ) ? $fhint_result->get_error_data()['status'] : null, 'as a conflict' );
+check_same( $fhint_http_before, did_action( 'http_api_debug' ), 'before anything is sent to Google' );
+
+// Over REST, as the screen asks.
+$fhint_admin = get_users( array( 'role' => 'administrator', 'number' => 1 ) );
+
+if ( $fhint_admin ) {
+	wp_set_current_user( $fhint_admin[0]->ID );
+
+	$fhint_request = new WP_REST_Request( 'GET', '/fhint/v1/reviews' );
+	$fhint_request->set_query_params(
+		array(
+			'rating'   => 5,
+			'replied'  => 'not_replied',
+			'status'   => 'all',
+			'search'   => 'great',
+			'per_page' => 10,
+		)
+	);
+	$fhint_response = rest_do_request( $fhint_request );
+
+	check_same( 200, $fhint_response->get_status(), 'GET /reviews takes the filters' );
+	check_same( array( 'f-1' ), array_column( $fhint_response->get_data()['data'], 'review_id' ), 'and applies them' );
+	check_same( 1, $fhint_response->get_data()['meta']['total'], 'with the matching total' );
+
+	$fhint_request = new WP_REST_Request( 'GET', '/fhint/v1/reviews' );
+	$fhint_request->set_query_params( array( 'status' => 'gone' ) );
+	check_same( 400, rest_do_request( $fhint_request )->get_status(), 'an unknown status is refused' );
+
+	$fhint_request = new WP_REST_Request( 'GET', '/fhint/v1/reviews' );
+	$fhint_request->set_query_params( array( 'rating' => 6 ) );
+	check_same( 400, rest_do_request( $fhint_request )->get_status(), 'and so is a rating above five' );
+
+	wp_set_current_user( 0 );
+}
+
+// Put back the single review the reply section below expects.
+ReviewRepository::truncate();
+ReviewRepository::upsert( fhint_review_row( array( 'review_id' => 'rev-9', 'reply_comment' => '' ) ) );
 
 // -- Replying to a review, with Google answered in-process ------------------
 //
@@ -1718,7 +1835,7 @@ LocationRepository::delete( (int) $fhint_other['id'] );
 GoogleLocationRepository::truncate();
 
 foreach ( $fhint_kept_listings as $fhint_kept ) {
-	GoogleLocationRepository::upsert( $fhint_kept );
+	GoogleLocationRepository::upsert( array_merge( array( 'payload' => array() ), $fhint_kept ) );
 
 	if ( (int) $fhint_kept['fhint_location_id'] > 0 ) {
 		GoogleLocationRepository::map( $fhint_kept['location_name'], (int) $fhint_kept['fhint_location_id'] );

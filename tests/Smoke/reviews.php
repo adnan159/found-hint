@@ -76,6 +76,32 @@ check_same( 0, ReviewMapper::stars( 'STAR_RATING_UNSPECIFIED' ), 'an unspecified
 check_same( 0, ReviewMapper::stars( '' ), 'a missing rating is 0' );
 check_same( 0, ReviewMapper::stars( 'SIX' ), 'a rating word nobody has heard of is 0' );
 
+// Customer photos: read from reviewMediaItems, Google's image host only,
+// with the size suffix swapped for the full photo.
+$fhint_thumb  = 'https://lh3.googleusercontent.com/grass-cs/ABC-123=k-no';
+$fhint_photos = ReviewMapper::photos(
+	array(
+		'reviewMediaItems' => array(
+			array( 'thumbnailUrl' => $fhint_thumb ),
+			array( 'thumbnailUrl' => 'https://evil.example.com/x.jpg' ),
+			array( 'thumbnailUrl' => 'http://lh3.googleusercontent.com/insecure=k-no' ),
+			array( 'thumbnailUrl' => 'https://lh3.googleusercontent.com.evil.example/x=k-no' ),
+			array( 'nothing' => 'here' ),
+			'not an array',
+		),
+	)
+);
+check_same( 1, count( $fhint_photos ), 'only https photos on Google\'s image host are kept' );
+check_same( $fhint_thumb, $fhint_photos[0]['thumb'], 'the thumbnail is the address Google sent' );
+check_same( 'https://lh3.googleusercontent.com/grass-cs/ABC-123=s1600', $fhint_photos[0]['full'], 'the full photo swaps the size suffix' );
+check_same(
+	'https://lh3.googleusercontent.com/p/ABC=s1600',
+	ReviewMapper::photos( array( 'reviewMediaItems' => array( array( 'thumbnailUrl' => 'https://lh3.googleusercontent.com/p/ABC' ) ) ) )[0]['full'],
+	'an address with no size suffix gets one'
+);
+check_same( array(), ReviewMapper::photos( array() ), 'a review without photos has none' );
+check_same( array(), ReviewMapper::photos( array( 'reviewMediaItems' => 'junk' ) ), 'a malformed photo list is ignored' );
+
 // ── timestamps ──────────────────────────────────────────────────────────
 
 check_same(

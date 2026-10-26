@@ -86,6 +86,10 @@ class ReviewReply {
 			return self::not_found();
 		}
 
+		if ( ! empty( $review['removed_at'] ) ) {
+			return self::removed();
+		}
+
 		$comment    = self::sanitize( $comment );
 		$validation = self::validate( $comment );
 
@@ -174,6 +178,20 @@ class ReviewReply {
 		$data = $error->get_error_data();
 
 		return is_array( $data ) && isset( $data['http_status'] ) && 404 === (int) $data['http_status'];
+	}
+
+	/**
+	 * A review its author removed from Google: there is nothing left there
+	 * to reply to.
+	 *
+	 * @return WP_Error
+	 */
+	private static function removed() {
+		return new WP_Error(
+			'fhint_review_removed',
+			__( 'This review was removed from Google, so it can no longer be replied to.', 'foundhint-local-seo' ),
+			array( 'status' => 409 )
+		);
 	}
 
 	/**

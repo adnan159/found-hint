@@ -211,6 +211,15 @@
   border-color: var(--input);
 }
 
+/* A firmer edge for fields that ask for one — the Reviews dialogs, where
+   the pale default all but disappears. A class, not a utility: the rule
+   above outranks utilities. Before the focus and invalid rules below, which
+   still win when they apply. */
+#fhint-app .fhint-firm-edge,
+[data-slot="dialog-content"] .fhint-firm-edge {
+  border-color: #b9b2af;
+}
+
 /* The two border colours a utility class would otherwise have set, restated
    because the rule above now outranks them. Invalid comes last: a refused
    field stays red while it has focus. */

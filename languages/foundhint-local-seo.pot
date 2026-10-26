@@ -53,11 +53,11 @@ msgstr ""
 msgid "None of those services belong to this business."
 msgstr ""
 
-#: includes/Admin/Menu.php:55 includes/Admin/Menu.php:56 src/admin/components/PageHeader.jsx:37 src/admin/layouts/root/components/Sidebar.jsx:326 src/admin/layouts/root/components/Sidebar.jsx:345 src/admin/pages/setup/components/WizardShell.jsx:44
+#: includes/Admin/Menu.php:55 includes/Admin/Menu.php:56 src/admin/components/PageHeader.jsx:48 src/admin/layouts/root/components/Sidebar.jsx:316 src/admin/layouts/root/components/Sidebar.jsx:335 src/admin/pages/setup/components/WizardShell.jsx:44
 msgid "FoundHint"
 msgstr ""
 
-#: includes/Admin.php:42 src/admin/layouts/root/components/Sidebar.jsx:114 src/admin/pages/settings/index.jsx:87 src/admin/pages/settings/index.jsx:96
+#: includes/Admin.php:42 src/admin/layouts/root/components/Sidebar.jsx:104 src/admin/pages/settings/index.jsx:87 src/admin/pages/settings/index.jsx:96
 msgid "Settings"
 msgstr ""
 
@@ -491,7 +491,7 @@ msgstr ""
 msgid "%1$d days with hours, %2$d closed"
 msgstr ""
 
-#: includes/App/Google/Import.php:893 src/admin/layouts/root/index.jsx:41 src/admin/pages/profile/tabs.jsx:198
+#: includes/App/Google/Import.php:893 src/admin/layouts/root/index.jsx:42 src/admin/pages/profile/tabs.jsx:198
 msgid "%d service"
 msgid_plural "%d services"
 msgstr[0] ""
@@ -561,7 +561,7 @@ msgstr ""
 msgid "Read %1$s across %2$s."
 msgstr ""
 
-#: includes/App/Google/Profiles.php:100 includes/App/Review/ReviewSync.php:99 src/admin/layouts/root/index.jsx:36 src/admin/pages/google/components/BusinessProfiles.jsx:52
+#: includes/App/Google/Profiles.php:100 includes/App/Review/ReviewSync.php:99 src/admin/layouts/root/index.jsx:37 src/admin/pages/google/components/BusinessProfiles.jsx:52
 msgid "%d location"
 msgid_plural "%d locations"
 msgstr[0] ""
@@ -669,19 +669,23 @@ msgstr ""
 msgid "Photos are added by uploading them, not by saving this section."
 msgstr ""
 
-#: includes/App/Review/ReviewReply.php:111
+#: includes/App/Review/ReviewReply.php:115
 msgid "Replied to a review on Google."
 msgstr ""
 
-#: includes/App/Review/ReviewReply.php:143
+#: includes/App/Review/ReviewReply.php:147
 msgid "Removed a reply to a review on Google."
 msgstr ""
 
-#: includes/App/Review/ReviewReply.php:187
+#: includes/App/Review/ReviewReply.php:192
+msgid "This review was removed from Google, so it can no longer be replied to."
+msgstr ""
+
+#: includes/App/Review/ReviewReply.php:205
 msgid "That review could not be found. Read your reviews from Google again."
 msgstr ""
 
-#: includes/App/Review/ReviewReply.php:200
+#: includes/App/Review/ReviewReply.php:218
 msgid "Google has the change, but it could not be saved here. Read your reviews from Google to catch up."
 msgstr ""
 
@@ -689,13 +693,13 @@ msgstr ""
 msgid "There are no Google locations to read reviews for yet. Read your Google profile first."
 msgstr ""
 
-#: includes/App/Review/ReviewSync.php:94 src/admin/components/location-bar/BusinessBar.jsx:134
+#: includes/App/Review/ReviewSync.php:94 src/admin/components/location-bar/BusinessBar.jsx:135
 msgid "%d review"
 msgid_plural "%d reviews"
 msgstr[0] ""
 msgstr[1] ""
 
-#: src/admin/components/ComingSoonBanner.jsx:36
+#: src/admin/components/ComingSoonBanner.jsx:36 src/admin/pages/reviews/components/SoonTag.jsx:23
 msgid "Coming soon"
 msgstr ""
 
@@ -715,7 +719,7 @@ msgstr ""
 msgid "Continue with Google"
 msgstr ""
 
-#: src/admin/components/Hint.jsx:30 src/admin/pages/business/index.jsx:176 src/admin/pages/google/components/ImportFromGoogle.jsx:46 src/admin/pages/profile/components/InfoSection.jsx:38 src/admin/pages/profile/components/publish/labels.js:10 src/admin/pages/setup/components/BusinessStep.jsx:93
+#: src/admin/components/Hint.jsx:30 src/admin/pages/business/index.jsx:176 src/admin/pages/google/components/ImportFromGoogle.jsx:47 src/admin/pages/profile/components/InfoSection.jsx:38 src/admin/pages/profile/components/publish/labels.js:10 src/admin/pages/setup/components/BusinessStep.jsx:93
 msgid "Business name"
 msgstr ""
 
@@ -735,19 +739,19 @@ msgstr ""
 msgid "That did not save"
 msgstr ""
 
-#: src/admin/components/location-bar/BusinessBar.jsx:71
+#: src/admin/components/location-bar/BusinessBar.jsx:72
 msgid "Your business"
 msgstr ""
 
-#: src/admin/components/location-bar/BusinessBar.jsx:122
+#: src/admin/components/location-bar/BusinessBar.jsx:123
 msgid "Rated"
 msgstr ""
 
-#: src/admin/components/location-bar/BusinessBar.jsx:127
+#: src/admin/components/location-bar/BusinessBar.jsx:128
 msgid "out of 5"
 msgstr ""
 
-#: src/admin/components/location-bar/BusinessBar.jsx:163
+#: src/admin/components/location-bar/BusinessBar.jsx:167
 msgid "View on Google"
 msgstr ""
 
@@ -807,71 +811,63 @@ msgstr ""
 msgid "What to fix"
 msgstr ""
 
-#: src/admin/layouts/root/components/Sidebar.jsx:74 src/admin/pages/reviews/index.jsx:204 src/admin/pages/reviews/index.jsx:234 src/admin/pages/reviews/index.jsx:250 src/admin/pages/reviews/index.jsx:296
+#: src/admin/layouts/root/components/Sidebar.jsx:74 src/admin/pages/reviews/index.jsx:232 src/admin/pages/reviews/index.jsx:237 src/admin/pages/reviews/index.jsx:253
 msgid "Reviews"
 msgstr ""
 
-#: src/admin/layouts/root/components/Sidebar.jsx:78 src/admin/pages/reviews/index.jsx:268
-msgid "At a glance"
-msgstr ""
-
-#: src/admin/layouts/root/components/Sidebar.jsx:82 src/admin/pages/reviews/index.jsx:315
-msgid "Every review"
-msgstr ""
-
-#: src/admin/layouts/root/components/Sidebar.jsx:88
+#: src/admin/layouts/root/components/Sidebar.jsx:78
 msgid "Google"
 msgstr ""
 
-#: src/admin/layouts/root/components/Sidebar.jsx:92 src/admin/pages/google/index.jsx:428
+#: src/admin/layouts/root/components/Sidebar.jsx:82 src/admin/pages/google/index.jsx:428
 msgid "Google client"
 msgstr ""
 
-#: src/admin/layouts/root/components/Sidebar.jsx:96 src/admin/pages/google/index.jsx:544
+#: src/admin/layouts/root/components/Sidebar.jsx:86 src/admin/pages/google/index.jsx:544
 msgid "Connection"
 msgstr ""
 
-#: src/admin/layouts/root/components/Sidebar.jsx:100 src/admin/pages/google/components/BusinessProfiles.jsx:104
+#: src/admin/layouts/root/components/Sidebar.jsx:90 src/admin/pages/google/components/BusinessProfiles.jsx:104
 msgid "Business profiles"
 msgstr ""
 
-#: src/admin/layouts/root/components/Sidebar.jsx:104 src/admin/pages/google/components/LocationMapping.jsx:173
+#: src/admin/layouts/root/components/Sidebar.jsx:94 src/admin/pages/google/components/LocationMapping.jsx:173
 msgid "Location mapping"
 msgstr ""
 
-#: src/admin/layouts/root/components/Sidebar.jsx:108 src/admin/pages/google/components/ImportFromGoogle.jsx:180 src/admin/pages/setup/google.jsx:477
+#: src/admin/layouts/root/components/Sidebar.jsx:98 src/admin/pages/google/components/ImportFromGoogle.jsx:181 src/admin/pages/setup/google.jsx:477
 msgid "Import from Google"
 msgstr ""
 
-#: src/admin/layouts/root/components/Sidebar.jsx:118 src/admin/pages/settings/index.jsx:111
+#: src/admin/layouts/root/components/Sidebar.jsx:108 src/admin/pages/settings/index.jsx:111
 msgid "Your data"
 msgstr ""
 
-#: src/admin/layouts/root/components/Sidebar.jsx:122 src/admin/pages/settings/index.jsx:148
+#: src/admin/layouts/root/components/Sidebar.jsx:112 src/admin/pages/settings/index.jsx:148
 msgid "Activity log"
 msgstr ""
 
-#: src/admin/layouts/root/components/Sidebar.jsx:126 src/admin/pages/settings/index.jsx:231
+#: src/admin/layouts/root/components/Sidebar.jsx:116 src/admin/pages/settings/index.jsx:231
 msgid "System"
 msgstr ""
 
-#: src/admin/layouts/root/components/Sidebar.jsx:287
+#: src/admin/layouts/root/components/Sidebar.jsx:277
 msgid "Collapse section list"
 msgstr ""
 
-#: src/admin/layouts/root/components/Sidebar.jsx:288
+#: src/admin/layouts/root/components/Sidebar.jsx:278
 msgid "Expand section list"
 msgstr ""
 
-#: src/admin/layouts/root/components/Sidebar.jsx:348
+#: src/admin/layouts/root/components/Sidebar.jsx:338
 msgid "Local SEO"
 msgstr ""
 
-#: src/admin/layouts/root/components/Sidebar.jsx:378
+#: src/admin/layouts/root/components/Sidebar.jsx:368
 msgid "FoundHint Free"
 msgstr ""
 
-#: src/admin/layouts/root/index.jsx:31
+#: src/admin/layouts/root/index.jsx:32
 msgid "%d business"
 msgid_plural "%d businesses"
 msgstr[0] ""
@@ -945,7 +941,7 @@ msgstr ""
 msgid "Write a reply before posting it."
 msgstr ""
 
-#: src/admin/lib/errors.js:84 src/admin/pages/reviews/components/ReplyBox.jsx:57
+#: src/admin/lib/errors.js:84 src/admin/pages/reviews/components/ReplyDialog.jsx:38
 msgid "That reply is too long for Google. Shorten it and try again."
 msgstr ""
 
@@ -1241,7 +1237,7 @@ msgstr ""
 msgid "Hours"
 msgstr ""
 
-#: src/admin/pages/audit/index.jsx:45 src/admin/pages/business/index.jsx:350 src/admin/pages/google/components/ImportFromGoogle.jsx:54 src/admin/pages/profile/components/InfoSection.jsx:88 src/admin/pages/profile/components/publish/labels.js:12 src/admin/pages/setup/components/BusinessStep.jsx:177
+#: src/admin/pages/audit/index.jsx:45 src/admin/pages/business/index.jsx:350 src/admin/pages/google/components/ImportFromGoogle.jsx:55 src/admin/pages/profile/components/InfoSection.jsx:88 src/admin/pages/profile/components/publish/labels.js:12 src/admin/pages/setup/components/BusinessStep.jsx:177
 msgid "Website"
 msgstr ""
 
@@ -1391,7 +1387,7 @@ msgstr ""
 msgid "Only if it differs from the trading name."
 msgstr ""
 
-#: src/admin/pages/business/index.jsx:221 src/admin/pages/google/components/ImportFromGoogle.jsx:64 src/admin/pages/setup/components/BusinessStep.jsx:113
+#: src/admin/pages/business/index.jsx:221 src/admin/pages/google/components/ImportFromGoogle.jsx:65 src/admin/pages/setup/components/BusinessStep.jsx:113
 msgid "Business type"
 msgstr ""
 
@@ -1411,7 +1407,7 @@ msgstr ""
 msgid "In your own words, e.g. Grocery Store."
 msgstr ""
 
-#: src/admin/pages/business/index.jsx:293 src/admin/pages/google/components/ImportFromGoogle.jsx:56 src/admin/pages/profile/components/publish/labels.js:11 src/admin/pages/profile/components/services/ServiceDescriptionField.jsx:17
+#: src/admin/pages/business/index.jsx:293 src/admin/pages/google/components/ImportFromGoogle.jsx:57 src/admin/pages/profile/components/publish/labels.js:11 src/admin/pages/profile/components/services/ServiceDescriptionField.jsx:17
 msgid "Description"
 msgstr ""
 
@@ -1427,7 +1423,7 @@ msgstr ""
 msgid "Locations can override these; leave a location's field empty to use the business value."
 msgstr ""
 
-#: src/admin/pages/business/index.jsx:322 src/admin/pages/google/components/BusinessProfiles.jsx:153 src/admin/pages/google/components/ImportFromGoogle.jsx:50 src/admin/pages/setup/components/BusinessStep.jsx:149
+#: src/admin/pages/business/index.jsx:322 src/admin/pages/google/components/BusinessProfiles.jsx:153 src/admin/pages/google/components/ImportFromGoogle.jsx:51 src/admin/pages/setup/components/BusinessStep.jsx:149
 msgid "Phone"
 msgstr ""
 
@@ -1451,7 +1447,7 @@ msgstr ""
 msgid "Founded"
 msgstr ""
 
-#: src/admin/pages/business/index.jsx:425 src/admin/pages/google/components/ImportFromGoogle.jsx:66
+#: src/admin/pages/business/index.jsx:425 src/admin/pages/google/components/ImportFromGoogle.jsx:67
 msgid "Social profiles"
 msgstr ""
 
@@ -1643,7 +1639,7 @@ msgstr ""
 msgid "Reconnect with Google"
 msgstr ""
 
-#: src/admin/pages/dashboard/components/GoogleCard.jsx:138 src/admin/pages/google/components/BusinessProfiles.jsx:126 src/admin/pages/profile/components/AttributesSection.jsx:204 src/admin/pages/reviews/index.jsx:224
+#: src/admin/pages/dashboard/components/GoogleCard.jsx:138 src/admin/pages/google/components/BusinessProfiles.jsx:126 src/admin/pages/profile/components/AttributesSection.jsx:204
 msgid "Read from Google"
 msgstr ""
 
@@ -1803,7 +1799,7 @@ msgstr ""
 msgid "%d added"
 msgstr ""
 
-#: src/admin/pages/dashboard/index.jsx:289 src/admin/pages/google/components/ImportFromGoogle.jsx:70 src/admin/pages/profile/components/publish/labels.js:21 src/admin/pages/profile/tabs.jsx:192 src/admin/pages/setup/components/DoneStep.jsx:9 src/admin/pages/setup/google.jsx:38
+#: src/admin/pages/dashboard/index.jsx:289 src/admin/pages/google/components/ImportFromGoogle.jsx:71 src/admin/pages/profile/components/publish/labels.js:21 src/admin/pages/profile/tabs.jsx:192 src/admin/pages/setup/components/DoneStep.jsx:9 src/admin/pages/setup/google.jsx:38
 msgid "Services"
 msgstr ""
 
@@ -1843,7 +1839,7 @@ msgstr ""
 msgid "Profile"
 msgstr ""
 
-#: src/admin/pages/google/components/BusinessProfiles.jsx:152 src/admin/pages/google/components/ImportFromGoogle.jsx:48 src/admin/pages/setup/components/DoneStep.jsx:7 src/admin/pages/setup/index.jsx:74
+#: src/admin/pages/google/components/BusinessProfiles.jsx:152 src/admin/pages/google/components/ImportFromGoogle.jsx:49 src/admin/pages/setup/components/DoneStep.jsx:7 src/admin/pages/setup/index.jsx:74
 msgid "Address"
 msgstr ""
 
@@ -1859,121 +1855,121 @@ msgstr ""
 msgid "Not mapped"
 msgstr ""
 
-#: src/admin/pages/google/components/ImportFromGoogle.jsx:52 src/admin/pages/profile/components/info/AdditionalPhonesField.jsx:47 src/admin/pages/profile/components/publish/labels.js:15
+#: src/admin/pages/google/components/ImportFromGoogle.jsx:53 src/admin/pages/profile/components/info/AdditionalPhonesField.jsx:47 src/admin/pages/profile/components/publish/labels.js:15
 msgid "Additional phone numbers"
 msgstr ""
 
-#: src/admin/pages/google/components/ImportFromGoogle.jsx:58 src/admin/pages/profile/components/InfoSection.jsx:67 src/admin/pages/profile/components/publish/labels.js:16
+#: src/admin/pages/google/components/ImportFromGoogle.jsx:59 src/admin/pages/profile/components/InfoSection.jsx:67 src/admin/pages/profile/components/publish/labels.js:16
 msgid "Opening date"
 msgstr ""
 
-#: src/admin/pages/google/components/ImportFromGoogle.jsx:60 src/admin/pages/setup/components/DoneStep.jsx:8 src/admin/pages/setup/google.jsx:37
+#: src/admin/pages/google/components/ImportFromGoogle.jsx:61 src/admin/pages/setup/components/DoneStep.jsx:8 src/admin/pages/setup/google.jsx:37
 msgid "Opening hours"
 msgstr ""
 
-#: src/admin/pages/google/components/ImportFromGoogle.jsx:62
+#: src/admin/pages/google/components/ImportFromGoogle.jsx:63
 msgid "Google categories"
 msgstr ""
 
-#: src/admin/pages/google/components/ImportFromGoogle.jsx:68
+#: src/admin/pages/google/components/ImportFromGoogle.jsx:69
 msgid "Booking and chat links"
 msgstr ""
 
-#: src/admin/pages/google/components/ImportFromGoogle.jsx:72
+#: src/admin/pages/google/components/ImportFromGoogle.jsx:73
 msgid "Map position"
 msgstr ""
 
-#: src/admin/pages/google/components/ImportFromGoogle.jsx:74 src/admin/pages/profile/components/address/ServiceAreaField.jsx:68 src/admin/pages/profile/components/publish/labels.js:17
+#: src/admin/pages/google/components/ImportFromGoogle.jsx:75 src/admin/pages/profile/components/address/ServiceAreaField.jsx:68 src/admin/pages/profile/components/publish/labels.js:17
 msgid "Service area"
 msgstr ""
 
-#: src/admin/pages/google/components/ImportFromGoogle.jsx:89
+#: src/admin/pages/google/components/ImportFromGoogle.jsx:90
 msgid "Shared by all locations"
 msgstr ""
 
-#: src/admin/pages/google/components/ImportFromGoogle.jsx:91
+#: src/admin/pages/google/components/ImportFromGoogle.jsx:92
 msgid "Added to your services"
 msgstr ""
 
-#: src/admin/pages/google/components/ImportFromGoogle.jsx:93
+#: src/admin/pages/google/components/ImportFromGoogle.jsx:94
 msgid "This location"
 msgstr ""
 
-#: src/admin/pages/google/components/ImportFromGoogle.jsx:181
+#: src/admin/pages/google/components/ImportFromGoogle.jsx:182
 msgid "Fill in your FoundHint details from the Google profile you have mapped to this location."
 msgstr ""
 
-#: src/admin/pages/google/components/ImportFromGoogle.jsx:191
+#: src/admin/pages/google/components/ImportFromGoogle.jsx:192
 msgid "Which profile are you importing?"
 msgstr ""
 
-#: src/admin/pages/google/components/ImportFromGoogle.jsx:196 src/admin/pages/google/components/ImportFromGoogle.jsx:204 src/admin/pages/google/components/LocationMapping.jsx:97
+#: src/admin/pages/google/components/ImportFromGoogle.jsx:197 src/admin/pages/google/components/ImportFromGoogle.jsx:205 src/admin/pages/google/components/LocationMapping.jsx:97
 msgid "Choose a Google profile"
 msgstr ""
 
-#: src/admin/pages/google/components/ImportFromGoogle.jsx:231
+#: src/admin/pages/google/components/ImportFromGoogle.jsx:232
 msgid "Read Google again"
 msgstr ""
 
-#: src/admin/pages/google/components/ImportFromGoogle.jsx:232
+#: src/admin/pages/google/components/ImportFromGoogle.jsx:233
 msgid "Read my Google profile"
 msgstr ""
 
-#: src/admin/pages/google/components/ImportFromGoogle.jsx:236
+#: src/admin/pages/google/components/ImportFromGoogle.jsx:237
 msgid "Nothing is saved until you choose."
 msgstr ""
 
-#: src/admin/pages/google/components/ImportFromGoogle.jsx:245
+#: src/admin/pages/google/components/ImportFromGoogle.jsx:246
 msgid "This site has no business details yet, so importing will create them from this profile."
 msgstr ""
 
-#: src/admin/pages/google/components/ImportFromGoogle.jsx:254
+#: src/admin/pages/google/components/ImportFromGoogle.jsx:255
 msgid "Importing will create a location from this profile's address and link the two, so a later import updates it rather than adding another."
 msgstr ""
 
-#: src/admin/pages/google/components/ImportFromGoogle.jsx:262
+#: src/admin/pages/google/components/ImportFromGoogle.jsx:263
 msgid "Fields you have not filled in are ticked. Fields you already hold are left for you to decide, because FoundHint cannot know which value is the newer one."
 msgstr ""
 
-#: src/admin/pages/google/components/ImportFromGoogle.jsx:273
+#: src/admin/pages/google/components/ImportFromGoogle.jsx:274
 msgid "Import"
 msgstr ""
 
-#: src/admin/pages/google/components/ImportFromGoogle.jsx:275
+#: src/admin/pages/google/components/ImportFromGoogle.jsx:276
 msgid "Detail"
 msgstr ""
 
-#: src/admin/pages/google/components/ImportFromGoogle.jsx:277
+#: src/admin/pages/google/components/ImportFromGoogle.jsx:278
 msgid "In FoundHint"
 msgstr ""
 
-#: src/admin/pages/google/components/ImportFromGoogle.jsx:280 src/admin/pages/profile/components/photos/PhotoSlot.jsx:34
+#: src/admin/pages/google/components/ImportFromGoogle.jsx:281 src/admin/pages/profile/components/photos/PhotoSlot.jsx:34
 msgid "On Google"
 msgstr ""
 
-#: src/admin/pages/google/components/ImportFromGoogle.jsx:317
+#: src/admin/pages/google/components/ImportFromGoogle.jsx:316
 msgid "Different here"
 msgstr ""
 
-#: src/admin/pages/google/components/ImportFromGoogle.jsx:329
+#: src/admin/pages/google/components/ImportFromGoogle.jsx:328
 msgid "Google has nothing here"
 msgstr ""
 
-#: src/admin/pages/google/components/ImportFromGoogle.jsx:351
+#: src/admin/pages/google/components/ImportFromGoogle.jsx:350
 msgid "Choose what to import"
 msgstr ""
 
-#: src/admin/pages/google/components/ImportFromGoogle.jsx:364
+#: src/admin/pages/google/components/ImportFromGoogle.jsx:363
 msgid "Imported values are saved as your own details and can be edited afterwards."
 msgstr ""
 
-#: src/admin/pages/google/components/ImportFromGoogle.jsx:157
+#: src/admin/pages/google/components/ImportFromGoogle.jsx:158
 msgid "Imported %d field from Google."
 msgid_plural "Imported %d fields from Google."
 msgstr[0] ""
 msgstr[1] ""
 
-#: src/admin/pages/google/components/ImportFromGoogle.jsx:354
+#: src/admin/pages/google/components/ImportFromGoogle.jsx:353
 msgid "Import %d field"
 msgid_plural "Import %d fields"
 msgstr[0] ""
@@ -2395,11 +2391,11 @@ msgstr ""
 msgid "Sent to Google. It can take a few minutes to show on your listing."
 msgstr ""
 
-#: src/admin/pages/profile/components/PublishDialog.jsx:123 src/admin/pages/profile/components/ServiceDialog.jsx:133
+#: src/admin/pages/profile/components/PublishDialog.jsx:123 src/admin/pages/profile/components/ServiceDialog.jsx:133 src/admin/pages/reviews/components/ReviewsDialog.jsx:59
 msgid "Close"
 msgstr ""
 
-#: src/admin/pages/profile/components/PublishDialog.jsx:124 src/admin/pages/profile/components/ServiceDialog.jsx:200 src/admin/pages/reviews/components/ReplyBox.jsx:176
+#: src/admin/pages/profile/components/PublishDialog.jsx:124 src/admin/pages/profile/components/ServiceDialog.jsx:200 src/admin/pages/reviews/components/AutoReplySetup.jsx:90 src/admin/pages/reviews/components/ReplyDialog.jsx:93 src/admin/pages/reviews/components/TemplateDialog.jsx:66
 msgid "Cancel"
 msgstr ""
 
@@ -2475,7 +2471,7 @@ msgstr ""
 msgid "Edit %s"
 msgstr ""
 
-#: src/admin/pages/profile/components/ServicesSection.jsx:182 src/admin/pages/reviews/components/ReplyBox.jsx:216
+#: src/admin/pages/profile/components/ServicesSection.jsx:182 src/admin/pages/reviews/components/TemplatesCard.jsx:114
 msgid "Edit"
 msgstr ""
 
@@ -2641,7 +2637,7 @@ msgstr ""
 msgid "This day"
 msgstr ""
 
-#: src/admin/pages/profile/components/hours/SpecialDayRow.jsx:24
+#: src/admin/pages/profile/components/hours/SpecialDayRow.jsx:24 src/admin/pages/reviews/index.jsx:64
 msgid "Date"
 msgstr ""
 
@@ -2787,7 +2783,7 @@ msgstr ""
 msgid "Photo on your Google listing"
 msgstr ""
 
-#: src/admin/pages/profile/components/photos/Gallery.jsx:54 src/admin/pages/reviews/index.jsx:385
+#: src/admin/pages/profile/components/photos/Gallery.jsx:54
 msgid "Show more"
 msgstr ""
 
@@ -3137,7 +3133,7 @@ msgstr ""
 msgid "Save Attributes"
 msgstr ""
 
-#: src/admin/pages/profile/tabs.jsx:172
+#: src/admin/pages/profile/tabs.jsx:172 src/admin/pages/reviews/components/ReviewToolbar.jsx:46
 msgid "%d selected"
 msgstr ""
 
@@ -3155,157 +3151,667 @@ msgid_plural "%d days open"
 msgstr[0] ""
 msgstr[1] ""
 
-#: src/admin/pages/reviews/components/ReplyBox.jsx:90
+#: src/admin/pages/reviews/components/AutoReplyBanner.jsx:22 src/admin/pages/reviews/components/AutoReplyBanner.jsx:34 src/admin/pages/reviews/components/AutoReplySetup.jsx:101
+msgid "Auto-reply"
+msgstr ""
+
+#: src/admin/pages/reviews/components/AutoReplyBanner.jsx:39
+msgid "Choose a template or an AI reply for each star rating, then switch it on."
+msgstr ""
+
+#: src/admin/pages/reviews/components/AutoReplyBanner.jsx:52
+msgid "Auto-replies sent"
+msgstr ""
+
+#: src/admin/pages/reviews/components/AutoReplyBanner.jsx:60
+msgid "AI replies left"
+msgstr ""
+
+#: src/admin/pages/reviews/components/AutoReplyBanner.jsx:74
+msgid "Set up"
+msgstr ""
+
+#: src/admin/pages/reviews/components/AutoReplyBanner.jsx:78
+msgid "Off"
+msgstr ""
+
+#: src/admin/pages/reviews/components/AutoReplyBanner.jsx:83 src/admin/pages/reviews/components/AutoReplySetup.jsx:111
+msgid "Auto-reply (coming soon)"
+msgstr ""
+
+#: src/admin/pages/reviews/components/AutoReplySetup.jsx:11
+msgid "AI reply"
+msgstr ""
+
+#: src/admin/pages/reviews/components/AutoReplySetup.jsx:12 src/admin/pages/reviews/components/ReplyDialog.jsx:164
+msgid "Built-in reply"
+msgstr ""
+
+#: src/admin/pages/reviews/components/AutoReplySetup.jsx:13
+msgid "My templates"
+msgstr ""
+
+#: src/admin/pages/reviews/components/AutoReplySetup.jsx:14
+msgid "Don't reply"
+msgstr ""
+
+#: src/admin/pages/reviews/components/AutoReplySetup.jsx:74
+msgid "Set up auto-reply"
+msgstr ""
+
+#: src/admin/pages/reviews/components/AutoReplySetup.jsx:75
+msgid "A preview of the auto-reply settings, which are coming in FoundHint Pro."
+msgstr ""
+
+#: src/admin/pages/reviews/components/AutoReplySetup.jsx:84
+msgid "Auto-reply is coming in FoundHint Pro."
+msgstr ""
+
+#: src/admin/pages/reviews/components/AutoReplySetup.jsx:93
+msgid "Save"
+msgstr ""
+
+#: src/admin/pages/reviews/components/AutoReplySetup.jsx:104
+msgid "Off. Nothing is sent automatically."
+msgstr ""
+
+#: src/admin/pages/reviews/components/AutoReplySetup.jsx:120 src/admin/pages/reviews/components/AutoReplySetup.jsx:123
+msgid "Which reviews"
+msgstr ""
+
+#: src/admin/pages/reviews/components/AutoReplySetup.jsx:129
+msgid "New reviews only"
+msgstr ""
+
+#: src/admin/pages/reviews/components/AutoReplySetup.jsx:133
+msgid "New and unanswered"
+msgstr ""
+
+#: src/admin/pages/reviews/components/AutoReplySetup.jsx:139
+msgid "Older reviews are left as they are."
+msgstr ""
+
+#: src/admin/pages/reviews/components/AutoReplySetup.jsx:140
+msgid "Reviews still waiting on a reply are answered too."
+msgstr ""
+
+#: src/admin/pages/reviews/components/AutoReplySetup.jsx:149
+msgid "How to reply"
+msgstr ""
+
+#: src/admin/pages/reviews/components/AutoReplySetup.jsx:158 src/admin/pages/reviews/components/ReviewFilters.jsx:46 src/admin/pages/reviews/index.jsx:63
+msgid "Rating"
+msgstr ""
+
+#: src/admin/pages/reviews/components/AutoReplySetup.jsx:161 src/admin/pages/reviews/components/AutoReplySetup.jsx:185
+msgid "With a comment"
+msgstr ""
+
+#: src/admin/pages/reviews/components/AutoReplySetup.jsx:164 src/admin/pages/reviews/components/AutoReplySetup.jsx:185 src/admin/pages/reviews/components/TemplateDialog.jsx:128 src/admin/pages/reviews/components/TemplatesCard.jsx:107
+msgid "Stars only"
+msgstr ""
+
+#: src/admin/pages/reviews/components/AutoReplySetup.jsx:204
+msgid "We suggest replying to 1 and 2 star reviews yourself. Unhappy customers notice a personal reply."
+msgstr ""
+
+#: src/admin/pages/reviews/components/AutoReplySetup.jsx:214 src/admin/pages/reviews/components/AutoReplySetup.jsx:219
+msgid "AI writing style"
+msgstr ""
+
+#: src/admin/pages/reviews/components/AutoReplySetup.jsx:225
+msgid "FoundHint style"
+msgstr ""
+
+#: src/admin/pages/reviews/components/AutoReplySetup.jsx:229
+msgid "My own instructions"
+msgstr ""
+
+#: src/admin/pages/reviews/components/AutoReplySetup.jsx:235
+msgid "Writes about what each customer actually said, and changes style so replies never sound the same."
+msgstr ""
+
+#: src/admin/pages/reviews/components/AutoReplySetup.jsx:239
+msgid "Tell the AI how you like to reply — your tone, what to mention, what to avoid."
+msgstr ""
+
+#: src/admin/pages/reviews/components/AutoReplySetup.jsx:246
+msgid "If AI replies run out, use a template instead of pausing"
+msgstr ""
+
+#: src/admin/pages/reviews/components/Pagination.jsx:38
+msgid "Review pages"
+msgstr ""
+
+#: src/admin/pages/reviews/components/Pagination.jsx:42
+msgid "Per page"
+msgstr ""
+
+#: src/admin/pages/reviews/components/Pagination.jsx:68 src/admin/pages/reviews/components/ReviewPhotos.jsx:97
+msgid "Previous"
+msgstr ""
+
+#: src/admin/pages/reviews/components/Pagination.jsx:88
+msgid "Page %d"
+msgstr ""
+
+#: src/admin/pages/reviews/components/Pagination.jsx:111 src/admin/pages/reviews/components/ReviewPhotos.jsx:104
+msgid "Next"
+msgstr ""
+
+#: src/admin/pages/reviews/components/ReplyDialog.jsx:56
 msgid "Your reply was updated on Google."
 msgstr ""
 
-#: src/admin/pages/reviews/components/ReplyBox.jsx:91
+#: src/admin/pages/reviews/components/ReplyDialog.jsx:57
 msgid "Your reply was posted on Google."
 msgstr ""
 
-#: src/admin/pages/reviews/components/ReplyBox.jsx:102
-msgid "Your reply was removed from Google."
+#: src/admin/pages/reviews/components/ReplyDialog.jsx:71
+msgid "Reply to %s"
 msgstr ""
 
-#: src/admin/pages/reviews/components/ReplyBox.jsx:118
-msgid "Edit your reply"
+#: src/admin/pages/reviews/components/ReplyDialog.jsx:74
+msgid "Reply to this review"
 msgstr ""
 
-#: src/admin/pages/reviews/components/ReplyBox.jsx:119 src/admin/pages/reviews/components/ReplyBox.jsx:201
-msgid "Your reply"
+#: src/admin/pages/reviews/components/ReplyDialog.jsx:76
+msgid "Write a reply. It is posted on your Google profile when you press Publish reply."
 msgstr ""
 
-#: src/admin/pages/reviews/components/ReplyBox.jsx:134
-msgid "Thank them, answer what they raised, and keep it short."
+#: src/admin/pages/reviews/components/ReplyDialog.jsx:81
+msgid "Publishing posts this reply on your Google profile."
 msgstr ""
 
-#: src/admin/pages/reviews/components/ReplyBox.jsx:142
-msgid "Shown publicly on Google under this review. %d left."
+#: src/admin/pages/reviews/components/ReplyDialog.jsx:102
+msgid "Publishing…"
 msgstr ""
 
-#: src/admin/pages/reviews/components/ReplyBox.jsx:166
-msgid "Update on Google"
+#: src/admin/pages/reviews/components/ReplyDialog.jsx:104
+msgid "Update reply"
 msgstr ""
 
-#: src/admin/pages/reviews/components/ReplyBox.jsx:167
-msgid "Post on Google"
+#: src/admin/pages/reviews/components/ReplyDialog.jsx:105
+msgid "Publish reply"
 msgstr ""
 
-#: src/admin/pages/reviews/components/ReplyBox.jsx:193
-msgid "Reply"
-msgstr ""
-
-#: src/admin/pages/reviews/components/ReplyBox.jsx:228
-msgid "Delete"
-msgstr ""
-
-#: src/admin/pages/reviews/components/ReplyBox.jsx:233
-msgid "Delete your reply?"
-msgstr ""
-
-#: src/admin/pages/reviews/components/ReplyBox.jsx:236
-msgid "It is removed from Google, so nobody will see it under this review any more. The review itself stays."
-msgstr ""
-
-#: src/admin/pages/reviews/components/ReplyBox.jsx:244
-msgid "Keep reply"
-msgstr ""
-
-#: src/admin/pages/reviews/components/ReplyBox.jsx:247
-msgid "Delete reply"
-msgstr ""
-
-#: src/admin/pages/reviews/index.jsx:67
-msgid "No rating"
-msgstr ""
-
-#: src/admin/pages/reviews/index.jsx:107
+#: src/admin/pages/reviews/components/ReplyDialog.jsx:114 src/admin/pages/reviews/components/ReviewCard.jsx:82 src/admin/pages/reviews/index.jsx:72
 msgid "Anonymous"
 msgstr ""
 
-#: src/admin/pages/reviews/index.jsx:122
-msgid "Needs a reply"
+#: src/admin/pages/reviews/components/ReplyDialog.jsx:121 src/admin/pages/reviews/components/ReviewCard.jsx:170
+msgid "Left a star rating without a comment."
 msgstr ""
 
-#: src/admin/pages/reviews/index.jsx:131
-msgid "A rating with no comment."
+#: src/admin/pages/reviews/components/ReplyDialog.jsx:138
+msgid "Quick templates"
 msgstr ""
 
-#: src/admin/pages/reviews/index.jsx:205
-msgid "What people are saying on your Google Business Profile, and which reviews are still waiting on you."
+#: src/admin/pages/reviews/components/ReplyDialog.jsx:146
+msgid "Your own templates are part of FoundHint Pro."
 msgstr ""
 
-#: src/admin/pages/reviews/index.jsx:219
-msgid "Reading…"
+#: src/admin/pages/reviews/components/ReplyDialog.jsx:176 src/admin/pages/reviews/components/ReviewCard.jsx:180 src/admin/pages/reviews/index.jsx:67
+msgid "Your reply"
 msgstr ""
 
-#: src/admin/pages/reviews/index.jsx:237
-msgid "No Google locations yet"
+#: src/admin/pages/reviews/components/ReplyDialog.jsx:186
+msgid "%1$s / %2$s"
 msgstr ""
 
-#: src/admin/pages/reviews/index.jsx:240
-msgid "Connect your Google account and read your profile first — reviews are read for the locations Google reports."
+#: src/admin/pages/reviews/components/ReplyDialog.jsx:203
+msgid "Write a short, personal reply. Use their first name and mention something they said."
 msgstr ""
 
-#: src/admin/pages/reviews/index.jsx:253
-msgid "This location has no Google listing"
+#: src/admin/pages/reviews/components/ReplyDialog.jsx:229 src/admin/pages/reviews/components/ReviewCard.jsx:280
+msgid "AI suggestion"
 msgstr ""
 
-#: src/admin/pages/reviews/index.jsx:256
-msgid "Reviews are read from a location's own Google listing. Link this location to one on the Google screen, or choose another location at the top of the page."
+#: src/admin/pages/reviews/components/ReplyDialog.jsx:236
+msgid "AI replies are coming in FoundHint Pro. Nothing is sent until you press Publish."
 msgstr ""
 
-#: src/admin/pages/reviews/index.jsx:273
-msgid "Last read from Google on %s."
+#: src/admin/pages/reviews/components/ReplyDialog.jsx:130
+msgid "Quick templates for %d-star reviews"
+msgid_plural "Quick templates for %d-star reviews"
+msgstr[0] ""
+msgstr[1] ""
+
+#: src/admin/pages/reviews/components/ReviewCard.jsx:91
+msgid "Your reply was removed from Google."
 msgstr ""
 
-#: src/admin/pages/reviews/index.jsx:276
-msgid "Not read from Google yet."
+#: src/admin/pages/reviews/components/ReviewCard.jsx:102
+msgid "Review from %s"
 msgstr ""
 
-#: src/admin/pages/reviews/index.jsx:288
-msgid "Average rating"
+#: src/admin/pages/reviews/components/ReviewCard.jsx:116
+msgid "Select review from %s"
 msgstr ""
 
-#: src/admin/pages/reviews/index.jsx:304
-msgid "Waiting on a reply"
+#: src/admin/pages/reviews/components/ReviewCard.jsx:132 src/admin/pages/reviews/components/ReviewFilters.jsx:93
+msgid "Edited"
 msgstr ""
 
-#: src/admin/pages/reviews/index.jsx:325
-msgid "Only those needing a reply"
+#: src/admin/pages/reviews/components/ReviewCard.jsx:137 src/admin/pages/reviews/components/ReviewFilters.jsx:95
+msgid "Removed by reviewer"
 msgstr ""
 
-#: src/admin/pages/reviews/index.jsx:339
-msgid "Nothing waiting on you"
+#: src/admin/pages/reviews/components/ReviewCard.jsx:148 src/admin/pages/reviews/components/ReviewFilters.jsx:74
+msgid "Replied"
 msgstr ""
 
-#: src/admin/pages/reviews/index.jsx:340
-msgid "No reviews stored yet"
+#: src/admin/pages/reviews/components/ReviewCard.jsx:158 src/admin/pages/reviews/components/ReviewFilters.jsx:77
+msgid "Not replied"
 msgstr ""
 
-#: src/admin/pages/reviews/index.jsx:344
-msgid "Every review you have has an answer."
+#: src/admin/pages/reviews/components/ReviewCard.jsx:199
+msgid "Edit your reply to %s"
 msgstr ""
 
-#: src/admin/pages/reviews/index.jsx:348
-msgid "Press Read from Google to fetch the reviews on your profile."
+#: src/admin/pages/reviews/components/ReviewCard.jsx:221
+msgid "Delete your reply to %s"
 msgstr ""
 
-#: src/admin/pages/reviews/index.jsx:370
-msgid "Showing %1$d of %2$d."
+#: src/admin/pages/reviews/components/ReviewCard.jsx:229
+msgid "Delete your reply?"
 msgstr ""
 
-#: src/admin/pages/reviews/index.jsx:92
+#: src/admin/pages/reviews/components/ReviewCard.jsx:232
+msgid "It is removed from Google, so nobody will see it under this review any more. The review itself stays."
+msgstr ""
+
+#: src/admin/pages/reviews/components/ReviewCard.jsx:240
+msgid "Keep reply"
+msgstr ""
+
+#: src/admin/pages/reviews/components/ReviewCard.jsx:243
+msgid "Delete reply"
+msgstr ""
+
+#: src/admin/pages/reviews/components/ReviewCard.jsx:259
+msgid "The reviewer removed this review from Google, so it can no longer be replied to. It is not counted in your rating."
+msgstr ""
+
+#: src/admin/pages/reviews/components/ReviewCard.jsx:268 src/admin/pages/reviews/components/TemplateDialog.jsx:150
+msgid "Reply"
+msgstr ""
+
+#: src/admin/pages/reviews/components/ReviewCard.jsx:273
+msgid "AI replies are coming in FoundHint Pro."
+msgstr ""
+
+#: src/admin/pages/reviews/components/ReviewCard.jsx:282
+msgid "(coming soon)"
+msgstr ""
+
+#: src/admin/pages/reviews/components/ReviewFilters.jsx:41
+msgid "Filter reviews"
+msgstr ""
+
+#: src/admin/pages/reviews/components/ReviewFilters.jsx:54
+msgid "All ratings"
+msgstr ""
+
+#: src/admin/pages/reviews/components/ReviewFilters.jsx:55
+msgid "5 stars"
+msgstr ""
+
+#: src/admin/pages/reviews/components/ReviewFilters.jsx:56
+msgid "4 stars"
+msgstr ""
+
+#: src/admin/pages/reviews/components/ReviewFilters.jsx:57
+msgid "3 stars"
+msgstr ""
+
+#: src/admin/pages/reviews/components/ReviewFilters.jsx:58
+msgid "2 stars"
+msgstr ""
+
+#: src/admin/pages/reviews/components/ReviewFilters.jsx:59
+msgid "1 star"
+msgstr ""
+
+#: src/admin/pages/reviews/components/ReviewFilters.jsx:64
+msgid "Reply status"
+msgstr ""
+
+#: src/admin/pages/reviews/components/ReviewFilters.jsx:72
+msgid "All reviews"
+msgstr ""
+
+#: src/admin/pages/reviews/components/ReviewFilters.jsx:83 src/admin/pages/reviews/index.jsx:66
+msgid "Review status"
+msgstr ""
+
+#: src/admin/pages/reviews/components/ReviewFilters.jsx:91
+msgid "Any status"
+msgstr ""
+
+#: src/admin/pages/reviews/components/ReviewFilters.jsx:92
+msgid "Live"
+msgstr ""
+
+#: src/admin/pages/reviews/components/ReviewFilters.jsx:101
+msgid "Search"
+msgstr ""
+
+#: src/admin/pages/reviews/components/ReviewFilters.jsx:113
+msgid "Name or words in a review"
+msgstr ""
+
+#: src/admin/pages/reviews/components/ReviewPhotos.jsx:33
+msgid "Photo %1$d of %2$d from %3$s"
+msgstr ""
+
+#: src/admin/pages/reviews/components/ReviewPhotos.jsx:42
+msgid "Photos in this review"
+msgstr ""
+
+#: src/admin/pages/reviews/components/ReviewPhotos.jsx:73
+msgid "The photo the customer attached to their review, at full size."
+msgstr ""
+
+#: src/admin/pages/reviews/components/ReviewPhotos.jsx:79
+msgid "Photo shared on Google by the reviewer."
+msgstr ""
+
+#: src/admin/pages/reviews/components/ReviewToolbar.jsx:37
+msgid "Select every review on this page"
+msgstr ""
+
+#: src/admin/pages/reviews/components/ReviewToolbar.jsx:64
+msgid "Showing %1$d to %2$d of %3$d"
+msgstr ""
+
+#: src/admin/pages/reviews/components/ReviewToolbar.jsx:70 src/admin/pages/reviews/index.jsx:306
+msgid "No reviews match these filters"
+msgstr ""
+
+#: src/admin/pages/reviews/components/ReviewToolbar.jsx:71
+msgid "No reviews yet"
+msgstr ""
+
+#: src/admin/pages/reviews/components/ReviewToolbar.jsx:82
+msgid "Exporting…"
+msgstr ""
+
+#: src/admin/pages/reviews/components/ReviewToolbar.jsx:84
+msgid "Export selected"
+msgstr ""
+
+#: src/admin/pages/reviews/components/ReviewToolbar.jsx:85
+msgid "Export CSV"
+msgstr ""
+
+#: src/admin/pages/reviews/components/ReviewToolbar.jsx:93
+msgid "Clear"
+msgstr ""
+
+#: src/admin/pages/reviews/components/ReviewToolbar.jsx:98
+msgid "Replying to many reviews at once comes with templates and AI replies."
+msgstr ""
+
+#: src/admin/pages/reviews/components/ReviewToolbar.jsx:104
+msgid "Bulk actions"
+msgstr ""
+
+#: src/admin/pages/reviews/components/SoonTag.jsx:22
+msgid "Pro"
+msgstr ""
+
+#: src/admin/pages/reviews/components/Stars.jsx:13
+msgid "No rating"
+msgstr ""
+
+#: src/admin/pages/reviews/components/Stars.jsx:30
 msgid "%d star"
 msgid_plural "%d stars"
 msgstr[0] ""
 msgstr[1] ""
 
-#: src/admin/pages/reviews/index.jsx:186
+#: src/admin/pages/reviews/components/TemplateDialog.jsx:48
+msgid "Edit template"
+msgstr ""
+
+#: src/admin/pages/reviews/components/TemplateDialog.jsx:49
+msgid "New reply template"
+msgstr ""
+
+#: src/admin/pages/reviews/components/TemplateDialog.jsx:51
+msgid "Reply templates are part of FoundHint Pro."
+msgstr ""
+
+#: src/admin/pages/reviews/components/TemplateDialog.jsx:58
+msgid "%1$d of %2$d used for %3$d-star reviews"
+msgstr ""
+
+#: src/admin/pages/reviews/components/TemplateDialog.jsx:71
+msgid "Saving templates is part of FoundHint Pro."
+msgstr ""
+
+#: src/admin/pages/reviews/components/TemplateDialog.jsx:77
+msgid "Save template"
+msgstr ""
+
+#: src/admin/pages/reviews/components/TemplateDialog.jsx:84
+msgid "Saving your own templates comes with FoundHint Pro."
+msgstr ""
+
+#: src/admin/pages/reviews/components/TemplateDialog.jsx:93 src/admin/pages/reviews/components/TemplatesCard.jsx:51
+msgid "Star rating"
+msgstr ""
+
+#: src/admin/pages/reviews/components/TemplateDialog.jsx:107
+msgid "%d stars"
+msgstr ""
+
+#: src/admin/pages/reviews/components/TemplateDialog.jsx:116
+msgid "Used for"
+msgstr ""
+
+#: src/admin/pages/reviews/components/TemplateDialog.jsx:125
+msgid "Reviews with a comment"
+msgstr ""
+
+#: src/admin/pages/reviews/components/TemplateDialog.jsx:136
+msgid "Name"
+msgstr ""
+
+#: src/admin/pages/reviews/components/TemplateDialog.jsx:143
+msgid "e.g. Warm thank-you"
+msgstr ""
+
+#: src/admin/pages/reviews/components/TemplateDialog.jsx:165
+msgid "Insert"
+msgstr ""
+
+#: src/admin/pages/reviews/components/TemplatesCard.jsx:37
+msgid "Reply templates"
+msgstr ""
+
+#: src/admin/pages/reviews/components/TemplatesCard.jsx:42
+msgid "Ready-made replies for each star rating."
+msgstr ""
+
+#: src/admin/pages/reviews/components/TemplatesCard.jsx:106
+msgid "With comment"
+msgstr ""
+
+#: src/admin/pages/reviews/components/TemplatesCard.jsx:127
+msgid "No templates for %d-star reviews yet."
+msgstr ""
+
+#: src/admin/pages/reviews/components/TemplatesCard.jsx:146
+msgid "Add a template"
+msgstr ""
+
+#: src/admin/pages/reviews/components/TemplatesCard.jsx:151
+msgid "Importing templates is part of FoundHint Pro."
+msgstr ""
+
+#: src/admin/pages/reviews/components/TemplatesCard.jsx:158
+msgid "Import from CSV"
+msgstr ""
+
+#: src/admin/pages/reviews/components/TemplatesCard.jsx:162
+msgid "Templates belong to this location. Words in curly brackets are swapped for real details when you reply."
+msgstr ""
+
+#: src/admin/pages/reviews/index.jsx:62
+msgid "Reviewer"
+msgstr ""
+
+#: src/admin/pages/reviews/index.jsx:65
+msgid "Review"
+msgstr ""
+
+#: src/admin/pages/reviews/index.jsx:68
+msgid "Replied on"
+msgstr ""
+
+#: src/admin/pages/reviews/index.jsx:226
+msgid "Syncing…"
+msgstr ""
+
+#: src/admin/pages/reviews/index.jsx:227
+msgid "Sync reviews"
+msgstr ""
+
+#: src/admin/pages/reviews/index.jsx:240
+msgid "No Google locations yet"
+msgstr ""
+
+#: src/admin/pages/reviews/index.jsx:243
+msgid "Connect your Google account and read your profile first — reviews are read for the locations Google reports."
+msgstr ""
+
+#: src/admin/pages/reviews/index.jsx:256
+msgid "This location has no Google listing"
+msgstr ""
+
+#: src/admin/pages/reviews/index.jsx:259
+msgid "Reviews are read from a location's own Google listing. Link this location to one on the Google screen, or choose another location at the top of the page."
+msgstr ""
+
+#: src/admin/pages/reviews/index.jsx:310
+msgid "No reviews stored yet"
+msgstr ""
+
+#: src/admin/pages/reviews/index.jsx:314
+msgid "Try a different rating, status or search."
+msgstr ""
+
+#: src/admin/pages/reviews/index.jsx:318
+msgid "Press Sync reviews at the top to read the reviews on your Google profile."
+msgstr ""
+
+#: src/admin/pages/reviews/index.jsx:365
+msgid "Review tools"
+msgstr ""
+
+#: src/admin/pages/reviews/index.jsx:373
+msgid "Email alerts"
+msgstr ""
+
+#: src/admin/pages/reviews/index.jsx:381
+msgid "AI reply history"
+msgstr ""
+
+#: src/admin/pages/reviews/index.jsx:173
 msgid "Read %d review from Google."
 msgid_plural "Read %d reviews from Google."
 msgstr[0] ""
 msgstr[1] ""
+
+#: src/admin/pages/reviews/lib/replies.js:35
+msgid "Thank you so much, {{reviewer_name}}! We're really glad you had a great experience with us. We look forward to seeing you again. — {{location_name}}"
+msgstr ""
+
+#: src/admin/pages/reviews/lib/replies.js:39
+msgid "Thank you for the 5 stars, {{reviewer_name}}! It means a lot to our team at {{location_name}}."
+msgstr ""
+
+#: src/admin/pages/reviews/lib/replies.js:45
+msgid "Thank you, {{reviewer_name}}! We're glad you enjoyed your visit, and we'll keep working to make the next one even better. — {{location_name}}"
+msgstr ""
+
+#: src/admin/pages/reviews/lib/replies.js:49
+msgid "Thanks for the 4 stars, {{reviewer_name}}! We hope to see you again soon at {{location_name}}."
+msgstr ""
+
+#: src/admin/pages/reviews/lib/replies.js:55
+msgid "Thank you for your feedback, {{reviewer_name}}. We'd love to hear how we could have made your visit better — please get in touch with us at {{location_name}}."
+msgstr ""
+
+#: src/admin/pages/reviews/lib/replies.js:59
+msgid "Thank you for your rating, {{reviewer_name}}. If there's anything we could do better, we'd love to hear it."
+msgstr ""
+
+#: src/admin/pages/reviews/lib/replies.js:65
+msgid "{{reviewer_name}}, we're sorry your visit fell short. We'd like to put it right — please contact us at {{location_name}} so we can talk it through."
+msgstr ""
+
+#: src/admin/pages/reviews/lib/replies.js:69
+msgid "We're sorry your experience wasn't better, {{reviewer_name}}. Please get in touch so we can make it right."
+msgstr ""
+
+#: src/admin/pages/reviews/lib/replies.js:75
+msgid "{{reviewer_name}}, we're truly sorry to read this. This isn't the experience we want for anyone. Please contact us at {{location_name}} so we can make it right."
+msgstr ""
+
+#: src/admin/pages/reviews/lib/replies.js:79
+msgid "We're sorry, {{reviewer_name}}. We'd like to understand what went wrong — please get in touch with us at {{location_name}}."
+msgstr ""
+
+#: src/admin/pages/reviews/lib/templates.js:19
+msgid "Warm thank-you"
+msgstr ""
+
+#: src/admin/pages/reviews/lib/templates.js:20
+msgid "Hi {{reviewer_name}}, thank you for such a lovely review! Our whole team at {{location_name}} was happy to read it. See you at your next visit."
+msgstr ""
+
+#: src/admin/pages/reviews/lib/templates.js:29
+msgid "Short and sweet"
+msgstr ""
+
+#: src/admin/pages/reviews/lib/templates.js:30
+msgid "Thanks so much for the 5 stars, {{reviewer_name}}! It means a lot to our team in {{location_city}}."
+msgstr ""
+
+#: src/admin/pages/reviews/lib/templates.js:39
+msgid "Glad you came"
+msgstr ""
+
+#: src/admin/pages/reviews/lib/templates.js:40
+msgid "Thank you, {{reviewer_name}}! We're glad you enjoyed your visit, and we'll keep working to make the next one even better."
+msgstr ""
+
+#: src/admin/pages/reviews/lib/templates.js:49
+msgid "We're listening"
+msgstr ""
+
+#: src/admin/pages/reviews/lib/templates.js:50
+msgid "Thanks for your honest feedback, {{reviewer_name}}. We'd love to hear how we could have made your visit better."
+msgstr ""
+
+#: src/admin/pages/reviews/lib/templates.js:59
+msgid "Let's put it right"
+msgstr ""
+
+#: src/admin/pages/reviews/lib/templates.js:60
+msgid "{{reviewer_name}}, we're sorry your visit fell short. Please contact us at {{location_name}} so we can put it right."
+msgstr ""
+
+#: src/admin/pages/reviews/lib/templates.js:69
+msgid "Sincere apology"
+msgstr ""
+
+#: src/admin/pages/reviews/lib/templates.js:70
+msgid "{{reviewer_name}}, we're truly sorry to read this. Please get in touch with us at {{location_name}} so we can make it right."
+msgstr ""
 
 #: src/admin/pages/schema/index.jsx:36
 msgid "Automatic"

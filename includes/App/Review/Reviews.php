@@ -35,6 +35,24 @@ class Reviews {
 	}
 
 	/**
+	 * Where a review stands: 'live', 'edited' by its author, or 'removed'
+	 * from Google — the same rule the list's status filter uses.
+	 *
+	 * @param array $review One review, as the repository returns it.
+	 * @return string
+	 */
+	public static function status( array $review ) {
+		if ( ! empty( $review['removed_at'] ) ) {
+			return 'removed';
+		}
+
+		$written = isset( $review['reviewed_at'] ) ? strtotime( (string) $review['reviewed_at'] . ' UTC' ) : false;
+		$changed = isset( $review['review_updated_at'] ) ? strtotime( (string) $review['review_updated_at'] . ' UTC' ) : false;
+
+		return $written && $changed && $changed - $written > ReviewRepository::EDIT_GRACE_SECONDS ? 'edited' : 'live';
+	}
+
+	/**
 	 * One page of reviews, with the location each belongs to named.
 	 *
 	 * @param array $args location_name, unanswered, per_page, offset.
@@ -48,14 +66,10 @@ class Reviews {
 			$items[ $index ] = self::present( $item, $titles );
 		}
 
+		// The same filters, without the paging, for "Showing 1 to 10 of 24".
 		return array(
 			'items' => $items,
-			'total' => ReviewRepository::count(
-				array(
-					'location_name' => isset( $args['location_name'] ) ? $args['location_name'] : '',
-					'unanswered'    => ! empty( $args['unanswered'] ),
-				)
-			),
+			'total' => ReviewRepository::count( array_diff_key( $args, array_flip( array( 'per_page', 'offset' ) ) ) ),
 		);
 	}
 
@@ -83,7 +97,9 @@ class Reviews {
 		$name = $review['location_name'];
 
 		$review['location_title'] = isset( $titles[ $name ] ) ? $titles[ $name ] : '';
-		$review['needs_reply']    = self::needs_reply( $review );
+		$review['status']         = self::status( $review );
+		// A removed review cannot be answered, so it is not waiting on one.
+		$review['needs_reply']    = 'removed' !== $review['status'] && self::needs_reply( $review );
 
 		return $review;
 	}

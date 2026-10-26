@@ -21,13 +21,24 @@ import { __ } from "@wordpress/i18n";
  * load does, so without this a keyboard or screen-reader user stays parked
  * on the link they just activated and never hears which screen they landed
  * on.
+ *
+ * `hidden` keeps the heading — and that focus — for a screen whose design
+ * has no title bar, such as Reviews: it is read out, but not drawn.
  */
-export function PageHeader({ title, description, actions }) {
+export function PageHeader({ title, description, actions, hidden = false }) {
   const headingRef = useRef(null);
 
   useEffect(() => {
     headingRef.current?.focus();
   }, [title]);
+
+  if (hidden) {
+    return (
+      <h1 ref={headingRef} tabIndex={-1} className="fhint:sr-only">
+        {title}
+      </h1>
+    );
+  }
 
   return (
     <>

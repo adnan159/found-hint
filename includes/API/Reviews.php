@@ -60,6 +60,28 @@ class Reviews extends AbstractController {
 								'type'    => 'boolean',
 								'default' => false,
 							),
+							'rating'        => array(
+								'type'    => 'integer',
+								'minimum' => 0,
+								'maximum' => 5,
+								'default' => 0,
+							),
+							'replied'       => array(
+								'type'    => 'string',
+								'enum'    => array( '', 'replied', 'not_replied' ),
+								'default' => '',
+							),
+							'status'        => array(
+								'type'    => 'string',
+								'enum'    => array( '', 'all', 'live', 'edited', 'removed' ),
+								'default' => '',
+							),
+							'search'        => array(
+								'type'              => 'string',
+								'maxLength'         => 200,
+								'default'           => '',
+								'sanitize_callback' => 'sanitize_text_field',
+							),
 							'per_page'      => array(
 								'type'    => 'integer',
 								'minimum' => 0,
@@ -159,6 +181,10 @@ class Reviews extends AbstractController {
 			array(
 				'location_name' => (string) $request->get_param( 'location_name' ),
 				'unanswered'    => (bool) $request->get_param( 'unanswered' ),
+				'rating'        => (int) $request->get_param( 'rating' ),
+				'replied'       => (string) $request->get_param( 'replied' ),
+				'status'        => (string) $request->get_param( 'status' ),
+				'search'        => (string) $request->get_param( 'search' ),
 				'per_page'      => (int) $request->get_param( 'per_page' ),
 				'offset'        => (int) $request->get_param( 'offset' ),
 			)

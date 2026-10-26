@@ -50,6 +50,12 @@ defined( 'ABSPATH' ) || exit;
  * @column payload           The raw review object, JSON, for fields no column
  *                           covers yet. Read-only to everything but the sync.
  * @column synced_at         When Google last answered for this row, UTC.
+ * @column removed_at        When a sync first found the review gone from Google —
+ *                           deleted by its author or taken down — UTC. NULL
+ *                           while it is live. A removed review is kept so the
+ *                           owner can still see it, but it is left out of every
+ *                           count and average, and it cannot be replied to. It
+ *                           comes back (NULL) if Google returns it again.
  * @column created_at        Row creation timestamp, UTC.
  * @column updated_at        Last write timestamp, UTC.
  */
@@ -82,6 +88,7 @@ class CreateReviewsTable {
 	review_updated_at datetime NULL,
 	payload longtext NULL,
 	synced_at datetime NULL,
+	removed_at datetime NULL,
 	created_at datetime NULL,
 	updated_at datetime NULL,
 	PRIMARY KEY  (id),
@@ -89,7 +96,8 @@ class CreateReviewsTable {
 	KEY location_name (location_name),
 	KEY star_rating (star_rating),
 	KEY reviewed_at (reviewed_at),
-	KEY replied_at (replied_at)
+	KEY replied_at (replied_at),
+	KEY removed_at (removed_at)
 ) {$charset_collate};";
 
 		return dbDelta( $sql );

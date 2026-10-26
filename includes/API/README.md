@@ -1075,10 +1075,35 @@ routes contact Google.
 
 ### `GET /reviews`
 
-Stored reviews, newest first. `location_name` limits to one Google location,
-`unanswered=1` to those with no reply. `per_page` (0–100, default 20) and
-`offset` page through them; `total` ignores paging so a "showing x of y" line
-is honest.
+Stored reviews, newest first. Filters, all optional:
+
+| Param | Values | Meaning |
+|---|---|---|
+| `location_name` | `locations/…` | One Google location |
+| `rating` | `0`–`5` | One star rating; `0` = any |
+| `replied` | `replied` · `not_replied` · `''` | Reply status (`unanswered=1` still means `not_replied`) |
+| `status` | `all` · `live` · `edited` · `removed` · `''` | `''` (default) = every review still on Google — what counts and averages use; `all` adds removed ones |
+| `search` | text | Words in the reviewer's name or the review, matched as typed (`%` and `_` are literal) |
+| `per_page` | `0`–`100` | Page size; `0` = every match (the CSV export) |
+| `offset` | `0`… | Skip this many |
+
+`meta.total` counts every match of the filters, ignoring paging, so
+"Showing 1 to 10 of 24" is honest. Unknown values answer `400`.
+
+Each review carries **`status`**: `live`; `edited` — changed by its author
+more than a minute after it was written (Google stamps some untouched
+reviews a few seconds late, and a reply does not move it); or `removed` —
+no longer returned by Google. **A removed review is kept** (with
+`removed_at`) so the owner can still read it, but it is left out of every
+count, average and "waiting on a reply", `needs_reply` is `false`, and a
+reply to it answers `409 fhint_review_removed`. It comes back to life if
+Google returns it again.
+
+Each review also carries **`photos`** — the pictures the customer attached,
+as `[{ "thumb": "…", "full": "…" }]` (empty when there are none). They are
+read from Google's `reviewMediaItems` in the stored response; only `https`
+addresses on `*.googleusercontent.com` are kept, and `full` is the same
+address with its size suffix replaced by `=s1600`.
 
 ```json
 {
@@ -1122,8 +1147,9 @@ Each entry in `locations` is `{ location_name, title, location_id, count }`;
 
 Asks Google for fresh reviews, for one `location_name` or for every synced
 location. Upserts on Google's review id, so a re-read updates rows rather
-than multiplying them, and **removes reviews Google no longer returns** — a
-deleted review must not linger in a count the owner is judged on.
+than multiplying them, and **marks reviews Google no longer returns as
+removed** — kept for the owner to read, but out of every count the owner is
+judged on.
 
 `data` carries the counts (`locations`, `reviews`, `failed`) and `meta.state`
 the refreshed figures, so a screen does not need a second request after a sync.

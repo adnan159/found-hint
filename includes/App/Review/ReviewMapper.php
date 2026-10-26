@@ -111,6 +111,40 @@ class ReviewMapper {
 	 * @param mixed $value Whatever the payload held.
 	 * @return int 1–5, or 0 when Google did not say.
 	 */
+	/**
+	 * The photos a customer attached to a review.
+	 *
+	 * Google sends them as `reviewMediaItems`, each with a `thumbnailUrl` on
+	 * its own image host. The same address with a different size suffix
+	 * (`=s1600` in place of `=k-no`) is the full photo. Only https addresses
+	 * on Google's image host are kept: the address ends up in an `<img>` in
+	 * the admin, so nothing else is let through.
+	 *
+	 * @param array $payload The review as Google sent it.
+	 * @return array[] Each `{ thumb, full }`.
+	 */
+	public static function photos( array $payload ) {
+		$items  = isset( $payload['reviewMediaItems'] ) && is_array( $payload['reviewMediaItems'] ) ? $payload['reviewMediaItems'] : array();
+		$photos = array();
+
+		foreach ( $items as $item ) {
+			$url = is_array( $item ) && isset( $item['thumbnailUrl'] ) ? (string) $item['thumbnailUrl'] : '';
+
+			if ( ! preg_match( '#^https://[a-z0-9.-]+\.googleusercontent\.com/#i', $url ) ) {
+				continue;
+			}
+
+			$url = esc_url_raw( $url );
+
+			$photos[] = array(
+				'thumb' => $url,
+				'full'  => (string) preg_replace( '#=[^/=]*$#', '', $url ) . '=s1600',
+			);
+		}
+
+		return $photos;
+	}
+
 	public static function stars( $value ) {
 		$key = strtoupper( trim( (string) $value ) );
 

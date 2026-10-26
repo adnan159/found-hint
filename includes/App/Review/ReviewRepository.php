@@ -25,9 +25,18 @@ defined( 'ABSPATH' ) || exit;
 class ReviewRepository {
 
 	/**
+	 * How long after a review was written a change to it counts as an edit.
+	 *
+	 * Google stamps `updateTime` a few seconds after `createTime` on some
+	 * reviews nobody edited — a rating saved, then its empty comment — and an
+	 * owner's reply does not move it at all. A minute separates the two.
+	 */
+	const EDIT_GRACE_SECONDS = 60;
+
+	/**
 	 * Reviews, newest first.
 	 *
-	 * @param array $args location_name, unanswered (bool), per_page, offset.
+	 * @param array $args See where(), plus per_page (0 for all) and offset.
 	 * @return array[]
 	 */
 	public static function all( array $args = array() ) {
@@ -37,18 +46,9 @@ class ReviewRepository {
 			return array();
 		}
 
-		$table  = Tables::name( Tables::REVIEWS );
-		$where  = 'WHERE 1 = %d';
-		$params = array( 1 );
+		$table = Tables::name( Tables::REVIEWS );
 
-		if ( ! empty( $args['location_name'] ) ) {
-			$where   .= ' AND location_name = %s';
-			$params[] = (string) $args['location_name'];
-		}
-
-		if ( ! empty( $args['unanswered'] ) ) {
-			$where .= " AND ( reply_comment IS NULL OR reply_comment = '' )";
-		}
+		list( $where, $params ) = self::where( $args );
 
 		$limit     = isset( $args['per_page'] ) ? (int) $args['per_page'] : 0;
 		$offset    = isset( $args['offset'] ) ? max( 0, (int) $args['offset'] ) : 0;
@@ -73,7 +73,7 @@ class ReviewRepository {
 	/**
 	 * How many reviews match, ignoring any paging.
 	 *
-	 * @param array $args location_name, unanswered (bool).
+	 * @param array $args See where().
 	 * @return int
 	 */
 	public static function count( array $args = array() ) {
@@ -83,7 +83,35 @@ class ReviewRepository {
 			return 0;
 		}
 
-		$table  = Tables::name( Tables::REVIEWS );
+		$table = Tables::name( Tables::REVIEWS );
+
+		list( $where, $params ) = self::where( $args );
+
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+		return (int) $wpdb->get_var(
+			// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+			$wpdb->prepare( "SELECT COUNT(*) FROM {$table} {$where}", $params )
+		);
+	}
+
+	/**
+	 * The WHERE clause for a set of filters, with its prepared values.
+	 *
+	 * - `location_name`: one Google location, or '' for all.
+	 * - `rating`: 1–5, or 0 for any.
+	 * - `replied`: 'replied', 'not_replied', or '' for either. `unanswered`
+	 *   (true) is the older way of asking for 'not_replied', still honoured.
+	 * - `status`: 'live' (not edited, not removed), 'edited', 'removed', 'all'
+	 *   (removed included), or '' — every review still on Google, which is
+	 *   what counts, averages and the dashboard read.
+	 * - `search`: words in the reviewer's name or the review, matched as typed.
+	 *
+	 * @param array $args Filters.
+	 * @return array{0:string, 1:array}
+	 */
+	private static function where( array $args ) {
+		global $wpdb;
+
 		$where  = 'WHERE 1 = %d';
 		$params = array( 1 );
 
@@ -92,15 +120,53 @@ class ReviewRepository {
 			$params[] = (string) $args['location_name'];
 		}
 
-		if ( ! empty( $args['unanswered'] ) ) {
-			$where .= " AND ( reply_comment IS NULL OR reply_comment = '' )";
+		$rating = isset( $args['rating'] ) ? (int) $args['rating'] : 0;
+
+		if ( $rating >= 1 && $rating <= 5 ) {
+			$where   .= ' AND star_rating = %d';
+			$params[] = $rating;
 		}
 
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-		return (int) $wpdb->get_var(
-			// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-			$wpdb->prepare( "SELECT COUNT(*) FROM {$table} {$where}", $params )
-		);
+		$replied = isset( $args['replied'] ) ? (string) $args['replied'] : '';
+
+		if ( ! empty( $args['unanswered'] ) ) {
+			$replied = 'not_replied';
+		}
+
+		if ( 'not_replied' === $replied ) {
+			$where .= " AND ( reply_comment IS NULL OR reply_comment = '' )";
+		} elseif ( 'replied' === $replied ) {
+			$where .= " AND reply_comment IS NOT NULL AND reply_comment <> ''";
+		}
+
+		$edited = 'review_updated_at > DATE_ADD( reviewed_at, INTERVAL ' . (int) self::EDIT_GRACE_SECONDS . ' SECOND )';
+
+		switch ( isset( $args['status'] ) ? (string) $args['status'] : '' ) {
+			case 'all':
+				break;
+			case 'removed':
+				$where .= ' AND removed_at IS NOT NULL';
+				break;
+			case 'edited':
+				$where .= " AND removed_at IS NULL AND {$edited}";
+				break;
+			case 'live':
+				$where .= " AND removed_at IS NULL AND NOT ( review_updated_at IS NOT NULL AND {$edited} )";
+				break;
+			default:
+				$where .= ' AND removed_at IS NULL';
+		}
+
+		$search = isset( $args['search'] ) ? trim( (string) $args['search'] ) : '';
+
+		if ( '' !== $search ) {
+			$like     = '%' . $wpdb->esc_like( $search ) . '%';
+			$where   .= ' AND ( reviewer_name LIKE %s OR comment LIKE %s )';
+			$params[] = $like;
+			$params[] = $like;
+		}
+
+		return array( $where, $params );
 	}
 
 	/**
@@ -164,6 +230,8 @@ class ReviewRepository {
 			'review_updated_at' => $data['review_updated_at'] ? $data['review_updated_at'] : null,
 			'payload'           => wp_json_encode( $data['payload'] ),
 			'synced_at'         => $now,
+			// Returned by Google, so live — even if a sync once found it gone.
+			'removed_at'        => null,
 			'updated_at'        => $now,
 		);
 
@@ -250,6 +318,9 @@ class ReviewRepository {
 			$params[] = (string) $location_name;
 		}
 
+		// A review its author removed is not part of the rating any more.
+		$where .= ' AND removed_at IS NULL';
+
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 		$rows = $wpdb->get_results(
 			// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
@@ -318,6 +389,41 @@ class ReviewRepository {
 	}
 
 	/**
+	 * Mark the reviews Google no longer returns for a location as removed.
+	 *
+	 * Kept rather than deleted, so the owner can still see what was said;
+	 * left out of every count and average from now on. A review already
+	 * marked keeps its first date.
+	 *
+	 * @param string $location_name Google location resource name.
+	 * @param array  $keep_ids      Review ids Google returned, which stay live.
+	 * @return int Rows newly marked.
+	 */
+	public static function mark_removed_for_location( $location_name, array $keep_ids ) {
+		global $wpdb;
+
+		if ( ! self::table_exists() || '' === (string) $location_name ) {
+			return 0;
+		}
+
+		$table  = Tables::name( Tables::REVIEWS );
+		$now    = current_time( 'mysql', true );
+		$params = array( $now, $now, (string) $location_name );
+		$skip   = '';
+
+		if ( $keep_ids ) {
+			$skip   = ' AND review_id NOT IN (' . implode( ',', array_fill( 0, count( $keep_ids ), '%s' ) ) . ')';
+			$params = array_merge( $params, array_map( 'strval', $keep_ids ) );
+		}
+
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+		return (int) $wpdb->query(
+			// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+			$wpdb->prepare( "UPDATE {$table} SET removed_at = %s, updated_at = %s WHERE location_name = %s AND removed_at IS NULL{$skip}", $params )
+		);
+	}
+
+	/**
 	 * Forget the reviews stored for one location.
 	 *
 	 * Used when a location stops being synced, and by the sync itself to
@@ -383,6 +489,18 @@ class ReviewRepository {
 	}
 
 	/**
+	 * The review as Google sent it, decoded.
+	 *
+	 * @param array $row Raw row.
+	 * @return array
+	 */
+	private static function payload( array $row ) {
+		$payload = isset( $row['payload'] ) ? json_decode( (string) $row['payload'], true ) : null;
+
+		return is_array( $payload ) ? $payload : array();
+	}
+
+	/**
 	 * Shape one database row for the rest of the plugin.
 	 *
 	 * @param array $row Raw row.
@@ -404,6 +522,10 @@ class ReviewRepository {
 			'reviewed_at'       => $row['reviewed_at'] ? (string) $row['reviewed_at'] : null,
 			'review_updated_at' => $row['review_updated_at'] ? (string) $row['review_updated_at'] : null,
 			'synced_at'         => $row['synced_at'] ? (string) $row['synced_at'] : null,
+			'removed_at'        => ! empty( $row['removed_at'] ) ? (string) $row['removed_at'] : null,
+			// Customer photos, read from the stored response — Google always
+			// sent them; nothing read them until now.
+			'photos'            => ReviewMapper::photos( self::payload( $row ) ),
 		);
 	}
 }

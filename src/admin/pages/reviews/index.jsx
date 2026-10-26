@@ -1,179 +1,166 @@
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { __, _n, sprintf } from "@wordpress/i18n";
-import { MessageSquareIcon, RefreshCwIcon, StarIcon } from "lucide-react";
+import { BellIcon, HistoryIcon, RefreshCwIcon } from "lucide-react";
 import { toast } from "sonner";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+import { cn } from "cn";
 import { Empty, EmptyDescription, EmptyTitle } from "@/components/ui/empty";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Spinner } from "@/components/ui/spinner";
-import { Switch } from "@/components/ui/switch";
-import { Label } from "@/components/ui/label";
 import PageHeader from "@/components/PageHeader";
-import useSelectedLocation from "@/hooks/useSelectedLocation";
 import RequestError from "@/components/RequestError";
 import SectionCard from "@/components/SectionCard";
-import ReplyBox from "./components/ReplyBox";
+import { pillButton } from "@/components/location-bar/styles";
+import { HeaderActions } from "@/context/HeaderActions";
+import useSelectedLocation from "@/hooks/useSelectedLocation";
+import { errorMessage } from "@/lib/errors";
 import {
   useGetReviewStateQuery,
   useGetReviewsQuery,
+  useLazyGetReviewsQuery,
   useSyncReviewsMutation,
 } from "@/store/api/reviewsApi";
+import AutoReplyBanner from "./components/AutoReplyBanner";
+import Pagination from "./components/Pagination";
+import ReplyDialog from "./components/ReplyDialog";
+import ReviewCard from "./components/ReviewCard";
+import ReviewFilters from "./components/ReviewFilters";
+import ReviewToolbar from "./components/ReviewToolbar";
+import SoonTag from "./components/SoonTag";
+import TemplatesCard from "./components/TemplatesCard";
+import { formatDate } from "./lib/replies";
+import { sampleTemplates } from "./lib/templates";
 
 /**
- * Google reviews.
+ * Google reviews for the location chosen in the bar at the top.
  *
- * Everything on this screen is read from stored rows. Pressing *Read from
- * Google*, or posting, editing or deleting a reply, are the only things that
- * contact Google, because asking costs a request against a quota every site
- * using this plugin shares.
+ * Everything here reads stored rows. "Sync reviews" in the bar, and
+ * posting, editing or deleting a reply, are the only things that contact
+ * Google — asking costs a request against a quota every site shares.
  *
- * Reviews are shown here, in the admin, and are deliberately not published
- * to the front end: review content belongs to its author and to Google, and
- * republishing it as the site's own structured data is not something this
- * plugin will do on an owner's behalf.
+ * Reviews are shown here, in the admin, and are not published on the site:
+ * review content belongs to its author and to Google.
  */
-const PER_PAGE = 20;
+const NO_FILTERS = { rating: "0", replied: "", status: "all", search: "" };
 
-function formatWhen(value) {
-  if (!value) {
-    return "";
+const SIDEBAR_ROW =
+  "fhint:flex fhint:items-center fhint:gap-2.5 fhint:border fhint:border-border fhint:bg-card fhint:px-4 fhint:py-3 fhint:text-[13px] fhint:font-extrabold";
+
+/** One CSV cell, quoted, with a leading formula character neutralised. */
+function cell(value) {
+  let text = String(value ?? "");
+
+  // A cell starting with = + - or @ is run as a formula by spreadsheets;
+  // a review is someone else's words and must never run as one.
+  if (/^[=+\-@]/.test(text)) {
+    text = `'${text}`;
   }
 
-  const parsed = new Date(`${value.replace(" ", "T")}Z`);
-
-  if (Number.isNaN(parsed.getTime())) {
-    return value;
-  }
-
-  return parsed.toLocaleDateString(undefined, {
-    year: "numeric",
-    month: "short",
-    day: "numeric",
-  });
+  return `"${text.replace(/"/g, '""')}"`;
 }
 
-/**
- * A rating, as stars and as words.
- *
- * The number is spelled out next to the stars on purpose: a row of icons is
- * a colour-and-shape signal, and the rating must survive somebody who cannot
- * tell those apart.
- */
-function Rating({ value }) {
-  if (!value) {
-    return (
-      <span className="fhint:text-[13px] fhint:text-muted-foreground">
-        {__("No rating", "foundhint-local-seo")}
-      </span>
-    );
-  }
+function toCsv(reviews) {
+  const header = [
+    __("Reviewer", "foundhint-local-seo"),
+    __("Rating", "foundhint-local-seo"),
+    __("Date", "foundhint-local-seo"),
+    __("Review", "foundhint-local-seo"),
+    __("Review status", "foundhint-local-seo"),
+    __("Your reply", "foundhint-local-seo"),
+    __("Replied on", "foundhint-local-seo"),
+  ];
+  const rows = reviews.map((review) => [
+    review.is_anonymous
+      ? __("Anonymous", "foundhint-local-seo")
+      : review.reviewer_name,
+    review.star_rating,
+    formatDate(review.reviewed_at),
+    review.comment,
+    review.status,
+    review.reply_comment,
+    formatDate(review.replied_at),
+  ]);
 
-  return (
-    <span className="fhint:flex fhint:items-center fhint:gap-1.5">
-      <span
-        aria-hidden="true"
-        className="fhint:flex fhint:items-center fhint:gap-0.5"
-      >
-        {[1, 2, 3, 4, 5].map((star) => (
-          <StarIcon
-            key={star}
-            className={
-              star <= value
-                ? "fhint:size-3.5 fhint:fill-current"
-                : "fhint:size-3.5 fhint:text-muted-foreground"
-            }
-          />
-        ))}
-      </span>
-      <span className="fhint:text-[13px] fhint:font-bold">
-        {sprintf(
-          /* translators: %d: a star rating from 1 to 5. */
-          _n("%d star", "%d stars", value, "foundhint-local-seo"),
-          value,
-        )}
-      </span>
-    </span>
-  );
+  // The byte-order mark makes Excel read the file as UTF-8, so names in
+  // Bengali or with accents arrive intact.
+  return `\uFEFF${[header, ...rows].map((row) => row.map(cell).join(",")).join("\r\n")}`;
 }
 
-function ReviewRow({ review }) {
-  return (
-    <li className="fhint:border-b fhint:border-border fhint:py-4 last:fhint:border-b-0">
-      <div className="fhint:flex fhint:flex-wrap fhint:items-center fhint:gap-x-3 fhint:gap-y-1.5">
-        <Rating value={review.star_rating} />
-        <span className="fhint:text-[13px] fhint:font-bold">
-          {review.is_anonymous || !review.reviewer_name
-            ? __("Anonymous", "foundhint-local-seo")
-            : review.reviewer_name}
-        </span>
-        {review.reviewed_at ? (
-          <span className="fhint:text-[13px] fhint:text-muted-foreground">
-            {formatWhen(review.reviewed_at)}
-          </span>
-        ) : null}
-        {review.location_title ? (
-          <span className="fhint:text-[13px] fhint:text-muted-foreground">
-            {review.location_title}
-          </span>
-        ) : null}
-        {review.needs_reply ? (
-          <Badge variant="secondary">
-            {__("Needs a reply", "foundhint-local-seo")}
-          </Badge>
-        ) : null}
-      </div>
-
-      {review.comment ? (
-        <p className="fhint:mt-2 fhint:text-sm">{review.comment}</p>
-      ) : (
-        <p className="fhint:mt-2 fhint:text-sm fhint:text-muted-foreground">
-          {__("A rating with no comment.", "foundhint-local-seo")}
-        </p>
-      )}
-
-      <ReplyBox review={review} formatWhen={formatWhen} />
-    </li>
+function download(name, text) {
+  const url = URL.createObjectURL(
+    new Blob([text], { type: "text/csv;charset=utf-8" }),
   );
+  const link = document.createElement("a");
+
+  link.href = url;
+  link.download = name;
+  link.click();
+  window.setTimeout(() => URL.revokeObjectURL(url), 1000);
 }
 
 export default function Reviews() {
-  // Always one location's reviews: the location chosen in the bar at the
-  // top of every page, through the Google listing that belongs to it.
   const { current, ready } = useSelectedLocation();
-  const [unanswered, setUnanswered] = useState(false);
-  const [perPage, setPerPage] = useState(PER_PAGE);
+  const [filters, setFilters] = useState(NO_FILTERS);
+  const [page, setPage] = useState(1);
+  const [perPage, setPerPage] = useState(10);
+  const [selected, setSelected] = useState([]);
+  const [replying, setReplying] = useState(null);
+  const [exporting, setExporting] = useState(false);
 
-  // The list of listings comes with the state, asked for once without a
-  // listing; the figures are then asked for that location's listing.
+  // Which Google listing belongs to the location in the bar.
   const { data: listingsState } = useGetReviewStateQuery({ locationName: "" });
   const listings = listingsState?.locations ?? [];
   const listing =
     current && listings.find((item) => item.location_id === current.id);
   const locationName = listing ? listing.location_name : "";
 
-  const {
-    currentData: state,
-    isFetching: stateFetching,
-    error: stateError,
-  } = useGetReviewStateQuery({ locationName }, { skip: !locationName });
-  const stateLoading = !ready || !listingsState || (stateFetching && !state);
+  // A new location or new filters start again at page 1, with nothing
+  // selected: a selection from other results would export the wrong rows.
+  useEffect(() => {
+    setPage(1);
+    setSelected([]);
+  }, [locationName, filters, perPage]);
+
+  const query = {
+    locationName,
+    rating: Number(filters.rating),
+    replied: filters.replied,
+    status: filters.status,
+    search: filters.search,
+  };
 
   const {
-    currentData: listingData,
-    isFetching: listLoading,
+    currentData: listData,
+    isFetching,
     error: listError,
   } = useGetReviewsQuery(
-    { locationName, unanswered, perPage },
+    { ...query, perPage, offset: (page - 1) * perPage },
     { skip: !locationName },
   );
-
+  const [fetchAll] = useLazyGetReviewsQuery();
   const [sync, { isLoading: syncing, error: syncError }] =
     useSyncReviewsMutation();
 
-  const locations = listings;
-  const items = listingData?.items ?? [];
-  const total = listingData?.total ?? 0;
+  const items = listData?.items ?? [];
+  const total = listData?.total ?? 0;
+  const pages = Math.max(1, Math.ceil(total / perPage));
+  const from = total ? (page - 1) * perPage + 1 : 0;
+  const to = Math.min(total, page * perPage);
+  const filtered =
+    filters.rating !== "0" ||
+    filters.replied ||
+    filters.status !== "all" ||
+    filters.search;
+  const templates = useMemo(() => sampleTemplates(), []);
+  const replyContext = {
+    locationName: listing?.title ?? current?.name ?? "",
+    locationCity: current?.city ?? "",
+  };
+
+  // A page past the end — after the last review on it was filtered away.
+  useEffect(() => {
+    if (page > pages) {
+      setPage(pages);
+    }
+  }, [page, pages]);
 
   const onSync = async () => {
     try {
@@ -193,44 +180,60 @@ export default function Reviews() {
         ),
       );
     } catch {
-      // The error is rendered by RequestError below; the toast would only
-      // repeat it, and a screen reader would hear the same thing twice.
+      // Shown by RequestError below; a toast would say it twice.
     }
   };
 
+  const onExport = async () => {
+    setExporting(true);
+
+    try {
+      const all = await fetchAll({ ...query, perPage: 0, offset: 0 }).unwrap();
+      const rows = selected.length
+        ? all.items.filter((review) => selected.includes(review.review_id))
+        : all.items;
+
+      download(
+        `reviews-${new Date().toISOString().slice(0, 10)}.csv`,
+        toCsv(rows),
+      );
+    } catch (error) {
+      toast.error(errorMessage(error));
+    } finally {
+      setExporting(false);
+    }
+  };
+
+  const pageIds = items.map((review) => review.review_id);
+  const noLocations = listingsState && !listings.length;
+  const noListing = ready && listingsState && listings.length > 0 && !listing;
+
   return (
     <>
-      <PageHeader
-        title={__("Reviews", "foundhint-local-seo")}
-        description={__(
-          "What people are saying on your Google Business Profile, and which reviews are still waiting on you.",
-          "foundhint-local-seo",
-        )}
-        actions={
-          <Button
+      {listing ? (
+        <HeaderActions>
+          <button
             type="button"
             onClick={onSync}
-            // Reads only the location on screen, never every location.
-            disabled={syncing || !locationName}
+            disabled={syncing}
+            className={pillButton}
           >
-            {syncing ? (
-              <>
-                <Spinner data-icon="inline-start" />
-                {__("Reading…", "foundhint-local-seo")}
-              </>
-            ) : (
-              <>
-                <RefreshCwIcon data-icon="inline-start" />
-                {__("Read from Google", "foundhint-local-seo")}
-              </>
-            )}
-          </Button>
-        }
-      />
+            <RefreshCwIcon
+              aria-hidden="true"
+              className={cn("fhint:size-3.5", syncing && "fhint:animate-spin")}
+            />
+            {syncing
+              ? __("Syncing…", "foundhint-local-seo")
+              : __("Sync reviews", "foundhint-local-seo")}
+          </button>
+        </HeaderActions>
+      ) : null}
 
-      <RequestError error={stateError ?? listError ?? syncError} />
+      <PageHeader title={__("Reviews", "foundhint-local-seo")} hidden />
 
-      {listingsState && !locations.length ? (
+      <RequestError error={listError ?? syncError} />
+
+      {noLocations ? (
         <SectionCard title={__("Reviews", "foundhint-local-seo")}>
           <Empty>
             <EmptyTitle>
@@ -246,7 +249,7 @@ export default function Reviews() {
         </SectionCard>
       ) : null}
 
-      {ready && listingsState && locations.length > 0 && !listing ? (
+      {noListing ? (
         <SectionCard title={__("Reviews", "foundhint-local-seo")}>
           <Empty>
             <EmptyTitle>
@@ -263,131 +266,134 @@ export default function Reviews() {
       ) : null}
 
       {listing ? (
-        <SectionCard
-          id="reviews-summary"
-          title={__("At a glance", "foundhint-local-seo")}
-          description={
-            state?.synced_at
-              ? sprintf(
-                  /* translators: %s: a date, e.g. "4 Oct 2026". */
-                  __("Last read from Google on %s.", "foundhint-local-seo"),
-                  formatWhen(state.synced_at),
-                )
-              : __("Not read from Google yet.", "foundhint-local-seo")
-          }
-        >
-          {stateLoading || !locationName ? (
-            <Skeleton className="fhint:h-20 fhint:w-full" />
-          ) : (
-            <div className="fhint:flex fhint:flex-wrap fhint:gap-8">
-              <div>
-                <p className="fhint:text-2xl fhint:font-bold">
-                  {state?.average || "—"}
-                </p>
-                <p className="fhint:text-[13px] fhint:text-muted-foreground">
-                  {__("Average rating", "foundhint-local-seo")}
-                </p>
+        <>
+          <AutoReplyBanner />
+
+          <div className="fhint:grid fhint:items-start fhint:gap-5 fhint:lg:grid-cols-[minmax(0,1fr)_300px]">
+            <div className="fhint:grid fhint:min-w-0 fhint:gap-3">
+              <ReviewFilters filters={filters} onChange={setFilters} />
+
+              <ReviewToolbar
+                pageIds={pageIds}
+                selected={selected}
+                onSelectPage={(on) =>
+                  setSelected((current) =>
+                    on
+                      ? [...new Set([...current, ...pageIds])]
+                      : current.filter((id) => !pageIds.includes(id)),
+                  )
+                }
+                onClear={() => setSelected([])}
+                from={from}
+                to={to}
+                total={total}
+                filtered={Boolean(filtered)}
+                onExport={onExport}
+                exporting={exporting}
+              />
+
+              {isFetching && !listData ? (
+                <div className="fhint:grid fhint:gap-3">
+                  <Skeleton className="fhint:h-36 fhint:w-full" />
+                  <Skeleton className="fhint:h-36 fhint:w-full" />
+                </div>
+              ) : null}
+
+              {listData && !items.length ? (
+                <Empty className="fhint:border fhint:border-border fhint:bg-card">
+                  <EmptyTitle>
+                    {filtered
+                      ? __(
+                          "No reviews match these filters",
+                          "foundhint-local-seo",
+                        )
+                      : __("No reviews stored yet", "foundhint-local-seo")}
+                  </EmptyTitle>
+                  <EmptyDescription>
+                    {filtered
+                      ? __(
+                          "Try a different rating, status or search.",
+                          "foundhint-local-seo",
+                        )
+                      : __(
+                          "Press Sync reviews at the top to read the reviews on your Google profile.",
+                          "foundhint-local-seo",
+                        )}
+                  </EmptyDescription>
+                </Empty>
+              ) : null}
+
+              <div
+                aria-busy={isFetching ? "true" : undefined}
+                className={cn(
+                  "fhint:grid fhint:gap-3",
+                  isFetching && listData && "fhint:opacity-60",
+                )}
+              >
+                {items.map((review) => (
+                  <ReviewCard
+                    key={review.review_id}
+                    review={review}
+                    selected={selected.includes(review.review_id)}
+                    onSelect={(on) =>
+                      setSelected((current) =>
+                        on
+                          ? [...current, review.review_id]
+                          : current.filter((id) => id !== review.review_id),
+                      )
+                    }
+                    onReply={() => setReplying(review)}
+                  />
+                ))}
               </div>
-              <div>
-                <p className="fhint:text-2xl fhint:font-bold">
-                  {state?.count ?? 0}
-                </p>
-                <p className="fhint:text-[13px] fhint:text-muted-foreground">
-                  {__("Reviews", "foundhint-local-seo")}
-                </p>
-              </div>
-              <div>
-                <p className="fhint:text-2xl fhint:font-bold">
-                  {state?.unanswered ?? 0}
-                </p>
-                <p className="fhint:text-[13px] fhint:text-muted-foreground">
-                  {__("Waiting on a reply", "foundhint-local-seo")}
-                </p>
-              </div>
+
+              {total ? (
+                <Pagination
+                  page={page}
+                  pages={pages}
+                  perPage={perPage}
+                  onPage={(next) => {
+                    setPage(next);
+                    window.scrollTo({ top: 0, behavior: "smooth" });
+                  }}
+                  onPerPage={setPerPage}
+                />
+              ) : null}
             </div>
-          )}
-        </SectionCard>
+
+            <aside
+              aria-label={__("Review tools", "foundhint-local-seo")}
+              className="fhint:grid fhint:gap-3"
+            >
+              <div className={SIDEBAR_ROW}>
+                <BellIcon
+                  aria-hidden="true"
+                  className="fhint:size-4 fhint:text-primary"
+                />
+                {__("Email alerts", "foundhint-local-seo")}
+                <SoonTag className="fhint:ml-auto" />
+              </div>
+              <div className={SIDEBAR_ROW}>
+                <HistoryIcon
+                  aria-hidden="true"
+                  className="fhint:size-4 fhint:text-primary"
+                />
+                {__("AI reply history", "foundhint-local-seo")}
+                <SoonTag className="fhint:ml-auto" />
+              </div>
+              <TemplatesCard />
+            </aside>
+          </div>
+        </>
       ) : null}
 
-      {listing ? (
-        <SectionCard
-          id="reviews-list"
-          title={__("Every review", "foundhint-local-seo")}
-          action={
-            <div className="fhint:flex fhint:flex-wrap fhint:items-center fhint:gap-4">
-              <div className="fhint:flex fhint:items-center fhint:gap-2">
-                <Switch
-                  id="reviews-unanswered"
-                  checked={unanswered}
-                  onCheckedChange={(value) => setUnanswered(Boolean(value))}
-                />
-                <Label htmlFor="reviews-unanswered">
-                  {__("Only those needing a reply", "foundhint-local-seo")}
-                </Label>
-              </div>
-            </div>
-          }
-        >
-          {listLoading && !items.length ? (
-            <Skeleton className="fhint:h-32 fhint:w-full" />
-          ) : null}
-
-          {!listLoading && !items.length ? (
-            <Empty>
-              <EmptyTitle>
-                {unanswered
-                  ? __("Nothing waiting on you", "foundhint-local-seo")
-                  : __("No reviews stored yet", "foundhint-local-seo")}
-              </EmptyTitle>
-              <EmptyDescription>
-                {unanswered
-                  ? __(
-                      "Every review you have has an answer.",
-                      "foundhint-local-seo",
-                    )
-                  : __(
-                      "Press Read from Google to fetch the reviews on your profile.",
-                      "foundhint-local-seo",
-                    )}
-              </EmptyDescription>
-            </Empty>
-          ) : null}
-
-          {items.length ? (
-            <>
-              <ul className="fhint:mt-1">
-                {items.map((review) => (
-                  <ReviewRow key={review.review_id} review={review} />
-                ))}
-              </ul>
-
-              <p
-                aria-live="polite"
-                className="fhint:mt-4 fhint:text-[13px] fhint:text-muted-foreground"
-              >
-                {sprintf(
-                  /* translators: 1: how many reviews are shown, 2: how many there are. */
-                  __("Showing %1$d of %2$d.", "foundhint-local-seo"),
-                  items.length,
-                  total,
-                )}
-              </p>
-
-              {items.length < total ? (
-                <Button
-                  type="button"
-                  variant="outline"
-                  className="fhint:mt-3"
-                  onClick={() => setPerPage(perPage + PER_PAGE)}
-                  disabled={listLoading}
-                >
-                  <MessageSquareIcon data-icon="inline-start" />
-                  {__("Show more", "foundhint-local-seo")}
-                </Button>
-              ) : null}
-            </>
-          ) : null}
-        </SectionCard>
+      {replying ? (
+        <ReplyDialog
+          review={replying}
+          context={replyContext}
+          templates={templates}
+          onClose={() => setReplying(null)}
+        />
       ) : null}
     </>
   );

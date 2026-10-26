@@ -5,6 +5,7 @@ import { Link } from "react-router";
 import LocationSwitcher, { switcherEntries } from "./LocationSwitcher";
 import { thumb } from "@/pages/profile/components/photos/lib";
 import { pillButton } from "./styles";
+import { HeaderActionsSlot } from "@/context/HeaderActions";
 
 /**
  * Which business and which location the screen is showing.
@@ -142,6 +143,9 @@ export function BusinessBar({
             </span>
           </Link>
         ) : null}
+
+        {/* The screen below can add its own buttons here — Reviews' Sync. */}
+        <HeaderActionsSlot />
 
         {entries.length > 1 ? (
           <LocationSwitcher
