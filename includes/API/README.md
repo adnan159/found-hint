@@ -395,7 +395,7 @@ rows moved).
   },
   "meta": {
     "system": {
-      "plugin_version": "0.1.0", "db_version": "0.1.0",
+      "plugin_version": "1.0.0", "db_version": "0.1.0",
       "tables_total": 7, "tables_missing": [], "db_needs_install": false,
       "log_entries": 6, "php_version": "8.2.0", "wp_version": "6.8",
       "db_charset": "utf8mb4", "timezone": "+00:00"
