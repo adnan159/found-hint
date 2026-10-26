@@ -4,7 +4,7 @@ Tags: local seo, schema, google business profile, local business, reviews
 Requires at least: 6.4
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 0.1.0
+Stable tag: 1.0.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -185,7 +185,7 @@ Send supported updates from FoundHint to Google: business information, phone num
 
 = Google Business Profile Reviews =
 
-See your customer reviews right inside your WordPress dashboard, for each location: the average rating, every review, and which ones are still waiting on a reply.
+See your customer reviews right inside your WordPress dashboard, for each location, with the reviewer's photo and any photos the customer attached. Filter by star rating, reply status and review status (live, edited, or removed by the reviewer), search by name or words, page through 5 to 100 reviews at a time, and export the list — or just the reviews you select — to CSV. Reviews a customer later removes from Google stay readable here, clearly marked, and no longer count toward your rating.
 
 = Review Replies =
 
@@ -355,6 +355,19 @@ Nothing is removed unless you ask for it. Turn on *Delete data on uninstall* in 
 
 == Changelog ==
 
+= 1.0.0 =
+* New: Redesigned Reviews screen, with Sync reviews and the location switcher in the top bar.
+* New: Filter reviews by star rating, reply status and review status, and search by reviewer name or words.
+* New: Pagination with 5, 10, 25, 50 or 100 reviews per page.
+* New: Customer photos attached to a review are shown on the review, and open full size in a viewer.
+* New: Reviewer profile photos, with initials when there is no photo.
+* New: "Edited" and "Removed by reviewer" review statuses. A removed review stays readable, is no longer counted in your rating, and cannot be replied to.
+* New: Reply dialog with the review quoted, a built-in reply for each star rating, and a character limit counter. Edit or delete your reply from the review.
+* New: Export reviews to CSV — every filtered review, or only the ones you select.
+* New: Previews of upcoming features — AI reply suggestions, auto-reply, reply templates, email alerts and AI reply history (coming soon).
+* Improvement: Clearer checkboxes, dialog borders and form fields on the Reviews screen.
+* Fix: Disconnecting and reconnecting the same Google account no longer creates duplicate locations.
+
 = 0.1.0 =
 * First release.
 * Business information, categories, locations, opening hours with special hours, services, service area, photos, and social and booking links.
@@ -364,6 +377,9 @@ Nothing is removed unless you ask for it. Turn on *Delete data on uninstall* in 
 * Google reviews for each location, with replies.
 
 == Upgrade Notice ==
+
+= 1.0.0 =
+First stable release: a redesigned Reviews screen with filters, search, pagination, customer photos and CSV export, and a fix for duplicate locations after reconnecting Google.
 
 = 0.1.0 =
 First release.
