@@ -33,6 +33,7 @@
     "eslint.config.js",
     "tsconfig.json",
     "CLAUDE.md",
+    "skills-lock.json",
     ".claude",
     ".agents",
     "build",
