@@ -811,7 +811,7 @@ msgstr ""
 msgid "What to fix"
 msgstr ""
 
-#: src/admin/layouts/root/components/Sidebar.jsx:74 src/admin/pages/reviews/index.jsx:232 src/admin/pages/reviews/index.jsx:237 src/admin/pages/reviews/index.jsx:253
+#: src/admin/layouts/root/components/Sidebar.jsx:74 src/admin/pages/reviews/index.jsx:234 src/admin/pages/reviews/index.jsx:239 src/admin/pages/reviews/index.jsx:255
 msgid "Reviews"
 msgstr ""
 
@@ -2637,7 +2637,7 @@ msgstr ""
 msgid "This day"
 msgstr ""
 
-#: src/admin/pages/profile/components/hours/SpecialDayRow.jsx:24 src/admin/pages/reviews/index.jsx:64
+#: src/admin/pages/profile/components/hours/SpecialDayRow.jsx:24 src/admin/pages/reviews/index.jsx:66
 msgid "Date"
 msgstr ""
 
@@ -3239,7 +3239,7 @@ msgstr ""
 msgid "How to reply"
 msgstr ""
 
-#: src/admin/pages/reviews/components/AutoReplySetup.jsx:158 src/admin/pages/reviews/components/ReviewFilters.jsx:46 src/admin/pages/reviews/index.jsx:63
+#: src/admin/pages/reviews/components/AutoReplySetup.jsx:158 src/admin/pages/reviews/components/ReviewFilters.jsx:46 src/admin/pages/reviews/index.jsx:65
 msgid "Rating"
 msgstr ""
 
@@ -3299,6 +3299,18 @@ msgstr ""
 msgid "Next"
 msgstr ""
 
+#: src/admin/pages/reviews/components/ProTemplatesCard.jsx:18 src/admin/pages/reviews/components/TemplatesCard.jsx:37
+msgid "Reply templates"
+msgstr ""
+
+#: src/admin/pages/reviews/components/ProTemplatesCard.jsx:28
+msgid "FoundHint Pro %s is active."
+msgstr ""
+
+#: src/admin/pages/reviews/components/ProTemplatesCard.jsx:31
+msgid "Loading FoundHint Pro…"
+msgstr ""
+
 #: src/admin/pages/reviews/components/ReplyDialog.jsx:56
 msgid "Your reply was updated on Google."
 msgstr ""
@@ -3335,7 +3347,7 @@ msgstr ""
 msgid "Publish reply"
 msgstr ""
 
-#: src/admin/pages/reviews/components/ReplyDialog.jsx:114 src/admin/pages/reviews/components/ReviewCard.jsx:82 src/admin/pages/reviews/index.jsx:72
+#: src/admin/pages/reviews/components/ReplyDialog.jsx:114 src/admin/pages/reviews/components/ReviewCard.jsx:82 src/admin/pages/reviews/index.jsx:74
 msgid "Anonymous"
 msgstr ""
 
@@ -3351,7 +3363,7 @@ msgstr ""
 msgid "Your own templates are part of FoundHint Pro."
 msgstr ""
 
-#: src/admin/pages/reviews/components/ReplyDialog.jsx:176 src/admin/pages/reviews/components/ReviewCard.jsx:180 src/admin/pages/reviews/index.jsx:67
+#: src/admin/pages/reviews/components/ReplyDialog.jsx:176 src/admin/pages/reviews/components/ReviewCard.jsx:180 src/admin/pages/reviews/index.jsx:69
 msgid "Your reply"
 msgstr ""
 
@@ -3481,7 +3493,7 @@ msgstr ""
 msgid "All reviews"
 msgstr ""
 
-#: src/admin/pages/reviews/components/ReviewFilters.jsx:83 src/admin/pages/reviews/index.jsx:66
+#: src/admin/pages/reviews/components/ReviewFilters.jsx:83 src/admin/pages/reviews/index.jsx:68
 msgid "Review status"
 msgstr ""
 
@@ -3525,7 +3537,7 @@ msgstr ""
 msgid "Showing %1$d to %2$d of %3$d"
 msgstr ""
 
-#: src/admin/pages/reviews/components/ReviewToolbar.jsx:70 src/admin/pages/reviews/index.jsx:306
+#: src/admin/pages/reviews/components/ReviewToolbar.jsx:70 src/admin/pages/reviews/index.jsx:308
 msgid "No reviews match these filters"
 msgstr ""
 
@@ -3627,10 +3639,6 @@ msgstr ""
 msgid "Insert"
 msgstr ""
 
-#: src/admin/pages/reviews/components/TemplatesCard.jsx:37
-msgid "Reply templates"
-msgstr ""
-
 #: src/admin/pages/reviews/components/TemplatesCard.jsx:42
 msgid "Ready-made replies for each star rating."
 msgstr ""
@@ -3659,67 +3667,67 @@ msgstr ""
 msgid "Templates belong to this location. Words in curly brackets are swapped for real details when you reply."
 msgstr ""
 
-#: src/admin/pages/reviews/index.jsx:62
+#: src/admin/pages/reviews/index.jsx:64
 msgid "Reviewer"
 msgstr ""
 
-#: src/admin/pages/reviews/index.jsx:65
+#: src/admin/pages/reviews/index.jsx:67
 msgid "Review"
 msgstr ""
 
-#: src/admin/pages/reviews/index.jsx:68
+#: src/admin/pages/reviews/index.jsx:70
 msgid "Replied on"
 msgstr ""
 
-#: src/admin/pages/reviews/index.jsx:226
+#: src/admin/pages/reviews/index.jsx:228
 msgid "Syncing…"
 msgstr ""
 
-#: src/admin/pages/reviews/index.jsx:227
+#: src/admin/pages/reviews/index.jsx:229
 msgid "Sync reviews"
 msgstr ""
 
-#: src/admin/pages/reviews/index.jsx:240
+#: src/admin/pages/reviews/index.jsx:242
 msgid "No Google locations yet"
 msgstr ""
 
-#: src/admin/pages/reviews/index.jsx:243
+#: src/admin/pages/reviews/index.jsx:245
 msgid "Connect your Google account and read your profile first — reviews are read for the locations Google reports."
 msgstr ""
 
-#: src/admin/pages/reviews/index.jsx:256
+#: src/admin/pages/reviews/index.jsx:258
 msgid "This location has no Google listing"
 msgstr ""
 
-#: src/admin/pages/reviews/index.jsx:259
+#: src/admin/pages/reviews/index.jsx:261
 msgid "Reviews are read from a location's own Google listing. Link this location to one on the Google screen, or choose another location at the top of the page."
 msgstr ""
 
-#: src/admin/pages/reviews/index.jsx:310
+#: src/admin/pages/reviews/index.jsx:312
 msgid "No reviews stored yet"
 msgstr ""
 
-#: src/admin/pages/reviews/index.jsx:314
+#: src/admin/pages/reviews/index.jsx:316
 msgid "Try a different rating, status or search."
 msgstr ""
 
-#: src/admin/pages/reviews/index.jsx:318
+#: src/admin/pages/reviews/index.jsx:320
 msgid "Press Sync reviews at the top to read the reviews on your Google profile."
 msgstr ""
 
-#: src/admin/pages/reviews/index.jsx:365
+#: src/admin/pages/reviews/index.jsx:367
 msgid "Review tools"
 msgstr ""
 
-#: src/admin/pages/reviews/index.jsx:373
+#: src/admin/pages/reviews/index.jsx:375
 msgid "Email alerts"
 msgstr ""
 
-#: src/admin/pages/reviews/index.jsx:381
+#: src/admin/pages/reviews/index.jsx:383
 msgid "AI reply history"
 msgstr ""
 
-#: src/admin/pages/reviews/index.jsx:173
+#: src/admin/pages/reviews/index.jsx:175
 msgid "Read %d review from Google."
 msgid_plural "Read %d reviews from Google."
 msgstr[0] ""

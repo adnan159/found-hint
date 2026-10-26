@@ -122,7 +122,7 @@ class Enqueue {
 	 * @return array
 	 */
 	private static function bootstrap_data() {
-		return array(
+		$data = array(
 			'rest_url'   => rest_url( \FHINT\API::NAMESPACE_NAME . '/' . \FHINT\API::VERSION ),
 			'rest_nonce' => wp_create_nonce( 'wp_rest' ),
 			'plugin_url' => FHINT_URL,
@@ -135,6 +135,22 @@ class Enqueue {
 				'currency'          => self::default_currency(),
 			),
 		);
+
+		/**
+		 * Filters the first-paint data handed to the admin app as
+		 * `window.FHINT`. It is page source: never add a secret.
+		 *
+		 * FoundHint Pro adds a `pro` key here — `{ version, rest_url,
+		 * features }` — which is how the app knows to show a Pro feature's
+		 * working screen instead of its upsell (src/admin/lib/pro.js). The
+		 * keys above are the app's own and are restored if a callback drops
+		 * or replaces them.
+		 *
+		 * @param array $data Bootstrap data.
+		 */
+		$filtered = apply_filters( 'fhint_admin_bootstrap_data', $data );
+
+		return is_array( $filtered ) ? array_merge( $filtered, $data ) : $data;
 	}
 
 	/**

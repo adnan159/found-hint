@@ -328,6 +328,13 @@ filter raises the plan ceilings — every limit check in the plugin goes
 through it, so a Pro tier raises a number instead of rewriting core. If
 Pro needs more, add narrow filters at the specific points it needs and
 document them; don't reintroduce a generic registry.
+
+**FoundHint Pro** is a separate add-on plugin (`../found-hint-pro`) that is
+**server-side only**: REST routes (`fhint-pro/v1`), data, jobs, limits.
+**All UI — Pro screens included — lives in this plugin.** A Pro screen is
+wrapped in `<ProFeature feature="…" fallback={upsell}>` and shows only
+when Pro reports serving that feature through `fhint_admin_bootstrap_data`
+(`src/admin/lib/pro.js`). See [`docs/EXTENDING.md`](docs/EXTENDING.md).
 UI-side gating (`PRO` badges, greyed "PRO ONLY" rows, sample-data cards)
 is described in `docs/NAVIGATION.md`.
 

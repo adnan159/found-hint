@@ -1831,3 +1831,31 @@ the listing carries photos. Both mutation-tested. Verified on the real
 bundle against re-captured REST data: the pet-shop review shows its photo
 (384×512 thumbnail, 900×1200 in the viewer).
 
+## Step 57 — FoundHint Pro add-on structure
+
+Version 1.0.0 for both plugins. Pro is a separate plugin
+(`plugins/found-hint-pro`), **server-side only**; all UI, Pro screens
+included, is in this plugin.
+
+**In this plugin** (`docs/EXTENDING.md`):
+- `fhint_admin_bootstrap_data` filter (`Admin\Enqueue`); the app's own
+  bootstrap keys survive any filter.
+- `src/admin/lib/pro.js` (`hasPro(feature)`, `proRestUrl()`),
+  `components/ProFeature.jsx` (working screen or upsell),
+  `store/api/proApi.js` (Pro endpoints, absolute URLs).
+- First feature key `reviews.templates`: `ProTemplatesCard` (placeholder,
+  reads Pro's status) in place of the `TemplatesCard` upsell.
+
+**Pro skeleton (PHP only):** same module layout as this plugin
+(`FHINTPRO\`, `fhintpro_` prefixes, `fhint-pro/v1`, text domain
+`found-hint-pro`). Runs only with FoundHint ≥ 1.0.0 active (notice
+otherwise); lifts limits via `fhint_limits`; `GET /status`;
+`Admin\AppData` adds `pro` to the bootstrap data. `composer run
+plugin:publish` → 36 KB zip.
+
+Verified on the dev site with Pro active: bootstrap carries `pro`, no
+Pro script is loaded, `/status` 200 (401 logged out); with the free
+plugin skipped, a notice and no fatal. In the browser (real bundle,
+mocked API): with Pro, the Pro card and one call to `/status`; without,
+the upsell and no Pro request; no console errors. Pro smoke suite (15)
+mutation-tested. Pro left deactivated on the dev site.
