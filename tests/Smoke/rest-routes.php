@@ -77,6 +77,13 @@ $expected = array(
 	'fhint/v1/reviews/state',
 	'fhint/v1/reviews/sync',
 	'fhint/v1/reviews/(?P<review_id>[A-Za-z0-9_-]+)/reply',
+	'fhint/v1/posts',
+	'fhint/v1/posts/state',
+	'fhint/v1/posts/photos',
+	'fhint/v1/posts/media',
+	'fhint/v1/posts/sync',
+	'fhint/v1/posts/(?P<id>\d+)',
+	'fhint/v1/posts/(?P<id>\d+)/publish',
 	'fhint/v1/schema',
 	'fhint/v1/audits',
 	'fhint/v1/dashboard',
@@ -122,6 +129,23 @@ foreach ( $routes as $route => $endpoints ) {
 }
 
 // The documented write verbs must actually be accepted.
+
+// Posting writes to the public listing: every route that sends a post to
+// Google needs a linked account, checked on the server.
+$fhint_post_guard = function ( $route, $method ) use ( $routes ) {
+	foreach ( $routes[ $route ] as $endpoint ) {
+		if ( is_array( $endpoint ) && isset( $endpoint['methods'] ) && $method === $endpoint['methods'] ) {
+			return is_array( $endpoint['permission_callback'] ) ? $endpoint['permission_callback'][1] : '';
+		}
+	}
+	return '';
+};
+check_same( 'google_write_check', $fhint_post_guard( 'fhint/v1/posts', 'POST' ), 'creating a post needs Google connected' );
+check_same( 'google_write_check', $fhint_post_guard( 'fhint/v1/posts/(?P<id>\d+)', 'PUT' ), 'editing a post needs Google connected' );
+check_same( 'google_write_check', $fhint_post_guard( 'fhint/v1/posts/(?P<id>\d+)/publish', 'POST' ), 'publishing a post needs Google connected' );
+check_same( 'google_write_check', $fhint_post_guard( 'fhint/v1/posts/media', 'POST' ), 'uploading a post photo needs Google connected — it may go on the listing' );
+check_same( 'permissions_check', $fhint_post_guard( 'fhint/v1/posts', 'GET' ), 'reading posts needs only the capability' );
+
 check( in_array( 'POST, PUT, PATCH', $methods_seen['fhint/v1/business'], true ), 'business accepts POST, PUT and PATCH' );
 check( in_array( 'GET', $methods_seen['fhint/v1/business'], true ), 'business is readable' );
 check( in_array( 'DELETE', $methods_seen['fhint/v1/locations/(?P<id>\d+)'], true ), 'a location can be deleted' );

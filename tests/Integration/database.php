@@ -37,6 +37,7 @@ use FHINT\App\Business\DescriptionHistoryRepository;
 use FHINT\App\Location\LocationAttributeRepository;
 use FHINT\App\Media\MediaRepository;
 use FHINT\App\Nap\Nap;
+use FHINT\App\Post\PostRepository;
 use FHINT\App\Review\ReviewReply;
 use FHINT\App\Review\ReviewRepository;
 use FHINT\App\Review\Reviews as ReviewService;
@@ -166,7 +167,7 @@ check( ! empty( $changes ), 'the first run creates tables' );
 $missing = Tables::missing();
 
 check_same( array(), $missing, 'every declared table exists after installation' );
-check_same( 14, count( Tables::all() ), 'all fourteen tables are declared' );
+check_same( 15, count( Tables::all() ), 'all fifteen tables are declared' );
 
 foreach ( array_keys( Tables::all() ) as $key ) {
 	check( Tables::exists( $key ), "table {$key} exists in MySQL" );
@@ -1684,6 +1685,305 @@ if ( $fhint_admin ) {
 }
 
 remove_filter( 'pre_http_request', $fhint_fake_reply, 10 );
+
+// -- Posts, with Google answered in-process ----------------------------------
+//
+// A post is public the moment Google takes it. A new post is kept whatever
+// Google says (failed, with the reason); an edit to a live post changes the
+// row only once Google has taken it.
+
+$fhint_post_calls  = array();
+$fhint_post_answer = array( 200, array() );
+$fhint_fake_posts  = static function ( $pre, $args, $url ) use ( &$fhint_post_calls, &$fhint_post_answer ) {
+	if ( false === strpos( (string) $url, 'localPosts' ) ) {
+		return $pre;
+	}
+
+	$fhint_post_calls[] = array(
+		'method' => isset( $args['method'] ) ? strtoupper( (string) $args['method'] ) : 'GET',
+		'url'    => (string) $url,
+		'body'   => isset( $args['body'] ) ? json_decode( (string) $args['body'], true ) : null,
+	);
+
+	return array(
+		'headers'  => array(),
+		'body'     => wp_json_encode( $fhint_post_answer[1] ),
+		'response' => array(
+			'code'    => $fhint_post_answer[0],
+			'message' => '',
+		),
+		'cookies'  => array(),
+	);
+};
+
+add_filter( 'pre_http_request', $fhint_fake_posts, 10, 3 );
+
+GoogleLocationRepository::upsert(
+	array(
+		'account_name'       => 'accounts/1',
+		'location_name'      => 'locations/1',
+		'title'              => 'Posts Test',
+		'store_code'         => '',
+		'address'            => '',
+		'phone'              => '',
+		'website'            => 'https://example.com',
+		'verification_state' => 'VERIFIED',
+		'cid'                => '',
+		'payload'            => array(),
+	)
+);
+
+$fhint_listing = GoogleLocationRepository::find_by_location_name( 'locations/1' );
+check( (bool) $fhint_listing, 'posts: a Google listing to post to' );
+
+// Validation first: nothing is stored, nothing is sent.
+$fhint_result = FHINT\App\Post\Posts::create( 'locations/1', array( 'topic_type' => 'update', 'summary' => '' ), true );
+check( $fhint_result instanceof FHINT\App\Core\ValidationResult, 'posts: an empty update is refused before anything is sent' );
+check_same( array(), $fhint_post_calls, 'posts: so Google is never asked' );
+check_same( 0, PostRepository::count(), 'posts: and nothing is stored' );
+
+$fhint_result = FHINT\App\Post\Posts::create( 'locations/unknown', array( 'summary' => 'Hi' ), false );
+check( is_wp_error( $fhint_result ) && 404 === $fhint_result->get_error_data()['status'], 'posts: a listing this site never read is refused' );
+
+// A draft is stored and never sent.
+$fhint_draft = FHINT\App\Post\Posts::create(
+	'locations/1',
+	array(
+		'topic_type'  => 'offer',
+		'title'       => '20% off',
+		'summary'     => 'All of October.',
+		'starts_at'   => '2026-10-01',
+		'ends_at'     => '2026-10-31',
+		'coupon_code' => 'SMILE20',
+		'cta_type'    => 'book',
+		'cta_url'     => 'https://example.com',
+		'google_name' => 'accounts/9/locations/9/localPosts/9',
+		'status'      => 'live',
+	),
+	false
+);
+check_same( 'draft', $fhint_draft['status'], 'posts: a draft is a draft' );
+check_same( array(), $fhint_post_calls, 'posts: and is not sent' );
+check_same( '', $fhint_draft['google_name'], 'posts: a request cannot set the Google name' );
+check_same( '', $fhint_draft['cta_type'], "posts: an offer keeps no button" );
+check_same( '2026-10-31 00:00:00', $fhint_draft['ends_at'], 'posts: the offer end date round-trips' );
+check_same( 'accounts/1', $fhint_draft['account_name'], 'posts: the account comes from the stored listing, not the request' );
+
+// Publishing a new post: Google says yes.
+$fhint_post_answer = array(
+	200,
+	array(
+		'name'       => 'accounts/1/locations/1/localPosts/p1',
+		'state'      => 'LIVE',
+		'topicType'  => 'STANDARD',
+		'summary'    => 'Open late on Thursdays.',
+		'searchUrl'  => 'https://local.google.com/place?id=1&lpsid=p1',
+		'createTime' => '2026-10-20T09:00:00Z',
+	),
+);
+
+$fhint_live = FHINT\App\Post\Posts::create(
+	'locations/1',
+	array(
+		'topic_type' => 'update',
+		'summary'    => 'Open late on Thursdays.',
+		'cta_type'   => 'learn_more',
+		'cta_url'    => 'https://example.com/hours',
+		'source'     => 'review',
+		'source_ref' => 'rev-9',
+	),
+	true
+);
+check( is_array( $fhint_live ) && 'live' === $fhint_live['status'], 'posts: a published post is live' );
+check_same( 'POST', $fhint_post_calls[0]['method'], 'posts: created with POST' );
+check_same( 'https://mybusiness.googleapis.com/v4/accounts/1/locations/1/localPosts', $fhint_post_calls[0]['url'], 'posts: to the listing the stored row names' );
+check_same( 'STANDARD', $fhint_post_calls[0]['body']['topicType'], 'posts: as Google spells an update' );
+check_same( 'accounts/1/locations/1/localPosts/p1', $fhint_live['google_name'], "posts: Google's name is kept" );
+check_same( '2026-10-20 09:00:00', $fhint_live['published_at'], "posts: stamped with Google's time" );
+check_same( 'review', $fhint_live['source'], 'posts: where it came from is kept' );
+check( $fhint_live['on_google'], 'posts: and it reads as on Google' );
+
+// Editing it: only by publishing, and the photo is left alone unless changed.
+$fhint_result = FHINT\App\Post\Posts::update( $fhint_live['id'], array( 'summary' => 'Draft-only edit' ), false );
+check( is_wp_error( $fhint_result ) && 'fhint_post_live' === $fhint_result->get_error_code(), 'posts: a live post is not edited without publishing' );
+
+$fhint_result = FHINT\App\Post\Posts::update( $fhint_live['id'], array( 'topic_type' => 'event' ), true );
+check( $fhint_result instanceof FHINT\App\Core\ValidationResult && isset( $fhint_result->errors()['topic_type'] ), "posts: a live post's type is locked" );
+
+$fhint_post_calls = array();
+$fhint_post_answer[1]['summary'] = 'Open late on Thursdays and Fridays.';
+$fhint_result = FHINT\App\Post\Posts::update( $fhint_live['id'], array( 'summary' => 'Open late on Thursdays and Fridays.' ), true );
+check_same( 'PATCH', $fhint_post_calls[0]['method'], 'posts: an edit is a PATCH' );
+check( false !== strpos( $fhint_post_calls[0]['url'], 'v4/accounts/1/locations/1/localPosts/p1?' ), 'posts: of that post' );
+check( false !== strpos( $fhint_post_calls[0]['url'], 'updateMask=summary%2CcallToAction' ) && false === strpos( $fhint_post_calls[0]['url'], 'media' ), 'posts: naming what changes, and not the media' );
+check_same( 'Open late on Thursdays and Fridays.', PostRepository::find( $fhint_live['id'] )['summary'], 'posts: and the edit is stored' );
+
+// Google refuses an edit: the row keeps what the public sees.
+$fhint_post_answer = array( 400, array( 'error' => array( 'code' => 400, 'message' => 'Request contains an invalid argument.', 'status' => 'INVALID_ARGUMENT' ) ) );
+$fhint_result = FHINT\App\Post\Posts::update( $fhint_live['id'], array( 'summary' => 'Refused edit' ), true );
+check( is_wp_error( $fhint_result ), 'posts: a refused edit is reported' );
+check_same( 'Open late on Thursdays and Fridays.', PostRepository::find( $fhint_live['id'] )['summary'], 'posts: and the stored post is left as Google has it' );
+check_same( 'live', PostRepository::find( $fhint_live['id'] )['status'], 'posts: and still live' );
+
+// Google refuses a new post: it is kept, failed, with the reason.
+$fhint_result = FHINT\App\Post\Posts::create( 'locations/1', array( 'summary' => 'Refused new post' ), true );
+check( is_wp_error( $fhint_result ), 'posts: a refused new post is reported' );
+$fhint_failed = PostRepository::find( (int) $fhint_result->get_error_data()['post_id'] );
+check_same( 'failed', $fhint_failed['status'], 'posts: and kept, as failed' );
+check_same( 'Request contains an invalid argument.', $fhint_failed['error'], "posts: with Google's reason" );
+
+// Retrying it once Google answers.
+$fhint_post_answer = array( 200, array( 'name' => 'accounts/1/locations/1/localPosts/p2', 'state' => 'PROCESSING', 'topicType' => 'STANDARD' ) );
+$fhint_result = FHINT\App\Post\Posts::publish( $fhint_failed['id'] );
+check_same( 'processing', $fhint_result['status'], 'posts: a retried post can be still processing' );
+check_same( '', $fhint_result['error'], 'posts: and the old reason is cleared' );
+$fhint_result = FHINT\App\Post\Posts::publish( $fhint_failed['id'] );
+check( is_wp_error( $fhint_result ) && 409 === $fhint_result->get_error_data()['status'], 'posts: a post on Google cannot be published twice' );
+
+// Filters and counts.
+check_same( 3, PostRepository::count( array( 'location_name' => 'locations/1' ) ), 'posts: three stored' );
+check_same( 1, PostRepository::count( array( 'location_name' => 'locations/1', 'status' => 'draft' ) ), 'posts: one draft' );
+check_same( 2, PostRepository::count( array( 'location_name' => 'locations/1', 'status' => 'live' ) ), 'posts: live includes still-processing' );
+check_same( 1, PostRepository::count( array( 'source' => 'review' ) ), 'posts: one from a review' );
+check_same(
+	array( 'all' => 2, 'update' => 2, 'event' => 0, 'offer' => 0 ),
+	PostRepository::counts_by_type( array( 'location_name' => 'locations/1', 'status' => 'live', 'topic_type' => 'offer' ) ),
+	'posts: the tab counts follow every filter but the type'
+);
+$fhint_ordered = PostRepository::all( array( 'location_name' => 'locations/1', 'sort' => 'old' ) );
+check_same( $fhint_live['id'], $fhint_ordered[0]['id'], 'posts: oldest first starts with the earliest published' );
+check_same( 2, count( PostRepository::all( array( 'per_page' => 2 ) ) ), 'posts: paging limits the page' );
+
+// A sync: Google's copy wins, but what only this site knows is kept, and a
+// post gone from Google is forgotten — drafts are never touched.
+$fhint_post_answer = array(
+	200,
+	array(
+		'localPosts' => array(
+			array(
+				'name'       => 'accounts/1/locations/1/localPosts/p1',
+				'state'      => 'LIVE',
+				'topicType'  => 'STANDARD',
+				'summary'    => 'Edited on Google itself.',
+				'createTime' => '2026-10-20T09:00:00Z',
+			),
+			array(
+				'name'      => 'accounts/1/locations/1/localPosts/p9',
+				'state'     => 'LIVE',
+				'topicType' => 'EVENT',
+				'event'     => array( 'title' => 'Written on Google' ),
+				'media'     => array( array( 'mediaFormat' => 'VIDEO', 'googleUrl' => 'https://lh3.googleusercontent.com/p/v1' ), array( 'mediaFormat' => 'PHOTO', 'googleUrl' => 'https://lh3.googleusercontent.com/p/v2' ) ),
+			),
+		),
+	),
+);
+$fhint_result = FHINT\App\Post\PostSync::run( 'locations/1' );
+check_same( array( 'posts' => 2, 'removed' => 1 ), $fhint_result, 'posts: a sync reads two and forgets the one Google dropped' );
+check_same( null, PostRepository::find( $fhint_failed['id'] ), 'posts: the post gone from Google is forgotten' );
+check( null !== PostRepository::find( $fhint_draft['id'] ), 'posts: the draft is untouched' );
+$fhint_synced = PostRepository::find( $fhint_live['id'] );
+check_same( 'Edited on Google itself.', $fhint_synced['summary'], "posts: Google's copy wins" );
+check_same( 'review', $fhint_synced['source'], 'posts: but its source is kept' );
+$fhint_google_only = PostRepository::find_by_google_name( 'accounts/1/locations/1/localPosts/p9' );
+check_same( 2, $fhint_google_only['media_count'], 'posts: a post with several photos or videos says how many' );
+check_same( 'manual', $fhint_google_only['source'], 'posts: a post written on Google counts as written by you' );
+
+// Deleting: from Google first; a post already gone there is still deleted here.
+$fhint_post_calls  = array();
+$fhint_post_answer = array( 404, array( 'error' => array( 'code' => 404, 'message' => 'Not found', 'status' => 'NOT_FOUND' ) ) );
+check_same( true, FHINT\App\Post\Posts::delete( $fhint_google_only['id'] ), 'posts: a post already gone from Google is deleted' );
+check_same( 'DELETE', $fhint_post_calls[0]['method'], 'posts: after asking Google' );
+$fhint_post_calls = array();
+check_same( true, FHINT\App\Post\Posts::delete( $fhint_draft['id'] ), 'posts: a draft is deleted' );
+check_same( array(), $fhint_post_calls, 'posts: without asking Google' );
+$fhint_post_answer = array( 500, array( 'error' => array( 'code' => 500, 'message' => 'Backend error', 'status' => 'INTERNAL' ) ) );
+check( is_wp_error( FHINT\App\Post\Posts::delete( $fhint_live['id'] ) ), 'posts: a delete Google refuses is reported' );
+check( null !== PostRepository::find( $fhint_live['id'] ), 'posts: and the post is kept' );
+
+// A photo uploaded for a post on a site Google cannot reach (this one is
+// on localhost): it goes on the listing's gallery as bytes, and the post
+// uses Google's link to it.
+$fhint_media_calls = array();
+$fhint_fake_media  = static function ( $pre, $args, $url ) use ( &$fhint_media_calls ) {
+	if ( false === strpos( (string) $url, 'media' ) || false !== strpos( (string) $url, 'localPosts' ) ) {
+		return $pre;
+	}
+
+	$fhint_media_calls[] = strtoupper( isset( $args['method'] ) ? (string) $args['method'] : 'GET' ) . ' ' . preg_replace( '#^https://mybusiness\.googleapis\.com#', '', strtok( (string) $url, '?' ) );
+
+	if ( false !== strpos( (string) $url, 'media:startUpload' ) ) {
+		$answer = array( 'resourceName' => 'ref-1' );
+	} elseif ( false !== strpos( (string) $url, '/upload/' ) ) {
+		$answer = array();
+	} elseif ( 'GET' === strtoupper( isset( $args['method'] ) ? (string) $args['method'] : 'GET' ) ) {
+		// Asked again a moment later, Google gives the lasting link.
+		$answer = array(
+			'name'        => 'accounts/1/locations/1/media/m1',
+			'mediaFormat' => 'PHOTO',
+			'googleUrl'   => 'https://lh3.googleusercontent.com/grass-cs/post-photo=s0',
+		);
+	} else {
+		// As Google really answers an upload: a temporary processing link.
+		$answer = array(
+			'name'        => 'accounts/1/locations/1/media/m1',
+			'mediaFormat' => 'PHOTO',
+			'googleUrl'   => 'https://lh3.googleusercontent.com/gpu-csl/post-photo',
+			'createTime'  => '2026-10-28T09:00:00Z',
+		);
+	}
+
+	return array(
+		'headers'  => array(),
+		'body'     => wp_json_encode( $answer ),
+		'response' => array(
+			'code'    => 200,
+			'message' => '',
+		),
+		'cookies'  => array(),
+	);
+};
+add_filter( 'pre_http_request', $fhint_fake_media, 10, 3 );
+add_filter( 'fhint_media_settle_pause', '__return_zero' );
+
+$fhint_image = imagecreatetruecolor( 400, 400 );
+for ( $fhint_i = 0; $fhint_i < 4000; $fhint_i++ ) {
+	imagesetpixel( $fhint_image, wp_rand( 0, 399 ), wp_rand( 0, 399 ), wp_rand( 0, 0xFFFFFF ) );
+}
+$fhint_tmp = wp_tempnam( 'post-photo.jpg' );
+imagejpeg( $fhint_image, $fhint_tmp, 95 );
+imagedestroy( $fhint_image );
+
+check( ! FHINT\App\Post\PostMedia::is_reachable( wp_get_upload_dir()['baseurl'] ), 'posts: this test site is one Google cannot reach' );
+
+$fhint_result = FHINT\App\Post\PostMedia::upload(
+	array(
+		'name'     => 'post-photo.jpg',
+		'tmp_name' => $fhint_tmp,
+		'error'    => 0,
+	),
+	'locations/1'
+);
+check( is_array( $fhint_result ) && ! empty( $fhint_result['via_gallery'] ), 'posts: an uploaded photo goes via the Google gallery' );
+check_same( 'https://lh3.googleusercontent.com/grass-cs/post-photo=s0', $fhint_result['url'] ?? '', "posts: and the post gets Google's lasting link to it, not the temporary one" );
+check_same(
+	array( 'POST /v4/accounts/1/locations/1/media:startUpload', 'POST /upload/v1/media/ref-1', 'POST /v4/accounts/1/locations/1/media', 'GET /v4/accounts/1/locations/1/media/m1' ),
+	$fhint_media_calls,
+	'posts: sent as bytes in three steps, then asked again for the lasting link'
+);
+check( (int) $fhint_result['attachment_id'] > 0, 'posts: the file is kept in the media library too' );
+
+// This suite never leaves anything behind in the developer's site.
+$fhint_attachment = (int) $fhint_result['attachment_id'];
+wp_delete_attachment( $fhint_attachment, true );
+check( null === get_post( $fhint_attachment ), 'posts: the test photo is removed again' );
+
+$fhint_result = FHINT\App\Post\PostMedia::upload( array( 'name' => 'x.jpg', 'tmp_name' => $fhint_tmp, 'error' => 0 ), 'locations/unknown' );
+check( is_wp_error( $fhint_result ) && 'fhint_no_google_location' === $fhint_result->get_error_code(), 'posts: an upload for a listing this site never read is refused' );
+
+remove_filter( 'pre_http_request', $fhint_fake_media, 10 );
+remove_filter( 'fhint_media_settle_pause', '__return_zero' );
+
+remove_filter( 'pre_http_request', $fhint_fake_posts, 10 );
 
 // -- No Google account linked: nothing shown, nothing changed ---------------
 //

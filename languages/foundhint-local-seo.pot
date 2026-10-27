@@ -53,11 +53,11 @@ msgstr ""
 msgid "None of those services belong to this business."
 msgstr ""
 
-#: includes/Admin/Menu.php:55 includes/Admin/Menu.php:56 src/admin/components/PageHeader.jsx:48 src/admin/layouts/root/components/Sidebar.jsx:316 src/admin/layouts/root/components/Sidebar.jsx:335 src/admin/pages/setup/components/WizardShell.jsx:44
+#: includes/Admin/Menu.php:55 includes/Admin/Menu.php:56 src/admin/components/PageHeader.jsx:48 src/admin/layouts/root/components/Sidebar.jsx:320 src/admin/layouts/root/components/Sidebar.jsx:339 src/admin/pages/setup/components/WizardShell.jsx:44
 msgid "FoundHint"
 msgstr ""
 
-#: includes/Admin.php:42 src/admin/layouts/root/components/Sidebar.jsx:104 src/admin/pages/settings/index.jsx:87 src/admin/pages/settings/index.jsx:96
+#: includes/Admin.php:42 src/admin/layouts/root/components/Sidebar.jsx:108 src/admin/pages/settings/index.jsx:87 src/admin/pages/settings/index.jsx:96
 msgid "Settings"
 msgstr ""
 
@@ -89,7 +89,7 @@ msgstr ""
 msgid "Several locations exist and none is marked as the main one. Choose which represents the business."
 msgstr ""
 
-#: includes/App/Audit/Rules/BusinessDescription.php:70 src/admin/lib/errors.js:288
+#: includes/App/Audit/Rules/BusinessDescription.php:70 src/admin/lib/errors.js:343
 msgid "No description."
 msgstr ""
 
@@ -101,7 +101,7 @@ msgstr ""
 msgid "Describe what you do in a sentence or two."
 msgstr ""
 
-#: includes/App/Audit/Rules/BusinessLogo.php:62 src/admin/lib/errors.js:286
+#: includes/App/Audit/Rules/BusinessLogo.php:62 src/admin/lib/errors.js:341
 msgid "No logo."
 msgstr ""
 
@@ -117,7 +117,7 @@ msgstr ""
 msgid "Add the name customers know you by on the Business screen."
 msgstr ""
 
-#: includes/App/Audit/Rules/BusinessPhone.php:71 src/admin/lib/errors.js:283
+#: includes/App/Audit/Rules/BusinessPhone.php:71 src/admin/lib/errors.js:338
 msgid "No phone number."
 msgstr ""
 
@@ -191,7 +191,7 @@ msgid_plural "%d days have no answer."
 msgstr[0] ""
 msgstr[1] ""
 
-#: includes/App/Audit/Rules/HoursSet.php:79 src/admin/lib/errors.js:291
+#: includes/App/Audit/Rules/HoursSet.php:79 src/admin/lib/errors.js:346
 msgid "No opening hours set."
 msgstr ""
 
@@ -215,7 +215,7 @@ msgstr ""
 msgid "A street, a city and a country are the minimum a search engine needs."
 msgstr ""
 
-#: includes/App/Audit/Rules/LocationCoordinates.php:66 src/admin/lib/errors.js:289
+#: includes/App/Audit/Rules/LocationCoordinates.php:66 src/admin/lib/errors.js:344
 msgid "No map coordinates."
 msgstr ""
 
@@ -275,7 +275,7 @@ msgstr ""
 msgid "Add at least one. They are published as corroborating links for the same business."
 msgstr ""
 
-#: includes/App/Audit/Rules/WebsiteAddress.php:70 src/admin/lib/errors.js:285
+#: includes/App/Audit/Rules/WebsiteAddress.php:70 src/admin/lib/errors.js:340
 msgid "No website address."
 msgstr ""
 
@@ -613,11 +613,11 @@ msgstr ""
 msgid "This server has no libsodium, so Google tokens are stored without encryption."
 msgstr ""
 
-#: includes/App/Media/MediaUpload.php:93
+#: includes/App/Media/MediaUpload.php:93 includes/App/Post/PostMedia.php:64
 msgid "No photo arrived. Choose the file again."
 msgstr ""
 
-#: includes/App/Media/MediaUpload.php:131
+#: includes/App/Media/MediaUpload.php:131 includes/App/Post/PostMedia.php:101
 msgid "The photo could not be added to your media library."
 msgstr ""
 
@@ -637,23 +637,81 @@ msgstr ""
 msgid "The file is no longer in your media library."
 msgstr ""
 
-#: includes/App/Media/MediaUpload.php:296
+#: includes/App/Media/MediaUpload.php:276
 msgid "A photo was sent to Google."
 msgstr ""
 
-#: includes/App/Media/MediaUpload.php:314
+#: includes/App/Media/MediaUpload.php:344
+msgid "Google did not take the photo. Try again."
+msgstr ""
+
+#: includes/App/Media/MediaUpload.php:362
 msgid "That photo no longer exists."
 msgstr ""
 
-#: includes/App/Media/MediaUpload.php:345
+#: includes/App/Media/MediaUpload.php:393
 msgid "Google did not confirm the photo."
+msgstr ""
+
+#: includes/App/Post/PostMedia.php:56 includes/App/Post/PostSync.php:46 includes/App/Post/Posts.php:404
+msgid "That location has no Google listing. Read your Google profile first."
+msgstr ""
+
+#: includes/App/Post/PostMedia.php:152
+msgid "The photo was added to your Google profile, but Google did not say where. Choose it from Your gallery after a refresh."
+msgstr ""
+
+#: includes/App/Post/PostMedia.php:163
+msgid "A post's photo was added to the Google profile's photos."
+msgstr ""
+
+#: includes/App/Post/PostPublisher.php:59
+msgid "Google refused a post."
+msgstr ""
+
+#: includes/App/Post/PostPublisher.php:66
+msgid "A post was sent to Google."
+msgstr ""
+
+#: includes/App/Post/PostPublisher.php:100
+msgid "A post was updated on Google."
+msgstr ""
+
+#: includes/App/Post/PostPublisher.php:121
+msgid "A post was deleted from Google."
+msgstr ""
+
+#: includes/App/Post/PostPublisher.php:160
+msgid "Google took the post, but it could not be saved here. Sync posts to see it."
+msgstr ""
+
+#: includes/App/Post/PostSync.php:93 src/admin/pages/posts/index.jsx:119
+msgid "Read %d post from Google."
+msgid_plural "Read %d posts from Google."
+msgstr[0] ""
+msgstr[1] ""
+
+#: includes/App/Post/Posts.php:114 src/admin/lib/errors.js:427
+msgid "This post is on Google. Changes to it are published straight away."
+msgstr ""
+
+#: includes/App/Post/Posts.php:159 src/admin/lib/errors.js:432
+msgid "This post is already on Google."
+msgstr ""
+
+#: includes/App/Post/Posts.php:393
+msgid "That post no longer exists."
+msgstr ""
+
+#: includes/App/Post/Posts.php:415
+msgid "The post could not be saved."
 msgstr ""
 
 #: includes/App/Profile/GoogleRefresh.php:175
 msgid "Attributes and photos were read from Google."
 msgstr ""
 
-#: includes/App/Profile/Profile.php:91 src/admin/lib/errors.js:365
+#: includes/App/Profile/Profile.php:91 src/admin/lib/errors.js:420
 msgid "That location no longer exists."
 msgstr ""
 
@@ -661,7 +719,7 @@ msgstr ""
 msgid "That is not a section of the profile."
 msgstr ""
 
-#: includes/App/Profile/Sections/Address.php:88 src/admin/lib/errors.js:380
+#: includes/App/Profile/Sections/Address.php:88 src/admin/lib/errors.js:447
 msgid "This address comes from your Google Business Profile. Change it on Google and it will be picked up here."
 msgstr ""
 
@@ -751,7 +809,7 @@ msgstr ""
 msgid "out of 5"
 msgstr ""
 
-#: src/admin/components/location-bar/BusinessBar.jsx:167
+#: src/admin/components/location-bar/BusinessBar.jsx:167 src/admin/pages/posts/components/PostRow.jsx:144
 msgid "View on Google"
 msgstr ""
 
@@ -815,55 +873,59 @@ msgstr ""
 msgid "Reviews"
 msgstr ""
 
-#: src/admin/layouts/root/components/Sidebar.jsx:78
+#: src/admin/layouts/root/components/Sidebar.jsx:78 src/admin/pages/posts/index.jsx:158
+msgid "Posts & Scheduling"
+msgstr ""
+
+#: src/admin/layouts/root/components/Sidebar.jsx:82
 msgid "Google"
 msgstr ""
 
-#: src/admin/layouts/root/components/Sidebar.jsx:82 src/admin/pages/google/index.jsx:428
+#: src/admin/layouts/root/components/Sidebar.jsx:86 src/admin/pages/google/index.jsx:428
 msgid "Google client"
 msgstr ""
 
-#: src/admin/layouts/root/components/Sidebar.jsx:86 src/admin/pages/google/index.jsx:544
+#: src/admin/layouts/root/components/Sidebar.jsx:90 src/admin/pages/google/index.jsx:544
 msgid "Connection"
 msgstr ""
 
-#: src/admin/layouts/root/components/Sidebar.jsx:90 src/admin/pages/google/components/BusinessProfiles.jsx:104
+#: src/admin/layouts/root/components/Sidebar.jsx:94 src/admin/pages/google/components/BusinessProfiles.jsx:104
 msgid "Business profiles"
 msgstr ""
 
-#: src/admin/layouts/root/components/Sidebar.jsx:94 src/admin/pages/google/components/LocationMapping.jsx:173
+#: src/admin/layouts/root/components/Sidebar.jsx:98 src/admin/pages/google/components/LocationMapping.jsx:173
 msgid "Location mapping"
 msgstr ""
 
-#: src/admin/layouts/root/components/Sidebar.jsx:98 src/admin/pages/google/components/ImportFromGoogle.jsx:181 src/admin/pages/setup/google.jsx:477
+#: src/admin/layouts/root/components/Sidebar.jsx:102 src/admin/pages/google/components/ImportFromGoogle.jsx:181 src/admin/pages/setup/google.jsx:477
 msgid "Import from Google"
 msgstr ""
 
-#: src/admin/layouts/root/components/Sidebar.jsx:108 src/admin/pages/settings/index.jsx:111
+#: src/admin/layouts/root/components/Sidebar.jsx:112 src/admin/pages/settings/index.jsx:111
 msgid "Your data"
 msgstr ""
 
-#: src/admin/layouts/root/components/Sidebar.jsx:112 src/admin/pages/settings/index.jsx:148
+#: src/admin/layouts/root/components/Sidebar.jsx:116 src/admin/pages/settings/index.jsx:148
 msgid "Activity log"
 msgstr ""
 
-#: src/admin/layouts/root/components/Sidebar.jsx:116 src/admin/pages/settings/index.jsx:231
+#: src/admin/layouts/root/components/Sidebar.jsx:120 src/admin/pages/settings/index.jsx:231
 msgid "System"
 msgstr ""
 
-#: src/admin/layouts/root/components/Sidebar.jsx:277
+#: src/admin/layouts/root/components/Sidebar.jsx:281
 msgid "Collapse section list"
 msgstr ""
 
-#: src/admin/layouts/root/components/Sidebar.jsx:278
+#: src/admin/layouts/root/components/Sidebar.jsx:282
 msgid "Expand section list"
 msgstr ""
 
-#: src/admin/layouts/root/components/Sidebar.jsx:338
+#: src/admin/layouts/root/components/Sidebar.jsx:342
 msgid "Local SEO"
 msgstr ""
 
-#: src/admin/layouts/root/components/Sidebar.jsx:368
+#: src/admin/layouts/root/components/Sidebar.jsx:372
 msgid "FoundHint Free"
 msgstr ""
 
@@ -877,7 +939,7 @@ msgstr[1] ""
 msgid "Enter the name customers know you by."
 msgstr ""
 
-#: src/admin/lib/errors.js:16 src/admin/lib/errors.js:186 src/admin/lib/errors.js:231
+#: src/admin/lib/errors.js:16 src/admin/lib/errors.js:241 src/admin/lib/errors.js:286
 msgid "That name is too long — 255 characters at most."
 msgstr ""
 
@@ -937,279 +999,355 @@ msgstr ""
 msgid "Google accepts an opening date up to one year ahead."
 msgstr ""
 
-#: src/admin/lib/errors.js:82
-msgid "Write a reply before posting it."
+#: src/admin/lib/errors.js:83
+msgid "Choose update, event or offer."
 msgstr ""
 
-#: src/admin/lib/errors.js:84 src/admin/pages/reviews/components/ReplyDialog.jsx:38
-msgid "That reply is too long for Google. Shorten it and try again."
+#: src/admin/lib/errors.js:85
+msgid "Google does not let a published post change type. Delete it and write a new one."
 msgstr ""
 
-#: src/admin/lib/errors.js:89
-msgid "Choose a real date for this day."
+#: src/admin/lib/errors.js:90
+msgid "That way of writing a post is not available."
 msgstr ""
 
-#: src/admin/lib/errors.js:91
-msgid "That date is already in the list. Edit the existing entry instead."
+#: src/admin/lib/errors.js:92
+msgid "Write what the post says."
 msgstr ""
 
-#: src/admin/lib/errors.js:96
-msgid "Google accepts JPG and PNG photos only."
+#: src/admin/lib/errors.js:94
+msgid "Google allows 1,500 characters in a post."
 msgstr ""
 
-#: src/admin/lib/errors.js:98
-msgid "That photo is over 5 MB. Choose a smaller one."
+#: src/admin/lib/errors.js:95
+msgid "Give it a title."
 msgstr ""
 
-#: src/admin/lib/errors.js:100
-msgid "That file is too small to be a photo Google will accept."
+#: src/admin/lib/errors.js:97
+msgid "Google allows 58 characters in a title."
+msgstr ""
+
+#: src/admin/lib/errors.js:99
+msgid "Choose when it starts."
+msgstr ""
+
+#: src/admin/lib/errors.js:101
+msgid "That start date is not a real date."
+msgstr ""
+
+#: src/admin/lib/errors.js:103
+msgid "Choose when it ends."
 msgstr ""
 
 #: src/admin/lib/errors.js:105
-msgid "That photo is too small. Google needs at least 250 pixels on each side."
+msgid "That end date is not a real date."
 msgstr ""
 
-#: src/admin/lib/errors.js:110
-msgid "That is not a value Google accepts here."
+#: src/admin/lib/errors.js:107
+msgid "It has to end after it starts."
 msgstr ""
 
-#: src/admin/lib/errors.js:112
-msgid "That service no longer exists. Reload the page and try again."
+#: src/admin/lib/errors.js:109
+msgid "Choose a button from the list."
 msgstr ""
 
-#: src/admin/lib/errors.js:117
-msgid "That service is in the list twice."
+#: src/admin/lib/errors.js:111
+msgid "Add the link the button opens."
 msgstr ""
 
-#: src/admin/lib/errors.js:119
-msgid "That service could not be read."
-msgstr ""
-
-#: src/admin/lib/errors.js:121
-msgid "The list of services could not be read."
-msgstr ""
-
-#: src/admin/lib/errors.js:123
-msgid "Google does not allow a web link in the description."
-msgstr ""
-
-#: src/admin/lib/errors.js:128
-msgid "Google says this is too long."
-msgstr ""
-
-#: src/admin/lib/errors.js:130
-msgid "Google does not recognise that category."
-msgstr ""
-
-#: src/admin/lib/errors.js:132
-msgid "Google could not accept that web address. Check it opens in a browser."
-msgstr ""
-
-#: src/admin/lib/errors.js:137
-msgid "Google did not accept this value."
-msgstr ""
-
-#: src/admin/lib/errors.js:139
-msgid "Google does not have that category. Choose one from the list."
-msgstr ""
-
-#: src/admin/lib/errors.js:144
-msgid "One of those categories is not on Google's list. Choose each one from the suggestions."
-msgstr ""
-
-#: src/admin/lib/errors.js:149
-msgid "Google allows 9 extra categories at most. Remove one to add another."
-msgstr ""
-
-#: src/admin/lib/errors.js:154
-msgid "Your main category is already counted. Remove it from the extra categories."
-msgstr ""
-
-#: src/admin/lib/errors.js:159 src/admin/lib/errors.js:202
-msgid "That does not look like an email address."
-msgstr ""
-
-#: src/admin/lib/errors.js:161 src/admin/lib/errors.js:204
-msgid "That does not look like a phone number."
-msgstr ""
-
-#: src/admin/lib/errors.js:163 src/admin/lib/errors.js:206 src/admin/lib/errors.js:250
+#: src/admin/lib/errors.js:113 src/admin/lib/errors.js:118 src/admin/lib/errors.js:218 src/admin/lib/errors.js:261 src/admin/lib/errors.js:305
 msgid "Enter a full web address, starting with https://"
 msgstr ""
 
-#: src/admin/lib/errors.js:168 src/admin/lib/errors.js:255
+#: src/admin/lib/errors.js:123
+msgid "A coupon code can be 58 characters at most."
+msgstr ""
+
+#: src/admin/lib/errors.js:125
+msgid "Terms can be 5,000 characters at most."
+msgstr ""
+
+#: src/admin/lib/errors.js:127
+msgid "Google is still processing this photo. Wait a minute, then choose it again from Your gallery."
+msgstr ""
+
+#: src/admin/lib/errors.js:132
+msgid "That photo is not a web address Google can open."
+msgstr ""
+
+#: src/admin/lib/errors.js:137
+msgid "Write a reply before posting it."
+msgstr ""
+
+#: src/admin/lib/errors.js:139 src/admin/pages/reviews/components/ReplyDialog.jsx:38
+msgid "That reply is too long for Google. Shorten it and try again."
+msgstr ""
+
+#: src/admin/lib/errors.js:144
+msgid "Choose a real date for this day."
+msgstr ""
+
+#: src/admin/lib/errors.js:146
+msgid "That date is already in the list. Edit the existing entry instead."
+msgstr ""
+
+#: src/admin/lib/errors.js:151
+msgid "Google accepts JPG and PNG photos only."
+msgstr ""
+
+#: src/admin/lib/errors.js:153
+msgid "That photo is over 5 MB. Choose a smaller one."
+msgstr ""
+
+#: src/admin/lib/errors.js:155
+msgid "That file is too small to be a photo Google will accept."
+msgstr ""
+
+#: src/admin/lib/errors.js:160
+msgid "That photo is too small. Google needs at least 250 pixels on each side."
+msgstr ""
+
+#: src/admin/lib/errors.js:165
+msgid "That is not a value Google accepts here."
+msgstr ""
+
+#: src/admin/lib/errors.js:167
+msgid "That service no longer exists. Reload the page and try again."
+msgstr ""
+
+#: src/admin/lib/errors.js:172
+msgid "That service is in the list twice."
+msgstr ""
+
+#: src/admin/lib/errors.js:174
+msgid "That service could not be read."
+msgstr ""
+
+#: src/admin/lib/errors.js:176
+msgid "The list of services could not be read."
+msgstr ""
+
+#: src/admin/lib/errors.js:178
+msgid "Google does not allow a web link in the description."
+msgstr ""
+
+#: src/admin/lib/errors.js:183
+msgid "Google says this is too long."
+msgstr ""
+
+#: src/admin/lib/errors.js:185
+msgid "Google does not recognise that category."
+msgstr ""
+
+#: src/admin/lib/errors.js:187
+msgid "Google could not accept that web address. Check it opens in a browser."
+msgstr ""
+
+#: src/admin/lib/errors.js:192
+msgid "Google did not accept this value."
+msgstr ""
+
+#: src/admin/lib/errors.js:194
+msgid "Google does not have that category. Choose one from the list."
+msgstr ""
+
+#: src/admin/lib/errors.js:199
+msgid "One of those categories is not on Google's list. Choose each one from the suggestions."
+msgstr ""
+
+#: src/admin/lib/errors.js:204
+msgid "Google allows 9 extra categories at most. Remove one to add another."
+msgstr ""
+
+#: src/admin/lib/errors.js:209
+msgid "Your main category is already counted. Remove it from the extra categories."
+msgstr ""
+
+#: src/admin/lib/errors.js:214 src/admin/lib/errors.js:257
+msgid "That does not look like an email address."
+msgstr ""
+
+#: src/admin/lib/errors.js:216 src/admin/lib/errors.js:259
+msgid "That does not look like a phone number."
+msgstr ""
+
+#: src/admin/lib/errors.js:223 src/admin/lib/errors.js:310
 msgid "Enter a full image address, starting with https://"
 msgstr ""
 
-#: src/admin/lib/errors.js:173
+#: src/admin/lib/errors.js:228
 msgid "Keep the price range short, like $$."
 msgstr ""
 
-#: src/admin/lib/errors.js:175
+#: src/admin/lib/errors.js:230
 msgid "Enter a real date in YYYY-MM-DD form."
 msgstr ""
 
-#: src/admin/lib/errors.js:177
+#: src/admin/lib/errors.js:232
 msgid "Enter the full profile address, starting with https://"
 msgstr ""
 
-#: src/admin/lib/errors.js:184
+#: src/admin/lib/errors.js:239
 msgid "Give this location a name, such as Downtown."
 msgstr ""
 
-#: src/admin/lib/errors.js:191
+#: src/admin/lib/errors.js:246
 msgid "That is too long — 255 characters at most."
 msgstr ""
 
-#: src/admin/lib/errors.js:193
+#: src/admin/lib/errors.js:248
 msgid "Use a two-letter country code, such as US or BD."
 msgstr ""
 
-#: src/admin/lib/errors.js:198
+#: src/admin/lib/errors.js:253
 msgid "Latitude must be between -90 and 90."
 msgstr ""
 
-#: src/admin/lib/errors.js:200
+#: src/admin/lib/errors.js:255
 msgid "Longitude must be between -180 and 180."
 msgstr ""
 
-#: src/admin/lib/errors.js:211
+#: src/admin/lib/errors.js:266
 msgid "Choose a time zone from the list."
 msgstr ""
 
-#: src/admin/lib/errors.js:213 src/admin/lib/errors.js:260
+#: src/admin/lib/errors.js:268 src/admin/lib/errors.js:315
 msgid "Choose a status from the list."
 msgstr ""
 
-#: src/admin/lib/errors.js:217
+#: src/admin/lib/errors.js:272
 msgid "That is not a valid day."
 msgstr ""
 
-#: src/admin/lib/errors.js:219
+#: src/admin/lib/errors.js:274
 msgid "Add an opening time, or mark the day closed."
 msgstr ""
 
-#: src/admin/lib/errors.js:221
+#: src/admin/lib/errors.js:276
 msgid "Add a closing time, or mark the day closed."
 msgstr ""
 
-#: src/admin/lib/errors.js:223
+#: src/admin/lib/errors.js:278
 msgid "Opening and closing time cannot be the same."
 msgstr ""
 
-#: src/admin/lib/errors.js:225
+#: src/admin/lib/errors.js:280
 msgid "These times overlap each other."
 msgstr ""
 
-#: src/admin/lib/errors.js:229
+#: src/admin/lib/errors.js:284
 msgid "Give this service a name."
 msgstr ""
 
-#: src/admin/lib/errors.js:236
+#: src/admin/lib/errors.js:291
 msgid "A service needs a URL slug."
 msgstr ""
 
-#: src/admin/lib/errors.js:238
+#: src/admin/lib/errors.js:293
 msgid "That slug is too long — 200 characters at most."
 msgstr ""
 
-#: src/admin/lib/errors.js:242
+#: src/admin/lib/errors.js:297
 msgid "Enter a number."
 msgstr ""
 
-#: src/admin/lib/errors.js:244
+#: src/admin/lib/errors.js:299
 msgid "A price cannot be negative."
 msgstr ""
 
-#: src/admin/lib/errors.js:246
+#: src/admin/lib/errors.js:301
 msgid "Choose a currency for this price."
 msgstr ""
 
-#: src/admin/lib/errors.js:248
+#: src/admin/lib/errors.js:303
 msgid "Use a three-letter currency code, such as USD."
 msgstr ""
 
-#: src/admin/lib/errors.js:265
+#: src/admin/lib/errors.js:320
 msgid "Add your business details before publishing markup."
 msgstr ""
 
-#: src/admin/lib/errors.js:270
+#: src/admin/lib/errors.js:325
 msgid "Add a location before publishing markup."
 msgstr ""
 
-#: src/admin/lib/errors.js:272
+#: src/admin/lib/errors.js:327
 msgid "A business name is required."
 msgstr ""
 
-#: src/admin/lib/errors.js:274
+#: src/admin/lib/errors.js:329
 msgid "The address needs a street, a city and a country at least."
 msgstr ""
 
-#: src/admin/lib/errors.js:279
+#: src/admin/lib/errors.js:334
 msgid "This location is marked permanently closed, so nothing is published for it."
 msgstr ""
 
-#: src/admin/lib/errors.js:356
+#: src/admin/lib/errors.js:411
 msgid "Your session has expired. Reload the page and sign in."
 msgstr ""
 
-#: src/admin/lib/errors.js:361
+#: src/admin/lib/errors.js:416
 msgid "You do not have permission to change this."
 msgstr ""
 
-#: src/admin/lib/errors.js:363
+#: src/admin/lib/errors.js:418
 msgid "Add your business details first."
 msgstr ""
 
-#: src/admin/lib/errors.js:367
+#: src/admin/lib/errors.js:422
+msgid "That post no longer exists. Sync posts to see the latest."
+msgstr ""
+
+#: src/admin/lib/errors.js:434
 msgid "That review is no longer stored here. Read your reviews from Google again."
 msgstr ""
 
-#: src/admin/lib/errors.js:372
+#: src/admin/lib/errors.js:439
 msgid "That service no longer exists."
 msgstr ""
 
-#: src/admin/lib/errors.js:374
+#: src/admin/lib/errors.js:441
 msgid "The changes could not be saved. Try again."
 msgstr ""
 
-#: src/admin/lib/errors.js:376
+#: src/admin/lib/errors.js:443
 msgid "Nothing to reorder."
 msgstr ""
 
-#: src/admin/lib/errors.js:378
+#: src/admin/lib/errors.js:445
 msgid "Check the highlighted fields and try again."
 msgstr ""
 
-#: src/admin/lib/errors.js:385
+#: src/admin/lib/errors.js:452
 msgid "Connect Google before sending your profile."
 msgstr ""
 
-#: src/admin/lib/errors.js:387
+#: src/admin/lib/errors.js:454
 msgid "Choose which Google listing belongs to this business first."
 msgstr ""
 
-#: src/admin/lib/errors.js:392
+#: src/admin/lib/errors.js:459
 msgid "Something changed since this was checked. Check again before sending."
 msgstr ""
 
-#: src/admin/lib/errors.js:397
+#: src/admin/lib/errors.js:464
 msgid "Google already has everything in this step."
 msgstr ""
 
-#: src/admin/lib/errors.js:399
+#: src/admin/lib/errors.js:466
 msgid "Google did not accept this. Nothing was changed."
 msgstr ""
 
-#: src/admin/lib/errors.js:412
+#: src/admin/lib/errors.js:479
 msgid "Your plan includes %d location."
 msgstr ""
 
-#: src/admin/lib/errors.js:420
+#: src/admin/lib/errors.js:487
 msgid "Your plan includes %d services."
 msgstr ""
 
-#: src/admin/lib/errors.js:427
+#: src/admin/lib/errors.js:494
 msgid "Something went wrong. Try again."
 msgstr ""
 
@@ -1407,7 +1545,7 @@ msgstr ""
 msgid "In your own words, e.g. Grocery Store."
 msgstr ""
 
-#: src/admin/pages/business/index.jsx:293 src/admin/pages/google/components/ImportFromGoogle.jsx:57 src/admin/pages/profile/components/publish/labels.js:11 src/admin/pages/profile/components/services/ServiceDescriptionField.jsx:17
+#: src/admin/pages/business/index.jsx:293 src/admin/pages/google/components/ImportFromGoogle.jsx:57 src/admin/pages/posts/components/Composer.jsx:388 src/admin/pages/profile/components/publish/labels.js:11 src/admin/pages/profile/components/services/ServiceDescriptionField.jsx:17
 msgid "Description"
 msgstr ""
 
@@ -2175,6 +2313,720 @@ msgstr ""
 msgid "Page not found"
 msgstr ""
 
+#: src/admin/pages/posts/components/Composer.jsx:199
+msgid "Your post was updated on Google."
+msgstr ""
+
+#: src/admin/pages/posts/components/Composer.jsx:201 src/admin/pages/posts/components/PostRow.jsx:53
+msgid "Your post was published on Google."
+msgstr ""
+
+#: src/admin/pages/posts/components/Composer.jsx:202
+msgid "Draft saved."
+msgstr ""
+
+#: src/admin/pages/posts/components/Composer.jsx:217 src/admin/pages/profile/components/PublishDialog.jsx:143 src/admin/pages/profile/components/publish/PublishStep.jsx:51
+msgid "Sending…"
+msgstr ""
+
+#: src/admin/pages/posts/components/Composer.jsx:219
+msgid "Update on Google"
+msgstr ""
+
+#: src/admin/pages/posts/components/Composer.jsx:221
+msgid "Save draft"
+msgstr ""
+
+#: src/admin/pages/posts/components/Composer.jsx:222
+msgid "Publish to Google"
+msgstr ""
+
+#: src/admin/pages/posts/components/Composer.jsx:247 src/admin/pages/posts/index.jsx:238
+msgid "New post"
+msgstr ""
+
+#: src/admin/pages/posts/components/Composer.jsx:249
+msgid "Edit post"
+msgstr ""
+
+#: src/admin/pages/posts/components/Composer.jsx:250
+msgid "Finish post"
+msgstr ""
+
+#: src/admin/pages/posts/components/Composer.jsx:256
+msgid "For %s"
+msgstr ""
+
+#: src/admin/pages/posts/components/Composer.jsx:263
+msgid "Write a post for your Google Business Profile. A preview of how Google shows it is beside the form."
+msgstr ""
+
+#: src/admin/pages/posts/components/Composer.jsx:276 src/admin/pages/profile/components/PublishDialog.jsx:123 src/admin/pages/profile/components/ServiceDialog.jsx:133 src/admin/pages/reviews/components/ReviewsDialog.jsx:59
+msgid "Close"
+msgstr ""
+
+#: src/admin/pages/posts/components/Composer.jsx:283 src/admin/pages/posts/components/PostFilters.jsx:62
+msgid "Post type"
+msgstr ""
+
+#: src/admin/pages/posts/components/Composer.jsx:332
+msgid "How to write"
+msgstr ""
+
+#: src/admin/pages/posts/components/Composer.jsx:338 src/admin/pages/posts/index.jsx:222
+msgid "Writing with AI is part of FoundHint Pro."
+msgstr ""
+
+#: src/admin/pages/posts/components/Composer.jsx:345 src/admin/pages/posts/index.jsx:229
+msgid "Write with AI"
+msgstr ""
+
+#: src/admin/pages/posts/components/Composer.jsx:350
+msgid "Write it myself"
+msgstr ""
+
+#: src/admin/pages/posts/components/Composer.jsx:359
+msgid "Event title"
+msgstr ""
+
+#: src/admin/pages/posts/components/Composer.jsx:360
+msgid "Offer title"
+msgstr ""
+
+#: src/admin/pages/posts/components/Composer.jsx:375
+msgid "e.g. Free kids check-up day"
+msgstr ""
+
+#: src/admin/pages/posts/components/Composer.jsx:376
+msgid "e.g. 20% off teeth whitening"
+msgstr ""
+
+#: src/admin/pages/posts/components/Composer.jsx:395
+msgid "Say what it is, who it is for, and what to do next."
+msgstr ""
+
+#: src/admin/pages/posts/components/Composer.jsx:399
+msgid "Aim for 150 to 300 characters. Lead with the most useful detail."
+msgstr ""
+
+#: src/admin/pages/posts/components/Composer.jsx:414
+msgid "What is new? Write it the way you would tell a customer at the front desk."
+msgstr ""
+
+#: src/admin/pages/posts/components/Composer.jsx:418
+msgid "What is happening, who it is for, and anything people should bring."
+msgstr ""
+
+#: src/admin/pages/posts/components/Composer.jsx:422
+msgid "What the deal is, who can get it, and how."
+msgstr ""
+
+#: src/admin/pages/posts/components/Composer.jsx:436
+msgid "Starts"
+msgstr ""
+
+#: src/admin/pages/posts/components/Composer.jsx:452
+msgid "Ends"
+msgstr ""
+
+#: src/admin/pages/posts/components/Composer.jsx:474
+msgid "Coupon code (optional)"
+msgstr ""
+
+#: src/admin/pages/posts/components/Composer.jsx:484
+msgid "e.g. SMILE20"
+msgstr ""
+
+#: src/admin/pages/posts/components/Composer.jsx:490
+msgid "Link to redeem (optional)"
+msgstr ""
+
+#: src/admin/pages/posts/components/Composer.jsx:517 src/admin/pages/posts/components/Composer.jsx:601
+msgid "Use my website address"
+msgstr ""
+
+#: src/admin/pages/posts/components/Composer.jsx:521
+msgid "Terms and conditions (optional)"
+msgstr ""
+
+#: src/admin/pages/posts/components/Composer.jsx:533
+msgid "e.g. New patients only. One per person."
+msgstr ""
+
+#: src/admin/pages/posts/components/Composer.jsx:546
+msgid "Button"
+msgstr ""
+
+#: src/admin/pages/posts/components/Composer.jsx:567
+msgid "Button link"
+msgstr ""
+
+#: src/admin/pages/posts/components/Composer.jsx:588
+msgid "The button calls the phone number on your Google profile."
+msgstr ""
+
+#: src/admin/pages/posts/components/Composer.jsx:625
+msgid "The photo was added to your Google profile's Photos, and this post uses it from there."
+msgstr ""
+
+#: src/admin/pages/posts/components/Composer.jsx:637 src/admin/pages/posts/components/Composer.jsx:641
+msgid "When to publish"
+msgstr ""
+
+#: src/admin/pages/posts/components/Composer.jsx:652
+msgid "Now"
+msgstr ""
+
+#: src/admin/pages/posts/components/Composer.jsx:659
+msgid "Scheduling posts is part of FoundHint Pro."
+msgstr ""
+
+#: src/admin/pages/posts/components/Composer.jsx:669
+msgid "Schedule"
+msgstr ""
+
+#: src/admin/pages/posts/components/Composer.jsx:680 src/admin/pages/posts/components/PostFilters.jsx:20 src/admin/pages/posts/lib/posts.js:48
+msgid "Draft"
+msgstr ""
+
+#: src/admin/pages/posts/components/Composer.jsx:685
+msgid "Saved here only. Nothing goes to Google until you finish it."
+msgstr ""
+
+#: src/admin/pages/posts/components/Composer.jsx:689
+msgid "Goes live when you press Publish. Google can take a few minutes to show it."
+msgstr ""
+
+#: src/admin/pages/posts/components/Composer.jsx:703
+msgid "Google did not take the post. It is saved here, so you can fix it and try again."
+msgstr ""
+
+#: src/admin/pages/posts/components/Composer.jsx:714
+msgid "Preview"
+msgstr ""
+
+#: src/admin/pages/posts/components/Composer.jsx:719
+msgid "Live preview on Google"
+msgstr ""
+
+#: src/admin/pages/posts/components/Composer.jsx:728
+msgid "Tip:"
+msgstr ""
+
+#: src/admin/pages/posts/components/Composer.jsx:729
+msgid "posts with a photo usually get more clicks than posts without one."
+msgstr ""
+
+#: src/admin/pages/posts/components/Composer.jsx:741
+msgid "Publishing posts this on your Google profile."
+msgstr ""
+
+#: src/admin/pages/posts/components/Composer.jsx:745
+msgid "Drafts are kept on this site only."
+msgstr ""
+
+#: src/admin/pages/posts/components/Composer.jsx:754 src/admin/pages/posts/components/PhotoField.jsx:57 src/admin/pages/profile/components/PublishDialog.jsx:124 src/admin/pages/profile/components/ServiceDialog.jsx:200 src/admin/pages/reviews/components/AutoReplySetup.jsx:90 src/admin/pages/reviews/components/ReplyDialog.jsx:93
+msgid "Cancel"
+msgstr ""
+
+#: src/admin/pages/posts/components/PhotoField.jsx:38 src/admin/pages/posts/components/PhotoField.jsx:280
+msgid "Customer photos"
+msgstr ""
+
+#: src/admin/pages/posts/components/PhotoField.jsx:39 src/admin/pages/posts/components/PhotoField.jsx:269
+msgid "Your gallery"
+msgstr ""
+
+#: src/admin/pages/posts/components/PhotoField.jsx:41
+msgid "Choose a photo that is already on your Google profile."
+msgstr ""
+
+#: src/admin/pages/posts/components/PhotoField.jsx:49
+msgid "Photos customers added to their reviews. Only use one with their permission."
+msgstr ""
+
+#: src/admin/pages/posts/components/PhotoField.jsx:53
+msgid "Photos on your Google Business Profile."
+msgstr ""
+
+#: src/admin/pages/posts/components/PhotoField.jsx:62
+msgid "Loading photos…"
+msgstr ""
+
+#: src/admin/pages/posts/components/PhotoField.jsx:81
+msgid "Photo from %s"
+msgstr ""
+
+#: src/admin/pages/posts/components/PhotoField.jsx:86
+msgid "Photo %d"
+msgstr ""
+
+#: src/admin/pages/posts/components/PhotoField.jsx:101
+msgid "None of this location's reviews has a photo yet. Sync reviews to check for new ones."
+msgstr ""
+
+#: src/admin/pages/posts/components/PhotoField.jsx:105
+msgid "This location has no photos on Google yet. Add them on the Business screen's Photos tab."
+msgstr ""
+
+#: src/admin/pages/posts/components/PhotoField.jsx:166
+msgid "Photo"
+msgstr ""
+
+#: src/admin/pages/posts/components/PhotoField.jsx:168
+msgid "Recommended. Posts with a photo get more clicks."
+msgstr ""
+
+#: src/admin/pages/posts/components/PhotoField.jsx:179
+msgid "The chosen photo"
+msgstr ""
+
+#: src/admin/pages/posts/components/PhotoField.jsx:207
+msgid "Google cannot open photos stored on this site, because it is not on the public internet. Choose one from Your gallery or Customer photos instead."
+msgstr ""
+
+#: src/admin/pages/posts/components/PhotoField.jsx:221
+msgid "Remove photo"
+msgstr ""
+
+#: src/admin/pages/posts/components/PhotoField.jsx:239 src/admin/pages/profile/components/photos/PendingPhotos.jsx:80 src/admin/pages/profile/components/photos/lib.js:31
+msgid "Uploading…"
+msgstr ""
+
+#: src/admin/pages/posts/components/PhotoField.jsx:240
+msgid "Upload"
+msgstr ""
+
+#: src/admin/pages/posts/components/PhotoField.jsx:245
+msgid "AI photos are part of FoundHint Pro."
+msgstr ""
+
+#: src/admin/pages/posts/components/PhotoField.jsx:256
+msgid "Make with AI"
+msgstr ""
+
+#: src/admin/pages/posts/components/PhotoField.jsx:286
+msgid "This site is not on the public internet, so Google cannot open a photo stored here. An uploaded photo is added to your Google profile's Photos first, and the post uses it from there."
+msgstr ""
+
+#: src/admin/pages/posts/components/PhotoField.jsx:188
+msgid "This post has %d photo or video on Google. Changing or removing the photo here replaces it."
+msgid_plural "This post has %d photos and videos on Google. Changing or removing the photo here replaces all of them."
+msgstr[0] ""
+msgstr[1] ""
+
+#: src/admin/pages/posts/components/PostFilters.jsx:6
+msgid "All"
+msgstr ""
+
+#: src/admin/pages/posts/components/PostFilters.jsx:7
+msgid "Updates"
+msgstr ""
+
+#: src/admin/pages/posts/components/PostFilters.jsx:8
+msgid "Events"
+msgstr ""
+
+#: src/admin/pages/posts/components/PostFilters.jsx:9
+msgid "Offers"
+msgstr ""
+
+#: src/admin/pages/posts/components/PostFilters.jsx:16
+msgid "Status"
+msgstr ""
+
+#: src/admin/pages/posts/components/PostFilters.jsx:18
+msgid "All statuses"
+msgstr ""
+
+#: src/admin/pages/posts/components/PostFilters.jsx:19 src/admin/pages/posts/lib/posts.js:44 src/admin/pages/reviews/components/ReviewFilters.jsx:92
+msgid "Live"
+msgstr ""
+
+#: src/admin/pages/posts/components/PostFilters.jsx:21 src/admin/pages/posts/lib/posts.js:47
+msgid "Failed"
+msgstr ""
+
+#: src/admin/pages/posts/components/PostFilters.jsx:26
+msgid "Time"
+msgstr ""
+
+#: src/admin/pages/posts/components/PostFilters.jsx:28
+msgid "Any time"
+msgstr ""
+
+#: src/admin/pages/posts/components/PostFilters.jsx:29
+msgid "Last 7 days"
+msgstr ""
+
+#: src/admin/pages/posts/components/PostFilters.jsx:30
+msgid "Last 30 days"
+msgstr ""
+
+#: src/admin/pages/posts/components/PostFilters.jsx:31
+msgid "Last 90 days"
+msgstr ""
+
+#: src/admin/pages/posts/components/PostFilters.jsx:36
+msgid "Source"
+msgstr ""
+
+#: src/admin/pages/posts/components/PostFilters.jsx:38
+msgid "All sources"
+msgstr ""
+
+#: src/admin/pages/posts/components/PostFilters.jsx:39
+msgid "Written by you"
+msgstr ""
+
+#: src/admin/pages/posts/components/PostFilters.jsx:40 src/admin/pages/posts/lib/posts.js:69
+msgid "From a review"
+msgstr ""
+
+#: src/admin/pages/posts/components/PostFilters.jsx:45
+msgid "Order"
+msgstr ""
+
+#: src/admin/pages/posts/components/PostFilters.jsx:47
+msgid "Newest first"
+msgstr ""
+
+#: src/admin/pages/posts/components/PostFilters.jsx:48
+msgid "Oldest first"
+msgstr ""
+
+#: src/admin/pages/posts/components/PostPreview.jsx:19
+msgid "What's new"
+msgstr ""
+
+#: src/admin/pages/posts/components/PostPreview.jsx:20 src/admin/pages/posts/lib/posts.js:12
+msgid "Event"
+msgstr ""
+
+#: src/admin/pages/posts/components/PostPreview.jsx:21 src/admin/pages/posts/lib/posts.js:13
+msgid "Offer"
+msgstr ""
+
+#: src/admin/pages/posts/components/PostPreview.jsx:25
+msgid "View offer"
+msgstr ""
+
+#: src/admin/pages/posts/components/PostPreview.jsx:63
+msgid "Just now · %s"
+msgstr ""
+
+#: src/admin/pages/posts/components/PostPreview.jsx:81
+msgid "Valid %1$s to %2$s"
+msgstr ""
+
+#: src/admin/pages/posts/components/PostPreview.jsx:87
+msgid "%1$s to %2$s"
+msgstr ""
+
+#: src/admin/pages/posts/components/PostPreview.jsx:96
+msgid "Start typing and your post will appear here."
+msgstr ""
+
+#: src/admin/pages/posts/components/PostRow.jsx:47
+msgid "Untitled post"
+msgstr ""
+
+#: src/admin/pages/posts/components/PostRow.jsx:65
+msgid "The post was deleted from Google."
+msgstr ""
+
+#: src/admin/pages/posts/components/PostRow.jsx:66
+msgid "The post was deleted."
+msgstr ""
+
+#: src/admin/pages/posts/components/PostRow.jsx:77
+msgid "%1$s: %2$s"
+msgstr ""
+
+#: src/admin/pages/posts/components/PostRow.jsx:127
+msgid "A photo or video post with no text."
+msgstr ""
+
+#: src/admin/pages/posts/components/PostRow.jsx:128
+msgid "No text yet."
+msgstr ""
+
+#: src/admin/pages/posts/components/PostRow.jsx:147
+msgid "(opens in a new tab)"
+msgstr ""
+
+#: src/admin/pages/posts/components/PostRow.jsx:160
+msgid "Google rejected this post after checking it."
+msgstr ""
+
+#: src/admin/pages/posts/components/PostRow.jsx:164
+msgid "Google did not take this post. It is saved here, so you can try again."
+msgstr ""
+
+#: src/admin/pages/posts/components/PostRow.jsx:185
+msgid "Trying…"
+msgstr ""
+
+#: src/admin/pages/posts/components/PostRow.jsx:186
+msgid "Retry"
+msgstr ""
+
+#: src/admin/pages/posts/components/PostRow.jsx:201 src/admin/pages/setup/index.jsx:77
+msgid "Finish"
+msgstr ""
+
+#: src/admin/pages/posts/components/PostRow.jsx:202 src/admin/pages/profile/components/ServicesSection.jsx:182 src/admin/pages/reviews/components/TemplatesCard.jsx:114
+msgid "Edit"
+msgstr ""
+
+#: src/admin/pages/posts/components/PostRow.jsx:215
+msgid "Delete"
+msgstr ""
+
+#: src/admin/pages/posts/components/PostRow.jsx:221
+msgid "Delete this post?"
+msgstr ""
+
+#: src/admin/pages/posts/components/PostRow.jsx:225
+msgid "It is removed from your Google profile, and nobody will see it there any more."
+msgstr ""
+
+#: src/admin/pages/posts/components/PostRow.jsx:229
+msgid "It was never on Google, so this only deletes it here."
+msgstr ""
+
+#: src/admin/pages/posts/components/PostRow.jsx:237
+msgid "Keep post"
+msgstr ""
+
+#: src/admin/pages/posts/components/PostRow.jsx:240
+msgid "Delete post"
+msgstr ""
+
+#: src/admin/pages/posts/components/TopCards.jsx:41
+msgid "Share your blog on Google"
+msgstr ""
+
+#: src/admin/pages/posts/components/TopCards.jsx:45
+msgid "Turn your WordPress blog posts into Google Business Profile updates."
+msgstr ""
+
+#: src/admin/pages/posts/components/TopCards.jsx:66
+msgid "Sharing your blog is part of FoundHint Pro."
+msgstr ""
+
+#: src/admin/pages/posts/components/TopCards.jsx:73
+msgid "Share Website Blog"
+msgstr ""
+
+#: src/admin/pages/posts/components/TopCards.jsx:96
+msgid "Turn reviews into posts"
+msgstr ""
+
+#: src/admin/pages/posts/components/TopCards.jsx:99
+msgid "Share your customers' 5-star reviews as a post in one click."
+msgstr ""
+
+#: src/admin/pages/posts/components/TopCards.jsx:116
+msgid "5 out of 5 stars"
+msgstr ""
+
+#: src/admin/pages/posts/components/TopCards.jsx:144
+msgid "Make a post"
+msgstr ""
+
+#: src/admin/pages/posts/components/TopCards.jsx:151
+msgid "Your 5-star reviews with a comment appear here. Sync reviews on the Reviews screen to check for new ones."
+msgstr ""
+
+#: src/admin/pages/posts/components/TopCards.jsx:163
+msgid "See all 5-star reviews"
+msgstr ""
+
+#: src/admin/pages/posts/components/TopCards.jsx:54
+msgid "%d published post on your site"
+msgid_plural "%d published posts on your site"
+msgstr[0] ""
+msgstr[1] ""
+
+#: src/admin/pages/posts/index.jsx:151 src/admin/pages/reviews/index.jsx:228
+msgid "Syncing…"
+msgstr ""
+
+#: src/admin/pages/posts/index.jsx:152
+msgid "Sync posts"
+msgstr ""
+
+#: src/admin/pages/posts/index.jsx:165
+msgid "Posts"
+msgstr ""
+
+#: src/admin/pages/posts/index.jsx:169 src/admin/pages/reviews/index.jsx:242
+msgid "No Google locations yet"
+msgstr ""
+
+#: src/admin/pages/posts/index.jsx:170 src/admin/pages/reviews/index.jsx:258
+msgid "This location has no Google listing"
+msgstr ""
+
+#: src/admin/pages/posts/index.jsx:177
+msgid "Connect your Google account and read your profile first — posts go to the listings Google reports."
+msgstr ""
+
+#: src/admin/pages/posts/index.jsx:181
+msgid "Posts are published to a location's own Google listing. Link this location to one on the Google screen, or choose another location at the top of the page."
+msgstr ""
+
+#: src/admin/pages/posts/index.jsx:201 src/admin/pages/profile/components/info/DescriptionField.jsx:76
+msgid "History"
+msgstr ""
+
+#: src/admin/pages/posts/index.jsx:206
+msgid "Scheduling posts from a CSV file is part of FoundHint Pro."
+msgstr ""
+
+#: src/admin/pages/posts/index.jsx:216
+msgid "Schedule with a CSV file"
+msgstr ""
+
+#: src/admin/pages/posts/index.jsx:249
+msgid "Your posts"
+msgstr ""
+
+#: src/admin/pages/posts/index.jsx:269
+msgid "No posts match these filters"
+msgstr ""
+
+#: src/admin/pages/posts/index.jsx:270
+msgid "No posts yet"
+msgstr ""
+
+#: src/admin/pages/posts/index.jsx:274
+msgid "Try a wider date range, or clear the filters to see everything."
+msgstr ""
+
+#: src/admin/pages/posts/index.jsx:278
+msgid "Write your first post, or press Sync posts at the top to read the ones already on Google."
+msgstr ""
+
+#: src/admin/pages/posts/index.jsx:289
+msgid "Clear filters"
+msgstr ""
+
+#: src/admin/pages/posts/index.jsx:315
+msgid "Post pages"
+msgstr ""
+
+#: src/admin/pages/posts/lib/posts.js:11
+msgid "Update"
+msgstr ""
+
+#: src/admin/pages/posts/lib/posts.js:19
+msgid "News or announcement"
+msgstr ""
+
+#: src/admin/pages/posts/lib/posts.js:20
+msgid "Happening on a date"
+msgstr ""
+
+#: src/admin/pages/posts/lib/posts.js:21
+msgid "Discount or deal"
+msgstr ""
+
+#: src/admin/pages/posts/lib/posts.js:28
+msgid "None"
+msgstr ""
+
+#: src/admin/pages/posts/lib/posts.js:29
+msgid "Learn more"
+msgstr ""
+
+#: src/admin/pages/posts/lib/posts.js:30
+msgid "Order online"
+msgstr ""
+
+#: src/admin/pages/posts/lib/posts.js:31
+msgid "Book"
+msgstr ""
+
+#: src/admin/pages/posts/lib/posts.js:32
+msgid "Sign up"
+msgstr ""
+
+#: src/admin/pages/posts/lib/posts.js:33
+msgid "Buy"
+msgstr ""
+
+#: src/admin/pages/posts/lib/posts.js:34
+msgid "Call now"
+msgstr ""
+
+#: src/admin/pages/posts/lib/posts.js:45
+msgid "Checking"
+msgstr ""
+
+#: src/admin/pages/posts/lib/posts.js:46
+msgid "Rejected"
+msgstr ""
+
+#: src/admin/pages/posts/lib/posts.js:49
+msgid "Scheduled"
+msgstr ""
+
+#: src/admin/pages/posts/lib/posts.js:70
+msgid "Written with AI"
+msgstr ""
+
+#: src/admin/pages/posts/lib/posts.js:71
+msgid "From CSV"
+msgstr ""
+
+#: src/admin/pages/posts/lib/posts.js:72
+msgid "Source: Website blog"
+msgstr ""
+
+#: src/admin/pages/posts/lib/posts.js:96 src/admin/pages/profile/lib/sync.js:20
+msgid "just now"
+msgstr ""
+
+#: src/admin/pages/posts/lib/posts.js:101
+msgid "%dm ago"
+msgstr ""
+
+#: src/admin/pages/posts/lib/posts.js:108
+msgid "%dh ago"
+msgstr ""
+
+#: src/admin/pages/posts/lib/posts.js:112
+msgid "%dd ago"
+msgstr ""
+
+#: src/admin/pages/posts/lib/posts.js:120
+msgid "Draft, last edited %s"
+msgstr ""
+
+#: src/admin/pages/posts/lib/posts.js:128
+msgid "Not sent, last tried %s"
+msgstr ""
+
+#: src/admin/pages/posts/lib/posts.js:135
+msgid "Posted %s"
+msgstr ""
+
+#: src/admin/pages/posts/lib/posts.js:199
+msgid "Thank you, %s, for the kind words!"
+msgstr ""
+
+#: src/admin/pages/posts/lib/posts.js:202
+msgid "Thank you for the kind words!"
+msgstr ""
+
+#: src/admin/pages/posts/lib/posts.js:216
+msgid "Showing %1$d to %2$d of %3$d post"
+msgid_plural "Showing %1$d to %2$d of %3$d posts"
+msgstr[0] ""
+msgstr[1] ""
+
 #: src/admin/pages/profile/components/AddressSection.jsx:73
 msgid "For your safety, Google does not let apps change a verified address. To move your address, update it in your Google Business Profile and FoundHint will pick up the change on the next sync."
 msgstr ""
@@ -2391,18 +3243,6 @@ msgstr ""
 msgid "Sent to Google. It can take a few minutes to show on your listing."
 msgstr ""
 
-#: src/admin/pages/profile/components/PublishDialog.jsx:123 src/admin/pages/profile/components/ServiceDialog.jsx:133 src/admin/pages/reviews/components/ReviewsDialog.jsx:59
-msgid "Close"
-msgstr ""
-
-#: src/admin/pages/profile/components/PublishDialog.jsx:124 src/admin/pages/profile/components/ServiceDialog.jsx:200 src/admin/pages/reviews/components/AutoReplySetup.jsx:90 src/admin/pages/reviews/components/ReplyDialog.jsx:93 src/admin/pages/reviews/components/TemplateDialog.jsx:66
-msgid "Cancel"
-msgstr ""
-
-#: src/admin/pages/profile/components/PublishDialog.jsx:143 src/admin/pages/profile/components/publish/PublishStep.jsx:51
-msgid "Sending…"
-msgstr ""
-
 #: src/admin/pages/profile/components/PublishDialog.jsx:145 src/admin/pages/setup/google.jsx:323 src/admin/pages/setup/google.jsx:476
 msgid "Try again"
 msgstr ""
@@ -2469,10 +3309,6 @@ msgstr ""
 
 #: src/admin/pages/profile/components/ServicesSection.jsx:177
 msgid "Edit %s"
-msgstr ""
-
-#: src/admin/pages/profile/components/ServicesSection.jsx:182 src/admin/pages/reviews/components/TemplatesCard.jsx:114
-msgid "Edit"
 msgstr ""
 
 #: src/admin/pages/profile/components/ServicesSection.jsx:191 src/admin/pages/profile/components/address/ServiceAreaField.jsx:119 src/admin/pages/profile/components/info/ExtraCategoriesField.jsx:68 src/admin/pages/setup/components/ServicesStep.jsx:92
@@ -2697,10 +3533,6 @@ msgstr ""
 msgid "Say what you do and where, in plain words. Please do not add web links, because Google rejects descriptions that have them."
 msgstr ""
 
-#: src/admin/pages/profile/components/info/DescriptionField.jsx:76
-msgid "History"
-msgstr ""
-
 #: src/admin/pages/profile/components/info/DescriptionField.jsx:89
 msgid "%1$d / %2$d characters"
 msgstr ""
@@ -2803,10 +3635,6 @@ msgstr ""
 
 #: src/admin/pages/profile/components/photos/PendingPhotos.jsx:70
 msgid "Remove all"
-msgstr ""
-
-#: src/admin/pages/profile/components/photos/PendingPhotos.jsx:80 src/admin/pages/profile/components/photos/lib.js:31
-msgid "Uploading…"
 msgstr ""
 
 #: src/admin/pages/profile/components/photos/PendingPhotos.jsx:81
@@ -3041,10 +3869,6 @@ msgstr ""
 
 #: src/admin/pages/profile/index.jsx:163
 msgid "Your profile could not be loaded"
-msgstr ""
-
-#: src/admin/pages/profile/lib/sync.js:20
-msgid "just now"
 msgstr ""
 
 #: src/admin/pages/profile/lib/sync.js:61
@@ -3501,10 +4325,6 @@ msgstr ""
 msgid "Any status"
 msgstr ""
 
-#: src/admin/pages/reviews/components/ReviewFilters.jsx:92
-msgid "Live"
-msgstr ""
-
 #: src/admin/pages/reviews/components/ReviewFilters.jsx:101
 msgid "Search"
 msgstr ""
@@ -3679,24 +4499,12 @@ msgstr ""
 msgid "Replied on"
 msgstr ""
 
-#: src/admin/pages/reviews/index.jsx:228
-msgid "Syncing…"
-msgstr ""
-
 #: src/admin/pages/reviews/index.jsx:229
 msgid "Sync reviews"
 msgstr ""
 
-#: src/admin/pages/reviews/index.jsx:242
-msgid "No Google locations yet"
-msgstr ""
-
 #: src/admin/pages/reviews/index.jsx:245
 msgid "Connect your Google account and read your profile first — reviews are read for the locations Google reports."
-msgstr ""
-
-#: src/admin/pages/reviews/index.jsx:258
-msgid "This location has no Google listing"
 msgstr ""
 
 #: src/admin/pages/reviews/index.jsx:261
@@ -4291,10 +5099,6 @@ msgstr ""
 
 #: src/admin/pages/setup/index.jsx:72
 msgid "Welcome"
-msgstr ""
-
-#: src/admin/pages/setup/index.jsx:77
-msgid "Finish"
 msgstr ""
 
 #: found-hint.php:175

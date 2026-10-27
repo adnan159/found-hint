@@ -1859,3 +1859,72 @@ plugin skipped, a notice and no fatal. In the browser (real bundle,
 mocked API): with Pro, the Pro card and one call to `/status`; without,
 the upsell and no Pro request; no console errors. Pro smoke suite (15)
 mutation-tested. Pro left deactivated on the dev site.
+
+## Step 58 — Posts & Scheduling
+
+A new "Posts & Scheduling" screen (sidebar, after Reviews), to the "FoundHint
+Posts" design, for the location in the top bar. Auto-posting from the design
+is left out.
+
+**Server** (`includes/App/Post/`, DB 0.18.0 — new `posts` table):
+- `PostMapper` — Google's v4 `localPosts` ⇄ rows (STANDARD/EVENT/OFFER,
+  buttons, schedules as business-local wall time, offer fields, photo by
+  link). Edits name `media` in the update mask only when the photo changed:
+  a post written on Google can hold many photos/videos (a real one here has
+  18) and this site keeps one link.
+- `PostValidator` — per-field codes; drafts checked loosely, publishing
+  strictly; sources filterable (`fhint_post_sources`) for Pro.
+- `PostRepository`, `PostPublisher` (new post kept as `failed` with Google's
+  reason when refused; live edits stored only after Google accepts),
+  `PostSync` (upsert, forget on-Google posts Google dropped, never drafts),
+  `PostMedia` (upload to the library; gallery and customer photos already on
+  Google; whether Google can reach a link), `Posts` (the rules).
+- REST `fhint/v1/posts…` — see includes/API/README.md "Posts".
+
+**Screen** (`src/admin/pages/posts/`): Sync posts in the top bar; History;
+blog card; "Turn reviews into posts"; type tabs with counts; status, time,
+source and order filters; rows with status/type/source tags, View on
+Google, Retry for failed, Edit/Finish, Delete (confirmed); pagination. The
+composer: Update/Event/Offer, fields per type, button + "Use my website
+address", photo (Upload, Your gallery, Customer photos), Now/Draft, live
+Google preview; warnings when Google cannot fetch an uploaded photo (local
+site) and when a post holds several photos/videos.
+
+**Pro, drawn and inert** (`PRO` tags): Write with AI (header + composer),
+Make with AI photo, Schedule, Schedule with a CSV file, Share Website Blog.
+Feature keys in docs/EXTENDING.md.
+
+Verified: real posts read from Google (the pet shop's video post); every
+route on the real database (validation codes, drafts, counts, state,
+photos, delete, 401 logged out); in the browser, the real bundle against a
+mock built from those responses — publish, Google refusing a new post then
+the retry going to the same row (PUT, no copy), live edit locked to its
+type, draft offer, post from a review, gallery/customer pickers, upload
+warning, filters, retry, delete. Smoke `posts.php` (81) and 72 new database
+checks, mutation-tested. One Google listing ("FoundHint") answers posts with
+Google's own "Internal error"; the pet shop works.
+
+## Step 59 — Post photos on a site Google cannot reach
+
+Google takes a post's photo only as a link, so an upload on a local site
+could not be used. Now, when Google cannot reach this site's uploads, an
+uploaded post photo is first added to the listing's Google gallery (as
+bytes, the way listing photos are sent) and the post uses Google's link.
+The composer says so before uploading (`uploads_reachable`), and confirms
+afterwards. The three-step upload is now `MediaUpload::send_file()`, shared
+by listing photos and posts. `POST /posts/media` takes `location_name` and
+needs Google connected. Database test with Google answered in-process
+(mutation-tested); the suite removes its test photo again.
+
+
+## Step 60 — "Internal error encountered" on a post with an uploaded photo
+
+Found on a real publish. Google answers a gallery upload with a temporary
+`…/gpu-csl/…` photo link while it processes the file; it loads in a
+browser, but Google's post service refuses it with a bare "Internal error
+encountered". `PostMedia::settled()` now asks Google for the media item
+again (up to 4 times, 2 s apart — `fhint_media_settle_pause`) and uses the
+lasting link. Publishing with a still-temporary link is refused up front
+(`post.media_url.processing`). The failed post was re-sent with the lasting
+link and is live on the "FoundHint" listing. Smoke + database tests,
+mutation-checked.

@@ -44,6 +44,7 @@ function fhint_capture_sql() {
 		Tables::MEDIA               => 'CreateMediaTable',
 		Tables::DESCRIPTION_HISTORY => 'CreateDescriptionHistoryTable',
 		Tables::GOOGLE_REFERENCE    => 'CreateGoogleReferenceTable',
+		Tables::POSTS               => 'CreatePostsTable',
 	);
 
 	foreach ( $classes as $key => $class ) {
@@ -68,7 +69,7 @@ function dbDelta( $sql ) { // phpcs:ignore WordPress.NamingConventions.ValidFunc
 
 $definitions = fhint_capture_sql();
 
-check_same( 14, count( $definitions ), 'every table has a definition' );
+check_same( 15, count( $definitions ), 'every table has a definition' );
 check_same( Tables::keys(), array_keys( $definitions ), 'definitions cover exactly the declared tables' );
 
 foreach ( $definitions as $key => $sql ) {

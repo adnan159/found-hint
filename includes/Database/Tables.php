@@ -32,6 +32,7 @@ class Tables {
 	const MEDIA               = 'media';
 	const DESCRIPTION_HISTORY = 'description_history';
 	const GOOGLE_REFERENCE    = 'google_reference';
+	const POSTS               = 'posts';
 
 	/**
 	 * Every table this plugin owns, unprefixed.
@@ -54,6 +55,7 @@ class Tables {
 			self::MEDIA,
 			self::DESCRIPTION_HISTORY,
 			self::GOOGLE_REFERENCE,
+			self::POSTS,
 		);
 	}
 

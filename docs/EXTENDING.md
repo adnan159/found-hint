@@ -40,3 +40,11 @@ listed here — not a general registry.
 | Key | Screen | Without Pro | With Pro |
 |---|---|---|---|
 | `reviews.templates` | Reviews sidebar | `TemplatesCard` (upsell, sample templates) | `ProTemplatesCard` (placeholder: reads `GET fhint-pro/v1/status`) |
+| `posts.ai` | Posts: "Write with AI" (header button and composer tab), "Make with AI" photo | disabled, `PRO` tag | — |
+| `posts.schedule` | Posts composer: "Schedule" under When to publish; `scheduled` status | disabled, `PRO` tag | — |
+| `posts.csv` | Posts: "Schedule with a CSV file" | disabled, `PRO` tag | — |
+| `posts.blog` | Posts: "Share your blog on Google" card | disabled, `PRO` tag | — |
+
+The posts table already has what Pro's posts need: `status` `scheduled`,
+`scheduled_at`, and `source` (`ai`, `csv`, `blog` — allowed on a request
+once Pro adds them through the `fhint_post_sources` filter).

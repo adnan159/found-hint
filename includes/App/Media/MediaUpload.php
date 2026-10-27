@@ -233,37 +233,17 @@ class MediaUpload {
 
 		MediaRepository::update( $photo['id'], array( 'state' => MediaRepository::STATE_UPLOADING ) );
 
-		$started = Client::post( sprintf( self::START_URL, (string) $account_name, (string) $location_name ), array(), array() );
-
-		if ( is_wp_error( $started ) || empty( $started['resourceName'] ) ) {
-			return self::refused( $photo, $started );
-		}
-
 		// phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents -- A local file, read to be sent.
-		$bytes = file_get_contents( $path );
-
-		$sent = Client::upload(
-			sprintf( self::BYTES_URL, (string) $started['resourceName'] ),
-			array( 'upload_type' => 'media' ),
+		$bytes   = file_get_contents( $path );
+		$created = self::send_file(
 			false === $bytes ? '' : $bytes,
-			$photo['mime_type'] ? $photo['mime_type'] : 'image/jpeg'
+			$photo['mime_type'] ? $photo['mime_type'] : 'image/jpeg',
+			$location_name,
+			$account_name,
+			MediaSync::category( $photo['role'] )
 		);
 
-		if ( is_wp_error( $sent ) ) {
-			return self::refused( $photo, $sent );
-		}
-
-		$created = Client::post(
-			sprintf( self::CREATE_URL, (string) $account_name, (string) $location_name ),
-			array(),
-			array(
-				'mediaFormat'         => 'PHOTO',
-				'locationAssociation' => array( 'category' => MediaSync::category( $photo['role'] ) ),
-				'dataRef'             => array( 'resourceName' => (string) $started['resourceName'] ),
-			)
-		);
-
-		if ( is_wp_error( $created ) || empty( $created['name'] ) ) {
+		if ( is_wp_error( $created ) ) {
 			return self::refused( $photo, $created );
 		}
 
@@ -296,6 +276,74 @@ class MediaUpload {
 		Logger::info( 'google', 'google.photo_published', __( 'A photo was sent to Google.', 'foundhint-local-seo' ) );
 
 		return MediaRepository::find( $photo['id'] );
+	}
+
+	/**
+	 * Put a photo on a Google listing: somewhere for the bytes, the bytes,
+	 * then the photo itself. The bytes are sent rather than a link to them,
+	 * so this works on a site Google cannot reach.
+	 *
+	 * Also used by posts: Google takes a post's photo only as a link, so on
+	 * a site Google cannot reach, a post's photo goes on the listing first
+	 * and the post uses Google's copy (FHINT\App\Post\PostMedia).
+	 *
+	 * @param string $bytes         File contents.
+	 * @param string $mime_type     image/jpeg or image/png.
+	 * @param string $location_name Google location resource name.
+	 * @param string $account_name  Google account resource name.
+	 * @param string $category      Google's photo category, e.g. ADDITIONAL.
+	 * @return array|WP_Error Google's new media item.
+	 */
+	public static function send_file( $bytes, $mime_type, $location_name, $account_name, $category ) {
+		$started = Client::post( sprintf( self::START_URL, (string) $account_name, (string) $location_name ), array(), array() );
+
+		if ( is_wp_error( $started ) ) {
+			return $started;
+		}
+
+		if ( empty( $started['resourceName'] ) ) {
+			return self::no_answer();
+		}
+
+		$sent = Client::upload(
+			sprintf( self::BYTES_URL, (string) $started['resourceName'] ),
+			array( 'upload_type' => 'media' ),
+			(string) $bytes,
+			(string) $mime_type
+		);
+
+		if ( is_wp_error( $sent ) ) {
+			return $sent;
+		}
+
+		$created = Client::post(
+			sprintf( self::CREATE_URL, (string) $account_name, (string) $location_name ),
+			array(),
+			array(
+				'mediaFormat'         => 'PHOTO',
+				'locationAssociation' => array( 'category' => (string) $category ),
+				'dataRef'             => array( 'resourceName' => (string) $started['resourceName'] ),
+			)
+		);
+
+		if ( is_wp_error( $created ) ) {
+			return $created;
+		}
+
+		return empty( $created['name'] ) ? self::no_answer() : (array) $created;
+	}
+
+	/**
+	 * Google answered, but not with what a step needs.
+	 *
+	 * @return WP_Error
+	 */
+	private static function no_answer() {
+		return new WP_Error(
+			'fhint_media_upload_failed',
+			__( 'Google did not take the photo. Try again.', 'foundhint-local-seo' ),
+			array( 'status' => 502 )
+		);
 	}
 
 	/**

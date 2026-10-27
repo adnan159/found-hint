@@ -4,6 +4,7 @@ import Audit from "./pages/audit";
 import Business from "./pages/business";
 import Dashboard from "./pages/dashboard";
 import Google from "./pages/google";
+import Posts from "./pages/posts";
 import Reviews from "./pages/reviews";
 import Schema from "./pages/schema";
 import NotFound from "./pages/not-found";
@@ -53,6 +54,7 @@ export const router = createHashRouter([
       },
       { path: "locations/:id", element: <LocationRedirect /> },
       { path: "reviews", element: <Reviews /> },
+      { path: "posts", element: <Posts /> },
       { path: "schema", element: <Schema /> },
       {
         path: "services",

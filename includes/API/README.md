@@ -1205,6 +1205,140 @@ the `PUT`. If Google says there is no reply (already removed on Google
 itself), the stored copy is cleared and the call succeeds — the owner's goal
 holds either way.
 
+## Posts
+
+Google Business Profile posts (Google's legacy v4 `localPosts`) for one
+listing at a time. Reads never touch the network; `POST /posts/sync` reads
+from Google, and creating with `publish`, `PUT` on a live post, publish and
+delete write to the public listing. Writes that send need Google connected
+(`google_write_check`).
+
+A post:
+
+```json
+{
+  "id": 7, "location_name": "locations/1", "location_title": "Northside Dental",
+  "google_name": "accounts/1/locations/1/localPosts/p1",
+  "topic_type": "update|event|offer",
+  "status": "draft|live|processing|rejected|failed|scheduled",
+  "source": "manual|review", "source_ref": "",
+  "title": "", "summary": "", "cta_type": "", "cta_url": "",
+  "starts_at": null, "ends_at": null,
+  "coupon_code": "", "redeem_url": "", "terms": "",
+  "media_url": "", "attachment_id": 0, "media_count": 0, "media_reachable": true,
+  "search_url": "", "error": "", "on_google": true,
+  "scheduled_at": null, "published_at": "2026-10-20 09:00:00",
+  "synced_at": "…", "created_at": "…", "updated_at": "…"
+}
+```
+
+- `cta_type`: '' (none), `learn_more`, `order`, `book`, `sign_up`, `shop`
+  (shown as "Buy"), `call` (no link: Google dials the listing's number).
+  An offer has no button — Google shows its own "View offer".
+- `starts_at` / `ends_at` are the business's wall-clock time (Google keeps a
+  date and time of day with no zone), not UTC. An offer runs whole days.
+- `media_count`: how many photos/videos Google holds on the post. A post
+  written on Google can carry several; this site keeps a link to the first.
+- `media_reachable`: whether Google could fetch `media_url` — false for a
+  photo on a local or private site. Google takes a post's photo only by link.
+
+### `GET /posts`
+
+| Param | Values | |
+|---|---|---|
+| `location_name` | resource name | |
+| `type` | `''` `update` `event` `offer` | |
+| `status` | `''` `live` (incl. processing) `draft` `scheduled` `failed` (incl. rejected) | |
+| `source` | a source key, or `''` | unknown keys are ignored |
+| `days` | `0` `7` `30` `90` | published (or, never published, last edited) within |
+| `sort` | `new` `old` | |
+| `per_page` | `0`–`100` (default 10, `0` = all) | |
+| `offset` | `0`… | |
+
+`meta.total` counts every match; `meta.counts` is `{ all, update, event,
+offer }` under every filter but `type` — the numbers on the type tabs.
+
+### `GET /posts/state?location_name=`
+
+`{ locations: [{ location_name, title, location_id }], synced_at, website,
+reviews: [{ review_id, comment, reviewer_name, reviewed_at }], blog_posts,
+uploads_reachable }`
+— `website` for "Use my website address" (the listing's, else the site's);
+`reviews` the latest two 5-star reviews with words; `blog_posts` the count
+of published WordPress posts; `uploads_reachable` whether Google can fetch
+a file from this site's uploads (when not, uploads go via the gallery).
+
+### `GET /posts/photos?location_name=`
+
+`{ gallery: [{ url }], customer: [{ url, thumb, label }] }` — photos already
+on Google: the listing's synced photos, and customers' review photos.
+
+### `POST /posts/media`
+
+Multipart `file` and `location_name`; needs Google connected. Stored in the
+media library with the listing photo rules (`media.*` codes). Answers
+`201 { attachment_id, url, reachable, via_gallery }`.
+
+Google takes a post's photo only as a link. When Google can reach this
+site, `url` is the media-library file. When it cannot (localhost, a private
+network, a `.test`/`.local` name), the photo is first added to the listing's
+Google gallery — sent as bytes, like any listing photo — and `url` is
+Google's link to it (`via_gallery: true`). The photo then also shows in the
+profile's Photos, and in the Photos tab here.
+
+### `POST /posts/sync`
+
+`{ location_name }` → `{ posts, removed }`. Upserts on `google_name`; keeps
+`source`, `source_ref` and `attachment_id`; forgets on-Google posts Google no
+longer returns (only after a complete read). Drafts and failed posts are
+never touched.
+
+### `POST /posts`
+
+`{ location_name, publish, …fields }`. Fields: `topic_type title summary
+cta_type cta_url starts_at ends_at coupon_code redeem_url terms media_url
+attachment_id source source_ref`. Dates as `YYYY-MM-DD`, `YYYY-MM-DDTHH:MM`
+or `YYYY-MM-DD HH:MM:SS`. Fields the type does not have are dropped. The
+account comes from the stored listing; `google_name` and `status` cannot be
+set. `publish: false` saves a draft (checked loosely); `true` sends it.
+
+**A new post Google refuses is kept** as `failed` with Google's reason in
+`error`; the error response carries `data.post_id` so the form can go on
+editing that row instead of creating another.
+
+### `PUT /posts/{id}`
+
+Same fields (`source`/`source_ref` are fixed once written). A draft or
+failed post is saved, and sent when `publish` is true. **A post on Google
+can only be changed by publishing** (`409 fhint_post_live` otherwise), its
+type is locked (`post.type.locked`), and the row changes only once Google
+has taken the edit. The PATCH names `media` only when the photo changed.
+
+### `POST /posts/{id}/publish`
+
+Send a draft or retry a failed post. `409 fhint_post_already_live` for a
+post on Google.
+
+### `DELETE /posts/{id}`
+
+On Google: deleted there first (a 404 counts as done). Otherwise only here.
+
+### Post validation codes
+
+`post.type.invalid` `post.type.locked` `post.source.invalid`
+`post.summary.required` (update, offer — when publishing)
+`post.summary.too_long` (1,500 characters) `post.title.required`
+`post.title.too_long` (58) `post.starts_at.required|invalid`
+`post.ends_at.required|invalid|before_start` `post.cta_type.invalid`
+`post.cta_url.required|invalid` `post.redeem_url.invalid`
+`post.coupon_code.too_long` (58) `post.terms.too_long` (5,000)
+`post.media_url.invalid`. Other codes: `fhint_post_not_found` (404),
+`fhint_no_google_location` (404).
+
+**Pro:** `fhint_post_sources` widens the sources a request may set
+(`ai`, `csv`, `blog`); `scheduled` / `scheduled_at` exist for Pro's
+scheduler and are never set by the free plugin.
+
 ## How the score works
 
 Each rule declares a **category** and a **weight within it**; categories

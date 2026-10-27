@@ -191,6 +191,12 @@ See your customer reviews right inside your WordPress dashboard, for each locati
 
 Reply to reviews directly from FoundHint — post, edit or delete your reply. No more switching between WordPress and Google.
 
+= Google Business Profile Posts =
+
+Publish updates, events and offers to each location's Google Business Profile from WordPress, with a live preview of how Google shows them. Add a button (Book, Order online, Learn more, Sign up, Buy or Call now), dates, a coupon code and terms, and a photo from your upload, your Google gallery or your customers' review photos. Save a draft and finish it later, edit or delete a live post, retry one Google did not take, and turn a 5-star review into a thank-you post in one click. Filter by type, status, time and source, and read the posts already on your profile with Sync posts.
+
+**FoundHint Pro:** write posts with AI, schedule them, schedule many at once from a CSV file, and share your WordPress blog posts on Google.
+
 = Coming soon =
 
 These are planned and are not in this version yet.
@@ -200,8 +206,7 @@ These are planned and are not in this version yet.
 * **Location Landing Pages** *(Coming soon)* — build a page for each location from data you already saved: address, phone, hours, services, description, map and directions, photos, calls to action and LocalBusiness schema.
 * **Location Page Templates** *(Coming soon)* — keep every location page consistent with reusable templates.
 * **Front-end blocks** *(Coming soon)* — show your business details, hours and map on any page.
-* **Google Business Profile Posts** *(Coming soon)* — create posts for your connected locations from FoundHint.
-* **Post Scheduling, Post Calendar and Post History** *(Coming soon)* — plan posts ahead, see them on a calendar, and track everything you have published.
+* **Post Calendar** *(Coming soon)* — see your planned and published posts on a calendar.
 * **Multi-Location Post Management** *(Coming soon)* — choose which locations each post goes to.
 * **Google Business Profile Performance** *(Coming soon)* — see how customers find and interact with your Business Profile.
 * **Local Ranking Grid** *(Coming soon)* — see how you rank across your whole area, not just from one spot: set a keyword, a location, a search area and grid points, and see the results on a map.
@@ -258,10 +263,10 @@ This plugin connects to three external services. Google's Business Profile APIs 
 
 **1. Google Business Profile APIs** (Google LLC)
 
-When you connect your Google account, your site talks directly to Google to read the business profiles your account manages: account and location lists, business details, opening date, phone numbers, opening hours, categories, services, service area, attributes (which carry your social and booking links), map coordinates, photos and reviews. Photos are shown in your admin directly from Google's image servers. When you press *Send to Google* or *Upload to Google*, or post, edit or delete a review reply, your site sends what you chose to your listing.
+When you connect your Google account, your site talks directly to Google to read the business profiles your account manages: account and location lists, business details, opening date, phone numbers, opening hours, categories, services, service area, attributes (which carry your social and booking links), map coordinates, photos, reviews and posts. Photos are shown in your admin directly from Google's image servers. When you press *Send to Google* or *Upload to Google*, post, edit or delete a review reply, or publish, edit or delete a post, your site sends what you chose to your listing. A post's photo is sent as a link, which Google fetches from where it is stored.
 
-* What is sent: your Google access token, and the identifier of the profile being read. When you choose to send them: your business details, attribute answers, photo files and review replies.
-* When: when you press *Continue with Google*, *Read from Google*, *Refresh from Google*, *Import*, *Send to Google* or *Upload to Google*, or reply to a review, and once when you first open the Business Profile screen for a connected listing. Never on a visitor-facing page.
+* What is sent: your Google access token, and the identifier of the profile being read. When you choose to send them: your business details, attribute answers, photo files, review replies and posts.
+* When: when you press *Continue with Google*, *Read from Google*, *Refresh from Google*, *Import*, *Send to Google* or *Upload to Google*, reply to a review, *Sync posts*, or publish, edit or delete a post, and once when you first open the Business Profile screen for a connected listing. Never on a visitor-facing page.
 * Terms of service: https://policies.google.com/terms
 * Privacy policy: https://policies.google.com/privacy
 
@@ -356,6 +361,8 @@ Nothing is removed unless you ask for it. Turn on *Delete data on uninstall* in 
 == Changelog ==
 
 = 1.0.0 =
+* New: Posts & Scheduling — publish updates, events and offers to Google with a live preview, drafts, editing, deleting and retry, photos from your uploads, your Google gallery or customer photos, and one-click posts from 5-star reviews.
+* New: Previews of FoundHint Pro posting features — write with AI, scheduling, CSV scheduling and sharing your website blog.
 * New: Redesigned Reviews screen, with Sync reviews and the location switcher in the top bar.
 * New: Filter reviews by star rating, reply status and review status, and search by reviewer name or words.
 * New: Pagination with 5, 10, 25, 50 or 100 reviews per page.
@@ -379,7 +386,7 @@ Nothing is removed unless you ask for it. Turn on *Delete data on uninstall* in 
 == Upgrade Notice ==
 
 = 1.0.0 =
-First stable release: a redesigned Reviews screen with filters, search, pagination, customer photos and CSV export, and a fix for duplicate locations after reconnecting Google.
+First stable release: Google posts from WordPress, a redesigned Reviews screen with filters, search, pagination, customer photos and CSV export, and a fix for duplicate locations after reconnecting Google.
 
 = 0.1.0 =
 First release.

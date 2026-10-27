@@ -78,6 +78,61 @@ const MESSAGES = {
       "Google accepts an opening date up to one year ahead.",
       "foundhint-local-seo",
     ),
+  // Posts.
+  "post.type.invalid": () =>
+    __("Choose update, event or offer.", "foundhint-local-seo"),
+  "post.type.locked": () =>
+    __(
+      "Google does not let a published post change type. Delete it and write a new one.",
+      "foundhint-local-seo",
+    ),
+  "post.source.invalid": () =>
+    __("That way of writing a post is not available.", "foundhint-local-seo"),
+  "post.summary.required": () =>
+    __("Write what the post says.", "foundhint-local-seo"),
+  "post.summary.too_long": () =>
+    __("Google allows 1,500 characters in a post.", "foundhint-local-seo"),
+  "post.title.required": () => __("Give it a title.", "foundhint-local-seo"),
+  "post.title.too_long": () =>
+    __("Google allows 58 characters in a title.", "foundhint-local-seo"),
+  "post.starts_at.required": () =>
+    __("Choose when it starts.", "foundhint-local-seo"),
+  "post.starts_at.invalid": () =>
+    __("That start date is not a real date.", "foundhint-local-seo"),
+  "post.ends_at.required": () =>
+    __("Choose when it ends.", "foundhint-local-seo"),
+  "post.ends_at.invalid": () =>
+    __("That end date is not a real date.", "foundhint-local-seo"),
+  "post.ends_at.before_start": () =>
+    __("It has to end after it starts.", "foundhint-local-seo"),
+  "post.cta_type.invalid": () =>
+    __("Choose a button from the list.", "foundhint-local-seo"),
+  "post.cta_url.required": () =>
+    __("Add the link the button opens.", "foundhint-local-seo"),
+  "post.cta_url.invalid": () =>
+    __(
+      "Enter a full web address, starting with https://",
+      "foundhint-local-seo",
+    ),
+  "post.redeem_url.invalid": () =>
+    __(
+      "Enter a full web address, starting with https://",
+      "foundhint-local-seo",
+    ),
+  "post.coupon_code.too_long": () =>
+    __("A coupon code can be 58 characters at most.", "foundhint-local-seo"),
+  "post.terms.too_long": () =>
+    __("Terms can be 5,000 characters at most.", "foundhint-local-seo"),
+  "post.media_url.processing": () =>
+    __(
+      "Google is still processing this photo. Wait a minute, then choose it again from Your gallery.",
+      "foundhint-local-seo",
+    ),
+  "post.media_url.invalid": () =>
+    __(
+      "That photo is not a web address Google can open.",
+      "foundhint-local-seo",
+    ),
   "review.reply.required": () =>
     __("Write a reply before posting it.", "foundhint-local-seo"),
   "review.reply.too_long": () =>
@@ -363,6 +418,18 @@ export function errorMessage(error) {
       __("Add your business details first.", "foundhint-local-seo"),
     fhint_location_not_found: () =>
       __("That location no longer exists.", "foundhint-local-seo"),
+    fhint_post_not_found: () =>
+      __(
+        "That post no longer exists. Sync posts to see the latest.",
+        "foundhint-local-seo",
+      ),
+    fhint_post_live: () =>
+      __(
+        "This post is on Google. Changes to it are published straight away.",
+        "foundhint-local-seo",
+      ),
+    fhint_post_already_live: () =>
+      __("This post is already on Google.", "foundhint-local-seo"),
     fhint_review_not_found: () =>
       __(
         "That review is no longer stored here. Read your reviews from Google again.",
