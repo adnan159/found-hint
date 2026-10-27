@@ -10,6 +10,7 @@ import RequestError from "@/components/RequestError";
 import SectionCard from "@/components/SectionCard";
 import { pillButton } from "@/components/location-bar/styles";
 import { HeaderActions } from "@/context/HeaderActions";
+import ProFeature from "@/components/ProFeature";
 import useSelectedLocation from "@/hooks/useSelectedLocation";
 import { errorMessage } from "@/lib/errors";
 import {
@@ -20,6 +21,7 @@ import {
 } from "@/store/api/reviewsApi";
 import AutoReplyBanner from "./components/AutoReplyBanner";
 import Pagination from "./components/Pagination";
+import ProTemplatesCard from "./components/ProTemplatesCard";
 import ReplyDialog from "./components/ReplyDialog";
 import ReviewCard from "./components/ReviewCard";
 import ReviewFilters from "./components/ReviewFilters";
@@ -381,7 +383,12 @@ export default function Reviews() {
                 {__("AI reply history", "foundhint-local-seo")}
                 <SoonTag className="fhint:ml-auto" />
               </div>
-              <TemplatesCard />
+              <ProFeature
+                feature="reviews.templates"
+                fallback={<TemplatesCard />}
+              >
+                <ProTemplatesCard />
+              </ProFeature>
             </aside>
           </div>
         </>

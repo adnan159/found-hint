@@ -33,6 +33,7 @@
     "eslint.config.js",
     "tsconfig.json",
     "CLAUDE.md",
+    "skills-lock.json",
     ".claude",
     ".agents",
     "build",
@@ -41,7 +42,8 @@
     ".npmrc",
     ".vscode",
     ".idea",
-    "*.log"
+    "*.log",
+    ".wordpress-org"
   ],
   "overrides": {
     "vite": "^8.0.10"

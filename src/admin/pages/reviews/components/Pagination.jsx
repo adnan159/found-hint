@@ -30,12 +30,12 @@ function pagesToShow(page, pages) {
 /**
  * Per page on the left; Previous, the page numbers and Next on the right.
  */
-export function Pagination({ page, pages, perPage, onPage, onPerPage }) {
+export function Pagination({ page, pages, perPage, onPage, onPerPage, label }) {
   const id = useId();
 
   return (
     <nav
-      aria-label={__("Review pages", "foundhint-local-seo")}
+      aria-label={label ?? __("Review pages", "foundhint-local-seo")}
       className="fhint:flex fhint:flex-wrap fhint:items-center fhint:gap-3"
     >
       <span className="fhint:flex fhint:items-center fhint:gap-2 fhint:text-[12.5px]">

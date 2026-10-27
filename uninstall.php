@@ -88,6 +88,7 @@ $fhint_tables = array(
 	'media',
 	'description_history',
 	'google_reference',
+	'posts',
 );
 
 foreach ( $fhint_tables as $fhint_table ) {

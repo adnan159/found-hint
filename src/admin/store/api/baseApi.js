@@ -61,6 +61,7 @@ export const baseApi = createApi({
     "Schema",
     "Audit",
     "Reviews",
+    "Posts",
     "Profile",
     "Dashboard",
   ],

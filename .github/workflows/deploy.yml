@@ -1,0 +1,82 @@
+name: Deploy to WordPress.org
+
+# Push a version tag (e.g. `git tag 1.0.1 && git push origin 1.0.1`) to
+# release FoundHint to WordPress.org. The tag must match the plugin
+# header "Version" and the readme "Stable tag".
+on:
+  push:
+    tags:
+      - '1.*'
+
+# One release at a time: a second tag waits instead of racing the first
+# (two runs committing to SVN at once conflict and abort).
+concurrency:
+  group: wporg-deploy
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    name: Release FoundHint to WordPress.org
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Check the version matches the tag
+        run: |
+          TAG="${GITHUB_REF_NAME}"
+          HEADER=$(grep -m1 -E '^\s*\*\s*Version:' found-hint.php | awk '{print $NF}')
+          STABLE=$(grep -m1 -E '^Stable tag:' readme.txt | awk '{print $NF}')
+          echo "Tag: $TAG | Version: $HEADER | Stable tag: $STABLE"
+          if [ "$TAG" != "$HEADER" ] || [ "$TAG" != "$STABLE" ]; then
+            echo "::error::Tag $TAG must match the plugin Version ($HEADER) and the readme Stable tag ($STABLE)."
+            exit 1
+          fi
+
+      - name: Install NodeJS
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20.x
+
+      - name: Cache node modules
+        uses: actions/cache@v4
+        with:
+          path: |
+            node_modules
+            ~/.npm
+          key: ${{ runner.os }}-node-${{ hashFiles('package.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+
+      - name: Install dependencies
+        run: npm install --legacy-peer-deps
+
+      - name: Set up PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '7.4'
+          tools: composer
+
+      # Builds the admin app, refreshes the .pot, copies the release files to
+      # build/ (package.json "buildExclude" leaves out dev files and vendor/)
+      # and writes a no-dev Composer autoloader there.
+      - name: Build and prepare
+        run: npm run plugin:prepare
+
+      - name: List build files
+        run: ls -la build
+
+      - name: Install SVN
+        run: sudo apt-get update && sudo apt-get install -y subversion
+
+      # Uploads build/ to trunk and tags/<version>, and .wordpress-org/
+      # (banners, icons, screenshots) to the plugin's assets.
+      - name: WordPress Plugin Deploy
+        uses: 10up/action-wordpress-plugin-deploy@2.2.2
+        env:
+          SVN_PASSWORD: ${{ secrets.WPORG_PASSWORD }}
+          SVN_USERNAME: ${{ secrets.WPORG_USERNAME }}
+          SLUG: foundhint-local-seo
+          BUILD_DIR: build
+          ASSETS_DIR: .wordpress-org

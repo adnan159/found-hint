@@ -65,6 +65,7 @@ class Database {
 		$changes = array_merge( $changes, Database\CreateMediaTable::up( $prefix, $cc ) );
 		$changes = array_merge( $changes, Database\CreateDescriptionHistoryTable::up( $prefix, $cc ) );
 		$changes = array_merge( $changes, Database\CreateGoogleReferenceTable::up( $prefix, $cc ) );
+		$changes = array_merge( $changes, Database\CreatePostsTable::up( $prefix, $cc ) );
 
 		// The Places lookup was removed in 0.4.0: its table and its scheduled
 		// event are cleared here rather than left behind on sites that ran an

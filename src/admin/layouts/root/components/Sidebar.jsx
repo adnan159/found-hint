@@ -74,6 +74,10 @@ const NAV_ITEMS = [
     label: () => __("Reviews", "foundhint-local-seo"),
   },
   {
+    to: "/posts",
+    label: () => __("Posts & Scheduling", "foundhint-local-seo"),
+  },
+  {
     to: "/google",
     label: () => __("Google", "foundhint-local-seo"),
     children: [
