@@ -42,7 +42,8 @@
     ".npmrc",
     ".vscode",
     ".idea",
-    "*.log"
+    "*.log",
+    ".wordpress-org"
   ],
   "overrides": {
     "vite": "^8.0.10"
