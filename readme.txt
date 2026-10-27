@@ -4,7 +4,7 @@ Tags: local seo, schema, google business profile, local business, reviews
 Requires at least: 6.4
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 1.0.0
+Stable tag: 1.1.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -360,9 +360,26 @@ Nothing is removed unless you ask for it. Turn on *Delete data on uninstall* in 
 
 == Changelog ==
 
+= 1.1.0 =
+* New: Posts & Scheduling screen — publish posts to your Google Business Profile from WordPress, for each location.
+* New: Three post types — Update, Event (title, start and end date and time) and Offer (title, dates, coupon code, redeem link, terms and conditions).
+* New: Add a button to a post — Learn more, Book, Order online, Sign up, Buy or Call now — with "Use my website address" for the link.
+* New: Live preview of how the post looks on Google, updated as you type.
+* New: Add a photo by uploading one, or choose from your Google gallery or your customers' review photos.
+* New: Save a post as a draft and finish it later.
+* New: Edit or delete a live post. Changes go straight to Google, and a post's type stays fixed once published, as Google requires.
+* New: A post Google does not accept is kept with Google's reason, so you can fix it and retry without writing it again.
+* New: Turn a 5-star review into a thank-you post in one click.
+* New: Sync posts — read the posts already on your Google profile, including ones written on Google.
+* New: Filter posts by type (with counts), status, time and source; History view; newest or oldest first; pagination.
+* New: "View on Google" link for every live post.
+* New: Previews of FoundHint Pro posting features — write posts and photos with AI, schedule posts, schedule many posts from a CSV file, and share your WordPress blog posts on Google.
+* New: Support for the FoundHint Pro add-on.
+* Improvement: On a site Google cannot reach, such as a local or staging site, an uploaded post photo is added to your Google profile's photos first, so the post can use it.
+* Improvement: Editing a post written on Google leaves its photos and videos alone unless you change the photo.
+* Fix: A post with a just-uploaded photo no longer fails with "Internal error encountered" — FoundHint waits for Google to finish processing the photo.
+
 = 1.0.0 =
-* New: Posts & Scheduling — publish updates, events and offers to Google with a live preview, drafts, editing, deleting and retry, photos from your uploads, your Google gallery or customer photos, and one-click posts from 5-star reviews.
-* New: Previews of FoundHint Pro posting features — write with AI, scheduling, CSV scheduling and sharing your website blog.
 * New: Redesigned Reviews screen, with Sync reviews and the location switcher in the top bar.
 * New: Filter reviews by star rating, reply status and review status, and search by reviewer name or words.
 * New: Pagination with 5, 10, 25, 50 or 100 reviews per page.
@@ -385,8 +402,11 @@ Nothing is removed unless you ask for it. Turn on *Delete data on uninstall* in 
 
 == Upgrade Notice ==
 
+= 1.1.0 =
+Posts & Scheduling: publish updates, events and offers to your Google Business Profile from WordPress, with a live preview, drafts, photos and posts from 5-star reviews.
+
 = 1.0.0 =
-First stable release: Google posts from WordPress, a redesigned Reviews screen with filters, search, pagination, customer photos and CSV export, and a fix for duplicate locations after reconnecting Google.
+First stable release: a redesigned Reviews screen with filters, search, pagination, customer photos and CSV export, and a fix for duplicate locations after reconnecting Google.
 
 = 0.1.0 =
 First release.
