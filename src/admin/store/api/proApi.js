@@ -3,7 +3,7 @@ import { baseApi } from "./baseApi";
 
 /**
  * Endpoints served by the FoundHint Pro add-on, under its own REST
- * namespace (`fhint-pro/v1`). The URL is absolute — RTK Query uses an
+ * namespace (`fhint-premium/v1`). The URL is absolute — RTK Query uses an
  * absolute URL as it is — so these share this app's store and nonce.
  * Only ever called inside a <ProFeature>, so the routes exist.
  */

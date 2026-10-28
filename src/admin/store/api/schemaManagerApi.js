@@ -3,7 +3,7 @@ import { baseApi } from "./baseApi";
 
 /**
  * The Schema Manager's routes, served by FoundHint Pro under
- * `fhint-pro/v1/schema/*` (absolute URLs, so they share this app's store
+ * `fhint-premium/v1/schema/*` (absolute URLs, so they share this app's store
  * and nonce). Only called inside a <ProFeature feature="schema.…">.
  */
 const url = (path, params) => {

@@ -482,7 +482,7 @@ export function errorMessage(error) {
       __("Add your business details first.", "foundhint-local-seo"),
     fhint_location_not_found: () =>
       __("That location no longer exists.", "foundhint-local-seo"),
-    fhintpro_google_required: () =>
+    fhintpremium_google_required: () =>
       __(
         "Connect your Google Business Profile to set up schema.",
         "foundhint-local-seo",

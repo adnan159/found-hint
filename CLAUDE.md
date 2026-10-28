@@ -336,7 +336,7 @@ Pro needs more, add narrow filters at the specific points it needs and
 document them; don't reintroduce a generic registry.
 
 **FoundHint Pro** is a separate add-on plugin (`../found-hint-premium`) that is
-**server-side only**: REST routes (`fhint-pro/v1`), data, jobs, limits.
+**server-side only**: REST routes (`fhint-premium/v1`), data, jobs, limits.
 **All UI — Pro screens included — lives in this plugin.** A Pro screen is
 wrapped in `<ProFeature feature="…" fallback={upsell}>` and shows only
 when Pro reports serving that feature through `fhint_admin_bootstrap_data`

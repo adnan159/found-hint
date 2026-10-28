@@ -6,9 +6,9 @@ no admin page, script or style of its own, and it never edits this plugin.
 
 ## How a Pro feature is built
 
-1. **Pro (PHP):** the routes under `fhint-pro/v1` (guarded by this
+1. **Pro (PHP):** the routes under `fhint-premium/v1` (guarded by this
    plugin's `manage_fhint` capability), tables, jobs. When the feature
-   works, add its key to `FHINTPRO\App\Core\Features::active()`.
+   works, add its key to `FHINTPREMIUM\App\Core\Features::active()`.
 2. **Free (React):** the screen, in this app. Wrap it:
 
    ```jsx
@@ -22,7 +22,7 @@ no admin page, script or style of its own, and it never edits this plugin.
    in `src/admin/store/api/proApi.js` (absolute URLs from `proRestUrl()`).
 
 The browser-side check is only about what to draw. The real gate is the
-server: without Pro, the `fhint-pro/v1` routes do not exist.
+server: without Pro, the `fhint-premium/v1` routes do not exist.
 
 ## Hooks this plugin offers Pro
 
@@ -42,7 +42,7 @@ listed here — not a general registry.
 
 | Key | Screen | Without Pro | With Pro |
 |---|---|---|---|
-| `reviews.templates` | Reviews sidebar | `TemplatesCard` (upsell, sample templates) | `ProTemplatesCard` (placeholder: reads `GET fhint-pro/v1/status`) |
+| `reviews.templates` | Reviews sidebar | `TemplatesCard` (upsell, sample templates) | `ProTemplatesCard` (placeholder: reads `GET fhint-premium/v1/status`) |
 | `posts.ai` | Posts: "Write with AI" (header button and composer tab), "Make with AI" photo | disabled, `PRO` tag | — |
 | `posts.schedule` | Posts composer: "Schedule" under When to publish; `scheduled` status | disabled, `PRO` tag | — |
 | `posts.csv` | Posts: "Schedule with a CSV file" | disabled, `PRO` tag | — |
@@ -51,7 +51,7 @@ listed here — not a general registry.
 The posts table already has what Pro's posts need: `status` `scheduled`,
 `scheduled_at`, and `source` (`ai`, `csv`, `blog` — allowed on a request
 once Pro adds them through the `fhint_post_sources` filter).
-| `schema.business` | Schema → 01 Business schema | The five-tab screen, locked, filled with the free markup | Editable tab; Pro's `fhint-pro/v1/schema/*` routes |
+| `schema.business` | Schema → 01 Business schema | The five-tab screen, locked, filled with the free markup | Editable tab; Pro's `fhint-premium/v1/schema/*` routes |
 | `schema.locations` · `schema.services` · `schema.website` · `schema.settings` | Schema tabs 02–05 | "Pro" | Each when its step ships (docs/SCHEMA-PLAN.md) |
 | `schema.output` | Front-end markup | Free LocalBusiness markup | Pro's per-page graph replaces it |
 

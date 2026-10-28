@@ -30,7 +30,7 @@ export function upgradeUrl() {
   return window.FHINT?.upgrade_url || "https://foundhint.com/";
 }
 
-/** The add-on's REST base (`…/fhint-pro/v1`), or "" without Pro. */
+/** The add-on's REST base (`…/fhint-premium/v1`), or "" without Pro. */
 export function proRestUrl() {
   return pro?.rest_url ?? "";
 }

@@ -25,7 +25,7 @@ what this plugin already does (the **current** schema: `App\Schema\Graph`,
 | D5 | **Pro is unlimited.** No service cap, no branch cap inside Pro. | Free has no manager, so the doc's "Free: 5 services" row no longer applies. |
 | D6 | **Tables are created by the free plugin; all logic is Pro.** Free: table definitions, migrations, uninstall, the screens, two narrow hooks. Pro: repositories, the builder, the renderer, REST. | Agreed Free/Pro architecture (`docs/EXTENDING.md`): Pro is server-side only, all UI is in Free. |
 | D7 | **Reuse the existing business, locations and services tables.** New tables hold only what schema adds: overrides, placement, providers, service areas, the page index. | The doc §3 says the same: "Schema must reference them, not duplicate them". |
-| D8 | **Keep the plugin's own naming**: tables `{prefix}fhint_*`, REST `fhint-pro/v1/schema/*`, hooks `fhint_schema_*`, capability `manage_fhint`. | The doc's `foundhint_*` / `manage_options` predate this codebase's conventions. |
+| D8 | **Keep the plugin's own naming**: tables `{prefix}fhint_*`, REST `fhint-premium/v1/schema/*`, hooks `fhint_schema_*`, capability `manage_fhint`. | The doc's `foundhint_*` / `manage_options` predate this codebase's conventions. |
 | D9 | **A closed day stays `opens/closes 00:00`.** | Google's LocalBusiness documentation says exactly this for "closed all day". The doc says omit the day; Google's own rule wins. Unknown days are still omitted. |
 | D10 | **Google connection required for the manager** (doc §2.3). Free's baseline markup keeps working without it. | Matches Reviews and Posts. |
 
@@ -48,7 +48,7 @@ Hooks:                                       AboutPage, ContactPage, Breadcrumb
 Baseline markup (unchanged)                  owners)
                                            Compat (plugin detection, owners)
                                            LiveCheck (WP-Cron)
-                                           REST fhint-pro/v1/schema/*
+                                           REST fhint-premium/v1/schema/*
 ```
 
 **Feature keys** — the free screens show a tab's working version only when
@@ -229,8 +229,8 @@ updated; the feature key added to `Features::active()`.
 - [x] `EXTENDING.md`: the hooks and the six feature keys.
 
 **Pro**
-- [x] `FHINTPRO\App\Schema\` skeleton; `IdFactory` (doc §2.2, fallback `#location-{code|id}`, slugged service ids), `Context::from_query()`, `Graph` (drop empties, dedupe by `@id`, every `{ "@id" }` resolves or is dropped, owner filtering), `Renderer` on `fhint_schema_document`.
-- [ ] `FHINTPRO_MIN_FREE_VERSION` → the free release carrying Step 0 (set when 1.2.0 is tagged).
+- [x] `FHINTPREMIUM\App\Schema\` skeleton; `IdFactory` (doc §2.2, fallback `#location-{code|id}`, slugged service ids), `Context::from_query()`, `Graph` (drop empties, dedupe by `@id`, every `{ "@id" }` resolves or is dropped, owner filtering), `Renderer` on `fhint_schema_document`.
+- [ ] `FHINTPREMIUM_MIN_FREE_VERSION` → the free release carrying Step 0 (set when 1.2.0 is tagged).
 
 **Done when** Pro returns an empty graph for a page and the free markup stays; ids are stable across rebuilds; a dangling reference never prints.
 
