@@ -13,7 +13,12 @@ class with a static `init()` owning one subdirectory of classes. The admin
 is a Vite-built React SPA mounted on a single WordPress admin page.
 
 The data layer (business, locations, opening hours, services), its REST API
-and the admin screens for all of it are built. The audit engine and schema
+and the admin screens for all of it are built.
+
+**Schema Manager (in progress):** the five-tab Schema screen is planned in
+[`docs/SCHEMA-PLAN.md`](docs/SCHEMA-PLAN.md) — decisions, data model, the
+Free/Pro split and the step-by-step checklist. Work through it in order and
+tick each step as it lands. The audit engine and schema
 output are not — see `docs/PROGRESS.md` for exactly what is done and next.
 
 The sibling `local-seo` plugin in this same directory is the reference for
