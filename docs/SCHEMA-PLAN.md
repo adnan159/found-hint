@@ -34,7 +34,7 @@ what this plugin already does (the **current** schema: `App\Schema\Graph`,
 ## 1. Architecture
 
 ```
-Free (found-hint)                          Pro (found-hint-pro)
+Free (found-hint)                          Pro (found-hint-premium)
 ─────────────────                          ────────────────────
 Tables (Create*Table, migrations,          Repositories for the schema tables
   uninstall)                               Provenance (reads Business/Location/
@@ -213,7 +213,7 @@ All in `src/admin/pages/schema/`:
 ## 5. Steps
 
 Each step ends the same way: Free + Pro PHPCS clean; Pro smoke suite and a
-Pro database suite (new: `found-hint-pro/tests/Integration/schema.php`,
+Pro database suite (new: `found-hint-premium/tests/Integration/schema.php`,
 own tables, cleans up after itself) mutation-tested; the real bundle checked
 in the browser against a mocked API, with Pro on and off; output pasted into
 Google's Rich Results Test (Code tab) and the Schema.org validator;

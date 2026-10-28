@@ -1,6 +1,6 @@
 # FoundHint and FoundHint Pro
 
-**All UI is in this plugin. FoundHint Pro (`../found-hint-pro`) is
+**All UI is in this plugin. FoundHint Pro (`../found-hint-premium`) is
 server-side only** — REST routes, data, background jobs, limits. It has
 no admin page, script or style of its own, and it never edits this plugin.
 

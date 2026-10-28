@@ -335,7 +335,7 @@ through it, so a Pro tier raises a number instead of rewriting core. If
 Pro needs more, add narrow filters at the specific points it needs and
 document them; don't reintroduce a generic registry.
 
-**FoundHint Pro** is a separate add-on plugin (`../found-hint-pro`) that is
+**FoundHint Pro** is a separate add-on plugin (`../found-hint-premium`) that is
 **server-side only**: REST routes (`fhint-pro/v1`), data, jobs, limits.
 **All UI — Pro screens included — lives in this plugin.** A Pro screen is
 wrapped in `<ProFeature feature="…" fallback={upsell}>` and shows only
