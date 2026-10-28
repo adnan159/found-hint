@@ -380,10 +380,13 @@ class Graph {
 	/**
 	 * The PostalAddress node.
 	 *
+	 * Public because FoundHint Pro's Schema Manager builds its nodes with
+	 * it — one implementation of the rule, not two that can drift.
+	 *
 	 * @param array $address Address parts from Nap.
 	 * @return array
 	 */
-	private static function address_node( array $address ) {
+	public static function address_node( array $address ) {
 		$node = array( '@type' => 'PostalAddress' );
 
 		$street = trim( $address['line_1'] . ( '' !== $address['line_2'] ? ' ' . $address['line_2'] : '' ) );
@@ -410,10 +413,13 @@ class Graph {
 	 * hours describe normal weeks, and normal weeks are not what is
 	 * happening.
 	 *
+	 * Public because FoundHint Pro's Schema Manager builds its nodes with
+	 * it — one implementation of the rule, not two that can drift.
+	 *
 	 * @param array $nap Resolved NAP values.
 	 * @return array[]
 	 */
-	private static function opening_hours( array $nap ) {
+	public static function opening_hours( array $nap ) {
 		if ( Location::STATUS_TEMPORARILY_CLOSED === $nap['status'] ) {
 			return array();
 		}
@@ -498,10 +504,13 @@ class Graph {
 	/**
 	 * Social profile URLs, as sameAs.
 	 *
+	 * Public because FoundHint Pro's Schema Manager builds its nodes with
+	 * it — one implementation of the rule, not two that can drift.
+	 *
 	 * @param array $profiles Social profiles keyed by network.
 	 * @return string[]
 	 */
-	private static function same_as( array $profiles ) {
+	public static function same_as( array $profiles ) {
 		$urls = array();
 
 		foreach ( $profiles as $url ) {

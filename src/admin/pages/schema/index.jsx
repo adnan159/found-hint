@@ -1,318 +1,232 @@
+import { useCallback, useRef, useState } from "react";
 import { __ } from "@wordpress/i18n";
-import { AlertTriangleIcon, CheckIcon, InfoIcon } from "lucide-react";
-import { toast } from "sonner";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { Button } from "@/components/ui/button";
-import { Field, FieldDescription, FieldLabel } from "@/components/ui/field";
+import { Link2Icon } from "lucide-react";
+import { useSearchParams } from "react-router";
+import { cn } from "cn";
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+  AlertDialog,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { Skeleton } from "@/components/ui/skeleton";
-import NoticeBar from "@/components/NoticeBar";
-import ComingSoonBanner from "@/components/ComingSoonBanner";
 import PageHeader from "@/components/PageHeader";
-import useSelectedLocation from "@/hooks/useSelectedLocation";
 import RequestError from "@/components/RequestError";
-import SectionCard from "@/components/SectionCard";
-import { messageForCode } from "@/lib/errors";
+import { hasPro } from "@/lib/pro";
+import { focus } from "@/pages/profile/styles";
 import { useGetSchemaQuery } from "@/store/api/schemaApi";
 import {
-  useGetSettingsQuery,
-  useUpdateSettingsMutation,
-} from "@/store/api/settingsApi";
+  useGetBusinessSchemaQuery,
+  useGetSchemaStateQuery,
+} from "@/store/api/schemaManagerApi";
+import BusinessTab from "./components/BusinessTab";
+import ComingTab from "./components/ComingTab";
+import SchemaHeader from "./components/SchemaHeader";
+import TabBar, { TABS } from "./components/TabBar";
+import WhoPublishes from "./components/WhoPublishes";
+import { lockedBusinessState, placementLabel } from "./lib/schema";
+
+const dialogButton = cn(
+  "fhint:cursor-pointer fhint:border fhint:border-[#bab6b6] fhint:bg-card fhint:px-3.5 fhint:py-2 fhint:text-[13px] fhint:font-bold",
+  focus,
+);
 
 /**
- * What this site publishes about the business, and who publishes it.
+ * Schema — the Schema Manager (docs/SCHEMA-PLAN.md).
  *
- * The preview is the graph the front end would print, read from the same
- * cache — not a second rendering that could quietly disagree with what
- * search engines actually see.
+ * Five tabs: Business, Location, Service, Website structure, Settings. With
+ * FoundHint Pro serving `schema.business`, the Business tab is live; the
+ * others arrive step by step. Without Pro, the same screen is shown locked,
+ * filled with the markup the free plugin already prints.
  */
-const MODE_LABELS = {
-  auto: () => __("Automatic", "foundhint-local-seo"),
-  plugin: () => __("FoundHint publishes it", "foundhint-local-seo"),
-  seo_plugin: () => __("My SEO plugin publishes it", "foundhint-local-seo"),
-  disabled: () => __("Nobody publishes it", "foundhint-local-seo"),
-};
-
-const MODE_HINTS = {
-  auto: () =>
-    __(
-      "FoundHint publishes the markup unless it finds another plugin already doing it.",
-      "foundhint-local-seo",
-    ),
-  plugin: () =>
-    __(
-      "Always publish, even if something else might be publishing too.",
-      "foundhint-local-seo",
-    ),
-  seo_plugin: () =>
-    __(
-      "Never publish. Use this when your SEO plugin already describes the business.",
-      "foundhint-local-seo",
-    ),
-  disabled: () =>
-    __(
-      "No local business markup is published from this site.",
-      "foundhint-local-seo",
-    ),
-};
-
-function StatusBanner({ schema }) {
-  const { ownership, isPublishable, blockers } = schema;
-
-  if (!ownership) {
-    return null;
-  }
-
-  if (!ownership.should_publish) {
-    return (
-      <NoticeBar>
-        {ownership.deferring_to_plugin
-          ? __(
-              "FoundHint is not publishing this markup, because a plugin known to publish it is active.",
-              "foundhint-local-seo",
-            )
-          : __(
-              "FoundHint is not publishing this markup, because of the setting below.",
-              "foundhint-local-seo",
-            )}
-      </NoticeBar>
-    );
-  }
-
-  if (!isPublishable) {
-    return (
-      <Alert variant="destructive" role="alert">
-        <AlertTitle>
-          {__("Nothing is being published", "foundhint-local-seo")}
-        </AlertTitle>
-        <AlertDescription>
-          <ul className="fhint:flex fhint:flex-col fhint:gap-1">
-            {blockers.map((code) => (
-              <li key={code}>{messageForCode(code)}</li>
-            ))}
-          </ul>
-        </AlertDescription>
-      </Alert>
-    );
-  }
-
-  return (
-    <div
-      role="status"
-      className="fhint:flex fhint:items-center fhint:gap-2 fhint:border fhint:border-border fhint:bg-card fhint:px-4 fhint:py-3 fhint:text-[13px]"
-    >
-      <CheckIcon
-        aria-hidden="true"
-        className="fhint:size-4 fhint:text-success"
-      />
-      {__("This markup is published on your site.", "foundhint-local-seo")}
-    </div>
-  );
-}
-
 export default function SchemaPage() {
-  // The preview is per location: the one chosen here or elsewhere, else
-  // the main location. Every location is published; this shows one.
-  const { locationId, ready } = useSelectedLocation();
-  const {
-    currentData: schema,
-    isFetching,
-    error,
-  } = useGetSchemaQuery(locationId, { skip: !ready });
-  const isLoading = !ready || (isFetching && !schema);
-  const { data: settingsData } = useGetSettingsQuery();
-  const [updateSettings, { isLoading: isSaving }] = useUpdateSettingsMutation();
+  const pro = hasPro("schema.business");
+  const live = hasPro("schema.output");
+  const [params, setParams] = useSearchParams();
+  const requested = params.get("tab");
+  const tab = TABS.some(([key]) => key === requested) ? requested : "business";
+  const [dirty, setDirty] = useState(false);
+  const [pending, setPending] = useState(null);
+  const saveRef = useRef(null);
 
-  if (isLoading || !schema) {
-    return (
-      <>
-        <PageHeader title={__("Schema", "foundhint-local-seo")} />
-        <Skeleton className="fhint:h-[60vh] fhint:w-full" />
-      </>
-    );
-  }
+  const { data: free, error: freeError } = useGetSchemaQuery(0);
+  const { data: state, error: stateError } = useGetSchemaStateQuery(undefined, {
+    skip: !pro,
+  });
+  const { data: business, error: businessError } = useGetBusinessSchemaQuery(
+    undefined,
+    { skip: !pro },
+  );
 
-  const ownership = schema.ownership ?? {};
-  const mode = settingsData?.settings?.schema_mode ?? ownership.mode ?? "auto";
+  const onDirtyChange = useCallback((next) => setDirty(next), []);
 
-  const onModeChange = async (next) => {
-    if (!next || next === mode) {
+  const go = (key) => {
+    setParams(key === "business" ? {} : { tab: key }, { replace: true });
+  };
+
+  const pick = (key) => {
+    if (key === tab) {
       return;
     }
 
-    try {
-      await updateSettings({ schema_mode: next }).unwrap();
-      toast.success(__("Saved.", "foundhint-local-seo"));
-    } catch {
-      // Shown inline.
+    if (dirty) {
+      setPending(key);
+      return;
     }
+
+    go(key);
   };
 
-  const json = schema.graph ? JSON.stringify(schema.graph, null, 2) : "";
+  const soon = __("Coming in a later update", "foundhint-local-seo");
+  const summaries = {
+    business: pro
+      ? business
+        ? `${business.schema_kind === "organization" ? "Organization" : business.type} · ${placementLabel(business.placement)}`
+        : "…"
+      : free?.graph?.["@graph"]?.[0]?.["@type"]
+        ? `${free.graph["@graph"][0]["@type"]} · ${placementLabel("every_page")}`
+        : __("Pro", "foundhint-local-seo"),
+    locations: pro ? soon : __("Pro", "foundhint-local-seo"),
+    services: pro ? soon : __("Pro", "foundhint-local-seo"),
+    website: pro ? soon : __("Pro", "foundhint-local-seo"),
+    settings: __("Who publishes it", "foundhint-local-seo"),
+  };
+
+  const loading = !free || (pro && (!state || !business));
+  const connectFirst = pro && state && !state.connected;
 
   return (
-    <>
-      <PageHeader
-        title={__("Schema", "foundhint-local-seo")}
-        description={__(
-          "The structured data that tells search engines what your business is, where it is, and when it is open. Every location is published; this is the one chosen at the top of the page.",
-          "foundhint-local-seo",
-        )}
-      />
+    <div className="fhint:grid fhint:min-w-0 fhint:grid-cols-[minmax(0,1fr)] fhint:gap-4">
+      <PageHeader title={__("Schema", "foundhint-local-seo")} hidden />
 
-      <ComingSoonBanner
-        title={__("Advanced schema coming soon!", "foundhint-local-seo")}
-        description={__(
-          "More schema types and finer control over your markup are on the way. Your business markup is already published.",
-          "foundhint-local-seo",
-        )}
-      />
+      <RequestError error={freeError ?? stateError ?? businessError} />
 
-      <RequestError error={error} />
+      {connectFirst ? (
+        <section className="fhint:grid fhint:justify-items-start fhint:gap-3 fhint:border fhint:border-[#e6e3e3] fhint:bg-card fhint:px-6 fhint:py-8">
+          <h2 className="fhint:m-0 fhint:text-[18px] fhint:font-bold">
+            {__(
+              "Connect your Google Business Profile to set up schema",
+              "foundhint-local-seo",
+            )}
+          </h2>
+          <p className="fhint:m-0 fhint:max-w-[60ch] fhint:text-[13.5px] fhint:leading-relaxed fhint:text-[#444141]">
+            {__(
+              "Your schema is built from your Business Profile: name, address, phone and hours come from Google, and you can edit any of them for your website. Nothing changes on your site until you connect.",
+              "foundhint-local-seo",
+            )}
+          </p>
+          <a
+            href="#/google"
+            className={cn(
+              dialogButton,
+              "fhint:inline-flex fhint:items-center fhint:gap-2 fhint:border-0 fhint:bg-[#FF6B35] fhint:text-white fhint:no-underline",
+            )}
+          >
+            <Link2Icon aria-hidden="true" className="fhint:size-4" />
+            {__("Connect Google", "foundhint-local-seo")}
+          </a>
+        </section>
+      ) : (
+        <>
+          <SchemaHeader locked={!pro} syncedAt={state?.synced_at} />
 
-      <StatusBanner schema={schema} />
+          <TabBar
+            current={tab}
+            summaries={summaries}
+            dirty={dirty}
+            onPick={pick}
+          />
 
-      <SectionCard
-        id="schema-owner"
-        title={__("Who publishes it", "foundhint-local-seo")}
-        description={__(
-          "Two descriptions of the same business on one page is worse than one — search engines pick one and ignore the other.",
-          "foundhint-local-seo",
-        )}
-      >
-        <Field>
-          <FieldLabel htmlFor="schema-mode">
-            {__("Publishing", "foundhint-local-seo")}
-          </FieldLabel>
-          <Select value={mode} onValueChange={onModeChange} disabled={isSaving}>
-            <SelectTrigger id="schema-mode">
-              {/* Base UI's Value renders the raw value unless given a
-                  function. Every other select here happens to use values
-                  that read as labels, so this is the first place it shows. */}
-              <SelectValue>
-                {(value) => (MODE_LABELS[value] ? MODE_LABELS[value]() : value)}
-              </SelectValue>
-            </SelectTrigger>
-            <SelectContent>
-              {(ownership.modes ?? Object.keys(MODE_LABELS)).map((value) => (
-                <SelectItem key={value} value={value}>
-                  {MODE_LABELS[value] ? MODE_LABELS[value]() : value}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-          <FieldDescription>
-            {MODE_HINTS[mode] ? MODE_HINTS[mode]() : ""}
-          </FieldDescription>
-        </Field>
-
-        {ownership.detected?.length ? (
-          <div className="fhint:mt-5 fhint:flex fhint:flex-col fhint:gap-2">
-            <span className="fhint:text-[11px] fhint:font-extrabold fhint:tracking-[0.1em] fhint:text-muted-foreground fhint:uppercase">
-              {__("Also installed", "foundhint-local-seo")}
-            </span>
-            {ownership.detected.map((plugin) => (
-              <div
-                key={plugin.id}
-                className="fhint:flex fhint:items-start fhint:gap-2 fhint:text-[13px]"
-              >
-                {plugin.emits_local_business === true ? (
-                  <AlertTriangleIcon
-                    aria-hidden="true"
-                    className="fhint:mt-0.5 fhint:size-4 fhint:shrink-0"
-                  />
-                ) : (
-                  <InfoIcon
-                    aria-hidden="true"
-                    className="fhint:mt-0.5 fhint:size-4 fhint:shrink-0 fhint:text-muted-foreground"
-                  />
-                )}
-                <span>
-                  <span className="fhint:font-bold">{plugin.name}</span>{" "}
-                  <span className="fhint:text-muted-strong">
-                    {plugin.emits_local_business === true
-                      ? __(
-                          "— publishes local business markup of its own.",
-                          "foundhint-local-seo",
-                        )
-                      : plugin.emits_local_business === false
-                        ? __(
-                            "— does not publish local business markup.",
-                            "foundhint-local-seo",
-                          )
-                        : __(
-                            "— may publish local business markup, depending on how it is set up. Check your page source if you are not sure.",
-                            "foundhint-local-seo",
-                          )}
-                  </span>
-                </span>
-              </div>
-            ))}
-          </div>
-        ) : null}
-      </SectionCard>
-
-      {schema.recommendations?.length ? (
-        <SectionCard
-          id="schema-improve"
-          title={__("What would make this better", "foundhint-local-seo")}
-          description={__(
-            "None of these stop the markup being published. They just leave less for a search engine to work with.",
-            "foundhint-local-seo",
-          )}
-        >
-          <ul className="fhint:flex fhint:flex-col fhint:gap-1.5 fhint:text-[13px]">
-            {schema.recommendations.map((code) => (
-              <li key={code} className="fhint:text-muted-strong">
-                {messageForCode(code)}
-              </li>
-            ))}
-          </ul>
-        </SectionCard>
-      ) : null}
-
-      <SectionCard
-        id="schema-preview"
-        title={__("What gets published", "foundhint-local-seo")}
-        description={__(
-          "Exactly what appears in your pages' head, read from the same cache the front end uses.",
-          "foundhint-local-seo",
-        )}
-        action={
-          <Button
-            type="button"
-            variant="outline"
-            onClick={async () => {
-              try {
-                await navigator.clipboard.writeText(json);
-                toast.success(__("Copied.", "foundhint-local-seo"));
-              } catch {
-                toast.error(
-                  __(
-                    "Could not copy. Select the text instead.",
+          {loading ? (
+            <Skeleton className="fhint:h-[60vh] fhint:w-full" />
+          ) : tab === "business" ? (
+            <BusinessTab
+              state={pro ? business : lockedBusinessState(free)}
+              locked={!pro}
+              live={live}
+              onDirtyChange={onDirtyChange}
+              saveRef={saveRef}
+            />
+          ) : tab === "settings" ? (
+            <WhoPublishes ownership={free.ownership ?? {}} />
+          ) : (
+            <ComingTab
+              title={TABS.find(([key]) => key === tab)[1]()}
+              body={
+                {
+                  locations: __(
+                    "Describe each branch: its own address, phone, hours and page, linked to your main business.",
                     "foundhint-local-seo",
                   ),
-                );
+                  services: __(
+                    "Describe what you offer, who provides it, where, and at what price — each on its own page.",
+                    "foundhint-local-seo",
+                  ),
+                  website: __(
+                    "Tie your pages together: your website's name, each page, About and Contact, and breadcrumbs.",
+                    "foundhint-local-seo",
+                  ),
+                }[tab]
               }
-            }}
-          >
-            {__("Copy", "foundhint-local-seo")}
-          </Button>
-        }
+            />
+          )}
+        </>
+      )}
+
+      <AlertDialog
+        open={Boolean(pending)}
+        onOpenChange={(open) => (open ? null : setPending(null))}
       >
-        {/* Rendered as text, never as markup. The one place the plugin
-            shows JSON-LD, and it goes through JSON.stringify on data the
-            server produced — there is no innerHTML anywhere near it. */}
-        <pre className="fhint:max-h-[520px] fhint:overflow-auto fhint:border fhint:border-border fhint:bg-muted fhint:p-4 fhint:text-[12.5px] fhint:leading-relaxed">
-          <code>{json}</code>
-        </pre>
-      </SectionCard>
-    </>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>
+              {__("You have unsaved changes", "foundhint-local-seo")}
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              {__(
+                "Save them before you leave this tab, discard them, or stay here.",
+                "foundhint-local-seo",
+              )}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <button
+              type="button"
+              className={dialogButton}
+              onClick={() => setPending(null)}
+            >
+              {__("Stay", "foundhint-local-seo")}
+            </button>
+            <button
+              type="button"
+              className={dialogButton}
+              onClick={() => {
+                saveRef.current?.discard();
+                go(pending);
+                setPending(null);
+              }}
+            >
+              {__("Discard", "foundhint-local-seo")}
+            </button>
+            <button
+              type="button"
+              className={cn(
+                dialogButton,
+                "fhint:border-0 fhint:bg-[#FF6B35] fhint:text-white",
+              )}
+              onClick={async () => {
+                await saveRef.current?.save();
+                go(pending);
+                setPending(null);
+              }}
+            >
+              {__("Save", "foundhint-local-seo")}
+            </button>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </div>
   );
 }

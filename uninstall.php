@@ -89,6 +89,10 @@ $fhint_tables = array(
 	'description_history',
 	'google_reference',
 	'posts',
+	'schema_entities',
+	'schema_service_providers',
+	'schema_service_areas',
+	'schema_page_index',
 );
 
 foreach ( $fhint_tables as $fhint_table ) {

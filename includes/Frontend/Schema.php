@@ -31,11 +31,52 @@ class Schema {
 	 * @return void
 	 */
 	public static function init() {
-		add_action( 'wp_head', array( __CLASS__, 'render' ), 20 );
+		add_action( 'wp_head', array( __CLASS__, 'render_head' ), 20 );
+		add_action( 'wp_footer', array( __CLASS__, 'render_footer' ), 20 );
 
 		// A settings change alters the output without touching business
 		// data, so the stamp would not move on its own.
 		add_action( 'fhint_settings_saved', array( SchemaCache::class, 'flush' ) );
+	}
+
+	/**
+	 * Print in <head>, unless the markup is placed before </body>.
+	 *
+	 * @return void
+	 */
+	public static function render_head() {
+		if ( 'footer' !== self::placement() ) {
+			self::render();
+		}
+	}
+
+	/**
+	 * Print just before </body>, when the markup is placed there.
+	 *
+	 * @return void
+	 */
+	public static function render_footer() {
+		if ( 'footer' === self::placement() ) {
+			self::render();
+		}
+	}
+
+	/**
+	 * Where the markup goes: head or footer.
+	 *
+	 * @return string
+	 */
+	public static function placement() {
+		/**
+		 * Filters where the JSON-LD is printed: 'head' (wp_head) or 'footer'
+		 * (wp_footer). FoundHint Pro's Settings tab sets it; the free markup
+		 * always goes in the head.
+		 *
+		 * @param string $placement head | footer.
+		 */
+		$placement = function_exists( 'apply_filters' ) ? apply_filters( 'fhint_schema_placement', 'head' ) : 'head';
+
+		return 'footer' === $placement ? 'footer' : 'head';
 	}
 
 	/**
@@ -44,12 +85,59 @@ class Schema {
 	 * @return void
 	 */
 	public static function render() {
+		echo self::markup(); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Built by script_tag(), which encodes for a script element.
+	}
+
+	/**
+	 * The script tag this request prints, or ''.
+	 *
+	 * @return string
+	 */
+	public static function markup() {
+		// Feeds and embeds carry no markup, whoever builds it.
+		if ( is_feed() || is_embed() ) {
+			return '';
+		}
+
+		/**
+		 * Filters the whole document printed on this request.
+		 *
+		 * Return an array — a JSON-LD document — to print it instead of the
+		 * free LocalBusiness markup; null keeps the free markup. This is how
+		 * FoundHint Pro's Schema Manager takes over the output: its graph is
+		 * built per page, with its own placement and ownership rules, so
+		 * the free plugin's ownership check does not apply to it.
+		 *
+		 * @param array|null $document Null, or the document to print.
+		 * @param array      $context  { post_id, url, is_front_page }.
+		 */
+		$document = function_exists( 'apply_filters' ) ? apply_filters( 'fhint_schema_document', null, self::context() ) : null;
+
+		if ( is_array( $document ) ) {
+			return self::script_tag( $document );
+		}
+
 		if ( ! self::should_render() ) {
-			return;
+			return '';
 		}
 
 		// Every location that can be published, each as its own business.
-		echo self::script_tag( SchemaCache::site() ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+		return self::script_tag( SchemaCache::site() );
+	}
+
+	/**
+	 * What this request is, for whoever builds its document.
+	 *
+	 * @return array{post_id:int, url:string, is_front_page:bool}
+	 */
+	public static function context() {
+		$singular = function_exists( 'is_singular' ) && is_singular();
+
+		return array(
+			'post_id'       => $singular && function_exists( 'get_queried_object_id' ) ? (int) get_queried_object_id() : 0,
+			'url'           => $singular && function_exists( 'wp_get_canonical_url' ) ? (string) wp_get_canonical_url() : '',
+			'is_front_page' => function_exists( 'is_front_page' ) && is_front_page(),
+		);
 	}
 
 	/**
@@ -79,7 +167,7 @@ class Schema {
 			return '';
 		}
 
-		return "\n" . '<script type="application/ld+json">' . $json . '</script>' . "\n";
+		return "\n" . '<script type="application/ld+json" id="fhint-schema">' . $json . '</script>' . "\n";
 	}
 
 	/**

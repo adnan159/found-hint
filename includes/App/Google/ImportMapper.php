@@ -309,8 +309,8 @@ class ImportMapper {
 
 		$map = array(
 			'pet store'            => 'PetStore',
-			'veterinarian'         => 'Veterinarian',
-			'veterinary care'      => 'Veterinarian',
+			'veterinarian'         => 'VeterinaryCare',
+			'veterinary care'      => 'VeterinaryCare',
 			'restaurant'           => 'Restaurant',
 			'cafe'                 => 'CafeOrCoffeeShop',
 			'coffee shop'          => 'CafeOrCoffeeShop',

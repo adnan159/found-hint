@@ -40,7 +40,42 @@ class Settings {
 			'schema'  => array(
 				// auto | plugin | seo_plugin | disabled — who publishes the
 				// local business markup when an SEO plugin is also present.
-				'mode' => 'auto',
+				'mode'        => 'auto',
+
+				// The Schema Manager (FoundHint Pro; docs/SCHEMA-PLAN.md).
+				// Read only while Pro serves the manager; the free markup
+				// ignores them. Pro sanitises every value before saving.
+				'enabled'     => true,
+				// head | footer — inside <head>, or just before </body>.
+				'placement'   => 'head',
+				'website'     => array(
+					'enabled'        => true,
+					// Blank: the business name from Google.
+					'name'           => '',
+					'alternate_name' => '',
+				),
+				'webpage'     => array(
+					'enabled' => true,
+				),
+				'about'       => array(
+					'enabled' => false,
+					'post_id' => 0,
+				),
+				'contact'     => array(
+					'enabled' => false,
+					'post_id' => 0,
+				),
+				'breadcrumbs' => array(
+					'enabled' => false,
+				),
+				// Who prints each type when an SEO plugin prints it too:
+				// 'fhint' or the other plugin's key (Ownership::detected()).
+				'owners'      => array(
+					'LocalBusiness'  => 'fhint',
+					'WebSite'        => 'fhint',
+					'WebPage'        => 'fhint',
+					'BreadcrumbList' => 'fhint',
+				),
 			),
 		);
 	}

@@ -127,6 +127,8 @@ class Enqueue {
 			'rest_nonce' => wp_create_nonce( 'wp_rest' ),
 			'plugin_url' => FHINT_URL,
 			'version'    => FHINT_VERSION,
+			// Where "Upgrade to Pro" goes; filterable for a campaign link.
+			'upgrade_url' => (string) apply_filters( 'fhint_upgrade_url', 'https://foundhint.com/' ),
 			'reference'  => array(
 				'business_types'    => Business::types(),
 				'location_statuses' => Location::statuses(),

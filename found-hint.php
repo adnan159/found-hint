@@ -80,7 +80,7 @@ final class FHINT {
 	 */
 	public function define_constants() {
 		define( 'FHINT_VERSION', '1.1.0' );
-		define( 'FHINT_DB_VERSION', '0.18.0' );
+		define( 'FHINT_DB_VERSION', '0.19.0' );
 		define( 'FHINT_MIN_PHP', '7.4' );
 		define( 'FHINT_SETTINGS_NAME', 'fhint_settings' );
 		define( 'FHINT_FILE', __FILE__ );

@@ -84,7 +84,7 @@ class Business {
 			'School',
 			'EducationalOrganization',
 			'TravelAgency',
-			'Veterinarian',
+			'VeterinaryCare',
 			'PetStore',
 			'Florist',
 			'ClothingStore',

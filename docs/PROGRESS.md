@@ -1928,3 +1928,54 @@ lasting link. Publishing with a still-temporary link is refused up front
 (`post.media_url.processing`). The failed post was re-sent with the lasting
 link and is live on the "FoundHint" listing. Smoke + database tests,
 mutation-checked.
+
+## Step 61 — Schema Manager: groundwork and Business schema (Steps 0–1)
+
+Following docs/SCHEMA-PLAN.md. Pro builds, Free draws.
+
+**Free** (DB 0.19.0):
+- Tables `fhint_schema_entities`, `…_service_providers`, `…_service_areas`,
+  `…_page_index` (created and dropped here, written only by Pro); `schema.*`
+  settings defaults.
+- `Frontend\Schema`: `fhint_schema_document` (a document from Pro replaces
+  the free markup; feeds/embeds never print) and `fhint_schema_placement`
+  (head or footer). The tag now carries `id="fhint-schema"`.
+- `Graph::opening_hours()`, `address_node()`, `same_as()` public so Pro
+  reuses them rather than copying the rules.
+- "Veterinarian" (not a schema.org type) → `VeterinaryCare`, with a guarded
+  migration of stored values.
+- The Schema screen rebuilt to the design: header (sync time, Refresh from
+  Google), five-tab bar with live summaries and an unsaved-changes prompt;
+  tab 01 complete — Organization / LocalBusiness cards, searchable subtype
+  (shadcn Combobox, added with the CLI), eligibility box, fields with
+  requirement badges, From Google / Edited here, Edit / Use Google's value,
+  `gbp.* · property` captions and disagreement notes, storefront vs service
+  area, images from the listing, hours read-only, type details, placement
+  cards with page chips, save bar, and the server-built JSON-LD preview
+  (Copy schema, Test with Google, Check with Schema.org, the Code-tab tip
+  for a site Google cannot reach). Tabs 02–04 say "Coming in a later
+  update"; 05 keeps the working "Who publishes it" control.
+- Without Pro the same screen is locked: read-only, an upgrade prompt
+  (`upgrade_url`, filter `fhint_upgrade_url`), and the markup the free
+  plugin really prints.
+
+**Pro** (`FHINTPRO\App\Schema`): `Types` + `data/schema-types.json` (57
+curated types, parents, Google matches, extras, service categories),
+`IdFactory`, `EntityRepository`, `Document` (prune, dedupe by @id, drop
+dangling references, property count), `BusinessFields` (provenance),
+`Pieces\Business` (days with equal hours grouped, special hours for the
+next 90 days, type extras), `BusinessSchema` (state, draft rules, save,
+preview), `Validator`, `Pages`, `SchemaState`, `Renderer` (gated on
+`schema.output`, not yet listed). REST `fhint-pro/v1/schema/{state,types,
+pages,business,preview}`; saves need Google connected. Feature key
+`schema.business`.
+
+Verified: Pro smoke `schema.php` (121) and database `Integration/schema.php`
+(36, own tables, restores the Google connection) — both mutation-tested;
+free smoke and database suites (721) pass; real routes on the dev site
+(type matched from "Software company", 11 of 18 fields from Google); the
+real bundle against captured responses with Pro on (edit, preview, save,
+refusal, reset, Organization, subtype by keyboard with its details at once,
+placement chips and the home warning, unsaved-changes prompt) and off
+(locked, no inputs, upgrade link, free markup).
+

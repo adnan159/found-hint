@@ -538,11 +538,11 @@ check_same( '', render_head(), 'nothing is printed when there is no publishable 
 // needs a database, this does not.
 $tag = \FHINT\Frontend\Schema::script_tag( Graph::from_parts( nap() ) );
 
-check( false !== strpos( $tag, '<script type="application/ld+json">' ), 'the tag declares the ld+json type' );
+check( false !== strpos( $tag, '<script type="application/ld+json" id="fhint-schema">' ), 'the tag declares the ld+json type' );
 check( false !== strpos( $tag, '</script>' ), 'and is closed' );
 check( false !== strpos( $tag, 'Northside Dental Care' ), 'and carries the business name' );
 
-$payload = trim( str_replace( array( '<script type="application/ld+json">', '</script>' ), '', $tag ) );
+$payload = trim( str_replace( array( '<script type="application/ld+json" id="fhint-schema">', '</script>' ), '', $tag ) );
 
 check( null !== json_decode( $payload, true ), 'what is printed between the tags is valid JSON' );
 
@@ -565,7 +565,7 @@ check( false === strpos( $tag, '<img' ), 'nor smuggle a tag of any kind into the
 check( false !== strpos( $tag, '\\u003C' ), 'because < is encoded as \\u003C' );
 
 // Escaped, not discarded — the value still decodes back intact.
-$payload = trim( str_replace( array( '<script type="application/ld+json">', '</script>' ), '', $tag ) );
+$payload = trim( str_replace( array( '<script type="application/ld+json" id="fhint-schema">', '</script>' ), '', $tag ) );
 $decoded = json_decode( $payload, true );
 
 check_same(
@@ -648,5 +648,74 @@ check( ! isset( $node['areaServed'] ), 'no service area, no areaServed' );
 
 $node = business_node( Graph::from_parts( nap() ) );
 check( ! isset( $node['areaServed'] ), 'nor for a NAP that has no service area at all' );
+
+// -- Hooks FoundHint Pro uses ---------------------------------------------
+//
+// fhint_schema_document replaces the whole document on a request;
+// fhint_schema_placement moves it from <head> to before </body>.
+
+$GLOBALS['__options']  = array();
+$GLOBALS['__filters']  = array();
+$GLOBALS['__is_feed']  = false;
+$GLOBALS['__is_embed'] = false;
+
+$fhint_pro_doc = array(
+	'@context' => 'https://schema.org',
+	'@graph'   => array( array( '@type' => 'WebSite', '@id' => 'https://example.test/#website', 'name' => 'From Pro' ) ),
+);
+
+// No document: the free path, which here has nothing publishable.
+check_same( '', \FHINT\Frontend\Schema::markup(), 'with no document from Pro, the free markup path runs (empty here)' );
+
+add_filter(
+	'fhint_schema_document',
+	function ( $document, $context ) use ( $fhint_pro_doc ) {
+		$GLOBALS['__seen_context'] = $context;
+		return $fhint_pro_doc;
+	},
+	10,
+	2
+);
+$fhint_markup = \FHINT\Frontend\Schema::markup();
+check( false !== strpos( $fhint_markup, 'From Pro' ), "a document from the filter is printed instead of the free markup" );
+check_same( 1, substr_count( $fhint_markup, '<script' ), 'as one script tag' );
+check( isset( $GLOBALS['__seen_context']['post_id'], $GLOBALS['__seen_context']['url'], $GLOBALS['__seen_context']['is_front_page'] ), 'and the filter is told which request it is' );
+
+$GLOBALS['__options']['fhint_settings'] = array( 'schema' => array( 'mode' => Ownership::MODE_DISABLED ) );
+check( false !== strpos( \FHINT\Frontend\Schema::markup(), 'From Pro' ), "the free ownership switch does not silence Pro's document — Pro owns its own rules" );
+
+$GLOBALS['__is_feed'] = true;
+check_same( '', \FHINT\Frontend\Schema::markup(), 'but a feed never carries it' );
+$GLOBALS['__is_feed'] = false;
+
+check_same( 'head', \FHINT\Frontend\Schema::placement(), 'the markup goes in the head by default' );
+ob_start();
+\FHINT\Frontend\Schema::render_footer();
+check_same( '', ob_get_clean(), 'and nothing prints in the footer then' );
+ob_start();
+\FHINT\Frontend\Schema::render_head();
+check( false !== strpos( ob_get_clean(), 'From Pro' ), 'it prints in the head' );
+
+add_filter(
+	'fhint_schema_placement',
+	function () {
+		return 'footer';
+	}
+);
+ob_start();
+\FHINT\Frontend\Schema::render_head();
+check_same( '', ob_get_clean(), 'placed in the footer, nothing prints in the head' );
+ob_start();
+\FHINT\Frontend\Schema::render_footer();
+check( false !== strpos( ob_get_clean(), 'From Pro' ), 'and it prints before </body>' );
+
+$GLOBALS['__filters']['fhint_schema_placement'] = array(
+	function () {
+		return 'sidebar';
+	},
+);
+check_same( 'head', \FHINT\Frontend\Schema::placement(), 'an unknown placement falls back to the head' );
+
+$GLOBALS['__filters'] = array();
 
 finish( 'Schema graph' );

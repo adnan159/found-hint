@@ -22,6 +22,14 @@ export function hasPro(feature) {
   );
 }
 
+/**
+ * Where "Upgrade to Pro" goes. From the bootstrap data (`upgrade_url`), so
+ * it can change without a release of the app.
+ */
+export function upgradeUrl() {
+  return window.FHINT?.upgrade_url || "https://foundhint.com/";
+}
+
 /** The add-on's REST base (`…/fhint-pro/v1`), or "" without Pro. */
 export function proRestUrl() {
   return pro?.rest_url ?? "";
