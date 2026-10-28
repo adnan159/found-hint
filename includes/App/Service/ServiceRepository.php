@@ -251,6 +251,8 @@ class ServiceRepository {
 			return false;
 		}
 
+		self::forget_schema( array( $id ) );
+
 		Logger::info( 'service', 'service.deleted', 'Service deleted.', array( 'metadata' => array( 'service_id' => $id ) ) );
 		BusinessRepository::stamp_data_changed();
 
@@ -445,7 +447,51 @@ class ServiceRepository {
 			return false;
 		}
 
+		$ids = array_map( 'intval', array_column( self::all( array( 'location_id' => $location_id ) ), 'id' ) );
+
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
-		return false !== $wpdb->delete( Tables::name( Tables::SERVICES ), array( 'location_id' => $location_id ) );
+		$deleted = false !== $wpdb->delete( Tables::name( Tables::SERVICES ), array( 'location_id' => $location_id ) );
+
+		if ( $deleted ) {
+			self::forget_schema( $ids );
+		}
+
+		return $deleted;
+	}
+
+	/**
+	 * Remove what the Schema Manager kept about deleted services: their
+	 * settings, providers and areas. Those tables are this plugin's, so a
+	 * service deleted anywhere leaves nothing behind, Premium installed or not.
+	 *
+	 * @param int[] $ids Service ids.
+	 * @return void
+	 */
+	private static function forget_schema( array $ids ) {
+		global $wpdb;
+
+		$ids = array_values( array_filter( array_map( 'intval', $ids ) ) );
+
+		if ( ! $ids ) {
+			return;
+		}
+
+		$placeholders = implode( ', ', array_fill( 0, count( $ids ), '%d' ) );
+
+		foreach ( array( Tables::SCHEMA_SERVICE_PROVIDERS, Tables::SCHEMA_SERVICE_AREAS ) as $key ) {
+			if ( Tables::exists( $key ) ) {
+				$table = Tables::name( $key );
+
+				// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.PreparedSQLPlaceholders.UnfinishedPrepare
+				$wpdb->query( $wpdb->prepare( "DELETE FROM {$table} WHERE service_id IN ({$placeholders})", $ids ) );
+			}
+		}
+
+		if ( Tables::exists( Tables::SCHEMA_ENTITIES ) ) {
+			$table = Tables::name( Tables::SCHEMA_ENTITIES );
+
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.PreparedSQLPlaceholders.UnfinishedPrepare
+			$wpdb->query( $wpdb->prepare( "DELETE FROM {$table} WHERE entity_kind = 'service' AND entity_id IN ({$placeholders})", $ids ) );
+		}
 	}
 }

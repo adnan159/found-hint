@@ -6,7 +6,8 @@ import { card, chip, input, muted } from "./styles";
 
 /**
  * "Add … schema to": Every page / Home page only / Pages I choose, with
- * the page chips for the last.
+ * the page chips for the last. `choices` replaces the cards
+ * (`[key, label, body]`); "chosen" always shows the page chips.
  */
 export function PlacementCards({
   title,
@@ -15,6 +16,7 @@ export function PlacementCards({
   postIds,
   locked,
   homeWarning = true,
+  choices,
   onChange,
   onPages,
 }) {
@@ -29,7 +31,7 @@ export function PlacementCards({
     (page) => page.front && postIds.includes(page.id),
   );
 
-  const options = [
+  const options = choices ?? [
     [
       "every_page",
       __("Every page", "foundhint-local-seo"),

@@ -151,6 +151,60 @@ const MESSAGES = {
     __("Choose your business, or not part of a group.", "foundhint-local-seo"),
   "schema.location.status.invalid": () =>
     __("Switch the branch on or off.", "foundhint-local-seo"),
+  "schema.service.name.required": () =>
+    __("Give the service a name.", "foundhint-local-seo"),
+  "schema.service.name.too_long": () =>
+    __("A service name can be 255 characters at most.", "foundhint-local-seo"),
+  "schema.service.description.too_long": () =>
+    __(
+      "Keep the short description to 300 characters or fewer.",
+      "foundhint-local-seo",
+    ),
+  "schema.service.service_type.too_long": () =>
+    __("A category can be 100 characters at most.", "foundhint-local-seo"),
+  "schema.service.status.invalid": () =>
+    __("Switch the service on or off.", "foundhint-local-seo"),
+  "schema.service.image.invalid": () =>
+    __(
+      "Enter the image's full web address, starting with https://.",
+      "foundhint-local-seo",
+    ),
+  "schema.service.provider.invalid": () =>
+    __("Choose who provides this service.", "foundhint-local-seo"),
+  "schema.service.provider.branch_required": () =>
+    __("Choose at least one branch.", "foundhint-local-seo"),
+  "schema.service.person.too_long": () =>
+    __(
+      "A provider's name can be 200 characters at most.",
+      "foundhint-local-seo",
+    ),
+  "schema.service.person.invalid": () =>
+    __("Choose a person or a partner company.", "foundhint-local-seo"),
+  "schema.service.areas.too_many": () =>
+    __("A service can list 20 places at most.", "foundhint-local-seo"),
+  "schema.service.areas.too_long": () =>
+    __("A place name can be 191 characters at most.", "foundhint-local-seo"),
+  "schema.service.areas.invalid": () =>
+    __("Choose what kind of place it is.", "foundhint-local-seo"),
+  "schema.service.page.invalid": () =>
+    __(
+      "Enter the page's full web address, starting with https://.",
+      "foundhint-local-seo",
+    ),
+  "schema.service.page.not_found": () =>
+    __("That page no longer exists. Choose another.", "foundhint-local-seo"),
+  "schema.service.pricing.invalid": () =>
+    __("Choose how the price is shown.", "foundhint-local-seo"),
+  "schema.service.price.required": () =>
+    __("Enter a price, or choose No price.", "foundhint-local-seo"),
+  "schema.service.price.invalid": () =>
+    __("Enter a price as a number, such as 1500.", "foundhint-local-seo"),
+  "schema.service.price_max.required": () =>
+    __("Enter the top of the range.", "foundhint-local-seo"),
+  "schema.service.price_max.below_min": () =>
+    __("The top of the range must be above its start.", "foundhint-local-seo"),
+  "schema.service.currency.invalid": () =>
+    __("Choose a currency.", "foundhint-local-seo"),
   "schema.placement.invalid": () =>
     __("Choose where the schema is added.", "foundhint-local-seo"),
   // Posts.

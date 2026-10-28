@@ -84,13 +84,106 @@ export const schemaManagerApi = baseApi
         invalidatesTags: ["SchemaManager"],
       }),
 
+      // Services, per list: 0 is the business's own, else a branch's.
+      getServiceSchemas: builder.query({
+        query: (list = 0) => url("/schema/services", { list }),
+        transformResponse: (response) => response?.data ?? null,
+        providesTags: ["SchemaManager"],
+      }),
+
+      getServiceSchema: builder.query({
+        query: (id) => url(`/schema/services/${Number(id)}`),
+        transformResponse: (response) => response?.data ?? null,
+        providesTags: ["SchemaManager"],
+      }),
+
+      // The editor for a service not yet added; nothing is stored.
+      getBlankServiceSchema: builder.query({
+        query: (list = 0) => url("/schema/services/blank", { list }),
+        transformResponse: (response) => response?.data ?? null,
+      }),
+
+      createServiceSchema: builder.mutation({
+        query: ({ list = 0, ...body }) => ({
+          url: url("/schema/services", { list }),
+          method: "POST",
+          body,
+        }),
+        transformResponse: (response) => response?.data ?? null,
+        invalidatesTags: ["SchemaManager", "Service", "Schema"],
+      }),
+
+      saveServiceSchema: builder.mutation({
+        query: ({ id, ...body }) => ({
+          url: url(`/schema/services/${Number(id)}`),
+          method: "PUT",
+          body,
+        }),
+        transformResponse: (response) => response?.data ?? null,
+        invalidatesTags: ["SchemaManager", "Service", "Schema"],
+      }),
+
+      // The list's switch: saves at once.
+      setServiceStatus: builder.mutation({
+        query: ({ id, status }) => ({
+          url: url(`/schema/services/${Number(id)}`),
+          method: "PATCH",
+          body: { status },
+        }),
+        transformResponse: (response) => response?.data ?? null,
+        invalidatesTags: ["SchemaManager", "Service", "Schema"],
+      }),
+
+      deleteServiceSchema: builder.mutation({
+        query: (id) => ({
+          url: url(`/schema/services/${Number(id)}`),
+          method: "DELETE",
+        }),
+        transformResponse: (response) => response?.data ?? null,
+        invalidatesTags: ["SchemaManager", "Service", "Schema"],
+      }),
+
+      reorderServiceSchemas: builder.mutation({
+        query: ({ list = 0, ids }) => ({
+          url: url("/schema/services/order"),
+          method: "PUT",
+          body: { list, ids },
+        }),
+        transformResponse: (response) => response?.data ?? null,
+        // The new order is shown at once; this keeps every list in step.
+        async onQueryStarted({ list = 0, ids }, { dispatch, queryFulfilled }) {
+          const patch = dispatch(
+            schemaManagerApi.util.updateQueryData(
+              "getServiceSchemas",
+              list,
+              (draft) => {
+                if (!draft?.services) {
+                  return;
+                }
+
+                draft.services.sort(
+                  (a, b) => ids.indexOf(a.id) - ids.indexOf(b.id),
+                );
+              },
+            ),
+          );
+
+          try {
+            await queryFulfilled;
+          } catch {
+            patch.undo();
+          }
+        },
+        invalidatesTags: ["Service", "Schema"],
+      }),
+
       // The markup for an entity, unsaved changes included. A mutation, not
       // a query: every keystroke is a new draft, and none is worth caching.
       previewSchema: builder.mutation({
-        query: ({ entity, id = 0, draft }) => ({
+        query: ({ entity, id = 0, list = 0, draft }) => ({
           url: url("/schema/preview"),
           method: "POST",
-          body: { entity, id, draft },
+          body: { entity, id, list, draft },
         }),
         transformResponse: (response) => response?.data ?? null,
       }),
@@ -106,5 +199,13 @@ export const {
   useGetLocationSchemasQuery,
   useGetLocationSchemaQuery,
   useSaveLocationSchemaMutation,
+  useGetServiceSchemasQuery,
+  useGetServiceSchemaQuery,
+  useGetBlankServiceSchemaQuery,
+  useCreateServiceSchemaMutation,
+  useSaveServiceSchemaMutation,
+  useSetServiceStatusMutation,
+  useDeleteServiceSchemaMutation,
+  useReorderServiceSchemasMutation,
   usePreviewSchemaMutation,
 } = schemaManagerApi;

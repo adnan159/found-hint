@@ -30,6 +30,7 @@ import BusinessTab from "./components/BusinessTab";
 import ComingTab from "./components/ComingTab";
 import LocationTab from "./components/LocationTab";
 import SchemaHeader from "./components/SchemaHeader";
+import ServiceTab from "./components/ServiceTab";
 import TabBar, { TABS } from "./components/TabBar";
 import WhoPublishes from "./components/WhoPublishes";
 import {
@@ -54,6 +55,7 @@ const dialogButton = cn(
 export default function SchemaPage() {
   const pro = hasPro("schema.business");
   const proLocations = hasPro("schema.locations");
+  const proServices = hasPro("schema.services");
   const live = hasPro("schema.output");
   const [params, setParams] = useSearchParams();
   const requested = params.get("tab");
@@ -80,7 +82,11 @@ export default function SchemaPage() {
   // One location for the whole admin: the bar at the top of every page.
   // The Business tab is the main location; the Location tab follows the
   // branch chosen there, and choosing a branch here switches the bar too.
-  const { locationId, choose } = useSelectedLocation();
+  const {
+    locationId,
+    current: currentLocation,
+    choose,
+  } = useSelectedLocation();
   const { registerGuard } = useLocationSelection();
 
   const go = (key) => {
@@ -155,6 +161,17 @@ export default function SchemaPage() {
     }
   };
 
+  // Anything else that would drop unsaved work (another service, a new
+  // one) waits for the same Save / Discard / Stay.
+  const guard = (run) => {
+    if (dirtyRef.current) {
+      setPending({ run });
+      return;
+    }
+
+    run();
+  };
+
   const pick = (key) => {
     if (key === tab) {
       return;
@@ -172,7 +189,12 @@ export default function SchemaPage() {
     if (pending && typeof pending === "object") {
       // Saved or discarded: nothing stands in the way any more.
       dirtyRef.current = false;
-      choose(pending.location);
+
+      if (pending.run) {
+        pending.run();
+      } else {
+        choose(pending.location);
+      }
     } else if (pending) {
       go(pending);
     }
@@ -214,7 +236,24 @@ export default function SchemaPage() {
       : pro
         ? soon
         : __("Pro", "foundhint-local-seo"),
-    services: pro ? soon : __("Pro", "foundhint-local-seo"),
+    services: proServices
+      ? state?.tabs?.services?.ready
+        ? state.tabs.services.check
+          ? sprintf(
+              /* translators: 1: active services, 2: services with something to check. */
+              __("%1$d active · %2$d to check", "foundhint-local-seo"),
+              state.tabs.services.active,
+              state.tabs.services.check,
+            )
+          : sprintf(
+              /* translators: %d: active services. */
+              __("%d active", "foundhint-local-seo"),
+              state.tabs.services.active,
+            )
+        : "…"
+      : pro
+        ? soon
+        : __("Pro", "foundhint-local-seo"),
     website: pro ? soon : __("Pro", "foundhint-local-seo"),
     settings: __("Who publishes it", "foundhint-local-seo"),
   };
@@ -292,6 +331,21 @@ export default function SchemaPage() {
               }
               locked={!proLocations}
               live={live}
+              onDirtyChange={onDirtyChange}
+              saveRef={saveRef}
+            />
+          ) : tab === "services" && (proServices || !pro) ? (
+            <ServiceTab
+              list={locationId}
+              branchName={
+                locationId
+                  ? currentLocation?.business_name || currentLocation?.name
+                  : ""
+              }
+              free={free}
+              locked={!proServices}
+              live={live}
+              guard={guard}
               onDirtyChange={onDirtyChange}
               saveRef={saveRef}
             />

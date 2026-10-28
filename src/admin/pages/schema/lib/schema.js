@@ -466,3 +466,47 @@ export function lockedLocationState(schema) {
       : null,
   };
 }
+
+/**
+ * The Service tab without Premium: the services the free markup already
+ * prints (inside the business's OfferCatalog), shown read-only.
+ *
+ * @param {Object} schema The free plugin's /schema response.
+ * @return {Object[]} Each `{ id, name, status, from_google, meta, warnings, node }`.
+ */
+export function lockedServices(schema) {
+  const graph = schema?.graph?.["@graph"] ?? [];
+  const catalog = graph.find((node) => node["@type"] === "OfferCatalog");
+  const offers = catalog?.itemListElement ?? [];
+
+  return offers.map((offer, index) => {
+    const service = offer.itemOffered ?? {};
+
+    return {
+      id: index + 1,
+      name: service.name ?? "",
+      status: "active",
+      from_google: false,
+      meta: {
+        category: "",
+        provider: catalog?.name ?? "",
+        areas: 0,
+        page: service.url ?? "",
+      },
+      warnings: [],
+      node: {
+        "@context": "https://schema.org",
+        ...service,
+        ...(offer.price
+          ? {
+              offers: {
+                "@type": "Offer",
+                price: offer.price,
+                priceCurrency: offer.priceCurrency,
+              },
+            }
+          : {}),
+      },
+    };
+  });
+}
