@@ -1,7 +1,21 @@
 import { __ } from "@wordpress/i18n";
 
 /** Field labels, in the design's words. */
-export function fieldLabel(key) {
+export function fieldLabel(key, scope = "business") {
+  if (scope === "location") {
+    const branch = {
+      name: __("Branch name", "foundhint-local-seo"),
+      branch_code: __("Branch code", "foundhint-local-seo"),
+      telephone: __("Phone", "foundhint-local-seo"),
+      email: __("Email", "foundhint-local-seo"),
+      url: __("Branch page URL", "foundhint-local-seo"),
+    }[key];
+
+    if (branch) {
+      return branch;
+    }
+  }
+
   return (
     {
       name: __("Business name", "foundhint-local-seo"),
@@ -313,6 +327,140 @@ export function lockedBusinessState(schema) {
     post_ids: [],
     photos: [],
     google: false,
+    preview: node["@type"]
+      ? { "@context": "https://schema.org", ...node }
+      : null,
+  };
+}
+
+/** The Location fields as the screen lays them out (Premium's LocationFields). */
+export const LOCATION_FIELDS = [
+  ["name", "branch", "name", "gbp.title", "required", "text"],
+  ["branch_code", "branch", "branchCode", "gbp.storeCode", "optional", "text"],
+  [
+    "street_address",
+    "address",
+    "address.streetAddress",
+    "gbp.storefrontAddress.addressLines",
+    "storefront",
+    "text",
+  ],
+  [
+    "locality",
+    "address",
+    "address.addressLocality",
+    "gbp.storefrontAddress.locality",
+    "storefront",
+    "text",
+  ],
+  [
+    "region",
+    "address",
+    "address.addressRegion",
+    "gbp.storefrontAddress.administrativeArea",
+    "optional",
+    "text",
+  ],
+  [
+    "postal_code",
+    "address",
+    "address.postalCode",
+    "gbp.storefrontAddress.postalCode",
+    "optional",
+    "text",
+  ],
+  [
+    "country",
+    "address",
+    "address.addressCountry",
+    "gbp.storefrontAddress.regionCode",
+    "storefront",
+    "text",
+  ],
+  [
+    "latitude",
+    "address",
+    "geo.latitude",
+    "gbp.latlng.latitude",
+    "optional",
+    "number",
+  ],
+  [
+    "longitude",
+    "address",
+    "geo.longitude",
+    "gbp.latlng.longitude",
+    "optional",
+    "number",
+  ],
+  ["map_url", "address", "hasMap", "gbp.metadata.mapsUri", "optional", "url"],
+  [
+    "telephone",
+    "contact",
+    "telephone",
+    "gbp.phoneNumbers.primaryPhone",
+    "recommended",
+    "tel",
+  ],
+  ["email", "contact", "email", "", "optional", "email"],
+  ["url", "contact", "url", "gbp.websiteUri", "recommended", "url"],
+  [
+    "hours",
+    "hours",
+    "openingHoursSpecification",
+    "gbp.regularHours",
+    "recommended",
+    "hours",
+  ],
+].map(([key, group, property, gbp, badge, inputKind]) => ({
+  key,
+  group,
+  property,
+  gbp,
+  badge,
+  input: inputKind,
+}));
+
+/**
+ * One branch as the free plugin prints it, drawn as the Location tab's
+ * locked state.
+ */
+export function lockedLocationState(schema) {
+  const node = schema?.graph?.["@graph"]?.[0] ?? {};
+  const address = node.address ?? {};
+  const values = {
+    name: node.name ?? "",
+    branch_code: "",
+    street_address: address.streetAddress ?? "",
+    locality: address.addressLocality ?? "",
+    region: address.addressRegion ?? "",
+    postal_code: address.postalCode ?? "",
+    country: address.addressCountry ?? "",
+    latitude: node.geo?.latitude ?? "",
+    longitude: node.geo?.longitude ?? "",
+    map_url: node.hasMap ?? "",
+    telephone: node.telephone ?? "",
+    email: node.email ?? "",
+    url: node.url ?? "",
+    hours: hoursFromSpecs(node.openingHoursSpecification),
+  };
+
+  return {
+    fields: LOCATION_FIELDS.map((field) => ({
+      ...field,
+      value: values[field.key],
+      google_value: null,
+      source: "manual",
+      disagrees: false,
+    })),
+    parent: node.parentOrganization ? "business" : "none",
+    parent_name: "",
+    sisters: [],
+    missing: [],
+    status: schema?.isPublishable ? "active" : "draft",
+    placement: "every_page",
+    post_ids: [],
+    warnings: [],
     preview: node["@type"]
       ? { "@context": "https://schema.org", ...node }
       : null,

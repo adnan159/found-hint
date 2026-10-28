@@ -20,7 +20,7 @@ const button = cn(
  * and Refresh from Google (the Business Profile's own refresh — schema
  * never calls Google itself). Without Pro: the upgrade prompt instead.
  */
-export function SchemaHeader({ locked, syncedAt }) {
+export function SchemaHeader({ locked, syncedAt, locationId = 0 }) {
   const [refresh, { isLoading }] = useRefreshFromGoogleMutation();
   const dispatch = useDispatch();
 
@@ -63,7 +63,8 @@ export function SchemaHeader({ locked, syncedAt }) {
 
   const onRefresh = async () => {
     try {
-      await refresh({ locationId: 0 }).unwrap();
+      // The location on screen: the main one, or the branch being edited.
+      await refresh({ locationId }).unwrap();
       // Un-edited fields follow Google: read the tab again.
       dispatch(schemaManagerApi.util.invalidateTags(["SchemaManager"]));
       toast.success(

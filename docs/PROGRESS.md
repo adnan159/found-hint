@@ -1979,3 +1979,55 @@ refusal, reset, Organization, subtype by keyboard with its details at once,
 placement chips and the home warning, unsaved-changes prompt) and off
 (locked, no inputs, upgrade link, free markup).
 
+## Step 62 — Premium rename; Schema Manager Step 2 (Location schema)
+
+**Rename.** The add-on is **FoundHint Premium**: folder and main file
+`found-hint-premium`, text domain `found-hint-premium`, namespace
+`FHINTPREMIUM\`, constants `FHINTPREMIUM_`, options/hooks `fhintpremium_`,
+REST `fhint-premium/v1`. The free app's bootstrap key stays `pro`
+(`window.FHINT.pro`). The free plugin's user-facing "Pro" labels are still
+to be renamed.
+
+**Location schema** (docs/SCHEMA-PLAN.md Step 2). Branches are every
+location but the main one (the main one is the business); one location →
+the tab says Business schema describes it.
+- Premium: `LocationFields` (provenance per branch: name, store code →
+  branchCode, address incl. region, coordinates, map link from the CID,
+  the branch's own phone and email, page URL = linked page else website,
+  hours read-only), `Pieces\Location` (typed like the business — or its
+  own category for a location trading under its own name — inherited logo,
+  photos, price range; parentOrganization unless "not part of a group";
+  unknown hours never published), `LocationSchema` (branches list, state,
+  save with on/off and drafts, permanently closed never prints, default
+  placement = its page + Contact, warnings `every_page_multi`, `no_pages`,
+  `permanently_closed`). `IdFactory::location()` never builds an @id on
+  another site's host. REST `schema/locations`, `schema/locations/{id}`,
+  preview `entity: location`. Feature key `schema.locations`.
+- Free: the Location tab — branch pills ("On n pages" / "Off"), on/off
+  switch, fields (Branch / Address / Contact / Hours) with the shared
+  field rows, Part of, sister branches, placement with its warnings, save
+  bar, preview; locked view from each branch's free markup ("On every
+  page"). `BusinessFields::resolve()` and `Validator::field()` now take the
+  tab's definitions/scope.
+
+Verified: Premium smoke 131 and database 59 (mutation-tested: parent
+default, switch-off, multi-branch warning, permanently closed, foreign-host
+id, parent link); real routes on the dev site (pet shop as PetStore, its
+own store code, not part of the group); the real bundle with Premium on
+(email, parent, switch off, save payload, refused email, plural summary)
+and off (locked, no inputs, free markup).
+
+
+## Step 63 — The Schema screen follows the selected location
+
+The location switcher at the top of every page now drives the Schema
+screen, as it does Reviews and the Business profile: a branch chosen there
+opens the Location tab on that branch; the main location opens the
+Business tab (Settings and later site-wide tabs stay put). Branch pills
+switch the top bar too, and with the main location selected the Location
+tab explains it and lists the branches. Refresh from Google refreshes the
+location on screen (the branch on the Location tab, else the main one).
+A switch with unsaved changes — from the bar or a pill — goes through the
+Save / Discard / Stay prompt (a guard on the shared selection).
+Verified on the real bundle: bar → Location tab + `location_id: 2` refresh,
+bar → Business tab, prompt keeps the branch until Discard, pill → bar.

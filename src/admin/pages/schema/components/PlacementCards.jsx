@@ -14,6 +14,7 @@ export function PlacementCards({
   value,
   postIds,
   locked,
+  homeWarning = true,
   onChange,
   onPages,
 }) {
@@ -126,7 +127,7 @@ export function PlacementCards({
               </span>
             ) : null}
           </div>
-          {!homeChosen ? (
+          {homeWarning && !homeChosen ? (
             <span className="fhint:text-[12.5px] fhint:font-semibold fhint:text-[#8a5a00]">
               {__(
                 "Your home page needs the business so the website can name its publisher. FoundHint will still add it there.",

@@ -62,13 +62,35 @@ export const schemaManagerApi = baseApi
         invalidatesTags: ["SchemaManager"],
       }),
 
+      getLocationSchemas: builder.query({
+        query: () => url("/schema/locations"),
+        transformResponse: (response) => response?.data ?? [],
+        providesTags: ["SchemaManager"],
+      }),
+
+      getLocationSchema: builder.query({
+        query: (id) => url(`/schema/locations/${Number(id)}`),
+        transformResponse: (response) => response?.data ?? null,
+        providesTags: ["SchemaManager"],
+      }),
+
+      saveLocationSchema: builder.mutation({
+        query: ({ id, ...body }) => ({
+          url: url(`/schema/locations/${Number(id)}`),
+          method: "PUT",
+          body,
+        }),
+        transformResponse: (response) => response?.data ?? null,
+        invalidatesTags: ["SchemaManager"],
+      }),
+
       // The markup for an entity, unsaved changes included. A mutation, not
       // a query: every keystroke is a new draft, and none is worth caching.
       previewSchema: builder.mutation({
-        query: ({ entity, draft }) => ({
+        query: ({ entity, id = 0, draft }) => ({
           url: url("/schema/preview"),
           method: "POST",
-          body: { entity, draft },
+          body: { entity, id, draft },
         }),
         transformResponse: (response) => response?.data ?? null,
       }),
@@ -81,5 +103,8 @@ export const {
   useGetSchemaPagesQuery,
   useGetBusinessSchemaQuery,
   useSaveBusinessSchemaMutation,
+  useGetLocationSchemasQuery,
+  useGetLocationSchemaQuery,
+  useSaveLocationSchemaMutation,
   usePreviewSchemaMutation,
 } = schemaManagerApi;

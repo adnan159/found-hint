@@ -23,6 +23,7 @@ export function FieldRow({
   visitMode,
   error,
   photos,
+  scope = "business",
   onEdit,
   onReset,
   onChange,
@@ -49,7 +50,7 @@ export function FieldRow({
           htmlFor={field.input === "hours" ? undefined : id}
           className={label}
         >
-          {fieldLabel(field.key)}
+          {fieldLabel(field.key, scope)}
         </label>
         {badgeLabel(field.badge, visitMode) ? (
           <span
@@ -94,7 +95,7 @@ export function FieldRow({
               className={cn(linkAction, "fhint:ml-auto")}
             >
               {__("Edit", "foundhint-local-seo")}
-              <span className="fhint:sr-only">{` ${fieldLabel(field.key)}`}</span>
+              <span className="fhint:sr-only">{` ${fieldLabel(field.key, scope)}`}</span>
             </button>
           )
         ) : null}

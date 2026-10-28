@@ -140,6 +140,17 @@ const MESSAGES = {
     __("Choose where customers visit you.", "foundhint-local-seo"),
   "schema.business.extra.invalid": () =>
     __("That value is not one this field accepts.", "foundhint-local-seo"),
+  "schema.location.email.invalid": () =>
+    __(
+      "Enter an email address, such as branch@example.com.",
+      "foundhint-local-seo",
+    ),
+  "schema.location.branch_code.too_long": () =>
+    __("A branch code can be 60 characters at most.", "foundhint-local-seo"),
+  "schema.location.parent.invalid": () =>
+    __("Choose your business, or not part of a group.", "foundhint-local-seo"),
+  "schema.location.status.invalid": () =>
+    __("Switch the branch on or off.", "foundhint-local-seo"),
   "schema.placement.invalid": () =>
     __("Choose where the schema is added.", "foundhint-local-seo"),
   // Posts.
@@ -421,7 +432,12 @@ const MESSAGES = {
  * @return {string} Human-readable message.
  */
 export function messageForCode(code) {
-  const entry = MESSAGES[code];
+  // A branch field shares the business field's wording.
+  const entry =
+    MESSAGES[code] ??
+    (String(code).startsWith("schema.location.")
+      ? MESSAGES[String(code).replace("schema.location.", "schema.business.")]
+      : undefined);
 
   return entry ? entry() : code;
 }

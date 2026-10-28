@@ -253,7 +253,7 @@ Google), Details for {type}, Add business schema to.
 
 **Done when** every field in the design round-trips; Edit → Edited here → Use Google's value works; a Google refresh updates un-edited fields only; the preview equals what the page prints.
 
-### Step 2 — Location schema (tab 02)
+### Step 2 — Location schema (tab 02) — done 2026-10-29
 
 **Free UI**: branch pills ("On {n} pages", "Off"), branch fields incl.
 **Region** and **Map URL** (§2.2 #8), Part of, sister-branch chips, hours
@@ -262,9 +262,9 @@ branch's own page + Contact). One location → selector hidden, location =
 the business.
 
 **Pro**
-- [ ] `Pieces\Location` — subtype of the business, `branchCode` from the listing's store code, own contacts, `url` = the linked page (`locations.wordpress_post_id`) else website, `hasMap`, hours + special hours, `parentOrganization` per §2.2 #2; shared fields inherited at render time.
-- [ ] Warning: a branch on Every page in a multi-branch setup.
-- [ ] REST: `GET schema/locations`, `GET/PUT schema/locations/{id}`.
+- [x] `Pieces\Location` — subtype of the business, `branchCode` from the listing's store code, own contacts, `url` = the linked page (`locations.wordpress_post_id`) else website, `hasMap`, hours + special hours, `parentOrganization` per §2.2 #2; shared fields inherited at render time.
+- [x] Warning: a branch on Every page in a multi-branch setup.
+- [x] REST: `GET schema/locations`, `GET/PUT schema/locations/{id}`.
 
 **Done when** each branch has its own `@id`, address, geo, hours; deactivating keeps the data and stops output; unknown hours are never published.
 
