@@ -31,8 +31,8 @@ export function BranchButtons({ branches, current, onPick }) {
             className={cn(
               "fhint:cursor-pointer fhint:border fhint:bg-card fhint:px-3 fhint:py-2 fhint:text-left",
               on
-                ? "fhint:border-[#FF6B35] fhint:bg-[#FFF8F4] fhint:shadow-[0_0_0_1px_#FF6B35]"
-                : "fhint:border-[#d7d3d3]",
+                ? "fhint:border-primary fhint:bg-notice fhint:shadow-[0_0_0_1px_var(--primary)]"
+                : "fhint:border-input",
               current !== undefined &&
                 branch.status === "inactive" &&
                 !on &&
@@ -43,7 +43,7 @@ export function BranchButtons({ branches, current, onPick }) {
             <strong className="fhint:block fhint:text-[13.5px]">
               {branch.name}
             </strong>
-            <span className="fhint:text-[12px] fhint:text-[#625e5e]">
+            <span className="fhint:text-[12.5px] fhint:text-muted-strong">
               {pagesLine(branch)}
             </span>
           </button>

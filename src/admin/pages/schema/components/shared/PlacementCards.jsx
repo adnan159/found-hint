@@ -56,7 +56,7 @@ export function PlacementCards({
   ];
 
   return (
-    <fieldset className="fhint:m-0 fhint:grid fhint:gap-3 fhint:border-0 fhint:border-t-2 fhint:border-t-[#201e1d] fhint:px-5 fhint:py-[18px]">
+    <fieldset className="fhint:m-0 fhint:grid fhint:gap-3 fhint:border-0 fhint:border-t fhint:border-t-border fhint:px-5 fhint:py-[18px]">
       <legend className="fhint:float-left fhint:mb-1 fhint:w-full fhint:p-0 fhint:text-[15px] fhint:font-bold">
         {title}
       </legend>
@@ -77,7 +77,7 @@ export function PlacementCards({
               onChange={() => onChange(key)}
               // WordPress pulls every admin radio up 4px; 1px down sets it
               // level with the title's 20px line.
-              className="fhint:m-0! fhint:mt-px! fhint:flex-none fhint:accent-[#FF6B35]"
+              className="fhint:m-0! fhint:mt-px! fhint:flex-none fhint:accent-primary"
             />
             <span>
               <strong className="fhint:block fhint:text-[13.5px] fhint:leading-5">
@@ -132,7 +132,7 @@ export function PlacementCards({
             ) : null}
           </div>
           {homeWarning && !homeChosen ? (
-            <span className="fhint:text-[12.5px] fhint:font-semibold fhint:text-[#8a5a00]">
+            <span className="fhint:text-[12.5px] fhint:font-semibold fhint:text-warning-foreground">
               {__(
                 "Your home page needs the business so the website can name its publisher. FoundHint will still add it there.",
                 "foundhint-local-seo",

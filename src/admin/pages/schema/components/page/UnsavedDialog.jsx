@@ -1,5 +1,4 @@
 import { __ } from "@wordpress/i18n";
-import { cn } from "cn";
 import {
   AlertDialog,
   AlertDialogContent,
@@ -8,7 +7,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { dialogButton } from "../styles";
+import { dialogButton, primaryAction } from "../styles";
 
 /**
  * Save / Discard / Stay, asked before unsaved edits would be dropped.
@@ -36,14 +35,7 @@ export function UnsavedDialog({ open, onStay, onDiscard, onSave }) {
           <button type="button" className={dialogButton} onClick={onDiscard}>
             {__("Discard", "foundhint-local-seo")}
           </button>
-          <button
-            type="button"
-            className={cn(
-              dialogButton,
-              "fhint:border-0 fhint:bg-[#FF6B35] fhint:text-white",
-            )}
-            onClick={onSave}
-          >
+          <button type="button" className={primaryAction} onClick={onSave}>
             {__("Save", "foundhint-local-seo")}
           </button>
         </AlertDialogFooter>

@@ -8,7 +8,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { dialogButton } from "../../styles";
+import { dialogButton, primaryAction } from "../../styles";
 
 /** Remove this service for good, or keep it. */
 export function RemoveDialog({ open, name, removing, onOpenChange, onRemove }) {
@@ -42,8 +42,8 @@ export function RemoveDialog({ open, name, removing, onOpenChange, onRemove }) {
             type="button"
             disabled={removing}
             className={cn(
-              dialogButton,
-              "fhint:border-0 fhint:bg-[#C02718] fhint:text-white",
+              primaryAction,
+              "fhint:bg-destructive fhint:text-white",
             )}
             onClick={onRemove}
           >

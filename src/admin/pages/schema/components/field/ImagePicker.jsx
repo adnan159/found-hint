@@ -21,7 +21,7 @@ export function ImagePicker({
     return (
       <span
         id={id}
-        className="fhint:text-[13px] fhint:text-[#625e5e]"
+        className="fhint:text-[13px] fhint:text-muted-strong"
         aria-describedby={describedBy}
       >
         {__("No photos on your Google profile yet.", "foundhint-local-seo")}
@@ -36,7 +36,7 @@ export function ImagePicker({
       aria-describedby={describedBy}
       className="fhint:grid fhint:gap-2"
     >
-      <span className="fhint:text-[13px] fhint:text-[#444141]">
+      <span className="fhint:text-[13px] fhint:text-foreground-soft">
         {sprintf(
           /* translators: 1: chosen photos, 2: photos on the profile. */
           __("%1$d chosen of %2$d Google photos", "foundhint-local-seo"),
@@ -71,7 +71,7 @@ export function ImagePicker({
               className={cn(
                 "fhint:relative fhint:size-14 fhint:cursor-pointer fhint:overflow-hidden fhint:border-2 fhint:p-0",
                 on
-                  ? "fhint:border-[#FF6B35]"
+                  ? "fhint:border-primary"
                   : "fhint:border-transparent fhint:opacity-60",
               )}
             >

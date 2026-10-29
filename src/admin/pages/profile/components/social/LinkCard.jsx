@@ -47,7 +47,7 @@ export function LinkCard({
     NETWORKS[network] ?? {
       name: network,
       short: network.slice(0, 2).toUpperCase(),
-      color: "#605d5d",
+      color: "var(--muted-strong)",
       placeholder: "https://",
     };
   const state = error ? "bad" : stateOf(value);
@@ -71,7 +71,7 @@ export function LinkCard({
       .join(" ") || undefined;
 
   return (
-    <div className="fhint:border fhint:border-[#e6e3e3] fhint:bg-card fhint:p-3.5">
+    <div className="fhint:border fhint:border-border fhint:bg-card fhint:p-3.5">
       <div className="fhint:grid fhint:min-w-0 fhint:gap-1.5">
         <div className="fhint:flex fhint:flex-wrap fhint:items-center fhint:gap-2">
           <label

@@ -94,7 +94,7 @@ export function ProviderSection({ form, options, list }) {
                 }
                 // WordPress pulls every admin radio up 4px; 1px down sets it
                 // level with the title's 20px line.
-                className="fhint:m-0! fhint:mt-px! fhint:flex-none fhint:accent-[#FF6B35]"
+                className="fhint:m-0! fhint:mt-px! fhint:flex-none fhint:accent-primary"
               />
               <span>
                 <strong className="fhint:block fhint:text-[13.5px] fhint:leading-5">

@@ -20,7 +20,7 @@ function Box({ on }) {
         "fhint:grid fhint:size-[15px] fhint:flex-none fhint:place-items-center fhint:rounded-[3px] fhint:border fhint:text-[10px] fhint:font-extrabold fhint:text-primary-foreground",
         on
           ? "fhint:border-primary fhint:bg-primary"
-          : "fhint:border-[#9b9797] fhint:bg-card",
+          : "fhint:border-muted-foreground fhint:bg-card",
       )}
     >
       {on ? "✓" : ""}

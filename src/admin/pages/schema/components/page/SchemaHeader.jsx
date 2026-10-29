@@ -14,7 +14,7 @@ import { schemaManagerApi } from "@/store/api/schemaManagerApi";
 import { relative } from "../../lib/schema";
 
 const button = cn(
-  "fhint:inline-flex fhint:cursor-pointer fhint:items-center fhint:gap-2 fhint:border fhint:border-[#bab6b6] fhint:bg-card fhint:px-3 fhint:py-2 fhint:text-[13px] fhint:font-bold fhint:text-[#201e1d] fhint:no-underline fhint:disabled:cursor-wait",
+  "fhint:inline-flex fhint:cursor-pointer fhint:items-center fhint:gap-2 fhint:border fhint:border-input fhint:bg-card fhint:px-3 fhint:py-2 fhint:text-[13px] fhint:font-bold fhint:text-foreground fhint:no-underline fhint:disabled:cursor-wait",
   focus,
 );
 
@@ -106,7 +106,7 @@ function UpgradeNotice() {
         rel="noopener noreferrer"
         className={cn(
           button,
-          "fhint:border-0 fhint:bg-[#FF6B35] fhint:text-white!",
+          "fhint:border-0 fhint:bg-primary fhint:text-white!",
         )}
       >
         {__("Upgrade to Pro", "foundhint-local-seo")}
@@ -142,7 +142,7 @@ function RefreshActions({ syncedAt, locationId }) {
   return (
     <div className="fhint:flex fhint:flex-wrap fhint:items-center fhint:gap-3.5">
       {syncedAt ? (
-        <span className="fhint:text-[12.5px] fhint:text-[#625e5e]">
+        <span className="fhint:text-[12.5px] fhint:text-muted-strong">
           {sprintf(
             /* translators: %s: e.g. "2 hours ago". */
             __("Synced from Google %s", "foundhint-local-seo"),

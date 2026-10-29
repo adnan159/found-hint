@@ -8,7 +8,7 @@ import VisitModePicker from "./VisitModePicker";
 
 const GROUP_HEAD = cn(
   groupHead,
-  "fhint:col-span-full fhint:m-0 fhint:border-t-2 fhint:border-t-[#201e1d] fhint:pt-2.5",
+  "fhint:col-span-full fhint:m-0 fhint:border-t fhint:border-t-border fhint:pt-2.5",
 );
 
 // Fields that take a whole row: all of Business information, and the long

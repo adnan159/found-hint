@@ -1,6 +1,6 @@
 import { cn } from "cn";
 import SoonTag from "@/pages/reviews/components/SoonTag";
-import { muted, panel } from "../styles";
+import { muted, panel, panelTitle } from "../styles";
 
 /**
  * A tab whose step has not shipped yet (docs/SCHEMA-PLAN.md).
@@ -13,7 +13,9 @@ export function ComingSoonTab({ title, body }) {
         "fhint:grid fhint:justify-items-start fhint:gap-2 fhint:px-5 fhint:py-6",
       )}
     >
-      <h2 className="fhint:m-0 fhint:flex fhint:items-center fhint:gap-2 fhint:text-[16px] fhint:font-bold">
+      <h2
+        className={cn(panelTitle, "fhint:flex fhint:items-center fhint:gap-2")}
+      >
         {title}
         <SoonTag />
       </h2>

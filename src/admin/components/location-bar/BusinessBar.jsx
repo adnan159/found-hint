@@ -111,7 +111,7 @@ export function BusinessBar({
             to="/reviews"
             className={cn(
               pillButton,
-              "fhint:border-[#F0D9AE] fhint:bg-[#FBF0DE] fhint:text-[#7a4a05]! fhint:hover:bg-[#F7E6C8]",
+              "fhint:border-warning-border fhint:bg-warning fhint:text-warning-foreground! fhint:hover:bg-warning-border",
             )}
           >
             <StarIcon

@@ -21,7 +21,7 @@ export function OptionalDetails({ form }) {
   const setPricing = (changes) => set({ pricing: { ...pricing, ...changes } });
 
   return (
-    <section className="fhint:border-t fhint:border-t-[#f0eeee]">
+    <section className="fhint:border-t fhint:border-t-border">
       <button
         type="button"
         aria-expanded={open}

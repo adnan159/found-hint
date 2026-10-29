@@ -98,8 +98,8 @@ export function TitleBar({
             className={cn(
               "fhint:inline-flex fhint:h-9 fhint:items-center fhint:gap-2 fhint:rounded-full fhint:px-4 fhint:text-[13px] fhint:font-bold fhint:whitespace-nowrap",
               google.mapped
-                ? "fhint:bg-[#E8F3ED] fhint:text-success"
-                : "fhint:bg-[#eae7e7] fhint:text-muted-strong",
+                ? "fhint:bg-success-tint fhint:text-success"
+                : "fhint:bg-muted fhint:text-muted-strong",
             )}
           >
             <span

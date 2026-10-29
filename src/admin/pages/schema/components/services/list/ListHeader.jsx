@@ -1,7 +1,7 @@
 import { __, sprintf } from "@wordpress/i18n";
 import { PlusIcon } from "lucide-react";
 import Hint from "@/components/Hint";
-import { muted, primary } from "../../styles";
+import { muted, panelHeader, panelTitle, primaryAction } from "../../styles";
 
 export const LIST_TITLE_ID = "fhint-schema-services-title";
 
@@ -11,12 +11,9 @@ export const LIST_TITLE_ID = "fhint-schema-services-title";
  */
 export function ListHeader({ locked, canAdd, limits, onAdd }) {
   return (
-    <div className="fhint:flex fhint:flex-wrap fhint:items-center fhint:gap-3 fhint:border-b fhint:border-b-[#e6e3e3] fhint:px-5 fhint:py-4">
+    <div className={panelHeader}>
       <span className="fhint:flex fhint:min-w-0 fhint:flex-[1_1_260px] fhint:items-center fhint:gap-2">
-        <h2
-          id={LIST_TITLE_ID}
-          className="fhint:m-0 fhint:text-[16px] fhint:font-bold"
-        >
+        <h2 id={LIST_TITLE_ID} className={panelTitle}>
           {__("Service schema", "foundhint-local-seo")}
         </h2>
         <Hint
@@ -43,7 +40,7 @@ export function ListHeader({ locked, canAdd, limits, onAdd }) {
             type="button"
             onClick={onAdd}
             disabled={!canAdd}
-            className={primary(canAdd)}
+            className={primaryAction}
           >
             <PlusIcon aria-hidden="true" className="fhint:size-4" />
             {__("Add a service", "foundhint-local-seo")}

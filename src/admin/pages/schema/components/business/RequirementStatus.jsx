@@ -61,15 +61,15 @@ export function RequirementStatus({ kind, visitMode, missing }) {
       className={cn(
         "fhint:mx-5 fhint:my-4 fhint:flex fhint:items-start fhint:gap-2.5 fhint:border fhint:px-3.5 fhint:py-3",
         ok
-          ? "fhint:border-[#cfe3d6] fhint:bg-[#eef6f1]"
-          : "fhint:border-[#f1dcb6] fhint:bg-[#FBF0DE]",
+          ? "fhint:border-border fhint:bg-success-tint"
+          : "fhint:border-warning-border fhint:bg-warning",
       )}
     >
       <span
         aria-hidden="true"
         className={cn(
           "fhint:mt-1.5 fhint:size-2 fhint:flex-none fhint:rounded-full",
-          ok ? "fhint:bg-[#157F4B]" : "fhint:bg-[#E0A33A]",
+          ok ? "fhint:bg-success" : "fhint:bg-warning-foreground",
         )}
       />
       <span className="fhint:text-[13px] fhint:leading-normal">

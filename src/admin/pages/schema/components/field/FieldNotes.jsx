@@ -15,7 +15,7 @@ export function FieldNotes({ id, field, error, missing }) {
       </code>
 
       {field.disagrees ? (
-        <span className="fhint:text-[12px] fhint:font-bold fhint:text-[#8a5a00]">
+        <span className="fhint:text-[12.5px] fhint:font-bold fhint:text-warning-foreground">
           {sprintf(
             /* translators: %s: Google's current value. */
             __(

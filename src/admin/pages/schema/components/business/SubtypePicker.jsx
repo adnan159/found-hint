@@ -33,7 +33,7 @@ export function SubtypePicker({
     (type ? { type, label: typeLabel || type } : null);
 
   return (
-    <div className="fhint:grid fhint:gap-1.5 fhint:border-b fhint:border-b-[#f0eeee] fhint:px-5 fhint:py-4">
+    <div className="fhint:grid fhint:gap-1.5 fhint:border-b fhint:border-b-border fhint:px-5 fhint:py-4">
       <div className="fhint:flex fhint:flex-wrap fhint:items-center fhint:gap-2">
         <label htmlFor={id} className={label}>
           {__("Business subtype", "foundhint-local-seo")}
@@ -44,9 +44,9 @@ export function SubtypePicker({
       </div>
 
       {locked ? (
-        <div className="fhint:flex fhint:items-center fhint:gap-2.5 fhint:border fhint:border-[#e6e3e3] fhint:bg-[#faf9f9] fhint:px-3 fhint:py-[9px] fhint:text-[13.5px]">
+        <div className="fhint:flex fhint:items-center fhint:gap-2.5 fhint:border fhint:border-border fhint:bg-muted fhint:px-3 fhint:py-[9px] fhint:text-[13.5px]">
           <span className="fhint:min-w-0 fhint:flex-1">{typeLabel}</span>
-          <code className="fhint:bg-[#FFE4D6] fhint:px-1.5 fhint:py-px fhint:font-mono fhint:text-[11.5px] fhint:text-[#8a3b12]">
+          <code className="fhint:bg-notice fhint:px-1.5 fhint:py-px fhint:font-mono fhint:text-[11.5px] fhint:text-notice-foreground">
             {type}
           </code>
         </div>
@@ -76,7 +76,7 @@ export function SubtypePicker({
                   <span className="fhint:min-w-0 fhint:flex-1">
                     {item.label}
                   </span>
-                  <code className="fhint:font-mono fhint:text-[11.5px] fhint:text-[#9b9797]">
+                  <code className="fhint:font-mono fhint:text-[11.5px] fhint:text-muted-foreground">
                     {item.type}
                   </code>
                 </ComboboxItem>

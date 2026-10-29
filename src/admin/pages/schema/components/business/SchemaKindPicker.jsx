@@ -36,7 +36,7 @@ const KINDS = () => [
  */
 export function SchemaKindPicker({ value, locked, onChange }) {
   return (
-    <fieldset className="fhint:m-0 fhint:grid fhint:gap-2.5 fhint:border-0 fhint:border-b fhint:border-b-[#f0eeee] fhint:px-5 fhint:py-4">
+    <fieldset className="fhint:m-0 fhint:grid fhint:gap-2.5 fhint:border-0 fhint:border-b fhint:border-b-border fhint:px-5 fhint:py-4">
       <legend
         className={cn(
           label,
@@ -63,7 +63,7 @@ export function SchemaKindPicker({ value, locked, onChange }) {
               // WordPress pulls every admin radio up 4px; 3px down sets it
               // level with the title's line, which the scope pill makes
               // taller than 20px.
-              className="fhint:m-0! fhint:mt-[3px]! fhint:flex-none fhint:accent-[#FF6B35]"
+              className="fhint:m-0! fhint:mt-[3px]! fhint:flex-none fhint:accent-primary"
             />
             <span className="fhint:grid fhint:min-w-0 fhint:gap-[5px]">
               <span className="fhint:flex fhint:flex-wrap fhint:items-center fhint:gap-2">
@@ -72,10 +72,10 @@ export function SchemaKindPicker({ value, locked, onChange }) {
                 </strong>
                 <span className={cn(pill, BADGES.scope)}>{scope}</span>
               </span>
-              <span className="fhint:text-[12.5px] fhint:leading-normal fhint:text-[#444141]">
+              <span className="fhint:text-[12.5px] fhint:leading-normal fhint:text-foreground-soft">
                 {purpose}
               </span>
-              <span className="fhint:text-[12px] fhint:leading-normal fhint:text-[#625e5e]">
+              <span className="fhint:text-[12.5px] fhint:leading-normal fhint:text-muted-strong">
                 {example}
               </span>
             </span>

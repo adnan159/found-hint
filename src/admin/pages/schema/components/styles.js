@@ -1,46 +1,80 @@
 import { cn } from "cn";
 import { textInput } from "@/lib/fieldStyles";
-import { focus } from "@/pages/profile/styles";
+import {
+  chip as headerChip,
+  errorText,
+  focus,
+  help,
+  label as fieldLabel,
+  primaryButton,
+  quietButton,
+  tag,
+  tagTones,
+} from "@/pages/profile/styles";
 
 /**
- * The Schema Manager's look, taken from the design's own values
- * (docs/schema/schema-design.html): white panels on #e6e3e3 hairlines,
- * #f0eeee inner rules, 13px bold labels, pill badges, orange for the
- * chosen card and the primary action.
+ * The Schema Manager's look — the Business Profile's, by construction.
+ *
+ * Labels, help text, errors, tags and buttons are the profile's own class
+ * strings, imported rather than copied; every colour is a theme token
+ * (`border`, `muted-strong`, `primary`, `notice`…), never a hex. Change the
+ * profile's look and this screen follows.
+ *
+ * The one deliberate exception is the JSON preview's dark code panel.
  */
-export const panel = "fhint:border fhint:border-[#e6e3e3] fhint:bg-card";
-export const rule = "fhint:border-b fhint:border-b-[#f0eeee]";
-export const sectionPad = "fhint:px-5 fhint:py-4";
-export const label = "fhint:text-[13px] fhint:font-bold";
+
+/** A white card with a hairline edge: the profile's section card. */
+export const panel = "fhint:border fhint:border-border fhint:bg-card";
+
+/** A panel's heading row, closed by the profile's heavier 2px rule. */
+export const panelHeader =
+  "fhint:flex fhint:flex-wrap fhint:items-center fhint:gap-3 fhint:border-b-2 fhint:border-b-border fhint:px-[22px] fhint:py-[18px] fhint:text-foreground";
+
+/** A panel's title: the profile section's. */
+export const panelTitle =
+  "fhint:m-0 fhint:text-base fhint:font-bold fhint:tracking-[-0.01em]";
+
+/** The count or state beside a panel title: "6 of 9 fields from Google". */
+export const panelChip = cn(headerChip, tagTones.accent);
+
+export const label = fieldLabel;
+
+/** A group's small uppercase title, over a hairline: "ADDRESS". */
 export const groupHead =
-  "fhint:text-[11.5px] fhint:font-bold fhint:tracking-[0.06em] fhint:text-[#625e5e] fhint:uppercase";
-export const muted = "fhint:text-[12.5px] fhint:text-[#625e5e]";
+  "fhint:text-[11.5px] fhint:font-extrabold fhint:tracking-[0.08em] fhint:text-muted-strong fhint:uppercase";
+
+/** Secondary text: descriptions, counts, notes. The profile's help text. */
+export const muted = help;
+
 // WordPress gives every admin `<code>` a 1px side margin, which left the
 // caption box narrower than the input above it.
 export const caption =
-  "fhint:m-0 fhint:font-mono fhint:text-[11px] fhint:text-[#9b9797]";
+  "fhint:m-0 fhint:font-mono fhint:text-[11px] fhint:text-muted-foreground";
 
 /** An amber note: something will not print as the owner may expect. */
 export const warningNote =
-  "fhint:mx-5 fhint:mt-0 fhint:mb-3 fhint:text-[12.5px] fhint:font-semibold fhint:text-[#8a5a00]";
+  "fhint:mx-5 fhint:mt-0 fhint:mb-3 fhint:text-[12.5px] fhint:font-semibold fhint:text-warning-foreground";
 
 /** A field's error, or the note that it is required and empty. */
-export const fieldError =
-  "fhint:text-[12px] fhint:font-bold fhint:text-[#C02718]";
+export const fieldError = errorText;
 
-export const pill =
-  "fhint:inline-flex fhint:items-center fhint:rounded-full fhint:px-2 fhint:py-0.5 fhint:text-[11px] fhint:font-bold fhint:whitespace-nowrap";
+/** A field's badge: the profile's small uppercase tag. */
+export const pill = cn(
+  tag,
+  "fhint:inline-flex fhint:items-center fhint:whitespace-nowrap",
+);
 
-/** The badges a field can carry (design's REQ table). */
+/** The badges a field can carry (design's REQ table), in the profile's tones. */
 export const BADGES = {
-  required: "fhint:bg-[#FBE9E6] fhint:text-[#C02718]",
-  storefront: "fhint:bg-[#FBF0DE] fhint:text-[#8a5a00]",
-  recommended: "fhint:bg-[#E8F3ED] fhint:text-[#157F4B]",
-  optional: "fhint:bg-[#f3f2f2] fhint:text-[#625e5e]",
-  fh: "fhint:bg-[#201e1d] fhint:text-white",
-  google: "fhint:bg-[#E7EFF6] fhint:text-[#2A5D8F]",
-  edited: "fhint:bg-[#FBF0DE] fhint:text-[#8a5a00]",
-  scope: "fhint:bg-[#f3f2f2] fhint:text-[#444141]",
+  required: tagTones.bad,
+  storefront: tagTones.accent,
+  recommended: tagTones.ok,
+  optional: tagTones.quiet,
+  fh: "fhint:bg-foreground fhint:text-background",
+  // Google's own blue: the one place a value's source is Google.
+  google: "fhint:bg-info-tint fhint:text-info",
+  edited: tagTones.accent,
+  scope: tagTones.quiet,
 };
 
 /**
@@ -55,13 +89,13 @@ export const input = (state) =>
     state === "missing" && "fhint:border-destructive",
   );
 
-/** A radio card — chosen: orange edge on a warm tint. */
+/** A radio card — chosen: an accent edge on the notice tint. */
 export const card = (on) =>
   cn(
     "fhint:flex fhint:cursor-pointer fhint:items-start fhint:gap-2.5 fhint:border fhint:px-[13px] fhint:py-[11px]",
     on
-      ? "fhint:border-[#FF6B35] fhint:bg-[#FFF8F4]"
-      : "fhint:border-[#e6e3e3] fhint:bg-card",
+      ? "fhint:border-primary fhint:bg-notice"
+      : "fhint:border-border fhint:bg-card",
   );
 
 /** A toggle chip — chosen: dark. */
@@ -69,27 +103,25 @@ export const chip = (on) =>
   cn(
     "fhint:cursor-pointer fhint:border fhint:px-3 fhint:py-1.5 fhint:text-[12.5px] fhint:font-bold fhint:disabled:cursor-default fhint:disabled:opacity-60",
     on
-      ? "fhint:border-[#201e1d] fhint:bg-[#201e1d] fhint:text-white"
-      : "fhint:border-[#d7d3d3] fhint:bg-card fhint:text-[#201e1d]",
+      ? "fhint:border-foreground fhint:bg-foreground fhint:text-background"
+      : "fhint:border-input fhint:bg-card fhint:text-foreground",
     focus,
   );
 
-/** A plain bordered button: dialogs, Stay / Discard, Connect Google. */
+/** The bordered secondary button: Stay, Discard, Keep it. The profile's. */
 export const dialogButton = cn(
-  "fhint:cursor-pointer fhint:border fhint:border-[#bab6b6] fhint:bg-card fhint:px-3.5 fhint:py-2 fhint:text-[13px] fhint:font-bold fhint:disabled:cursor-default fhint:disabled:opacity-60",
-  focus,
+  quietButton,
+  "fhint:px-4 fhint:py-[9px] fhint:text-[13px]",
 );
 
+/** The filled main action: Save, Add a service. The profile's. */
+export const primaryAction = cn(
+  primaryButton,
+  "fhint:px-4 fhint:py-[9px] fhint:text-[13px]",
+);
+
+/** A text-only action beside a field: Edit, Use Google's value. */
 export const linkAction = cn(
-  "fhint:cursor-pointer fhint:border-0 fhint:bg-transparent fhint:p-0 fhint:text-[12px] fhint:font-bold fhint:text-[#D8521F] fhint:hover:underline",
+  "fhint:cursor-pointer fhint:border-0 fhint:bg-transparent fhint:p-0 fhint:text-[12.5px] fhint:font-bold fhint:text-link-accent fhint:hover:underline",
   focus,
 );
-
-export const primary = (enabled) =>
-  cn(
-    "fhint:inline-flex fhint:items-center fhint:gap-2 fhint:border-0 fhint:px-4 fhint:py-[9px] fhint:text-[13px] fhint:font-bold",
-    enabled
-      ? "fhint:cursor-pointer fhint:bg-[#FF6B35] fhint:text-white"
-      : "fhint:cursor-default fhint:bg-[#e6e3e3] fhint:text-[#9b9797]",
-    focus,
-  );

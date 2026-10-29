@@ -39,8 +39,8 @@ export const tag =
   "fhint:px-1.5 fhint:py-0.5 fhint:text-[10px] fhint:font-extrabold fhint:tracking-[0.07em] fhint:uppercase";
 
 export const tagTones = {
-  ok: "fhint:bg-[#E8F3ED] fhint:text-success",
-  bad: "fhint:bg-[#FBE9E6] fhint:text-destructive",
+  ok: "fhint:bg-success-tint fhint:text-success",
+  bad: "fhint:bg-destructive-tint fhint:text-destructive",
   quiet: "fhint:bg-background fhint:text-muted-strong",
   accent: "fhint:bg-notice fhint:text-notice-foreground",
 };

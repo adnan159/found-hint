@@ -6,8 +6,8 @@ import { muted } from "../../styles";
  */
 export function ListSummary({ branchName, active, inactive }) {
   return (
-    <div className="fhint:flex fhint:flex-wrap fhint:items-baseline fhint:gap-2 fhint:border-b fhint:border-b-[#f0eeee] fhint:px-5 fhint:py-2.5">
-      <span className="fhint:text-[11.5px] fhint:font-bold fhint:tracking-[0.06em] fhint:text-[#625e5e] fhint:uppercase">
+    <div className="fhint:flex fhint:flex-wrap fhint:items-baseline fhint:gap-2 fhint:border-b fhint:border-b-border fhint:px-5 fhint:py-2.5">
+      <span className="fhint:text-[11.5px] fhint:font-bold fhint:tracking-[0.06em] fhint:text-muted-strong fhint:uppercase">
         {__("Services offered", "foundhint-local-seo")}
       </span>
       {branchName ? (

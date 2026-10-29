@@ -3,7 +3,7 @@ import Hint from "@/components/Hint";
 
 /** The small grey number before each section's title: 01, 02… */
 export const sectionNumber =
-  "fhint:font-mono fhint:text-[11px] fhint:text-[#9b9797]";
+  "fhint:font-mono fhint:text-[11px] fhint:text-muted-foreground";
 
 /**
  * One numbered section of the service editor: number, title, an optional
@@ -15,7 +15,7 @@ export function EditorSection({ number, title, hint, children }) {
   return (
     <section
       aria-labelledby={id}
-      className="fhint:grid fhint:gap-3 fhint:border-t fhint:border-t-[#f0eeee] fhint:px-5 fhint:py-4"
+      className="fhint:grid fhint:gap-3 fhint:border-t fhint:border-t-border fhint:px-5 fhint:py-4"
     >
       <div className="fhint:flex fhint:items-center fhint:gap-2">
         <span className={sectionNumber}>{number}</span>

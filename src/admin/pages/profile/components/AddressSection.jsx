@@ -68,7 +68,7 @@ export function AddressSection({
       {locked ? (
         <div
           role="note"
-          className="fhint:border fhint:border-[#F0D9AE] fhint:bg-[#FBF0DE] fhint:px-[15px] fhint:py-[13px] fhint:text-[13px] fhint:leading-normal fhint:text-[#7a4a05]"
+          className="fhint:border fhint:border-warning-border fhint:bg-warning fhint:px-[15px] fhint:py-[13px] fhint:text-[13px] fhint:leading-normal fhint:text-warning-foreground"
         >
           {__(
             "For your safety, Google does not let apps change a verified address. To move your address, update it in your Google Business Profile and FoundHint will pick up the change on the next sync.",

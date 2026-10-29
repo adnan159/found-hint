@@ -133,7 +133,7 @@ export function LocationTab({
           counter={state.counter}
         />
 
-        <div className="fhint:grid fhint:gap-2 fhint:border-b fhint:border-b-[#f0eeee] fhint:px-5 fhint:py-3.5">
+        <div className="fhint:grid fhint:gap-2 fhint:border-b fhint:border-b-border fhint:px-5 fhint:py-3.5">
           <span className={label}>{__("Branch", "foundhint-local-seo")}</span>
           <BranchButtons
             branches={branches}
@@ -188,7 +188,7 @@ export function LocationTab({
         {saveState.error && !Object.keys(errors).length ? (
           <p
             role="alert"
-            className="fhint:mx-5 fhint:mb-3 fhint:text-[13px] fhint:text-[#C02718]"
+            className="fhint:mx-5 fhint:mb-3 fhint:text-[13px] fhint:text-destructive"
           >
             {errorMessage(saveState.error)}
           </p>

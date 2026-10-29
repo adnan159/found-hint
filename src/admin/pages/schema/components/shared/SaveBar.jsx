@@ -1,9 +1,10 @@
 import { __ } from "@wordpress/i18n";
 import { cn } from "cn";
-import { primary } from "../styles";
+import { primaryAction } from "../styles";
 
 /**
- * The footer of every tab: where things stand, and Save and publish.
+ * The footer of every tab — the profile section's footer: where things
+ * stand, and Save and publish.
  */
 export function SaveBar({ dirty, saving, status, live, onSave }) {
   const line = saving
@@ -22,25 +23,23 @@ export function SaveBar({ dirty, saving, status, live, onSave }) {
               "foundhint-local-seo",
             );
 
+  // In words as well as colour, as the profile's section footer says it.
+  const tone = saving
+    ? "fhint:text-muted-strong"
+    : dirty
+      ? "fhint:text-foreground"
+      : status !== "draft" && live
+        ? "fhint:text-success"
+        : "fhint:text-muted-strong";
+
   return (
-    <div className="fhint:flex fhint:flex-wrap fhint:items-center fhint:gap-3 fhint:border-t fhint:border-t-[#e6e3e3] fhint:bg-[#faf9f9] fhint:px-5 fhint:py-3.5">
-      <span
-        aria-hidden="true"
-        className={cn(
-          "fhint:size-2 fhint:rounded-full",
-          dirty
-            ? "fhint:bg-[#E0A33A]"
-            : status === "draft" || !live
-              ? "fhint:bg-[#bab6b6]"
-              : "fhint:bg-[#3BC27A]",
-        )}
-      />
+    <div className="fhint:flex fhint:flex-wrap fhint:items-center fhint:gap-3 fhint:border-t fhint:border-t-border fhint:px-[22px] fhint:py-3.5">
       <span
         role="status"
         aria-live="polite"
         className={cn(
-          "fhint:flex-[1_1_220px] fhint:text-[13px]",
-          dirty && "fhint:text-[#8a5a00]",
+          "fhint:min-w-0 fhint:flex-[1_1_220px] fhint:text-[13px] fhint:font-bold",
+          tone,
         )}
       >
         {line}
@@ -49,7 +48,7 @@ export function SaveBar({ dirty, saving, status, live, onSave }) {
         type="button"
         onClick={onSave}
         disabled={!dirty || saving}
-        className={primary(dirty && !saving)}
+        className={primaryAction}
       >
         {__("Save and publish", "foundhint-local-seo")}
       </button>

@@ -1,3 +1,5 @@
+import { fieldError } from "../../styles";
+
 /**
  * A field's server error. Messages may come as a list; they are joined.
  */
@@ -9,11 +11,7 @@ export function FieldError({ id, messages }) {
   }
 
   return (
-    <span
-      id={id}
-      role="alert"
-      className="fhint:text-[12.5px] fhint:text-[#C02718]"
-    >
+    <span id={id} role="alert" className={fieldError}>
       {text}
     </span>
   );

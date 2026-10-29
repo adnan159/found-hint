@@ -148,7 +148,7 @@ export function PageSection({ form, resolved, pageTitle, usedBy, warnings }) {
       {resolved ? (
         <span className={muted}>
           {__("Primary landing page:", "foundhint-local-seo")}{" "}
-          <code className="fhint:font-mono fhint:text-[12px] fhint:break-all">
+          <code className="fhint:font-mono fhint:text-[12.5px] fhint:break-all">
             {resolved}
           </code>
         </span>
@@ -162,7 +162,7 @@ export function PageSection({ form, resolved, pageTitle, usedBy, warnings }) {
           {warnings.map((warning) => (
             <li
               key={warning.code}
-              className="fhint:border-l-[3px] fhint:border-l-[#E0A33A] fhint:bg-[#FBF0DE] fhint:px-3 fhint:py-2 fhint:text-[12.5px] fhint:text-[#5c3d00]"
+              className="fhint:border-l-[3px] fhint:border-l-warning-border fhint:bg-warning fhint:px-3 fhint:py-2 fhint:text-[12.5px] fhint:text-warning-foreground"
             >
               <span className="fhint:sr-only">
                 {__("Check:", "foundhint-local-seo")}{" "}

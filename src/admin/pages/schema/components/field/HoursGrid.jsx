@@ -10,7 +10,7 @@ export function HoursGrid({ hours }) {
 
   if (!days.length) {
     return (
-      <span className="fhint:text-[13px] fhint:text-[#625e5e]">
+      <span className="fhint:text-[13px] fhint:text-muted-strong">
         {__("No opening hours yet.", "foundhint-local-seo")}
       </span>
     );
@@ -21,7 +21,7 @@ export function HoursGrid({ hours }) {
     // day reaches 1px past its cell and the list clips it, so the days' own
     // right and bottom rules vanish under the outer border at the edges
     // instead of doubling it — however the week wraps.
-    <dl className="fhint:m-0 fhint:grid fhint:grid-cols-[repeat(auto-fill,minmax(min(100%,120px),1fr))] fhint:overflow-hidden fhint:border fhint:border-[#e6e3e3] fhint:xl:grid-cols-7">
+    <dl className="fhint:m-0 fhint:grid fhint:grid-cols-[repeat(auto-fill,minmax(min(100%,120px),1fr))] fhint:overflow-hidden fhint:border fhint:border-border fhint:xl:grid-cols-7">
       {days.map((day) => {
         const periods = day.periods ?? [];
         const closed = periods.some((period) => period.is_closed);
@@ -42,17 +42,17 @@ export function HoursGrid({ hours }) {
         return (
           <div
             key={day.day_name}
-            className="fhint:-mr-px fhint:-mb-px fhint:grid fhint:min-w-0 fhint:gap-0.5 fhint:border-r fhint:border-b fhint:border-[#f0eeee] fhint:px-[11px] fhint:py-2"
+            className="fhint:-mr-px fhint:-mb-px fhint:grid fhint:min-w-0 fhint:gap-0.5 fhint:border-r fhint:border-b fhint:border-border fhint:px-[11px] fhint:py-2"
           >
-            <dt className="fhint:text-[12px] fhint:text-[#625e5e]">
+            <dt className="fhint:text-[12.5px] fhint:text-muted-strong">
               {day.day_name}
             </dt>
             <dd
               className={cn(
                 "fhint:m-0 fhint:text-[13px] fhint:font-bold",
                 !day.configured || closed
-                  ? "fhint:text-[#625e5e]"
-                  : "fhint:text-[#201e1d]",
+                  ? "fhint:text-muted-strong"
+                  : "fhint:text-foreground",
               )}
             >
               {text}

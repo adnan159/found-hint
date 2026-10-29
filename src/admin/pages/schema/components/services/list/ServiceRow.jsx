@@ -7,7 +7,7 @@ import { serviceMetaLine, warningText } from "../../../lib/service";
 import { BADGES, pill } from "../../styles";
 
 const iconButton = cn(
-  "fhint:inline-flex fhint:cursor-pointer fhint:items-center fhint:justify-center fhint:border fhint:border-[#e6e3e3] fhint:bg-card fhint:p-1 fhint:text-[#625e5e] fhint:disabled:cursor-default fhint:disabled:opacity-40",
+  "fhint:inline-flex fhint:cursor-pointer fhint:items-center fhint:justify-center fhint:border fhint:border-border fhint:bg-card fhint:p-1 fhint:text-muted-strong fhint:disabled:cursor-default fhint:disabled:opacity-40",
   focus,
 );
 
@@ -53,8 +53,8 @@ export function ServiceRow({
       draggable={!locked}
       {...drag}
       className={cn(
-        "fhint:border-b fhint:border-b-[#f0eeee] fhint:last:border-b-0",
-        current && "fhint:bg-[#FFF8F4]",
+        "fhint:border-b fhint:border-b-border fhint:last:border-b-0",
+        current && "fhint:bg-notice",
         dragged && "fhint:opacity-50",
       )}
     >
@@ -63,7 +63,7 @@ export function ServiceRow({
           <span className="fhint:flex fhint:items-center fhint:gap-1">
             <GripVerticalIcon
               aria-hidden="true"
-              className="fhint:size-4 fhint:cursor-grab fhint:text-[#bab6b6]"
+              className="fhint:size-4 fhint:cursor-grab fhint:text-muted-foreground"
             />
             <button
               type="button"
@@ -112,7 +112,7 @@ export function ServiceRow({
               </span>
             ) : null}
           </span>
-          <span className="fhint:truncate fhint:text-[12px] fhint:text-[#625e5e]">
+          <span className="fhint:truncate fhint:text-[12.5px] fhint:text-muted-strong">
             {serviceMetaLine(service)}
           </span>
         </button>
@@ -124,7 +124,7 @@ export function ServiceRow({
             onClick={onExpand}
             className={cn(
               pill,
-              "fhint:cursor-pointer fhint:border-0 fhint:bg-[#FBF0DE] fhint:text-[#8a5a00]",
+              "fhint:cursor-pointer fhint:border-0 fhint:bg-warning fhint:text-warning-foreground",
               focus,
             )}
           >
@@ -141,7 +141,7 @@ export function ServiceRow({
           </button>
         ) : null}
 
-        <span className="fhint:hidden fhint:w-[52px] fhint:text-right fhint:text-[12px] fhint:text-[#625e5e] fhint:sm:inline">
+        <span className="fhint:hidden fhint:w-[52px] fhint:text-right fhint:text-[12.5px] fhint:text-muted-strong fhint:sm:inline">
           {on
             ? __("Active", "foundhint-local-seo")
             : __("Inactive", "foundhint-local-seo")}
@@ -163,7 +163,7 @@ export function ServiceRow({
           {checks.map((warning) => (
             <li
               key={`${warning.code}-${warning.branch ?? ""}`}
-              className="fhint:text-[12.5px] fhint:text-[#5c3d00]"
+              className="fhint:text-[12.5px] fhint:text-warning-foreground"
             >
               {warningText(warning)}
             </li>

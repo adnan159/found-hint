@@ -126,7 +126,7 @@ export function PhotosSection({ media, google, locationId, onChanged }) {
       {gallery.length ? <Gallery gallery={gallery} /> : null}
 
       {nothing ? (
-        <div className="fhint:rounded-[12px] fhint:border fhint:border-dashed fhint:border-[#cfc8c6] fhint:px-6 fhint:py-7">
+        <div className="fhint:rounded-[12px] fhint:border fhint:border-dashed fhint:border-input fhint:px-6 fhint:py-7">
           <strong className="fhint:mb-1.5 fhint:block fhint:text-base fhint:font-extrabold">
             {__("Your Google photos will appear here", "foundhint-local-seo")}
           </strong>

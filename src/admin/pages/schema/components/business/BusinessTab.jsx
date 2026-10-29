@@ -196,7 +196,7 @@ export function BusinessTab({ state, locked, live, onDirtyChange, saveRef }) {
         {saveState.error && !Object.keys(errors).length ? (
           <p
             role="alert"
-            className="fhint:mx-5 fhint:mb-3 fhint:text-[13px] fhint:text-[#C02718]"
+            className="fhint:mx-5 fhint:mb-3 fhint:text-[13px] fhint:text-destructive"
           >
             {errorMessage(saveState.error)}
           </p>

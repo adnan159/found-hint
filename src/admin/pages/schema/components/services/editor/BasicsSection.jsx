@@ -96,7 +96,7 @@ export function BasicsSection({ form, fromGoogle, options, nameRef }) {
               className={cn(
                 muted,
                 values.description.length > MAX_DESCRIPTION &&
-                  "fhint:font-bold fhint:text-[#C02718]",
+                  "fhint:font-bold fhint:text-destructive",
               )}
             >
               {`${values.description.length}/${MAX_DESCRIPTION}`}
@@ -171,7 +171,7 @@ export function BasicsSection({ form, fromGoogle, options, nameRef }) {
             </option>
           </select>
           {values.image.mode === "featured" && !options.featured ? (
-            <span className="fhint:text-[12px] fhint:text-[#8a5a00]">
+            <span className="fhint:text-[12.5px] fhint:text-warning-foreground">
               {__(
                 "The service page has no featured image yet, so none is printed.",
                 "foundhint-local-seo",

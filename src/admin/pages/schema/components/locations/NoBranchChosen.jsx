@@ -1,6 +1,6 @@
 import { __ } from "@wordpress/i18n";
 import { cn } from "cn";
-import { muted, panel } from "../styles";
+import { muted, panel, panelTitle } from "../styles";
 import BranchButtons from "./BranchButtons";
 
 /**
@@ -16,7 +16,7 @@ export function NoBranchChosen({ branches, onBranch }) {
           "fhint:grid fhint:justify-items-start fhint:gap-2 fhint:px-5 fhint:py-6",
         )}
       >
-        <h2 className="fhint:m-0 fhint:text-[16px] fhint:font-bold">
+        <h2 className={panelTitle}>
           {__("Your business has one location", "foundhint-local-seo")}
         </h2>
         <p
@@ -38,7 +38,7 @@ export function NoBranchChosen({ branches, onBranch }) {
     <section
       className={cn(panel, "fhint:grid fhint:gap-3 fhint:px-5 fhint:py-5")}
     >
-      <h2 className="fhint:m-0 fhint:text-[16px] fhint:font-bold">
+      <h2 className={panelTitle}>
         {__("Location schema", "foundhint-local-seo")}
       </h2>
       <p

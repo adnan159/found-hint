@@ -57,10 +57,10 @@ export function AreasSection({ form, suggestions = [] }) {
         {areas.map((area) => (
           <li
             key={`${area.type}-${area.name}`}
-            className="fhint:inline-flex fhint:items-center fhint:gap-1.5 fhint:border fhint:border-[#d7d3d3] fhint:bg-card fhint:py-1 fhint:pr-1 fhint:pl-2.5 fhint:text-[12.5px]"
+            className="fhint:inline-flex fhint:items-center fhint:gap-1.5 fhint:border fhint:border-input fhint:bg-card fhint:py-1 fhint:pr-1 fhint:pl-2.5 fhint:text-[12.5px]"
           >
             <strong>{area.name}</strong>
-            <span className="fhint:text-[11.5px] fhint:text-[#625e5e]">
+            <span className="fhint:text-[11.5px] fhint:text-muted-strong">
               {areaTypeLabel(area.type)}
             </span>
             {locked ? null : (
@@ -75,7 +75,7 @@ export function AreasSection({ form, suggestions = [] }) {
                   area.name,
                 )}
                 className={cn(
-                  "fhint:inline-flex fhint:cursor-pointer fhint:border-0 fhint:bg-transparent fhint:p-0.5 fhint:text-[#625e5e]",
+                  "fhint:inline-flex fhint:cursor-pointer fhint:border-0 fhint:bg-transparent fhint:p-0.5 fhint:text-muted-strong",
                   focus,
                 )}
               >
