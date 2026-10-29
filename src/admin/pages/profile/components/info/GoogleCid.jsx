@@ -2,8 +2,7 @@ import { useState } from "react";
 import { __ } from "@wordpress/i18n";
 import { ExternalLinkIcon } from "lucide-react";
 import { Link } from "react-router";
-import { cn } from "cn";
-import { primaryButton, quietButton } from "../../styles";
+import { primaryLink, quietButton, quietLink } from "../../styles";
 
 /**
  * Google's own id for the listing: shown, copied and opened in Maps once it
@@ -62,7 +61,7 @@ export function GoogleCid({ cid, mapped }) {
             href={`https://maps.google.com/?cid=${encodeURIComponent(cid)}`}
             target="_blank"
             rel="noopener noreferrer"
-            className={quietButton}
+            className={quietLink}
           >
             {__("Open in Maps", "foundhint-local-seo")}
             <ExternalLinkIcon aria-hidden="true" className="fhint:size-3" />
@@ -70,7 +69,7 @@ export function GoogleCid({ cid, mapped }) {
         </span>
       ) : null}
       {!cid && !mapped ? (
-        <Link to="/google" className={cn(primaryButton, "fhint:no-underline")}>
+        <Link to="/google" className={primaryLink}>
           {__("Connect Google", "foundhint-local-seo")}
         </Link>
       ) : null}

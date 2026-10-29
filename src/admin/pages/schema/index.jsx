@@ -285,7 +285,7 @@ export default function SchemaPage() {
             href="#/google"
             className={cn(
               dialogButton,
-              "fhint:inline-flex fhint:items-center fhint:gap-2 fhint:border-0 fhint:bg-[#FF6B35] fhint:text-white fhint:no-underline",
+              "fhint:inline-flex fhint:items-center fhint:gap-2 fhint:border-0 fhint:bg-[#FF6B35] fhint:text-white! fhint:no-underline",
             )}
           >
             <Link2Icon aria-hidden="true" className="fhint:size-4" />

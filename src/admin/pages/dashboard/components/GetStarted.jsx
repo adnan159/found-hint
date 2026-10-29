@@ -227,7 +227,7 @@ function Decision({ onConnect, isConnecting, headingRef }) {
                   second tab. */}
               <Button
                 variant="outline"
-                className="fhint:h-auto fhint:border-foreground fhint:px-[18px] fhint:py-3 fhint:text-[14.5px] fhint:font-extrabold"
+                className="fhint:h-auto fhint:border-foreground fhint:px-[18px] fhint:py-3 fhint:text-[14.5px] fhint:font-extrabold fhint:text-foreground!"
                 render={
                   <a
                     href={GOOGLE_CREATE_URL}

@@ -1,21 +1,29 @@
 import Hint from "@/components/Hint";
 import { __ } from "@wordpress/i18n";
 import { cn } from "cn";
-import { LinkIcon, SendIcon } from "lucide-react";
+import { LinkIcon, RefreshCwIcon, SendIcon } from "lucide-react";
 import { useEffect, useRef } from "react";
 import { Link } from "react-router";
-import { pillButton } from "./styles";
+import { pillButton, pillLink } from "./styles";
 
 /**
- * The page's own title, whether Google is connected, and the button that
- * sends the saved profile to Google — or, before that is possible, the way
- * to connect.
+ * The page's own title, whether Google is connected, and the buttons that
+ * read the listing from Google and send the saved profile to it — or, before
+ * that is possible, the way to connect.
  *
  * `meta` is absent while the profile loads; the title is drawn regardless,
  * and carries the rule that meets the sidebar's until the business bar above
  * it arrives.
  */
-export function TitleBar({ meta, onPublish, publishDisabled, publishHint }) {
+export function TitleBar({
+  meta,
+  onPublish,
+  publishDisabled,
+  publishHint,
+  onRefresh,
+  isRefreshing,
+  refreshDisabled,
+}) {
   const headingRef = useRef(null);
 
   // The same courtesy PageHeader pays: a hash route change does not move
@@ -63,6 +71,29 @@ export function TitleBar({ meta, onPublish, publishDisabled, publishHint }) {
 
       {meta ? (
         <div className="fhint:flex fhint:flex-wrap fhint:items-center fhint:gap-2">
+          {google.mapped && onRefresh ? (
+            <button
+              type="button"
+              onClick={onRefresh}
+              disabled={isRefreshing || refreshDisabled}
+              title={__(
+                "Reads your attributes and photos from Google. Nothing on Google is changed.",
+                "foundhint-local-seo",
+              )}
+              className={pillButton}
+            >
+              <RefreshCwIcon
+                aria-hidden="true"
+                className={cn(
+                  "fhint:size-3.5",
+                  isRefreshing && "fhint:animate-spin",
+                )}
+              />
+              {isRefreshing
+                ? __("Reading Google…", "foundhint-local-seo")
+                : __("Refresh from Google", "foundhint-local-seo")}
+            </button>
+          ) : null}
           <span
             className={cn(
               "fhint:inline-flex fhint:h-9 fhint:items-center fhint:gap-2 fhint:rounded-full fhint:px-4 fhint:text-[13px] fhint:font-bold fhint:whitespace-nowrap",
@@ -96,7 +127,7 @@ export function TitleBar({ meta, onPublish, publishDisabled, publishHint }) {
               {__("Send to Google", "foundhint-local-seo")}
             </button>
           ) : (
-            <Link to="/google" className={pillButton}>
+            <Link to="/google" className={pillLink}>
               <LinkIcon aria-hidden="true" className="fhint:size-3.5" />
               {google.connected
                 ? __("Choose a listing", "foundhint-local-seo")

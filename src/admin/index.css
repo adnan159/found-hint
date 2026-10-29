@@ -272,6 +272,18 @@
   color: var(--sidebar-accent-foreground);
 }
 
+/*
+ * The rest of the app's links keep their colours by marking them important
+ * (see `quietLink` in the profile styles). What is left of WordPress's focus
+ * treatment is the blue glow: dropped on a mouse click, leaving each link's
+ * own ring for the keyboard.
+ */
+#fhint-app a:focus:not(:focus-visible),
+[data-slot="dialog-content"] a:focus:not(:focus-visible) {
+  box-shadow: none;
+  outline: none;
+}
+
 [data-slot="sidebar-nav"] a:focus-visible {
   outline: 2px solid var(--sidebar-ring);
   outline-offset: -2px;

@@ -240,7 +240,7 @@ export default function DashboardPage() {
                   {!step.done ? (
                     <Link
                       to={step.to}
-                      className="fhint:ml-auto fhint:text-[12px] fhint:font-extrabold fhint:text-link-accent fhint:no-underline fhint:hover:underline"
+                      className="fhint:ml-auto fhint:text-[12px] fhint:font-extrabold fhint:text-link-accent! fhint:no-underline fhint:hover:underline"
                     >
                       {__("Do this", "foundhint-local-seo")}
                       <ArrowRightIcon
@@ -312,7 +312,12 @@ function StatCard({ icon: Icon, label, value, to }) {
         </CardTitle>
       </CardHeader>
       <CardContent>
-        <Button variant="outline" size="sm" render={<Link to={to} />}>
+        <Button
+          variant="outline"
+          size="sm"
+          render={<Link to={to} />}
+          className="fhint:text-foreground!"
+        >
           {__("Manage", "foundhint-local-seo")}
         </Button>
       </CardContent>

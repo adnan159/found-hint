@@ -49,7 +49,7 @@ export function SchemaHeader({ locked, syncedAt, locationId = 0 }) {
           rel="noopener noreferrer"
           className={cn(
             button,
-            "fhint:border-0 fhint:bg-[#FF6B35] fhint:text-white",
+            "fhint:border-0 fhint:bg-[#FF6B35] fhint:text-white!",
           )}
         >
           {__("Upgrade to Pro", "foundhint-local-seo")}

@@ -1,6 +1,6 @@
 import { __, sprintf } from "@wordpress/i18n";
 import { ExternalLinkIcon, MapPinIcon } from "lucide-react";
-import { quietButton } from "../styles";
+import { quietLink } from "../styles";
 import MapPreview, { mapQuery } from "./MapPreview";
 import TextField from "./TextField";
 import ServiceAreaField from "./address/ServiceAreaField";
@@ -133,7 +133,7 @@ export function AddressSection({
             href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(mapQuery({ latitude, longitude, query: mapSearch }))}`}
             target="_blank"
             rel="noopener noreferrer"
-            className={quietButton}
+            className={quietLink}
           >
             {__("Open in Maps", "foundhint-local-seo")}
             <ExternalLinkIcon aria-hidden="true" className="fhint:size-3" />
@@ -144,7 +144,7 @@ export function AddressSection({
             href="https://business.google.com/"
             target="_blank"
             rel="noopener noreferrer"
-            className={quietButton}
+            className={quietLink}
           >
             {__("Change address on Google", "foundhint-local-seo")}
             <ExternalLinkIcon aria-hidden="true" className="fhint:size-3" />

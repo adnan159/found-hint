@@ -174,7 +174,7 @@ export function JsonPreview({
           href={`https://search.google.com/test/rich-results?url=${encodeURIComponent(url)}`}
           target="_blank"
           rel="noopener noreferrer"
-          className={cn(action, "fhint:bg-[#201e1d] fhint:text-white")}
+          className={cn(action, "fhint:bg-[#201e1d] fhint:text-white!")}
         >
           <FlaskConicalIcon aria-hidden="true" className="fhint:size-4" />
           {__("Test with Google", "foundhint-local-seo")}
@@ -188,7 +188,7 @@ export function JsonPreview({
           rel="noopener noreferrer"
           className={cn(
             action,
-            "fhint:col-span-full fhint:justify-center fhint:border fhint:border-[#d7d3d3] fhint:bg-card fhint:py-2 fhint:text-[12.5px] fhint:text-[#201e1d]",
+            "fhint:col-span-full fhint:justify-center fhint:border fhint:border-[#d7d3d3] fhint:bg-card fhint:py-2 fhint:text-[12.5px] fhint:text-[#201e1d]!",
           )}
         >
           <ExternalLinkIcon aria-hidden="true" className="fhint:size-3.5" />

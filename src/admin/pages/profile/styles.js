@@ -52,3 +52,12 @@ export const chip =
   "fhint:px-[7px] fhint:py-[3px] fhint:text-[11.5px] fhint:font-extrabold fhint:tracking-[0.06em] fhint:uppercase";
 
 export const focus = FOCUS;
+
+/*
+ * The same buttons, for a link. WordPress colours every admin link blue on
+ * hover, press and focus with `a:hover` / `a:focus`, which outrank a plain
+ * colour utility; the link's own colour is marked important to keep it.
+ */
+export const quietLink = `${quietButton} fhint:text-foreground!`;
+
+export const primaryLink = `${primaryButton} fhint:text-primary-foreground! fhint:no-underline`;

@@ -6,6 +6,7 @@ import {
   focus,
   linkButton,
   primaryButton,
+  primaryLink,
   tag,
   tagTones,
 } from "../../styles";
@@ -81,10 +82,7 @@ export function PendingPhotos({
               : __("Upload to Google", "foundhint-local-seo")}
           </button>
         ) : (
-          <Link
-            to="/google"
-            className={cn(primaryButton, "fhint:no-underline")}
-          >
+          <Link to="/google" className={primaryLink}>
             {__("Connect Google", "foundhint-local-seo")}
           </Link>
         )}

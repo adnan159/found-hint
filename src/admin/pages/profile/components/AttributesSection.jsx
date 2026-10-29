@@ -1,7 +1,7 @@
 import { __ } from "@wordpress/i18n";
 import { Link } from "react-router";
 import { cn } from "cn";
-import { focus, help, primaryButton } from "../styles";
+import { focus, help, primaryButton, primaryLink } from "../styles";
 
 const pill = (on) =>
   cn(
@@ -204,10 +204,7 @@ export function AttributesSection({
                 : __("Read from Google", "foundhint-local-seo")}
             </button>
           ) : (
-            <Link
-              to="/google"
-              className={cn(primaryButton, "fhint:no-underline")}
-            >
+            <Link to="/google" className={primaryLink}>
               {__("Connect Google", "foundhint-local-seo")}
             </Link>
           )}

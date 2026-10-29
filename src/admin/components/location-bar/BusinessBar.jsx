@@ -4,7 +4,7 @@ import { ExternalLinkIcon, StarIcon } from "lucide-react";
 import { Link } from "react-router";
 import LocationSwitcher, { switcherEntries } from "./LocationSwitcher";
 import { thumb } from "@/pages/profile/components/photos/lib";
-import { pillButton } from "./styles";
+import { pillButton, pillLink } from "./styles";
 import { HeaderActionsSlot } from "@/context/HeaderActions";
 
 /**
@@ -111,7 +111,7 @@ export function BusinessBar({
             to="/reviews"
             className={cn(
               pillButton,
-              "fhint:border-[#F0D9AE] fhint:bg-[#FBF0DE] fhint:text-[#7a4a05] fhint:hover:bg-[#F7E6C8]",
+              "fhint:border-[#F0D9AE] fhint:bg-[#FBF0DE] fhint:text-[#7a4a05]! fhint:hover:bg-[#F7E6C8]",
             )}
           >
             <StarIcon
@@ -161,7 +161,7 @@ export function BusinessBar({
             href={`https://maps.google.com/?cid=${encodeURIComponent(cid)}`}
             target="_blank"
             rel="noopener noreferrer"
-            className={pillButton}
+            className={pillLink}
           >
             <ExternalLinkIcon aria-hidden="true" className="fhint:size-3.5" />
             {__("View on Google", "foundhint-local-seo")}
