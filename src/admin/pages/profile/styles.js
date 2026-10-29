@@ -1,21 +1,19 @@
 /**
  * Class strings shared by the profile's sections.
  *
- * Measured from the design: 13px bold labels, 12.5px help text, inputs with
- * a 1px rule and 10px/12px padding, square corners throughout. Kept here so
- * seven sections read as one screen and a change to a field's look is made
- * once.
+ * Measured from the design: 13px bold labels, 12.5px help text, square
+ * corners throughout. Kept here so seven sections read as one screen.
  *
- * Padding on the inputs is marked important because WordPress's admin
- * stylesheet sets `padding: 0 12px` on url, tel, number, date and time inputs
- * with a selector a utility class cannot outrank.
+ * The fields themselves come from `lib/fieldStyles` — the one definition of
+ * a text field for every screen.
  *
  * Every interactive class carries a visible focus state — the design shows
  * none because it was never tabbed through.
  */
 
-const FOCUS =
-  "fhint:outline-none fhint:focus-visible:ring-2 fhint:focus-visible:ring-ring fhint:focus-visible:ring-offset-1";
+import { focusRing, textInput } from "@/lib/fieldStyles";
+
+const FOCUS = focusRing;
 
 export const label = "fhint:text-[13px] fhint:font-bold";
 
@@ -25,9 +23,9 @@ export const help =
 export const errorText =
   "fhint:text-[12.5px] fhint:font-semibold fhint:text-destructive";
 
-export const input = `fhint:w-full fhint:min-w-0 fhint:border fhint:border-input fhint:bg-card fhint:px-3! fhint:py-2.5! fhint:text-sm fhint:text-foreground fhint:placeholder:text-muted-foreground fhint:read-only:bg-muted fhint:read-only:text-muted-strong fhint:aria-invalid:border-destructive ${FOCUS}`;
+export const input = textInput();
 
-export const smallInput = `fhint:border fhint:border-input fhint:bg-card fhint:px-[7px]! fhint:py-[5px]! fhint:text-[12.5px] fhint:text-foreground fhint:aria-invalid:border-destructive ${FOCUS}`;
+export const smallInput = textInput({ size: "sm" });
 
 // The bordered white button used for secondary actions inside a section.
 export const quietButton = `fhint:inline-flex fhint:cursor-pointer fhint:items-center fhint:gap-1.5 fhint:border fhint:border-input fhint:bg-card fhint:px-[11px] fhint:py-[7px] fhint:text-[12.5px] fhint:font-extrabold fhint:text-foreground fhint:no-underline fhint:disabled:cursor-not-allowed fhint:disabled:text-muted-foreground ${FOCUS}`;

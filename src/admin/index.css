@@ -243,6 +243,15 @@
   border-color: var(--destructive);
 }
 
+/* A read-only field keeps its edge when clicked: nothing in it can change,
+   so it should not look ready for typing. Read-only fields are kept out of
+   the Tab order (`tabIndex={-1}`), so no keyboard focus goes unseen. A
+   refused field stays red. */
+#fhint-app input[readonly]:not([aria-invalid="true"]):focus-visible,
+#fhint-app textarea[readonly]:not([aria-invalid="true"]):focus-visible {
+  border-color: var(--input);
+}
+
 #fhint-app input:focus,
 #fhint-app textarea:focus,
 #fhint-app select:focus {

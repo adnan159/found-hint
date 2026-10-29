@@ -109,7 +109,7 @@ export function DescriptionField({
         aria-describedby={`${descriptionId}-help`}
         className={cn(
           input,
-          "fhint:resize-y fhint:p-[11px] fhint:text-[13.5px] fhint:leading-[1.55]",
+          "fhint:resize-y fhint:text-[13.5px] fhint:leading-[1.55]",
         )}
       />
       <div id={`${descriptionId}-help`} className="fhint:grid fhint:gap-1.5">

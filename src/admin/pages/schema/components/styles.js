@@ -1,4 +1,5 @@
 import { cn } from "cn";
+import { textInput } from "@/lib/fieldStyles";
 import { focus } from "@/pages/profile/styles";
 
 /**
@@ -14,7 +15,18 @@ export const label = "fhint:text-[13px] fhint:font-bold";
 export const groupHead =
   "fhint:text-[11.5px] fhint:font-bold fhint:tracking-[0.06em] fhint:text-[#625e5e] fhint:uppercase";
 export const muted = "fhint:text-[12.5px] fhint:text-[#625e5e]";
-export const caption = "fhint:font-mono fhint:text-[11px] fhint:text-[#9b9797]";
+// WordPress gives every admin `<code>` a 1px side margin, which left the
+// caption box narrower than the input above it.
+export const caption =
+  "fhint:m-0 fhint:font-mono fhint:text-[11px] fhint:text-[#9b9797]";
+
+/** An amber note: something will not print as the owner may expect. */
+export const warningNote =
+  "fhint:mx-5 fhint:mt-0 fhint:mb-3 fhint:text-[12.5px] fhint:font-semibold fhint:text-[#8a5a00]";
+
+/** A field's error, or the note that it is required and empty. */
+export const fieldError =
+  "fhint:text-[12px] fhint:font-bold fhint:text-[#C02718]";
 
 export const pill =
   "fhint:inline-flex fhint:items-center fhint:rounded-full fhint:px-2 fhint:py-0.5 fhint:text-[11px] fhint:font-bold fhint:whitespace-nowrap";
@@ -31,16 +43,16 @@ export const BADGES = {
   scope: "fhint:bg-[#f3f2f2] fhint:text-[#444141]",
 };
 
+/**
+ * A field, from `lib/fieldStyles` like every other screen's.
+ * `missing` turns the border red — the app's invalid rule — while the field
+ * has no `aria-invalid` of its own (a select, a picker).
+ */
 export const input = (state) =>
   cn(
-    "fhint:box-border fhint:w-full fhint:border fhint:px-2.5! fhint:py-[9px]! fhint:text-[13.5px] fhint:leading-snug",
-    state === "missing"
-      ? "fhint:border-[#C02718]"
-      : state === "locked"
-        ? "fhint:border-[#e6e3e3] fhint:bg-[#faf9f9] fhint:text-[#444141]"
-        : "fhint:border-[#bab6b6] fhint:bg-card fhint:text-[#201e1d]",
-    "fhint-firm-edge",
-    focus,
+    textInput(),
+    state === "locked" && "fhint:bg-muted fhint:text-muted-strong",
+    state === "missing" && "fhint:border-destructive",
   );
 
 /** A radio card — chosen: orange edge on a warm tint. */
@@ -55,12 +67,18 @@ export const card = (on) =>
 /** A toggle chip — chosen: dark. */
 export const chip = (on) =>
   cn(
-    "fhint:cursor-pointer fhint:border fhint:px-3 fhint:py-1.5 fhint:text-[12.5px] fhint:font-bold",
+    "fhint:cursor-pointer fhint:border fhint:px-3 fhint:py-1.5 fhint:text-[12.5px] fhint:font-bold fhint:disabled:cursor-default fhint:disabled:opacity-60",
     on
       ? "fhint:border-[#201e1d] fhint:bg-[#201e1d] fhint:text-white"
       : "fhint:border-[#d7d3d3] fhint:bg-card fhint:text-[#201e1d]",
     focus,
   );
+
+/** A plain bordered button: dialogs, Stay / Discard, Connect Google. */
+export const dialogButton = cn(
+  "fhint:cursor-pointer fhint:border fhint:border-[#bab6b6] fhint:bg-card fhint:px-3.5 fhint:py-2 fhint:text-[13px] fhint:font-bold fhint:disabled:cursor-default fhint:disabled:opacity-60",
+  focus,
+);
 
 export const linkAction = cn(
   "fhint:cursor-pointer fhint:border-0 fhint:bg-transparent fhint:p-0 fhint:text-[12px] fhint:font-bold fhint:text-[#D8521F] fhint:hover:underline",
