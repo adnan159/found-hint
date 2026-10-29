@@ -141,7 +141,7 @@ export function GoogleCard() {
             <Button
               variant="outline"
               render={<Link to="/google" />}
-              className="fhint:h-auto fhint:px-[15px] fhint:py-2.5 fhint:text-[13.5px] fhint:font-bold"
+              className="fhint:h-auto fhint:px-[15px] fhint:py-2.5 fhint:text-[13.5px] fhint:font-bold fhint:text-foreground!"
             >
               {__("Manage", "foundhint-local-seo")}
             </Button>

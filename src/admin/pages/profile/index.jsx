@@ -141,6 +141,9 @@ export function Profile() {
           ? __("Save your changes first.", "foundhint-local-seo")
           : undefined
       }
+      onRefresh={googleRead.refreshFromGoogle}
+      isRefreshing={googleRead.isRefreshing}
+      refreshDisabled={locked || isSaving}
     />
   );
 
@@ -190,9 +193,6 @@ export function Profile() {
           google={google}
           isBusy={isFetching}
           notice={googleRead.refreshNotice}
-          isRefreshing={googleRead.isRefreshing}
-          disabled={isSaving}
-          onRefresh={googleRead.refreshFromGoogle}
         />
       )}
 

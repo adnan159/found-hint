@@ -7,7 +7,7 @@ import OpenSwitch from "./OpenSwitch";
 import { STATE } from "./styles";
 
 const ROW =
-  "fhint:flex fhint:flex-wrap fhint:items-center fhint:gap-3 fhint:border-b fhint:border-b-[#eae7e7] fhint:px-0.5 fhint:py-[11px] fhint:last:border-b-0";
+  "fhint:flex fhint:flex-wrap fhint:items-center fhint:gap-3 fhint:border-b fhint:border-b-border fhint:px-0.5 fhint:py-[11px] fhint:last:border-b-0";
 
 /**
  * One weekday: its times, or that it is closed, or that nobody has said.

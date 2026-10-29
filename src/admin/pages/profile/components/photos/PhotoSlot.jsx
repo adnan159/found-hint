@@ -41,7 +41,7 @@ export function PhotoSlot({
     wide ? "fhint:h-[150px] fhint:w-full" : "fhint:size-[130px]",
     shown?.url
       ? "fhint:border-border fhint:bg-card"
-      : "fhint:border-dashed fhint:border-[#b9b3b1] fhint:bg-[#efe9e7] fhint:hover:bg-[#e8e1de]",
+      : "fhint:border-dashed fhint:border-input fhint:bg-muted fhint:hover:bg-accent",
   );
 
   return (
@@ -61,7 +61,7 @@ export function PhotoSlot({
       <div
         className={cn(
           "fhint:grid fhint:place-items-center fhint:rounded-[10px]",
-          wide ? "" : "fhint:bg-[#f6f1ef] fhint:py-[10px]",
+          wide ? "" : "fhint:bg-muted fhint:py-[10px]",
         )}
       >
         <Picker

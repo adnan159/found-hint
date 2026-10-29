@@ -93,7 +93,7 @@ export function buildProfileTabs({
             )}{" "}
             <Link
               to="/business/details"
-              className="fhint:font-extrabold fhint:text-foreground fhint:underline"
+              className="fhint:font-extrabold fhint:text-foreground! fhint:underline"
             >
               {__("Edit markup details", "foundhint-local-seo")}
             </Link>

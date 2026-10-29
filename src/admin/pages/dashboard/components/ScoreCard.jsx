@@ -284,7 +284,7 @@ export function ScoreCard({ summary }) {
           <div className="fhint:mt-auto fhint:flex fhint:flex-wrap fhint:items-center fhint:gap-2.5">
             <Button
               render={<Link to="/audit" />}
-              className="fhint:mt-3.5 fhint:h-auto fhint:px-4 fhint:py-2.5 fhint:text-[13.5px] fhint:font-extrabold"
+              className="fhint:mt-3.5 fhint:h-auto fhint:px-4 fhint:py-2.5 fhint:text-[13.5px] fhint:font-extrabold fhint:text-primary-foreground!"
             >
               {summary.open_findings > 0
                 ? sprintf(
