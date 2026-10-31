@@ -7,8 +7,9 @@ import { TABS } from "../components/page/TabBar";
  * open another.
  *
  * A branch chosen in the location bar opens the Location tab; the main
- * location opens the Business tab. The other tabs are site-wide and stay
- * where they are.
+ * location opens the LocalBusiness tab (the place). The other tabs are
+ * site-wide and stay where they are. The LocalBusiness tab is the default,
+ * and an old `?tab=business` link opens it.
  *
  * @param {number} locationId The location chosen in the bar; 0 is the main.
  * @return {{tab: string, go: Function}} The open tab, and `go(key)`.
@@ -16,10 +17,12 @@ import { TABS } from "../components/page/TabBar";
 export default function useSchemaTab(locationId) {
   const [params, setParams] = useSearchParams();
   const requested = params.get("tab");
-  const tab = TABS.some(([key]) => key === requested) ? requested : "business";
+  const tab = TABS.some(([key]) => key === requested)
+    ? requested
+    : "localbusiness";
 
   const go = (key) => {
-    setParams(key === "business" ? {} : { tab: key }, { replace: true });
+    setParams(key === "localbusiness" ? {} : { tab: key }, { replace: true });
   };
 
   const previousLocation = useRef(locationId);
@@ -31,10 +34,10 @@ export default function useSchemaTab(locationId) {
 
     previousLocation.current = locationId;
 
-    if (locationId && tab === "business") {
+    if (locationId && tab === "localbusiness") {
       go("locations");
     } else if (!locationId && tab === "locations") {
-      go("business");
+      go("localbusiness");
     }
   });
 

@@ -310,6 +310,47 @@ tested the Business tab set to Organization. Fixed in the Business tab:
 - [ ] Duplicate Organization with Yoast / Rank Math (WP-009) — Step 5's compat work.
 - [ ] The report's 43 manual tests in a real admin (saving, security, caching, theme switch, multisite).
 
+### Two business tabs and tab switches — done 2026-11-01
+
+The Business tab is split into **01 Organization schema** (the brand,
+`#organization`) and **02 LocalBusiness schema** (the place, `#business`);
+the tabs after them move up one number. Every schema tab has an on/off
+switch in the tab bar.
+
+- [x] Each business tab keeps its own settings row (`entity_kind`
+  `organization` / `business`); both start from the same stored records. The
+  kind picker is gone — the tab is the kind (`?kind=` on `schema/business`,
+  `entity: organization` on preview).
+- [x] A row saved as Organization before the split moves to the
+  Organization tab once, on first read (Organization on, LocalBusiness off).
+- [x] The Organization has no photos field (its image is the logo); the
+  LocalBusiness, Location and Service keep theirs.
+- [x] With both on, the LocalBusiness has `parentOrganization` →
+  `#organization`; the website's publisher is the Organization when it is
+  on, else the LocalBusiness, else nobody.
+- [x] Switches (`Tabs`, `PUT schema/tabs`): `schema.tabs.{organization,
+  localbusiness, locations, services}` and the existing
+  `schema.website.enabled`. Off keeps the details, prints and links nothing;
+  the tab's form is replaced by an off panel ("… schema is off", what turning
+  it on does, "Turn on … schema"). Switching off the open tab with unsaved
+  changes asks Save / Discard / Stay first. The Organization starts off. Settings has no switch.
+- [x] URLs: `#/schema?tab=organization`; LocalBusiness is the default and an
+  old `?tab=business` link opens it. The renderer (Step 5) must honour the
+  switches.
+
+### Design update (FoundHint Schema (1).html) — in progress
+
+Built in order A → B → C → D (the 6-tab bar stays, by decision).
+
+**A. Choose your main business — done 2026-11-01**
+- [x] With more than one location and no choice yet, the Main business tab asks first: each Google profile (area, ★ rating, "Suggested" when its website is this site), or "My head office isn't on Google — enter details manually" (name required, address, website).
+- [x] A location chosen becomes the primary location across FoundHint; a head office typed here describes the LocalBusiness from those details (nothing from a listing it is not) and every location becomes a branch. Saved in the business row's `extras.main`; `GET/PUT schema/main` (`mode`: location | manual | ask).
+- [ ] "Your main business is a head office" status — with the setup wizard (B).
+
+**B. Locations** — list of profiles (role, page, status, issues, actions), location setup wizard, "more profiles found", branch editor (create or pick a page, parent picker, inherit switches, issue alerts), separate-website profiles.
+**C. Settings** — header output and position, live check, website structure rows, "What goes where", SEO plugin conflicts (with Step 5).
+**D. Preview** — "Outputs on: {page}".
+
 ### Step 4 — Website structure (tab 04)
 
 **Free UI**: the five rows — toggle, type chip, description, "Added to"

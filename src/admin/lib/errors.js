@@ -186,6 +186,19 @@ const MESSAGES = {
     __("List 10 languages at most.", "foundhint-local-seo"),
   "schema.business.social.too_many": () =>
     __("List 20 profile links at most.", "foundhint-local-seo"),
+  "schema.main.location.invalid": () =>
+    __("Choose one of your locations.", "foundhint-local-seo"),
+  "schema.main.name.required": () =>
+    __("Enter your head office's name.", "foundhint-local-seo"),
+  "schema.main.name.too_long": () =>
+    __("A name can be 200 characters at most.", "foundhint-local-seo"),
+  "schema.main.address.too_long": () =>
+    __("An address can be 255 characters at most.", "foundhint-local-seo"),
+  "schema.main.website.invalid": () =>
+    __(
+      "Enter the website's full address, starting with https://.",
+      "foundhint-local-seo",
+    ),
   "schema.business.telephone.not_international": () =>
     __(
       "Add the country code, such as +880 1518-984873, or set the country, so the number can be written in international form.",

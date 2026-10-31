@@ -2112,3 +2112,65 @@ storefront".
 **Still open:** the SoftwareApplication node (a decision), live output
 (Step 5), duplicate detection with SEO plugins, and the report's manual
 tests.
+
+## Step 66 — Organization and LocalBusiness as two tabs; tab switches
+
+The Business tab became two schema tabs — Organization (the brand) and
+LocalBusiness (the place) — each with its own fields and saved settings,
+and every schema tab gained an on/off switch in the tab bar.
+
+**Shipped (Premium):** `BusinessSchema` takes a kind (default
+LocalBusiness, so branches, services and the tab state are unchanged); the
+organization settings row and a one-time move of an old Organization row;
+`Tabs`; `PUT schema/tabs`; `?kind=` on `schema/business`; preview
+`entity: organization`; `parentOrganization` on the place when the brand is
+on; the website's publisher follows the switches; the tab state reports
+them.
+**Shipped (free):** `schema.tabs.*` settings; six tabs with switches ("Off ·
+not printed"); the off notice; the Business tab fixed to its kind (no kind
+picker); the Organization without photos; LocalBusiness the default tab.
+
+**Verified:** Premium smoke 246 and database 145, mutation-tested
+(survivors explained: equivalent defaults and a redundant assignment).
+Browser on the real site: six tabs, the Organization off by default with
+its notice and no photos field, switching it on links the LocalBusiness
+preview (`parentOrganization`, website `publisher` → `#organization`), no
+console errors.
+
+**Bug caught:** the off notice's wrapper let the page scroll sideways (the
+grid stretched to the preview's longest line).
+
+**Then:** a switched-off tab shows only an off panel in place of its form
+(icon, "… schema is off" with an Off tag, what turning it on does, "Turn on
+… schema"); its heading takes focus. Switching off the open tab with
+unsaved changes goes through Save / Discard / Stay. Verified in the
+browser: the panel alone, Turn on brings the form back, an unsaved edit
+then Off prompts, Discard switches off and saves nothing.
+
+## Step 67 — Design update A: choose your main business
+
+From the new design (`FoundHint Schema (1).html`): with more than one
+Google profile, the Main business tab first asks which one is the main
+business — the one that represents the brand on this website — or takes a
+head office that is not on Google, typed by hand.
+
+**Shipped (Premium):** `MainBusiness` (the choice in `extras.main`;
+candidates with area, rating and a "suggested" mark; choosing a location
+makes it the primary location; a manual head office); `BusinessFields::manual()`
+(the head office's values — nothing from a listing it is not); every
+location a branch under a manual head office; `GET/PUT schema/main`; the
+tab state carries `main`. The database suite now starts from default
+settings (settings live in the real options table).
+**Shipped (free):** `MainBusinessPicker` in place of the Main business form
+while a choice is needed; messages for its codes.
+
+**Verified:** Premium smoke 251, database 164, mutation-tested (both
+survivors of the first run closed by new tests). Browser on the real site:
+two profiles with ratings, the manual option's Continue disabled until a
+name is typed, choosing FoundHint opens the form with "FoundHint is your
+main business. Its fields are below." State restored afterwards (asking,
+LocalBusiness off).
+
+**Bug caught:** the database suite read the site's real tab switches, so
+it failed whenever the developer had switched a tab off.
+

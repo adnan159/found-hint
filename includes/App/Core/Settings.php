@@ -46,6 +46,16 @@ class Settings {
 				// Read only while Pro serves the manager; the free markup
 				// ignores them. Pro sanitises every value before saving.
 				'enabled'     => true,
+				// Each schema tab's switch (the website's is website.enabled).
+				// Off keeps the details and prints nothing. The Organization
+				// starts off: a business is a LocalBusiness until the brand is
+				// described too.
+				'tabs'        => array(
+					'organization'  => false,
+					'localbusiness' => true,
+					'locations'     => true,
+					'services'      => true,
+				),
 				// head | footer — inside <head>, or just before </body>.
 				'placement'   => 'head',
 				'website'     => array(

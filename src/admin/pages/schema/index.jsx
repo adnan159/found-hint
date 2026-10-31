@@ -3,9 +3,12 @@ import RequestError from "@/components/RequestError";
 import useSelectedLocation from "@/hooks/useSelectedLocation";
 import { hasPro } from "@/lib/pro";
 import { useGetSchemaQuery } from "@/store/api/schemaApi";
+import { toast } from "sonner";
+import { errorMessage } from "@/lib/errors";
 import {
   useGetBusinessSchemaQuery,
   useGetSchemaStateQuery,
+  useSetSchemaTabMutation,
 } from "@/store/api/schemaManagerApi";
 import ConnectGoogleNotice from "./components/page/ConnectGoogleNotice";
 import SchemaHeader from "./components/page/SchemaHeader";
@@ -20,9 +23,10 @@ import { tabSummaries } from "./lib/tabSummaries";
 /**
  * Schema — the Schema Manager (docs/SCHEMA-PLAN.md).
  *
- * Five tabs: Business, Location, Service, Website structure, Settings. With
- * FoundHint Pro serving `schema.business`, the Business tab is live; the
- * others arrive step by step. Without Pro, the same screen is shown locked,
+ * Six tabs: Organization, LocalBusiness, Location, Service, Website
+ * structure, Settings — each schema tab with its own on/off switch. With
+ * FoundHint Premium serving `schema.business`, the two business tabs are
+ * live; the others arrive step by step. Without Pro, the same screen is shown locked,
  * filled with the markup the free plugin already prints.
  *
  * This file wires the page together; the parts live in `hooks/` (open tab,
@@ -58,6 +62,31 @@ export default function SchemaPage() {
     { skip: !plan.business },
   );
 
+  const { data: organization, error: organizationError } =
+    useGetBusinessSchemaQuery("organization", {
+      skip: !plan.business || tab !== "organization",
+    });
+  const [setTab, setTabState] = useSetSchemaTabMutation();
+
+  // A tab's switch saves at once, like a service's. Switching off the open
+  // tab hides its form, so unsaved changes there are saved or discarded
+  // first.
+  const toggle = (key, on) => {
+    const run = async () => {
+      try {
+        await setTab({ key, enabled: on }).unwrap();
+      } catch (error) {
+        toast.error(errorMessage(error));
+      }
+    };
+
+    if (!on && key === tab) {
+      unsaved.guard(run);
+    } else {
+      run();
+    }
+  };
+
   const loading = !free || (plan.business && (!state || !business));
   const connectFirst = plan.business && state && !state.connected;
 
@@ -70,7 +99,9 @@ export default function SchemaPage() {
         actions={!connectFirst}
       />
 
-      <RequestError error={freeError ?? stateError ?? businessError} />
+      <RequestError
+        error={freeError ?? stateError ?? businessError ?? organizationError}
+      />
 
       {connectFirst ? (
         <ConnectGoogleNotice />
@@ -80,7 +111,10 @@ export default function SchemaPage() {
             current={tab}
             summaries={tabSummaries({ plan, free, state, business })}
             dirty={unsaved.dirty}
+            enabled={state?.enabled}
+            locked={!plan.business}
             onPick={(key) => (key === tab ? null : unsaved.pickTab(key))}
+            onToggle={toggle}
           />
 
           {loading ? (
@@ -91,6 +125,10 @@ export default function SchemaPage() {
               plan={plan}
               free={free}
               business={business}
+              organization={organization}
+              enabled={state?.enabled}
+              switching={setTabState.isLoading}
+              onToggle={toggle}
               branches={branches}
               locationId={locationId}
               branchName={

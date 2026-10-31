@@ -1,7 +1,10 @@
 import { __ } from "@wordpress/i18n";
+import { Skeleton } from "@/components/ui/skeleton";
 import { lockedBusinessState } from "../../lib/schema";
 import BusinessTab from "../business/BusinessTab";
+import MainBusinessPicker from "../business/MainBusinessPicker";
 import ComingSoonTab from "./ComingSoonTab";
+import OffPanel from "./OffPanel";
 import LocationTab from "../locations/LocationTab";
 import ServiceTab from "../services/ServiceTab";
 import { TABS } from "./TabBar";
@@ -38,17 +41,41 @@ const COMING = {
  * @param {Object}   props.plan          `{ business, locations, services,
  *                                       live }`: what Pro serves.
  * @param {Object}   props.free          The free plugin's schema.
- * @param {Object}   props.business      Premium's Business tab.
+ * @param {Object}   props.business      Premium's LocalBusiness tab.
+ * @param {Object}   props.organization  Premium's Organization tab.
+ * @param {Object}   props.enabled       Each tab's switch.
+ * @param {boolean}  props.switching     A switch is being saved.
+ * @param {Function} props.onToggle      `(key, on)`: switch a tab.
  * @param {Object}   props.branches      From `useLocationBranches`.
  * @param {number}   props.locationId    The location chosen in the bar.
  * @param {string}   props.branchName    Its name, when it is a branch.
  * @param {Object}   props.unsaved       From `useUnsavedGuard`.
  */
-export function TabPanel({
+/**
+ * The open tab: its form, or — switched off — only the off panel, with the
+ * button that turns it back on. Its saved details are kept either way.
+ */
+export function TabPanel(props) {
+  if (props.enabled?.[props.tab] === false) {
+    return (
+      <OffPanel
+        tab={props.tab}
+        locked={!props.plan.business}
+        busy={props.switching}
+        onTurnOn={() => props.onToggle?.(props.tab, true)}
+      />
+    );
+  }
+
+  return <TabContent {...props} />;
+}
+
+function TabContent({
   tab,
   plan,
   free,
   business,
+  organization,
   branches,
   locationId,
   branchName,
@@ -60,13 +87,28 @@ export function TabPanel({
     saveRef: unsaved.saveRef,
   };
 
-  if (tab === "business") {
-    return (
+  if (tab === "organization" || tab === "localbusiness") {
+    const state = plan.business
+      ? tab === "organization"
+        ? organization
+        : business
+      : lockedBusinessState(free);
+
+    // With several Google profiles, the main business is chosen first.
+    if (tab === "localbusiness" && plan.business && state?.main?.ask) {
+      return <MainBusinessPicker main={state.main} locked={false} />;
+    }
+
+    return state ? (
       <BusinessTab
-        state={plan.business ? business : lockedBusinessState(free)}
+        key={tab}
+        kind={tab}
+        state={state}
         locked={!plan.business}
         {...editing}
       />
+    ) : (
+      <Skeleton className="fhint:h-[60vh] fhint:w-full" />
     );
   }
 
