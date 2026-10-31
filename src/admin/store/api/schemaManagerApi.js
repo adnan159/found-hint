@@ -177,6 +177,18 @@ export const schemaManagerApi = baseApi
         invalidatesTags: ["Service", "Schema"],
       }),
 
+      // Copy one of the listing's Google photos into the Media Library, so
+      // schema serves it from this site.
+      importSchemaPhoto: builder.mutation({
+        query: (photoUrl) => ({
+          url: url("/schema/media/import"),
+          method: "POST",
+          body: { url: photoUrl },
+        }),
+        transformResponse: (response) => response?.data ?? null,
+        invalidatesTags: ["SchemaManager"],
+      }),
+
       // The markup for an entity, unsaved changes included. A mutation, not
       // a query: every keystroke is a new draft, and none is worth caching.
       previewSchema: builder.mutation({
@@ -207,5 +219,6 @@ export const {
   useSetServiceStatusMutation,
   useDeleteServiceSchemaMutation,
   useReorderServiceSchemasMutation,
+  useImportSchemaPhotoMutation,
   usePreviewSchemaMutation,
 } = schemaManagerApi;

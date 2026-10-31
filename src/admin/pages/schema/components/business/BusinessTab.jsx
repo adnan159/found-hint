@@ -11,6 +11,7 @@ import useOverrideDraft from "../../hooks/useOverrideDraft";
 import useSchemaPreview from "../../hooks/useSchemaPreview";
 import {
   EMPTY_BUSINESS_DRAFT,
+  NOT_FOR_ORGANIZATION,
   isBusinessDraftDirty,
   missingBusinessFields,
 } from "../../lib/business";
@@ -80,12 +81,17 @@ export function BusinessTab({ state, locked, live, onDirtyChange, saveRef }) {
     visitMode,
   );
 
-  // An Organization shows its information group and its social links.
+  // An Organization leaves out what it never prints (hours, price, map).
   const fields = state.fields
     .map(draftApi.source)
     .filter(
-      (field) =>
-        !organization || field.group === "info" || field.key === "social",
+      (field) => !organization || !NOT_FOR_ORGANIZATION.includes(field.key),
+    )
+    // Nothing in an Organization's address is required.
+    .map((field) =>
+      organization && field.badge === "storefront"
+        ? { ...field, badge: "optional" }
+        : field,
     );
 
   const onSave = async () => {
@@ -160,6 +166,7 @@ export function BusinessTab({ state, locked, live, onDirtyChange, saveRef }) {
           locked={locked}
           missing={missing}
           visitMode={visitMode}
+          organization={organization}
           onVisitMode={(next) => set({ visit_mode: next })}
           errors={errors}
           photos={state.photos}
@@ -215,7 +222,11 @@ export function BusinessTab({ state, locked, live, onDirtyChange, saveRef }) {
 
       <JsonPreview
         document={document}
-        rootType={document?.["@type"] ?? ""}
+        // With the website beside it the document is a @graph; the
+        // business is its first node.
+        rootType={
+          document?.["@type"] ?? document?.["@graph"]?.[0]?.["@type"] ?? ""
+        }
         live={live && !dirty && state.status === "active"}
         loading={preview.loading && !document}
         dirty={dirty}

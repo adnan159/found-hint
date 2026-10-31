@@ -4,8 +4,10 @@
 step finishes: what shipped, and how it was verified — the evidence, not the
 intent. Name any bug the verification caught.
 
-Last updated: step 3. The data layer, its REST API and the admin screens
-for everything it covers exist. The audit engine and schema output do not.
+Last updated: step 65. The data layer, its REST API and the admin screens
+for everything it covers exist. The Schema Manager's Business, Location and
+Service tabs are built in FoundHint Premium; its front-end output (Step 5
+of `docs/SCHEMA-PLAN.md`) is not.
 
 ## Step 0 · Scaffold — done
 
@@ -2031,3 +2033,82 @@ A switch with unsaved changes — from the bar or a pill — goes through the
 Save / Discard / Stay prompt (a guard on the shared selection).
 Verified on the real bundle: bar → Location tab + `location_id: 2` refresh,
 bar → Business tab, prompt keeps the branch until Discard, pill → bar.
+
+## Step 64 — Schema Manager Step 3: Service schema
+
+The Service tab: a list per location (the main location's services, or a
+branch's own list — the top bar decides) and an editor for one service.
+
+**Shipped (Premium):** `Pieces\Service` (`provider` → the business or
+branch `@id`s; a named Person `worksFor` the provider, a partner company
+joins the providers; `areaServed` typed places; `offers` as a fixed price,
+a starting price or a range; `@id` `{page}#service-{slug}`, never another
+site's address); `ServiceSchema` (list, editor state, create, save, the
+list switch, delete, reorder, preview, page checks); `ServiceRelations`
+(providers and areas tables, written as whole lists); routes
+`schema/services`, `schema/services/blank`, `schema/services/{id}`
+(GET/PUT/PATCH/DELETE), `schema/services/order`; `schema.services` feature;
+tab summary "N active · M to check". Services stay on the free plugin's
+records (name, description, price, currency, page URL, on/off — shared with
+the Profile screen and Google); only schema's own details go to the schema
+tables.
+**Shipped (free):** `ServiceRepository` deleting a service — or a branch's
+list — also clears its schema settings, providers and areas; the Service
+tab (list with badges, checks on demand, a switch that saves at once, drag
+and up/down reordering; editor sections 01–05 and placement); the editor
+scrolls into view and focuses the name when opened from the list.
+
+**Verified:** Premium smoke 159 and database 103, every rule
+mutation-tested (two survivors explained: "No price" already blanks the
+price, Premium has no service limit). In the browser, against the real dev
+site: add a service (a refused backwards range first), the preview's
+`PriceSpecification`, the switch (one PATCH), remove (its schema rows gone
+from the database), a branch's empty list and its defaults (the branch as
+provider, pet-store categories).
+
+**Bugs caught:** service and location `@id`s built from `?page_id=` links
+lost the query, so on a site without pretty permalinks every page looked
+like the home page — `IdFactory::page()` now keeps the arguments that name
+a page. A just-added service briefly showed another one until the list
+refreshed. "Add a service" opened the editor out of sight below a long
+list.
+
+## Step 65 — Organization schema QA fixes (D1–D8)
+
+The QA report on the Organization output (1 critical, 4 high defects) —
+all eight fixed in the Business tab (`docs/SCHEMA-PLAN.md`, "QA fixes").
+
+**Shipped (Premium):** `Media` (avatar filter, self-hosted check, Google
+photo import with an allow-list and dedupe by source, default logo, image
+sizes); `Phone` (international form from the country's calling code and
+trunk prefix; save check; "Printed as" note); `Pieces\WebSite`; the logo as
+an `ImageObject` at `#logo`, `image` falling back to it; ten new business
+fields (identity and contact point) with their validation; an
+Organization's optional address and areas; profile links tidied and
+deduplicated; `POST schema/media/import`; the business preview as a
+`@graph` with the website; nested `@id`s resolvable in documents.
+**Shipped (free):** Media Library logo and photo pickers (with "+ Add" for
+Google photos), the new field groups and controls, an Organization's field
+set (no hours, price, coordinates or map), phone, description and
+profile-link guidance under their fields, messages for every new code.
+
+**Verified:** Premium smoke 244 and database 124, mutation-tested (the
+one survivor is a deliberate second safeguard: avatars are also caught by
+the self-hosted rule). On real data: 7 Google photos → 6 offered (one
+avatar); an import saved a 1600×899 JPEG and a second import reused it; a
+foreign URL was refused; the phone `01518-984873` prints as
+`+880-1518-984873` (the branch as `+880-1335-521022`); the preview links
+`WebSite.publisher` to the business; the description guidance flags the
+report's own case (320 characters, "local seo" ×3). Browser: pickers,
+import, preview, new groups. Choosing inside the Media Library window was
+simulated — the browser pane is not logged in to WordPress.
+
+**Bugs caught:** a reference to the nested logo was dropped by the
+document finaliser; branches would have printed the new logo object as the
+text "Array"; repeated topics kept the last spelling instead of the first;
+an Organization's address fields still said "Required by Google for a
+storefront".
+
+**Still open:** the SoftwareApplication node (a decision), live output
+(Step 5), duplicate detection with SEO plugins, and the report's manual
+tests.

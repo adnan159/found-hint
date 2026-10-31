@@ -2,7 +2,7 @@ import { __, sprintf } from "@wordpress/i18n";
 import { cn } from "cn";
 import { BUSINESS_GROUPS, STOREFRONT_ONLY } from "../../lib/business";
 import FieldRow from "../field/FieldRow";
-import { groupHead } from "../styles";
+import { groupHead, muted } from "../styles";
 import ExtraField from "./ExtraField";
 import VisitModePicker from "./VisitModePicker";
 
@@ -26,6 +26,8 @@ const fullRow = (group, key) =>
  * @param {boolean}  props.locked     Read-only.
  * @param {string[]} props.missing    Required fields still empty.
  * @param {string}   props.visitMode  `storefront` or `service_area`.
+ * @param {boolean}  props.organization The Organization kind: its address is
+ *                                    optional and has no visit mode.
  * @param {Function} props.onVisitMode Change it.
  * @param {Object}   props.errors     Server errors by field key.
  * @param {Object[]} props.photos     The listing's photos, for the picker.
@@ -38,6 +40,7 @@ export function BusinessFields({
   locked,
   missing,
   visitMode,
+  organization = false,
   onVisitMode,
   errors,
   photos,
@@ -85,12 +88,24 @@ export function BusinessFields({
           <h3 key="address-head" className={GROUP_HEAD}>
             {title()}
           </h3>,
-          <VisitModePicker
-            key="visit"
-            value={visitMode}
-            locked={locked}
-            onChange={onVisitMode}
-          />,
+          organization ? (
+            <p
+              key="visit"
+              className={cn(muted, "fhint:col-span-full fhint:m-0")}
+            >
+              {__(
+                "Optional. Fill in only what you want published — a city and country is enough.",
+                "foundhint-local-seo",
+              )}
+            </p>
+          ) : (
+            <VisitModePicker
+              key="visit"
+              value={visitMode}
+              locked={locked}
+              onChange={onVisitMode}
+            />
+          ),
           <div
             key="address-fields"
             className="fhint:col-span-full fhint:grid fhint:grid-cols-1 fhint:gap-4 fhint:sm:grid-cols-2"
@@ -98,6 +113,7 @@ export function BusinessFields({
             {inGroup
               .filter(
                 (field) =>
+                  organization ||
                   !(
                     visitMode === "service_area" &&
                     STOREFRONT_ONLY.includes(field.key)

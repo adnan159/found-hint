@@ -1,15 +1,25 @@
 import { __ } from "@wordpress/i18n";
 import { cn } from "cn";
+import { CONTACT_TYPES } from "../../lib/business";
 import { PRICE_RANGES } from "../../lib/field";
 import HoursGrid from "./HoursGrid";
 import { input } from "../styles";
 import ImagePicker from "./ImagePicker";
+import LogoPicker from "./LogoPicker";
 
-const TEXT_TYPES = { url: "url", tel: "tel" };
+const TEXT_TYPES = { url: "url", tel: "tel", email: "email" };
+
+// Hints for fields whose format is not obvious from the label.
+const PLACEHOLDERS = {
+  founding_date: () => "YYYY-MM-DD",
+  contact_languages: () => __("e.g. English, Bengali", "foundhint-local-seo"),
+  alternate_name: () => __("Another name people use", "foundhint-local-seo"),
+};
 
 /**
  * The control for one field, by its `input` kind: the week's hours, a
- * textarea (or one link per line), a price range, photos, or a text box.
+ * textarea (or one link per line), a price range, the logo, photos, or a
+ * text box.
  */
 export function FieldControl({
   id,
@@ -41,12 +51,17 @@ export function FieldControl({
           aria-invalid={invalid}
           aria-describedby={describedBy}
           placeholder={
-            field.input === "lines"
+            field.key === "knows_about"
               ? __(
-                  "One link per line, starting with https://",
+                  "One topic per line, e.g. Local SEO. Up to 10.",
                   "foundhint-local-seo",
                 )
-              : undefined
+              : field.input === "lines"
+                ? __(
+                    "One link per line, starting with https://",
+                    "foundhint-local-seo",
+                  )
+                : undefined
           }
           className={cn(input(tone), "fhint:resize-y")}
         />
@@ -76,6 +91,37 @@ export function FieldControl({
         </select>
       );
 
+    case "select":
+      return (
+        <select
+          id={id}
+          value={value ?? ""}
+          disabled={readOnly}
+          onChange={(event) => onChange(event.target.value)}
+          aria-invalid={invalid}
+          aria-describedby={describedBy}
+          className={cn(input(tone), "fhint:max-w-none! fhint:pr-8!")}
+        >
+          <option value="">{__("None", "foundhint-local-seo")}</option>
+          {CONTACT_TYPES.map(([key, text]) => (
+            <option key={key} value={key}>
+              {text()}
+            </option>
+          ))}
+        </select>
+      );
+
+    case "media":
+      return (
+        <LogoPicker
+          id={id}
+          value={value ?? ""}
+          readOnly={readOnly}
+          onChange={onChange}
+          describedBy={describedBy}
+        />
+      );
+
     case "images":
       return (
         <ImagePicker
@@ -93,6 +139,7 @@ export function FieldControl({
         <input
           id={id}
           type={TEXT_TYPES[field.input] ?? "text"}
+          placeholder={PLACEHOLDERS[field.key]?.()}
           inputMode={field.input === "number" ? "decimal" : undefined}
           value={value ?? ""}
           readOnly={readOnly}

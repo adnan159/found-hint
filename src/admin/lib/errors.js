@@ -132,6 +132,89 @@ const MESSAGES = {
       "Put one link per line, each starting with https://",
       "foundhint-local-seo",
     ),
+  "schema.business.legal_name.too_long": () =>
+    __("A legal name can be 200 characters at most.", "foundhint-local-seo"),
+  "schema.business.alternate_name.too_long": () =>
+    __(
+      "An alternate name can be 200 characters at most.",
+      "foundhint-local-seo",
+    ),
+  "schema.business.founder.too_long": () =>
+    __(
+      "A founder's name can be 200 characters at most.",
+      "foundhint-local-seo",
+    ),
+  "schema.business.email.invalid": () =>
+    __(
+      "Enter an email address, such as hello@example.com.",
+      "foundhint-local-seo",
+    ),
+  "schema.business.contact_email.invalid": () =>
+    __(
+      "Enter an email address, such as support@example.com.",
+      "foundhint-local-seo",
+    ),
+  "schema.business.founding_date.invalid": () =>
+    __(
+      "Enter the date as YYYY-MM-DD, such as 2019-03-01. A year, or a year and month, also works.",
+      "foundhint-local-seo",
+    ),
+  "schema.business.founding_date.future": () =>
+    __("A founding date can't be in the future.", "foundhint-local-seo"),
+  "schema.business.knows_about.too_long": () =>
+    __("Keep each topic to 100 characters or fewer.", "foundhint-local-seo"),
+  "schema.business.knows_about.too_many": () =>
+    __(
+      "List 10 topics at most — the ones you are really known for.",
+      "foundhint-local-seo",
+    ),
+  "schema.business.contact_type.invalid": () =>
+    __("Choose a contact type from the list.", "foundhint-local-seo"),
+  "schema.business.contact_telephone.invalid": () =>
+    __(
+      "Enter a phone number with 7 to 15 digits, such as +880 1518-984873.",
+      "foundhint-local-seo",
+    ),
+  "schema.business.contact_telephone.not_international": () =>
+    __(
+      "Add the country code, such as +880 1518-984873, or set the country, so the number can be written in international form.",
+      "foundhint-local-seo",
+    ),
+  "schema.business.contact_languages.too_long": () =>
+    __("Keep each language to 40 characters or fewer.", "foundhint-local-seo"),
+  "schema.business.contact_languages.too_many": () =>
+    __("List 10 languages at most.", "foundhint-local-seo"),
+  "schema.business.social.too_many": () =>
+    __("List 20 profile links at most.", "foundhint-local-seo"),
+  "schema.business.telephone.not_international": () =>
+    __(
+      "Add the country code, such as +880 1518-984873, or set the country, so the number can be written in international form.",
+      "foundhint-local-seo",
+    ),
+  "schema.business.logo.external": () =>
+    __(
+      "Choose the logo from your Media Library, so your site serves it.",
+      "foundhint-local-seo",
+    ),
+  "schema.business.images.external": () =>
+    __(
+      "Choose photos from your Media Library, so your site serves them.",
+      "foundhint-local-seo",
+    ),
+  fhintpremium_photo_not_found: () =>
+    __("That photo is not on your Google profile.", "foundhint-local-seo"),
+  fhintpremium_photo_download_failed: () =>
+    __(
+      "The photo could not be downloaded from Google. Try again.",
+      "foundhint-local-seo",
+    ),
+  fhintpremium_photo_not_image: () =>
+    __("Google sent something that is not a photo.", "foundhint-local-seo"),
+  fhintpremium_photo_import_failed: () =>
+    __(
+      "The photo could not be added to your Media Library.",
+      "foundhint-local-seo",
+    ),
   "schema.business.images.invalid": () =>
     __("Every image must be a web address.", "foundhint-local-seo"),
   "schema.business.images.too_many": () =>

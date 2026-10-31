@@ -365,6 +365,10 @@ Writable: `name`, `slug`, `description`, `image_attachment_id`,
   URL. Send `slug` explicitly to change it.
 - A `price` requires a `currency`: `service.currency.required_with_price`.
 - `POST` returns `409 fhint_business_required` when no business exists.
+- `DELETE` also removes what the Schema Manager kept about the service —
+  its row in `fhint_schema_entities` and its providers and areas — so
+  nothing is left behind whether or not FoundHint Premium is active.
+  Deleting a location's own list does the same for every service on it.
 
 ### `POST /services/reorder`
 
