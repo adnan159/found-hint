@@ -74,7 +74,7 @@ function Box({ state }) {
     <span
       aria-hidden="true"
       className={cn(
-        "fhint:grid fhint:size-5 fhint:flex-none fhint:place-items-center fhint:border fhint:text-[13px] fhint:leading-none fhint:font-extrabold",
+        "fhint:grid fhint:size-5 fhint:flex-none fhint:place-items-center fhint:border fhint:text-sm fhint:leading-none fhint:font-extrabold",
         done &&
           "fhint:border-success fhint:bg-success fhint:text-success-foreground",
         state === "failed" &&
@@ -217,14 +217,14 @@ export default function SetupGooglePage() {
         <span className="fhint:text-[11px] fhint:font-bold fhint:tracking-[0.12em] fhint:text-muted-foreground fhint:uppercase">
           {__("Setup", "foundhint-local-seo")}
         </span>
-        <span className="fhint:ml-auto fhint:text-[12.5px] fhint:text-muted-strong">
+        <span className="fhint:ml-auto fhint:text-sm fhint:text-muted-strong">
           {__("Connecting Google", "foundhint-local-seo")}
         </span>
         <button
           type="button"
           onClick={() => leave("dismiss", "/business")}
           disabled={phase === "running"}
-          className="fhint:cursor-pointer fhint:border-0 fhint:bg-transparent fhint:p-0 fhint:text-[12.5px] fhint:font-bold fhint:underline fhint:disabled:cursor-not-allowed fhint:disabled:text-muted-foreground"
+          className="fhint:cursor-pointer fhint:border-0 fhint:bg-transparent fhint:p-0 fhint:text-sm fhint:font-bold fhint:underline fhint:disabled:cursor-not-allowed fhint:disabled:text-muted-foreground"
         >
           {__("I'll do this later", "foundhint-local-seo")}
         </button>
@@ -268,7 +268,7 @@ export default function SetupGooglePage() {
         {error ? (
           <p
             role="alert"
-            className="fhint:mb-4 fhint:text-[13.5px] fhint:font-semibold fhint:text-destructive"
+            className="fhint:mb-4 fhint:text-sm fhint:font-semibold fhint:text-destructive"
           >
             {errorMessage(error)}
           </p>
@@ -294,7 +294,7 @@ export default function SetupGooglePage() {
         {heading(title, intro)}
         <p
           aria-live="polite"
-          className="fhint:m-0 fhint:flex fhint:items-center fhint:gap-2 fhint:text-[14px]"
+          className="fhint:m-0 fhint:flex fhint:items-center fhint:gap-2 fhint:text-sm"
         >
           <Spinner />
           {__("Reading your Google Business Profiles…", "foundhint-local-seo")}
@@ -309,7 +309,7 @@ export default function SetupGooglePage() {
         {heading(title, intro)}
         <p
           role="alert"
-          className="fhint:m-0 fhint:mb-5 fhint:text-[14px] fhint:font-semibold fhint:text-destructive"
+          className="fhint:m-0 fhint:mb-5 fhint:text-sm fhint:font-semibold fhint:text-destructive"
         >
           {syncState.isError
             ? errorMessage(syncState.error)
@@ -325,7 +325,7 @@ export default function SetupGooglePage() {
           <button
             type="button"
             onClick={() => leave("dismiss", "/business")}
-            className="fhint:cursor-pointer fhint:border-0 fhint:bg-transparent fhint:p-0 fhint:text-[13.5px] fhint:font-bold fhint:underline"
+            className="fhint:cursor-pointer fhint:border-0 fhint:bg-transparent fhint:p-0 fhint:text-sm fhint:font-bold fhint:underline"
           >
             {__("Enter my details myself", "foundhint-local-seo")}
           </button>
@@ -340,7 +340,7 @@ export default function SetupGooglePage() {
 
       {!started && listings.length > 1 ? (
         <fieldset className="fhint:m-0 fhint:mb-6 fhint:grid fhint:gap-2 fhint:border-0 fhint:p-0">
-          <legend className="fhint:mb-2 fhint:p-0 fhint:text-[14px] fhint:font-extrabold">
+          <legend className="fhint:mb-2 fhint:p-0 fhint:text-sm fhint:font-extrabold">
             {__(
               "Which Business Profile is this website for?",
               "foundhint-local-seo",
@@ -365,11 +365,11 @@ export default function SetupGooglePage() {
                 className="fhint:mt-1 fhint:accent-primary"
               />
               <span className="fhint:grid fhint:gap-0.5">
-                <span className="fhint:text-[14.5px] fhint:font-extrabold">
+                <span className="fhint:text-sm fhint:font-extrabold">
                   {listing.title}
                 </span>
                 {listing.address ? (
-                  <span className="fhint:text-[13px] fhint:text-muted-strong">
+                  <span className="fhint:text-sm fhint:text-muted-strong">
                     {listing.address}
                   </span>
                 ) : null}
@@ -380,11 +380,11 @@ export default function SetupGooglePage() {
       ) : null}
 
       {!started && listings.length === 1 ? (
-        <p className="fhint:m-0 fhint:mb-6 fhint:border fhint:border-border fhint:bg-card fhint:px-4 fhint:py-3 fhint:text-[14px]">
+        <p className="fhint:m-0 fhint:mb-6 fhint:border fhint:border-border fhint:bg-card fhint:px-4 fhint:py-3 fhint:text-sm">
           <strong className="fhint:block fhint:font-extrabold">
             {listings[0].title}
           </strong>
-          <span className="fhint:text-[13px] fhint:text-muted-strong">
+          <span className="fhint:text-sm fhint:text-muted-strong">
             {listings[0].address}
           </span>
         </p>
@@ -425,7 +425,7 @@ export default function SetupGooglePage() {
                 </span>
                 <span
                   className={cn(
-                    "fhint:text-[13.5px]",
+                    "fhint:text-sm",
                     state === "failed"
                       ? "fhint:font-bold fhint:text-destructive"
                       : "fhint:text-muted-strong",
@@ -443,7 +443,7 @@ export default function SetupGooglePage() {
         {failure ? (
           <p
             role="alert"
-            className="fhint:m-0 fhint:mb-4 fhint:text-[14px] fhint:font-semibold fhint:text-destructive"
+            className="fhint:m-0 fhint:mb-4 fhint:text-sm fhint:font-semibold fhint:text-destructive"
           >
             {failure}
           </p>

@@ -105,14 +105,14 @@ export function ServiceRow({
           )}
         >
           <span className="fhint:flex fhint:flex-wrap fhint:items-center fhint:gap-1.5">
-            <strong className="fhint:text-[13.5px]">{name}</strong>
+            <strong className="fhint:text-sm">{name}</strong>
             {service.from_google ? (
               <span className={cn(pill, BADGES.google)}>
                 {__("From Google", "foundhint-local-seo")}
               </span>
             ) : null}
           </span>
-          <span className="fhint:truncate fhint:text-[12.5px] fhint:text-muted-strong">
+          <span className="fhint:truncate fhint:text-sm fhint:text-muted-strong">
             {serviceMetaLine(service)}
           </span>
         </button>
@@ -141,7 +141,7 @@ export function ServiceRow({
           </button>
         ) : null}
 
-        <span className="fhint:hidden fhint:w-[52px] fhint:text-right fhint:text-[12.5px] fhint:text-muted-strong fhint:sm:inline">
+        <span className="fhint:hidden fhint:w-[52px] fhint:text-right fhint:text-sm fhint:text-muted-strong fhint:sm:inline">
           {on
             ? __("Active", "foundhint-local-seo")
             : __("Inactive", "foundhint-local-seo")}
@@ -163,7 +163,7 @@ export function ServiceRow({
           {checks.map((warning) => (
             <li
               key={`${warning.code}-${warning.branch ?? ""}`}
-              className="fhint:text-[12.5px] fhint:text-warning-foreground"
+              className="fhint:text-sm fhint:text-warning-foreground"
             >
               {warningText(warning)}
             </li>

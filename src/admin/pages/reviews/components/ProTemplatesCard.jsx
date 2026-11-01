@@ -20,7 +20,7 @@ export function ProTemplatesCard() {
       title={__("Reply templates", "foundhint-local-seo")}
     >
       <RequestError error={error} />
-      <p className="fhint:m-0 fhint:flex fhint:items-center fhint:gap-2 fhint:text-[13px]">
+      <p className="fhint:m-0 fhint:flex fhint:items-center fhint:gap-2 fhint:text-sm">
         <BadgeCheckIcon
           aria-hidden="true"
           className="fhint:size-4 fhint:text-primary"

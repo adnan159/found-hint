@@ -7,9 +7,8 @@ import {
 } from "../../lib/guidance";
 import { caption, fieldError } from "../styles";
 
-const ADVICE = "fhint:text-[12.5px] fhint:text-muted-strong";
-const WARN =
-  "fhint:text-[12.5px] fhint:font-bold fhint:text-warning-foreground";
+const ADVICE = "fhint:text-sm fhint:text-muted-strong";
+const WARN = "fhint:text-sm fhint:font-bold fhint:text-warning-foreground";
 
 /** Length and repetition, under the description (QA D8). */
 function DescriptionAdvice({ value }) {
@@ -112,7 +111,7 @@ export function FieldNotes({ id, field, value, error, missing }) {
       </code>
 
       {field.disagrees ? (
-        <span className="fhint:text-[12.5px] fhint:font-bold fhint:text-warning-foreground">
+        <span className="fhint:text-sm fhint:font-bold fhint:text-warning-foreground">
           {sprintf(
             /* translators: %s: Google's current value. */
             __(
@@ -128,7 +127,7 @@ export function FieldNotes({ id, field, value, error, missing }) {
       {field.key === "social" ? <ProfileAdvice value={value} /> : null}
 
       {phone === "printed" ? (
-        <span className="fhint:text-[12.5px] fhint:text-muted-strong">
+        <span className="fhint:text-sm fhint:text-muted-strong">
           {sprintf(
             /* translators: %s: the phone number in international form. */
             __("Printed as %s", "foundhint-local-seo"),
@@ -136,7 +135,7 @@ export function FieldNotes({ id, field, value, error, missing }) {
           )}
         </span>
       ) : phone === "local" ? (
-        <span className="fhint:text-[12.5px] fhint:font-bold fhint:text-warning-foreground">
+        <span className="fhint:text-sm fhint:font-bold fhint:text-warning-foreground">
           {__(
             "Not printed: add the country code (such as +880), or set the business country, so it can be written in international form.",
             "foundhint-local-seo",

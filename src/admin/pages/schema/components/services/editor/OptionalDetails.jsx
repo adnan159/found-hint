@@ -33,7 +33,7 @@ export function OptionalDetails({ form }) {
         )}
       >
         <span className={sectionNumber}>05</span>
-        <strong className="fhint:text-[14px]">
+        <strong className="fhint:text-sm">
           {__("Optional details", "foundhint-local-seo")}
         </strong>
         <span className={cn(muted, "fhint:flex-1")}>

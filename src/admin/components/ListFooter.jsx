@@ -25,7 +25,7 @@ export function ListFooter({
 }) {
   return (
     <div className="fhint:flex fhint:flex-wrap fhint:items-center fhint:gap-x-4 fhint:gap-y-2 fhint:border-t fhint:border-t-border fhint:px-5.5 fhint:py-3.5">
-      <span className="fhint:text-[12.5px] fhint:font-semibold fhint:text-muted-strong">
+      <span className="fhint:text-sm fhint:font-semibold fhint:text-muted-strong">
         {summary}
       </span>
       <div className="fhint:min-w-0 fhint:flex-1">

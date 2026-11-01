@@ -123,7 +123,7 @@ export function CategorySearch({
               }}
               onMouseEnter={() => setActive(index)}
               className={cn(
-                "fhint:m-0 fhint:flex fhint:cursor-pointer fhint:flex-wrap fhint:items-baseline fhint:gap-x-2.5 fhint:border-b fhint:border-b-border fhint:px-3 fhint:py-2 fhint:text-[13px] fhint:last:border-b-0",
+                "fhint:m-0 fhint:flex fhint:cursor-pointer fhint:flex-wrap fhint:items-baseline fhint:gap-x-2.5 fhint:border-b fhint:border-b-border fhint:px-3 fhint:py-2 fhint:text-sm fhint:last:border-b-0",
                 index === active && "fhint:bg-muted",
               )}
             >

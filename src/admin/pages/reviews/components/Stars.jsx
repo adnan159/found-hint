@@ -13,7 +13,7 @@ export function Stars({ value }) {
 
   if (!rating) {
     return (
-      <span className="fhint:text-[12.5px] fhint:text-muted-strong">
+      <span className="fhint:text-sm fhint:text-muted-strong">
         {__("No rating", "foundhint-local-seo")}
       </span>
     );
@@ -28,7 +28,7 @@ export function Stars({ value }) {
           className={cn(
             "fhint:size-3 fhint:flex-none",
             index < rating
-              ? "fhint:fill-[#C27A1B] fhint:text-[#C27A1B]"
+              ? "fhint:fill-star fhint:text-star"
               : "fhint:fill-[#D9D3D0] fhint:text-[#D9D3D0]",
           )}
         />

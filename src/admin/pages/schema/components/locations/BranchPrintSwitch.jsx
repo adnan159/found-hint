@@ -17,7 +17,7 @@ export function BranchPrintSwitch({
 
   return (
     <div className="fhint:flex fhint:flex-wrap fhint:items-center fhint:gap-3 fhint:border-b fhint:border-b-border fhint:px-5 fhint:py-3">
-      <label className="fhint:flex fhint:items-center fhint:gap-2.5 fhint:text-[13px] fhint:font-bold">
+      <label className="fhint:flex fhint:items-center fhint:gap-2.5 fhint:text-sm fhint:font-bold">
         <Switch
           checked={!off}
           disabled={locked || closed}

@@ -47,7 +47,7 @@ export function ReviewsCard({ reviews, onMakePost }) {
             >
               <div className="fhint:grid fhint:min-w-0 fhint:flex-1 fhint:gap-1.5">
                 <Stars value={5} />
-                <q className="fhint:line-clamp-2 fhint:text-[13px] fhint:font-semibold">
+                <q className="fhint:line-clamp-2 fhint:text-sm fhint:font-semibold">
                   {review.comment}
                 </q>
                 <span className="fhint:text-[12px] fhint:text-muted-strong">

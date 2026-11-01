@@ -30,7 +30,7 @@ export function PhotosSection({ media, google, locationId, onChanged }) {
     !media?.logo && !media?.cover && !gallery.length && !waiting.length;
   return (
     <>
-      <p className={cn(help, "fhint:m-0 fhint:text-[13px]")}>
+      <p className={cn(help, "fhint:m-0 fhint:text-sm")}>
         <strong className="fhint:text-foreground">
           {__("What Google accepts:", "foundhint-local-seo")}
         </strong>{" "}
@@ -78,7 +78,7 @@ export function PhotosSection({ media, google, locationId, onChanged }) {
           >
             <ArrowUpToLineIcon className="fhint:size-4" />
           </span>
-          <strong className="fhint:text-[14.5px] fhint:font-extrabold">
+          <strong className="fhint:text-sm fhint:font-extrabold">
             {__("Add photos to your gallery", "foundhint-local-seo")}
           </strong>
           <span className={cn(help, "fhint:leading-relaxed")}>
@@ -88,7 +88,7 @@ export function PhotosSection({ media, google, locationId, onChanged }) {
             )}
           </span>
           {/* Looks like a button; the whole card is what opens the picker. */}
-          <span className="fhint:mt-1 fhint:inline-flex fhint:items-center fhint:rounded-full fhint:bg-primary fhint:px-[18px] fhint:py-2.5 fhint:text-[13.5px] fhint:font-extrabold fhint:text-primary-foreground">
+          <span className="fhint:mt-1 fhint:inline-flex fhint:items-center fhint:rounded-full fhint:bg-primary fhint:px-[18px] fhint:py-2.5 fhint:text-sm fhint:font-extrabold fhint:text-primary-foreground">
             {busy && !sending
               ? __("Working…", "foundhint-local-seo")
               : gallery.length
@@ -133,7 +133,7 @@ export function PhotosSection({ media, google, locationId, onChanged }) {
           <span
             className={cn(
               help,
-              "fhint:block fhint:max-w-[62ch] fhint:text-[13.5px] fhint:leading-relaxed",
+              "fhint:block fhint:max-w-[62ch] fhint:text-sm fhint:leading-relaxed",
             )}
           >
             {google?.mapped

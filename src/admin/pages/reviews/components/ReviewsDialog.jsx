@@ -66,7 +66,7 @@ export function ReviewsDialog({
         </div>
 
         <div className="fhint:flex fhint:flex-none fhint:flex-wrap fhint:items-center fhint:gap-3 fhint:border-t fhint:border-t-border fhint:px-5 fhint:py-3.5">
-          <span className="fhint:min-w-0 fhint:flex-1 fhint:text-[12.5px] fhint:text-muted-strong">
+          <span className="fhint:min-w-0 fhint:flex-1 fhint:text-sm fhint:text-muted-strong">
             {note}
           </span>
           <div className="fhint:flex fhint:gap-2">{footer}</div>

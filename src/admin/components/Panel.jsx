@@ -39,11 +39,14 @@ export function Panel({
   return (
     <section aria-labelledby={id} className={panel}>
       {/* One fixed height for every panel's heading row, so the list and
-          the sidebar beside it line up whether or not a row has a button. */}
+          the sidebar beside it line up whether or not a row has a button.
+          A heading row alone drops its rule: the panel's own bottom edge
+          closes it, and both together drew a double line. */}
       <div
         className={cn(
           panelHeader,
           "fhint:box-border fhint:min-h-16 fhint:py-2",
+          children ? null : "fhint:border-b-0",
         )}
       >
         {Icon ? (

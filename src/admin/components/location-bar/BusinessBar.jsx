@@ -97,7 +97,7 @@ export function BusinessBar({
           {name}
         </p>
         {detail ? (
-          <p className="fhint:m-0 fhint:truncate fhint:text-[13px] fhint:text-muted-strong">
+          <p className="fhint:m-0 fhint:truncate fhint:text-sm fhint:text-muted-strong">
             {detail}
           </p>
         ) : null}
@@ -108,7 +108,7 @@ export function BusinessBar({
           // The listing's rating on Google: a statement, not a control, so
           // it is drawn as a badge — no pointer, no hover. Reviews has its
           // own entry in the sidebar.
-          <span className="fhint:inline-flex fhint:h-9 fhint:items-center fhint:gap-2 fhint:rounded-full fhint:border fhint:border-warning-border fhint:bg-warning fhint:px-4 fhint:text-[13px] fhint:leading-none fhint:whitespace-nowrap fhint:text-warning-foreground">
+          <span className="fhint:inline-flex fhint:h-9 fhint:items-center fhint:gap-2 fhint:rounded-full fhint:border fhint:border-warning-border fhint:bg-warning fhint:px-4 fhint:text-sm fhint:leading-none fhint:whitespace-nowrap fhint:text-warning-foreground">
             <StarIcon
               aria-hidden="true"
               className="fhint:size-3.5 fhint:flex-none fhint:fill-current"
@@ -166,7 +166,7 @@ export function BusinessBar({
       {switchError ? (
         <p
           role="alert"
-          className="fhint:m-0 fhint:w-full fhint:text-[13px] fhint:font-semibold fhint:text-destructive"
+          className="fhint:m-0 fhint:w-full fhint:text-sm fhint:font-semibold fhint:text-destructive"
         >
           {switchError}
         </p>

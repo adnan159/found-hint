@@ -69,7 +69,7 @@ export function ProfileTabs({
             <TabsTrigger
               key={id}
               value={id}
-              className="fhint:flex-none fhint:cursor-pointer fhint:rounded-none fhint:px-2.5 fhint:py-2 fhint:text-[13px] fhint:font-bold fhint:data-active:bg-primary! fhint:data-active:text-primary-foreground! fhint:after:hidden!"
+              className="fhint:flex-none fhint:cursor-pointer fhint:rounded-none fhint:px-2.5 fhint:py-2 fhint:text-sm fhint:font-bold fhint:data-active:bg-primary! fhint:data-active:text-primary-foreground! fhint:after:hidden!"
             >
               <Icon aria-hidden="true" />
               {label}

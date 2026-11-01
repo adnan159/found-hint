@@ -171,7 +171,7 @@ export function BasicsSection({ form, fromGoogle, options, nameRef }) {
             </option>
           </select>
           {values.image.mode === "featured" && !options.featured ? (
-            <span className="fhint:text-[12.5px] fhint:text-warning-foreground">
+            <span className="fhint:text-sm fhint:text-warning-foreground">
               {__(
                 "The service page has no featured image yet, so none is printed.",
                 "foundhint-local-seo",

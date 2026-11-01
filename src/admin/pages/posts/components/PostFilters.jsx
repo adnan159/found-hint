@@ -83,7 +83,7 @@ export function PostFilters({ filters, counts, onChange }) {
               aria-selected={on}
               onClick={() => onChange({ ...filters, type: value })}
               className={cn(
-                "fhint:-mb-px fhint:inline-flex fhint:cursor-pointer fhint:items-center fhint:gap-2 fhint:border-0 fhint:border-b-2 fhint:bg-transparent fhint:px-3 fhint:pt-1 fhint:pb-2.5 fhint:text-[13px] fhint:leading-none fhint:font-extrabold fhint:transition-colors",
+                "fhint:-mb-px fhint:inline-flex fhint:cursor-pointer fhint:items-center fhint:gap-2 fhint:border-0 fhint:border-b-2 fhint:bg-transparent fhint:px-3 fhint:pt-1 fhint:pb-2.5 fhint:text-sm fhint:leading-none fhint:font-extrabold fhint:transition-colors",
                 on
                   ? "fhint:border-b-primary fhint:text-foreground"
                   : "fhint:border-b-transparent fhint:text-muted-strong fhint:hover:border-b-border fhint:hover:text-foreground",

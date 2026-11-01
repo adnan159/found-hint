@@ -89,7 +89,7 @@ export function TemplateDialog({ template, rating, count, onClose }) {
         </>
       }
     >
-      <p className="fhint:m-0 fhint:flex fhint:items-center fhint:gap-2 fhint:text-[12.5px] fhint:text-muted-strong">
+      <p className="fhint:m-0 fhint:flex fhint:items-center fhint:gap-2 fhint:text-sm fhint:text-muted-strong">
         <SoonTag kind="pro" />
         {__(
           "Saving your own templates comes with FoundHint Pro.",

@@ -41,7 +41,7 @@ export function ScreenTitleBar({ title, hint, ready, actions }) {
         )}
       >
         <div className="fhint:min-w-45 fhint:flex-1">
-          <p className="fhint:m-0 fhint:text-[12.5px] fhint:font-semibold fhint:text-muted-strong">
+          <p className="fhint:m-0 fhint:text-sm fhint:font-semibold fhint:text-muted-strong">
             {sprintf(
               /* translators: %s: the screen's name. */
               __("FoundHint / %s", "foundhint-local-seo"),

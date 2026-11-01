@@ -76,7 +76,7 @@ export default function Reviews() {
       ) : null}
 
       {list.listing ? (
-        <div className="fhint:grid fhint:items-start fhint:gap-5 fhint:lg:grid-cols-[minmax(0,1fr)_300px] fhint:2xl:grid-cols-[minmax(0,1fr)_380px]">
+        <div className="fhint:grid fhint:items-start fhint:gap-5 fhint:lg:grid-cols-[minmax(0,1fr)_320px] fhint:xl:grid-cols-[minmax(0,1fr)_350px]">
           <div className="fhint:grid fhint:min-w-0 fhint:gap-5">
             <ReviewToolbar
               from={list.from}

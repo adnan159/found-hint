@@ -40,10 +40,8 @@ export function BranchButtons({ branches, current, onPick }) {
               focus,
             )}
           >
-            <strong className="fhint:block fhint:text-[13.5px]">
-              {branch.name}
-            </strong>
-            <span className="fhint:text-[12.5px] fhint:text-muted-strong">
+            <strong className="fhint:block fhint:text-sm">{branch.name}</strong>
+            <span className="fhint:text-sm fhint:text-muted-strong">
               {pagesLine(branch)}
             </span>
           </button>

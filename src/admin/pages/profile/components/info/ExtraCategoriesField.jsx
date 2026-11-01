@@ -33,7 +33,7 @@ export function ExtraCategoriesField({ model, onChange, errors, max }) {
             )}
           />
         </div>
-        <span className="fhint:ml-auto fhint:text-[12.5px] fhint:font-bold fhint:text-muted-strong">
+        <span className="fhint:ml-auto fhint:text-sm fhint:font-bold fhint:text-muted-strong">
           {sprintf(
             /* translators: 1: how many extra categories are chosen, 2: how many Google allows. */
             __("%1$d of %2$d used", "foundhint-local-seo"),
@@ -51,7 +51,7 @@ export function ExtraCategoriesField({ model, onChange, errors, max }) {
         {extra.map((category) => (
           <span
             key={category.id}
-            className="fhint:inline-flex fhint:items-center fhint:gap-[7px] fhint:rounded-full fhint:border fhint:border-border fhint:bg-background fhint:py-[5px] fhint:pr-2 fhint:pl-3 fhint:text-[13px] fhint:font-semibold"
+            className="fhint:inline-flex fhint:items-center fhint:gap-[7px] fhint:rounded-full fhint:border fhint:border-border fhint:bg-background fhint:py-[5px] fhint:pr-2 fhint:pl-3 fhint:text-sm fhint:font-semibold"
           >
             {category.name}
             <button
@@ -92,7 +92,7 @@ export function ExtraCategoriesField({ model, onChange, errors, max }) {
                 )
               : __("Type a category and choose it", "foundhint-local-seo")
           }
-          inputClassName={cn(chipBoxInput, "fhint:w-full fhint:text-[13px]")}
+          inputClassName={cn(chipBoxInput, "fhint:w-full fhint:text-sm")}
           onType={setExtraDraft}
           onChoose={(category) => {
             onChange({

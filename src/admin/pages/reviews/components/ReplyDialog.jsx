@@ -19,7 +19,7 @@ import Stars from "./Stars";
 
 // A quick template: a rounded pill that fills the reply when pressed.
 const pill = cn(
-  "fhint:inline-flex fhint:cursor-pointer fhint:items-center fhint:rounded-full fhint:border fhint:border-input fhint:bg-card fhint:px-3.5 fhint:py-1.5 fhint:text-[12.5px] fhint:font-bold fhint:text-foreground fhint:hover:bg-muted",
+  "fhint:inline-flex fhint:cursor-pointer fhint:items-center fhint:rounded-full fhint:border fhint:border-input fhint:bg-card fhint:px-3.5 fhint:py-1.5 fhint:text-sm fhint:font-bold fhint:text-foreground fhint:hover:bg-muted",
   focus,
 );
 
@@ -120,7 +120,7 @@ export function ReplyDialog({ review, context, templates, onClose }) {
       }
     >
       <blockquote className="fhint:m-0 fhint:grid fhint:gap-1.5 fhint:border fhint:border-border fhint:bg-[#faf6f4] fhint:px-3.5 fhint:py-3">
-        <span className="fhint:flex fhint:flex-wrap fhint:items-center fhint:gap-2 fhint:text-[13px]">
+        <span className="fhint:flex fhint:flex-wrap fhint:items-center fhint:gap-2 fhint:text-sm">
           <strong>
             {review.is_anonymous || !review.reviewer_name
               ? __("Anonymous", "foundhint-local-seo")
@@ -133,7 +133,7 @@ export function ReplyDialog({ review, context, templates, onClose }) {
             </span>
           ) : null}
         </span>
-        <span className="fhint:text-[13px] fhint:leading-relaxed">
+        <span className="fhint:text-sm fhint:leading-relaxed">
           {review.comment ||
             __("Left a star rating without a comment.", "foundhint-local-seo")}
         </span>

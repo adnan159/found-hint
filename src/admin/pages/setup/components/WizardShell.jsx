@@ -40,14 +40,14 @@ export function WizardShell({
           height={24}
           className="fhint:size-6 fhint:shrink-0"
         />
-        <strong className="fhint:text-[14px] fhint:font-extrabold fhint:tracking-tight">
+        <strong className="fhint:text-sm fhint:font-extrabold fhint:tracking-tight">
           {__("FoundHint", "foundhint-local-seo")}
         </strong>
         <span className="fhint:text-[11px] fhint:font-bold fhint:tracking-[0.12em] fhint:text-muted-foreground fhint:uppercase">
           {__("Setup", "foundhint-local-seo")}
         </span>
 
-        <span className="fhint:ml-auto fhint:text-[12.5px] fhint:text-muted-strong">
+        <span className="fhint:ml-auto fhint:text-sm fhint:text-muted-strong">
           {sprintf(
             /* translators: 1: current step number, 2: total steps. */
             __("Step %1$d of %2$d", "foundhint-local-seo"),
@@ -58,7 +58,7 @@ export function WizardShell({
         <button
           type="button"
           onClick={onDismiss}
-          className="fhint:cursor-pointer fhint:bg-transparent fhint:text-[12.5px] fhint:font-bold fhint:underline"
+          className="fhint:cursor-pointer fhint:bg-transparent fhint:text-sm fhint:font-bold fhint:underline"
         >
           {__("I'll do this later", "foundhint-local-seo")}
         </button>

@@ -25,7 +25,7 @@ export function BlogCard({ blogPosts }) {
       )}
       actions={
         <>
-          <span className="fhint:text-[12.5px] fhint:font-semibold fhint:text-muted-strong">
+          <span className="fhint:text-sm fhint:font-semibold fhint:text-muted-strong">
             {sprintf(
               /* translators: %d: number of published blog posts. */
               _n(

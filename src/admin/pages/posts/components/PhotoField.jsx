@@ -1,10 +1,9 @@
-import { useRef, useState } from "react";
+import { useState } from "react";
 import { __, _n, sprintf } from "@wordpress/i18n";
 import {
+  ArrowUpToLineIcon,
   ImagesIcon,
-  SparklesIcon,
   TriangleAlertIcon,
-  UploadIcon,
   UsersIcon,
   XIcon,
 } from "lucide-react";
@@ -12,15 +11,16 @@ import { cn } from "cn";
 import { errorMessage, fieldErrors } from "@/lib/errors";
 import { errorText, focus, help, label } from "@/pages/profile/styles";
 import ReviewsDialog from "@/pages/reviews/components/ReviewsDialog";
-import SoonTag from "@/pages/reviews/components/SoonTag";
+import Picker from "@/pages/profile/components/photos/Picker";
 import { dialogButton } from "../styles";
 import {
   useGetPostPhotosQuery,
   useUploadPostPhotoMutation,
 } from "@/store/api/postsApi";
 
-const optionButton = cn(
-  "fhint:inline-flex fhint:min-h-[42px] fhint:cursor-pointer fhint:items-center fhint:gap-2 fhint:border fhint:border-[#b9b2af] fhint:bg-card fhint:px-3 fhint:py-2 fhint:text-left fhint:text-[12.5px] fhint:leading-tight fhint:font-extrabold fhint:hover:bg-muted fhint:disabled:cursor-not-allowed fhint:disabled:border-[#e2dcda] fhint:disabled:text-muted-foreground fhint:disabled:hover:bg-card",
+// "Your gallery" / "Customer photos": a small pill, as on the Reviews dialogs.
+const googlePill = cn(
+  "fhint:inline-flex fhint:cursor-pointer fhint:items-center fhint:gap-1.5 fhint:rounded-full fhint:border fhint:border-input fhint:bg-card fhint:px-3 fhint:py-1 fhint:text-[13px] fhint:font-bold fhint:text-foreground fhint:hover:bg-muted",
   focus,
 );
 
@@ -127,7 +127,6 @@ export function PhotoField({
   error,
   onChange,
 }) {
-  const fileRef = useRef(null);
   const [picking, setPicking] = useState("");
   const [upload, { isLoading: uploading, error: uploadError, reset }] =
     useUploadPostPhotoMutation();
@@ -135,11 +134,7 @@ export function PhotoField({
     fieldErrors(uploadError).file ??
     (uploadError ? errorMessage(uploadError) : "");
 
-  const onFile = async (event) => {
-    const file = event.target.files?.[0];
-
-    event.target.value = "";
-
+  const onFiles = async ([file]) => {
     if (!file) {
       return;
     }
@@ -172,114 +167,121 @@ export function PhotoField({
         </span>
       </span>
 
-      {value ? (
-        <div className="fhint:flex fhint:items-start fhint:gap-3 fhint:border fhint:border-border fhint:bg-muted/40 fhint:p-2.5">
-          <img
-            src={value}
-            alt={__("The chosen photo", "foundhint-local-seo")}
-            referrerPolicy="no-referrer"
-            className="fhint:size-16 fhint:flex-none fhint:object-cover"
-          />
-          <div className="fhint:grid fhint:min-w-0 fhint:flex-1 fhint:gap-1.5">
-            {mediaCount > 1 ? (
-              <span className={help}>
-                {sprintf(
-                  /* translators: %d: number of photos and videos. */
-                  _n(
-                    "This post has %d photo or video on Google. Changing or removing the photo here replaces it.",
-                    "This post has %d photos and videos on Google. Changing or removing the photo here replaces all of them.",
-                    mediaCount,
-                    "foundhint-local-seo",
-                  ),
-                  mediaCount,
-                )}
-              </span>
-            ) : null}
-            {reachable === false ? (
-              <span
-                role="alert"
-                className="fhint:flex fhint:gap-1.5 fhint:text-[12.5px] fhint:font-semibold fhint:text-destructive"
-              >
-                <TriangleAlertIcon
-                  aria-hidden="true"
-                  className="fhint:mt-0.5 fhint:size-3.5 fhint:flex-none"
-                />
-                {__(
-                  "Google cannot open photos stored on this site, because it is not on the public internet. Choose one from Your gallery or Customer photos instead.",
-                  "foundhint-local-seo",
-                )}
-              </span>
-            ) : null}
+      <div className="fhint:flex fhint:items-stretch fhint:gap-3">
+        {value ? (
+          <div className="fhint:relative fhint:w-32 fhint:flex-none">
+            <img
+              src={value}
+              alt={__("The chosen photo", "foundhint-local-seo")}
+              referrerPolicy="no-referrer"
+              className="fhint:size-full fhint:min-h-20 fhint:rounded-[12px] fhint:border fhint:border-border fhint:object-cover"
+            />
             <button
               type="button"
               onClick={() =>
                 onChange({ media_url: "", attachment_id: 0, reachable: true })
               }
-              className={cn(dialogButton, "fhint:justify-self-start")}
+              className={cn(
+                "fhint:absolute fhint:-top-2 fhint:-right-2 fhint:grid fhint:size-6 fhint:cursor-pointer fhint:place-items-center fhint:rounded-full fhint:border fhint:border-border fhint:bg-card fhint:p-0 fhint:text-foreground fhint:shadow-sm fhint:hover:bg-destructive fhint:hover:text-white",
+                focus,
+              )}
             >
               <XIcon aria-hidden="true" className="fhint:size-3.5" />
-              {__("Remove photo", "foundhint-local-seo")}
+              <span className="fhint:sr-only">
+                {__("Remove photo", "foundhint-local-seo")}
+              </span>
+            </button>
+          </div>
+        ) : null}
+
+        <div className="fhint:grid fhint:min-w-0 fhint:flex-1 fhint:rounded-[12px] fhint:border fhint:border-dashed fhint:border-primary/40 fhint:bg-primary/5">
+          <Picker
+            droppable
+            disabled={uploading}
+            onFiles={onFiles}
+            label={__("Upload a photo for this post", "foundhint-local-seo")}
+            className="fhint:flex fhint:cursor-pointer fhint:flex-wrap fhint:items-center fhint:gap-3 fhint:rounded-t-[12px] fhint:p-4 fhint:text-left fhint:transition-colors fhint:hover:bg-primary/10"
+            draggingClassName="fhint:bg-primary/15"
+          >
+            <span
+              aria-hidden="true"
+              className="fhint:grid fhint:size-9 fhint:flex-none fhint:place-items-center fhint:rounded-[8px] fhint:bg-primary/15 fhint:text-primary"
+            >
+              <ArrowUpToLineIcon className="fhint:size-4" />
+            </span>
+            <span className="fhint:grid fhint:min-w-0 fhint:flex-1 fhint:gap-0.5">
+              <strong className="fhint:text-sm fhint:font-extrabold">
+                {value
+                  ? __("Upload a different photo", "foundhint-local-seo")
+                  : __("Upload a photo", "foundhint-local-seo")}
+              </strong>
+              <span className={help}>
+                {__(
+                  "Drop a JPG or PNG here, or choose one from your computer.",
+                  "foundhint-local-seo",
+                )}
+              </span>
+            </span>
+            {/* Looks like a button; the whole upload area opens the picker. */}
+            <span className="fhint:inline-flex fhint:items-center fhint:rounded-full fhint:bg-primary fhint:px-[18px] fhint:py-2.5 fhint:text-sm fhint:font-extrabold fhint:text-primary-foreground">
+              {uploading
+                ? __("Uploading…", "foundhint-local-seo")
+                : __("Choose photo", "foundhint-local-seo")}
+            </span>
+          </Picker>
+          <div className="fhint:flex fhint:flex-wrap fhint:items-center fhint:gap-2 fhint:border-t fhint:border-dashed fhint:border-t-primary/30 fhint:px-4 fhint:py-2">
+            <span className="fhint:text-[13px] fhint:text-muted-strong">
+              {__("Or use one already on Google:", "foundhint-local-seo")}
+            </span>
+            <button
+              type="button"
+              onClick={() => setPicking("gallery")}
+              className={googlePill}
+            >
+              <ImagesIcon aria-hidden="true" className="fhint:size-3" />
+              {__("Your gallery", "foundhint-local-seo")}
+            </button>
+            <button
+              type="button"
+              onClick={() => setPicking("customer")}
+              className={googlePill}
+            >
+              <UsersIcon aria-hidden="true" className="fhint:size-3" />
+              {__("Customer photos", "foundhint-local-seo")}
             </button>
           </div>
         </div>
-      ) : null}
+      </div>
 
-      <div className="fhint:grid fhint:grid-cols-2 fhint:gap-2 fhint:sm:grid-cols-4">
-        <button
-          type="button"
-          onClick={() => fileRef.current?.click()}
-          disabled={uploading}
-          className={cn(optionButton, "fhint:border-dashed")}
+      {mediaCount > 1 ? (
+        <span className={help}>
+          {sprintf(
+            /* translators: %d: number of photos and videos. */
+            _n(
+              "This post has %d photo or video on Google. Changing or removing the photo here replaces it.",
+              "This post has %d photos and videos on Google. Changing or removing the photo here replaces all of them.",
+              mediaCount,
+              "foundhint-local-seo",
+            ),
+            mediaCount,
+          )}
+        </span>
+      ) : null}
+      {reachable === false ? (
+        <span
+          role="alert"
+          className="fhint:flex fhint:gap-1.5 fhint:text-sm fhint:font-semibold fhint:text-destructive"
         >
-          <UploadIcon
+          <TriangleAlertIcon
             aria-hidden="true"
-            className="fhint:size-4 fhint:flex-none"
+            className="fhint:mt-0.5 fhint:size-3.5 fhint:flex-none"
           />
-          {uploading
-            ? __("Uploading…", "foundhint-local-seo")
-            : __("Upload", "foundhint-local-seo")}
-        </button>
-        <button
-          type="button"
-          disabled
-          title={__(
-            "AI photos are part of FoundHint Pro.",
+          {__(
+            "Google cannot open photos stored on this site, because it is not on the public internet. Choose one from Your gallery or Customer photos instead.",
             "foundhint-local-seo",
           )}
-          className={optionButton}
-        >
-          <SparklesIcon
-            aria-hidden="true"
-            className="fhint:size-4 fhint:flex-none"
-          />
-          <span className="fhint:grid fhint:gap-1">
-            {__("Make with AI", "foundhint-local-seo")}
-            <SoonTag kind="pro" className="fhint:justify-self-start" />
-          </span>
-        </button>
-        <button
-          type="button"
-          onClick={() => setPicking("gallery")}
-          className={optionButton}
-        >
-          <ImagesIcon
-            aria-hidden="true"
-            className="fhint:size-4 fhint:flex-none"
-          />
-          {__("Your gallery", "foundhint-local-seo")}
-        </button>
-        <button
-          type="button"
-          onClick={() => setPicking("customer")}
-          className={optionButton}
-        >
-          <UsersIcon
-            aria-hidden="true"
-            className="fhint:size-4 fhint:flex-none"
-          />
-          {__("Customer photos", "foundhint-local-seo")}
-        </button>
-      </div>
+        </span>
+      ) : null}
 
       {uploadsReachable ? null : (
         <span className={help}>
@@ -289,16 +291,6 @@ export function PhotoField({
           )}
         </span>
       )}
-
-      <input
-        ref={fileRef}
-        type="file"
-        accept="image/jpeg,image/png"
-        onChange={onFile}
-        className="fhint:sr-only"
-        tabIndex={-1}
-        aria-hidden="true"
-      />
 
       {uploadMessage || error ? (
         <span role="alert" className={errorText}>

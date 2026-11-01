@@ -67,15 +67,15 @@ export function SchemaKindPicker({ value, locked, onChange }) {
             />
             <span className="fhint:grid fhint:min-w-0 fhint:gap-[5px]">
               <span className="fhint:flex fhint:flex-wrap fhint:items-center fhint:gap-2">
-                <strong className="fhint:text-[14px] fhint:leading-5">
+                <strong className="fhint:text-sm fhint:leading-5">
                   {title}
                 </strong>
                 <span className={cn(pill, BADGES.scope)}>{scope}</span>
               </span>
-              <span className="fhint:text-[12.5px] fhint:leading-normal fhint:text-foreground-soft">
+              <span className="fhint:text-sm fhint:leading-normal fhint:text-foreground-soft">
                 {purpose}
               </span>
-              <span className="fhint:text-[12.5px] fhint:leading-normal fhint:text-muted-strong">
+              <span className="fhint:text-sm fhint:leading-normal fhint:text-muted-strong">
                 {example}
               </span>
             </span>

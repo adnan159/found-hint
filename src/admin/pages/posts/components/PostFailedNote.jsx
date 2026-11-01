@@ -31,7 +31,7 @@ export function PostFailedNote({ post }) {
   return (
     <div
       role="alert"
-      className="fhint:mt-1 fhint:flex fhint:flex-wrap fhint:items-center fhint:gap-3 fhint:bg-destructive-tint fhint:px-3.5 fhint:py-2.5 fhint:text-[12.5px] fhint:text-destructive"
+      className="fhint:mt-1 fhint:flex fhint:flex-wrap fhint:items-center fhint:gap-3 fhint:bg-destructive-tint fhint:px-3.5 fhint:py-2.5 fhint:text-sm fhint:text-destructive"
     >
       <span className="fhint:min-w-0 fhint:flex-1">
         {post.status === "rejected"

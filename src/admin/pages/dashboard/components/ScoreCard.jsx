@@ -197,7 +197,7 @@ export function ScoreCard({ summary }) {
       type="button"
       onClick={() => runAudit(0)}
       disabled={isRunning}
-      className="fhint:mt-3.5 fhint:h-auto fhint:px-4 fhint:py-2.5 fhint:text-[13.5px] fhint:font-extrabold"
+      className="fhint:mt-3.5 fhint:h-auto fhint:px-4 fhint:py-2.5 fhint:text-sm fhint:font-extrabold"
     >
       {isRunning ? <Spinner data-icon="inline-start" /> : null}
       {label}
@@ -249,7 +249,7 @@ export function ScoreCard({ summary }) {
               </div>
               <div
                 className={cn(
-                  "fhint:text-[12.5px] fhint:font-bold",
+                  "fhint:text-sm fhint:font-bold",
                   trend.tone === "up" && "fhint:text-success",
                   trend.tone === "down" && "fhint:text-band-needs-work",
                   trend.tone === "muted" && "fhint:text-muted-foreground",
@@ -265,7 +265,7 @@ export function ScoreCard({ summary }) {
           {summary.stale ? (
             <div
               role="status"
-              className="fhint:mt-3.5 fhint:border fhint:border-notice-border fhint:bg-notice fhint:px-3 fhint:py-2 fhint:text-[12.5px] fhint:text-notice-foreground"
+              className="fhint:mt-3.5 fhint:border fhint:border-notice-border fhint:bg-notice fhint:px-3 fhint:py-2 fhint:text-sm fhint:text-notice-foreground"
             >
               {__(
                 "Your details have changed since this check, so this score may be out of date.",
@@ -274,7 +274,7 @@ export function ScoreCard({ summary }) {
             </div>
           ) : null}
 
-          <p className="fhint:mt-3.5 fhint:mb-0 fhint:text-[12.5px] fhint:leading-[1.45] fhint:text-muted-strong">
+          <p className="fhint:mt-3.5 fhint:mb-0 fhint:text-sm fhint:leading-[1.45] fhint:text-muted-strong">
             {__(
               "This is FoundHint's own read on how complete and consistent your local details are. It is not a Google ranking.",
               "foundhint-local-seo",
@@ -284,7 +284,7 @@ export function ScoreCard({ summary }) {
           <div className="fhint:mt-auto fhint:flex fhint:flex-wrap fhint:items-center fhint:gap-2.5">
             <Button
               render={<Link to="/audit" />}
-              className="fhint:mt-3.5 fhint:h-auto fhint:px-4 fhint:py-2.5 fhint:text-[13.5px] fhint:font-extrabold fhint:text-primary-foreground!"
+              className="fhint:mt-3.5 fhint:h-auto fhint:px-4 fhint:py-2.5 fhint:text-sm fhint:font-extrabold fhint:text-primary-foreground!"
             >
               {summary.open_findings > 0
                 ? sprintf(
@@ -305,7 +305,7 @@ export function ScoreCard({ summary }) {
             {__("No score yet", "foundhint-local-seo")}
           </div>
           <BandBar band={null} />
-          <p className="fhint:mt-3.5 fhint:mb-0 fhint:text-[12.5px] fhint:leading-[1.45] fhint:text-muted-strong">
+          <p className="fhint:mt-3.5 fhint:mb-0 fhint:text-sm fhint:leading-[1.45] fhint:text-muted-strong">
             {__(
               "Run a check to see how complete and consistent your local details are. It takes a moment and changes nothing.",
               "foundhint-local-seo",

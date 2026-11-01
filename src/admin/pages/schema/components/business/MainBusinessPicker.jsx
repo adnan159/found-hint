@@ -156,7 +156,7 @@ export function MainBusinessPicker({ main, locked }) {
                 className="fhint:mt-[3px] fhint:accent-primary"
               />
               <span className="fhint:grid fhint:gap-0.5">
-                <span className="fhint:flex fhint:flex-wrap fhint:items-center fhint:gap-1.5 fhint:text-[13.5px]">
+                <span className="fhint:flex fhint:flex-wrap fhint:items-center fhint:gap-1.5 fhint:text-sm">
                   <strong>{option.name}</strong>
                   {option.area ? (
                     <>
@@ -204,7 +204,7 @@ export function MainBusinessPicker({ main, locked }) {
               onChange={() => setChoice(MANUAL)}
               className="fhint:mt-[3px] fhint:accent-primary"
             />
-            <span className="fhint:text-[13.5px] fhint:font-bold">
+            <span className="fhint:text-sm fhint:font-bold">
               {__(
                 "My head office isn't on Google — enter details manually",
                 "foundhint-local-seo",

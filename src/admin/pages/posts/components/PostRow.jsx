@@ -73,11 +73,11 @@ export function PostRow({ post, onEdit }) {
           </strong>
         ) : null}
         {post.summary ? (
-          <p className="fhint:m-0 fhint:line-clamp-2 fhint:text-[13.5px] fhint:leading-relaxed fhint:text-muted-strong">
+          <p className="fhint:m-0 fhint:line-clamp-2 fhint:text-sm fhint:leading-relaxed fhint:text-muted-strong">
             {post.summary}
           </p>
         ) : !post.title ? (
-          <p className="fhint:m-0 fhint:text-[13px] fhint:text-muted-strong fhint:italic">
+          <p className="fhint:m-0 fhint:text-sm fhint:text-muted-strong fhint:italic">
             {post.media_count
               ? __("A photo or video post with no text.", "foundhint-local-seo")
               : __("No text yet.", "foundhint-local-seo")}

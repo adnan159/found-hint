@@ -38,7 +38,7 @@ export function SaveBar({ dirty, saving, status, live, onSave }) {
         role="status"
         aria-live="polite"
         className={cn(
-          "fhint:min-w-0 fhint:flex-[1_1_220px] fhint:text-[13px] fhint:font-bold",
+          "fhint:min-w-0 fhint:flex-[1_1_220px] fhint:text-sm fhint:font-bold",
           tone,
         )}
       >

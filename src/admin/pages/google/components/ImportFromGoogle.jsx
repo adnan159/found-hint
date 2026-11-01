@@ -188,7 +188,7 @@ export function ImportFromGoogle({ isConnected }) {
 
       {needsChoice ? (
         <div className="fhint:mb-4 fhint:flex fhint:flex-wrap fhint:items-center fhint:gap-2.5">
-          <span className="fhint:text-[13px] fhint:font-bold">
+          <span className="fhint:text-sm fhint:font-bold">
             {__("Which profile are you importing?", "foundhint-local-seo")}
           </span>
           <Select value={profile} onValueChange={setProfile}>
@@ -233,7 +233,7 @@ export function ImportFromGoogle({ isConnected }) {
             : __("Read my Google profile", "foundhint-local-seo")}
         </Button>
         {!previewData ? (
-          <span className="fhint:text-[13px] fhint:text-muted-strong">
+          <span className="fhint:text-sm fhint:text-muted-strong">
             {__("Nothing is saved until you choose.", "foundhint-local-seo")}
           </span>
         ) : null}
@@ -242,7 +242,7 @@ export function ImportFromGoogle({ isConnected }) {
       {previewData ? (
         <div className="fhint:mt-5 fhint:flex fhint:flex-col fhint:gap-4">
           {previewData.creates_business ? (
-            <p className="fhint:m-0 fhint:bg-notice fhint:px-3.5 fhint:py-2.5 fhint:text-[13px] fhint:text-notice-foreground">
+            <p className="fhint:m-0 fhint:bg-notice fhint:px-3.5 fhint:py-2.5 fhint:text-sm fhint:text-notice-foreground">
               {__(
                 "This site has no business details yet, so importing will create them from this profile.",
                 "foundhint-local-seo",
@@ -251,7 +251,7 @@ export function ImportFromGoogle({ isConnected }) {
           ) : null}
 
           {previewData.creates_location ? (
-            <p className="fhint:m-0 fhint:bg-notice fhint:px-3.5 fhint:py-2.5 fhint:text-[13px] fhint:text-notice-foreground">
+            <p className="fhint:m-0 fhint:bg-notice fhint:px-3.5 fhint:py-2.5 fhint:text-sm fhint:text-notice-foreground">
               {__(
                 "Importing will create a location from this profile's address and link the two, so a later import updates it rather than adding another.",
                 "foundhint-local-seo",
@@ -259,7 +259,7 @@ export function ImportFromGoogle({ isConnected }) {
             </p>
           ) : null}
 
-          <p className="fhint:m-0 fhint:text-[13px] fhint:text-muted-strong">
+          <p className="fhint:m-0 fhint:text-sm fhint:text-muted-strong">
             {__(
               "Fields you have not filled in are ticked. Fields you already hold are left for you to decide, because FoundHint cannot know which value is the newer one.",
               "foundhint-local-seo",
@@ -359,7 +359,7 @@ export function ImportFromGoogle({ isConnected }) {
                     selected.length,
                   )}
             </Button>
-            <span className="fhint:text-[13px] fhint:text-muted-strong">
+            <span className="fhint:text-sm fhint:text-muted-strong">
               {__(
                 "Imported values are saved as your own details and can be edited afterwards.",
                 "foundhint-local-seo",

@@ -2,14 +2,16 @@ import { useState } from "react";
 import { __, _n, sprintf } from "@wordpress/i18n";
 import {
   MessageSquareTextIcon,
+  PencilIcon,
   PlusIcon,
   StarIcon,
   UploadIcon,
 } from "lucide-react";
 import { cn } from "cn";
-import { focus, help, linkButton, tag, tagTones } from "@/pages/profile/styles";
+import { focus, help, tag, tagTones } from "@/pages/profile/styles";
 import { sampleTemplates } from "../lib/templates";
 import SoonTag from "./SoonTag";
+import { iconButton } from "../styles";
 import Panel from "@/components/Panel";
 import TemplateDialog from "./TemplateDialog";
 
@@ -17,7 +19,7 @@ import TemplateDialog from "./TemplateDialog";
  * Reply templates, one set per star rating, in the sidebar.
  *
  * Drawn as it will work — star tabs with counts, each template with its
- * kind and an Edit link, "Add a template" and "Import from CSV" — with
+ * kind and an edit (pencil) button, "Add a template" and "Import from CSV" — with
  * sample templates in it. Writing your own is FoundHint Pro, which the card
  * says at the top; the editor opens as a preview.
  */
@@ -70,7 +72,7 @@ export function TemplatesCard() {
             }
             onClick={() => setRating(stars)}
             className={cn(
-              "fhint:-mb-px fhint:inline-flex fhint:min-w-0 fhint:cursor-pointer fhint:items-center fhint:justify-center fhint:gap-1 fhint:border-0 fhint:border-b-2 fhint:leading-none fhint:bg-transparent fhint:px-1 fhint:pt-1 fhint:pb-2 fhint:text-[12.5px] fhint:font-extrabold fhint:whitespace-nowrap fhint:transition-colors",
+              "fhint:-mb-px fhint:inline-flex fhint:min-w-0 fhint:cursor-pointer fhint:items-center fhint:justify-center fhint:gap-1 fhint:border-0 fhint:border-b-2 fhint:leading-none fhint:bg-transparent fhint:px-1 fhint:pt-1 fhint:pb-2 fhint:text-sm fhint:font-extrabold fhint:whitespace-nowrap fhint:transition-colors",
               rating === stars
                 ? "fhint:border-b-primary fhint:text-foreground"
                 : "fhint:border-b-transparent fhint:text-muted-strong fhint:hover:border-b-border fhint:hover:text-foreground",
@@ -84,7 +86,7 @@ export function TemplatesCard() {
                 {stars}
                 <StarIcon
                   aria-hidden="true"
-                  className="fhint:-mt-0.5 fhint:size-3 fhint:flex-none fhint:fill-[#C27A1B] fhint:text-[#C27A1B]"
+                  className="fhint:-translate-y-[0.5px] fhint:size-3 fhint:flex-none fhint:fill-star fhint:text-star"
                 />
               </>
             )}
@@ -127,7 +129,7 @@ export function TemplatesCard() {
             className="fhint:grid fhint:gap-1 fhint:border fhint:border-border fhint:px-3 fhint:py-2.5"
           >
             <span className="fhint:flex fhint:flex-wrap fhint:items-center fhint:gap-2">
-              <strong className="fhint:text-[13px]">{template.name}</strong>
+              <strong className="fhint:text-sm">{template.name}</strong>
               <span
                 className={cn(
                   tag,
@@ -142,10 +144,16 @@ export function TemplatesCard() {
               <button
                 type="button"
                 onClick={() => setEditing(template)}
-                className={cn(linkButton, "fhint:ml-auto")}
+                className={cn(iconButton, "fhint:ml-auto")}
               >
-                {__("Edit", "foundhint-local-seo")}
-                <span className="fhint:sr-only"> {template.name}</span>
+                <PencilIcon aria-hidden="true" className="fhint:size-3.5" />
+                <span className="fhint:sr-only">
+                  {sprintf(
+                    /* translators: %s: the template name. */
+                    __("Edit %s", "foundhint-local-seo"),
+                    template.name,
+                  )}
+                </span>
               </button>
             </span>
             {/* Which rating it answers: that many stars, and the number in
@@ -156,7 +164,7 @@ export function TemplatesCard() {
                   <StarIcon
                     key={index}
                     aria-hidden="true"
-                    className="fhint:size-3 fhint:flex-none fhint:fill-[#C27A1B] fhint:text-[#C27A1B]"
+                    className="fhint:size-3 fhint:flex-none fhint:fill-star fhint:text-star"
                   />
                 ))}
                 <span className="fhint:sr-only">
@@ -173,7 +181,7 @@ export function TemplatesCard() {
                 </span>
               </span>
             ) : null}
-            <span className="fhint:line-clamp-3 fhint:text-[12.5px] fhint:leading-snug fhint:text-muted-strong">
+            <span className="fhint:line-clamp-3 fhint:text-sm fhint:leading-snug fhint:text-muted-strong">
               {template.text}
             </span>
           </li>
@@ -196,7 +204,7 @@ export function TemplatesCard() {
         type="button"
         onClick={() => setEditing("new")}
         className={cn(
-          "fhint:inline-flex fhint:cursor-pointer fhint:items-center fhint:gap-2 fhint:border fhint:border-dashed fhint:border-input fhint:bg-card fhint:px-3 fhint:py-2 fhint:text-[12.5px] fhint:font-extrabold fhint:hover:bg-muted",
+          "fhint:inline-flex fhint:cursor-pointer fhint:items-center fhint:gap-2 fhint:border fhint:border-dashed fhint:border-input fhint:bg-card fhint:px-3 fhint:py-2 fhint:text-sm fhint:font-extrabold fhint:hover:bg-muted",
           focus,
         )}
       >
@@ -210,7 +218,7 @@ export function TemplatesCard() {
           "Importing templates is part of FoundHint Pro.",
           "foundhint-local-seo",
         )}
-        className="fhint:inline-flex fhint:cursor-not-allowed fhint:items-center fhint:gap-2 fhint:border fhint:border-dashed fhint:border-input fhint:bg-card fhint:px-3 fhint:py-2 fhint:text-[12.5px] fhint:font-extrabold fhint:text-muted-foreground"
+        className="fhint:inline-flex fhint:cursor-not-allowed fhint:items-center fhint:gap-2 fhint:border fhint:border-dashed fhint:border-input fhint:bg-card fhint:px-3 fhint:py-2 fhint:text-sm fhint:font-extrabold fhint:text-muted-foreground"
       >
         <UploadIcon aria-hidden="true" className="fhint:size-3.5" />
         {__("Import from CSV", "foundhint-local-seo")}

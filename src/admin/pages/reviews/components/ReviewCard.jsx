@@ -135,11 +135,11 @@ export function ReviewCard({ review, onReply }) {
 
       <div className="fhint:grid fhint:gap-3 fhint:pl-12">
         {review.comment ? (
-          <p className="fhint:m-0 fhint:text-[14px] fhint:leading-relaxed fhint:whitespace-pre-line">
+          <p className="fhint:m-0 fhint:text-sm fhint:leading-relaxed fhint:whitespace-pre-line">
             {review.comment}
           </p>
         ) : (
-          <p className="fhint:m-0 fhint:text-[13px] fhint:text-muted-strong fhint:italic">
+          <p className="fhint:m-0 fhint:text-sm fhint:text-muted-strong fhint:italic">
             {__("Left a star rating without a comment.", "foundhint-local-seo")}
           </p>
         )}
@@ -149,7 +149,7 @@ export function ReviewCard({ review, onReply }) {
         {replied ? (
           <div className="fhint:grid fhint:gap-1.5 fhint:bg-[#faf6f4] fhint:px-3.5 fhint:py-3">
             <div className="fhint:flex fhint:items-center fhint:gap-2">
-              <strong className="fhint:text-[13px]">
+              <strong className="fhint:text-sm">
                 {__("Your reply", "foundhint-local-seo")}
               </strong>
               {review.replied_at ? (
@@ -224,14 +224,14 @@ export function ReviewCard({ review, onReply }) {
                 </span>
               )}
             </div>
-            <p className="fhint:m-0 fhint:text-[13px] fhint:leading-relaxed fhint:whitespace-pre-line">
+            <p className="fhint:m-0 fhint:text-sm fhint:leading-relaxed fhint:whitespace-pre-line">
               {review.reply_comment}
             </p>
           </div>
         ) : null}
 
         {removed ? (
-          <p className="fhint:m-0 fhint:text-[12.5px] fhint:text-muted-strong">
+          <p className="fhint:m-0 fhint:text-sm fhint:text-muted-strong">
             {__(
               "The reviewer removed this review from Google, so it can no longer be replied to. It is not counted in your rating.",
               "foundhint-local-seo",

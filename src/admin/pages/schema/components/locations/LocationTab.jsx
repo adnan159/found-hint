@@ -188,7 +188,7 @@ export function LocationTab({
         {saveState.error && !Object.keys(errors).length ? (
           <p
             role="alert"
-            className="fhint:mx-5 fhint:mb-3 fhint:text-[13px] fhint:text-destructive"
+            className="fhint:mx-5 fhint:mb-3 fhint:text-sm fhint:text-destructive"
           >
             {errorMessage(saveState.error)}
           </p>

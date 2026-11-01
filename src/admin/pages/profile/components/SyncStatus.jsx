@@ -14,9 +14,9 @@ export function SyncStatus({ google, isBusy, notice }) {
     <div
       aria-busy={isBusy}
       hidden={!syncText}
-      className="fhint:grid fhint:gap-1 fhint:text-[13.5px] fhint:text-muted-strong"
+      className="fhint:grid fhint:gap-1 fhint:text-sm fhint:text-muted-strong"
     >
-      <p className="fhint:m-0 fhint:flex fhint:flex-wrap fhint:items-center fhint:gap-x-3 fhint:gap-y-1 fhint:text-[13px]">
+      <p className="fhint:m-0 fhint:flex fhint:flex-wrap fhint:items-center fhint:gap-x-3 fhint:gap-y-1 fhint:text-sm">
         <span>{syncText}</span>
         <span
           aria-live="polite"

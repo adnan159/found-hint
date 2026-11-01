@@ -112,7 +112,7 @@ export function SettingsTab({ ownership = {} }) {
           {ownership.detected.map((plugin) => (
             <div
               key={plugin.id}
-              className="fhint:flex fhint:items-start fhint:gap-2 fhint:text-[13px]"
+              className="fhint:flex fhint:items-start fhint:gap-2 fhint:text-sm"
             >
               {plugin.emits_local_business === true ? (
                 <AlertTriangleIcon

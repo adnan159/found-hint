@@ -45,6 +45,7 @@
   --color-card: var(--card);
   --color-foreground: var(--foreground);
   --color-background: var(--background);
+  --color-star: var(--star);
   --color-notice: var(--notice);
   --color-notice-border: var(--notice-border);
   --color-notice-foreground: var(--notice-foreground);
@@ -149,6 +150,8 @@
      were lost once, in the tooltip commit), `bg-notice` is transparent and
      `border-notice-border` falls back to the text colour: every notice
      turns into a near-black outline on white. */
+  /* A filled rating star: Google's star yellow, the one people know. */
+  --star: #f2a900;
   --notice: #fff1eb;
   --notice-border: #ffc9af;
   --notice-foreground: #8a3b12;
@@ -355,9 +358,16 @@
   outline-offset: -2px;
 }
 
+@supports not selector(::-webkit-scrollbar) {
+  .modern-scroll {
+    scrollbar-width: thin;
+    scrollbar-color: #a8a09d transparent;
+  }
+}
+
 .modern-scroll::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: 7px;
+  height: 7px;
 }
 
 /* Track */
@@ -367,13 +377,13 @@
 
 /* Handle */
 .modern-scroll::-webkit-scrollbar-thumb {
-  background: #888;
+  background: #a8a09d;
   border-radius: 100px;
 }
 
 /* Handle on hover */
 .modern-scroll::-webkit-scrollbar-thumb:hover {
-  background: #555;
+  background: #867e7b;
 }
 
 .modern-scroll::-webkit-scrollbar-button {
@@ -385,4 +395,17 @@
 /* Remove corner/background */
 .modern-scroll::-webkit-scrollbar-corner {
   background: transparent;
+}
+
+/*
+ * Popups above WordPress. Dialogs, selects, menus and tooltips render into
+ * <body> with `z-50`, which sits under the admin menu (9990) and the admin
+ * bar (99999), so the WordPress sidebar showed through an open modal. They
+ * are lifted here rather than in the generated `components/ui/**` files,
+ * which the shadcn CLI would overwrite. Every layer gets the same value, so
+ * a select opened inside a dialog still stacks above it (later in the DOM).
+ * Nothing outside `components/ui` uses `z-50`.
+ */
+.fhint\:z-50 {
+  z-index: 100000;
 }

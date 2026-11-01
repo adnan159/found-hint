@@ -294,7 +294,7 @@ function NavGroup({ item }) {
             <button
               type="button"
               onClick={() => goToSection(child.id)}
-              className="fhint:block fhint:w-full fhint:cursor-pointer fhint:border-l-3 fhint:border-l-transparent fhint:py-[9px] fhint:pr-3.5 fhint:pl-[17px] fhint:text-left fhint:text-[13px] fhint:font-medium fhint:text-sidebar-sub-foreground fhint:hover:bg-muted"
+              className="fhint:block fhint:w-full fhint:cursor-pointer fhint:border-l-3 fhint:border-l-transparent fhint:py-[9px] fhint:pr-3.5 fhint:pl-[17px] fhint:text-left fhint:text-sm fhint:font-medium fhint:text-sidebar-sub-foreground fhint:hover:bg-muted"
             >
               {child.label()}
             </button>
