@@ -186,6 +186,25 @@ const MESSAGES = {
     __("List 10 languages at most.", "foundhint-local-seo"),
   "schema.business.social.too_many": () =>
     __("List 20 profile links at most.", "foundhint-local-seo"),
+  "schema.website.page.required": () =>
+    __(
+      "Choose the page for this row, or switch it off.",
+      "foundhint-local-seo",
+    ),
+  "schema.website.page.invalid": () =>
+    __("Choose a published page.", "foundhint-local-seo"),
+  "schema.website.name.too_long": () =>
+    __("A name can be 200 characters at most.", "foundhint-local-seo"),
+  "schema.output.placement.invalid": () =>
+    __("Choose the head or the end of the page.", "foundhint-local-seo"),
+  "schema.location.role.invalid": () =>
+    __("Choose Branch or Separate.", "foundhint-local-seo"),
+  "schema.location.role.not_a_profile": () =>
+    __("That isn't one of your other Google profiles.", "foundhint-local-seo"),
+  "schema.location.type.invalid": () =>
+    __("Choose a business type from the list.", "foundhint-local-seo"),
+  "schema.location.page.not_found": () =>
+    __("That page no longer exists. Choose another.", "foundhint-local-seo"),
   "schema.main.location.invalid": () =>
     __("Choose one of your locations.", "foundhint-local-seo"),
   "schema.main.name.required": () =>

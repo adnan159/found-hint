@@ -26,6 +26,8 @@ export default function useSchemaTab(locationId) {
   };
 
   const previousLocation = useRef(locationId);
+  // Set by "All locations": back to the main location, staying on the list.
+  const staying = useRef(false);
 
   useEffect(() => {
     if (previousLocation.current === locationId) {
@@ -34,6 +36,11 @@ export default function useSchemaTab(locationId) {
 
     previousLocation.current = locationId;
 
+    if (staying.current) {
+      staying.current = false;
+      return;
+    }
+
     if (locationId && tab === "localbusiness") {
       go("locations");
     } else if (!locationId && tab === "locations") {
@@ -41,5 +48,10 @@ export default function useSchemaTab(locationId) {
     }
   });
 
-  return { tab, go };
+  // The next switch of the location bar keeps this tab open.
+  const stay = () => {
+    staying.current = true;
+  };
+
+  return { tab, go, stay };
 }

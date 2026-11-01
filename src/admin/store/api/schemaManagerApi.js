@@ -76,6 +76,49 @@ export const schemaManagerApi = baseApi
         invalidatesTags: ["SchemaManager", "Location", "Schema", "Service"],
       }),
 
+      // 05 Website structure: the website, each page, About and Contact
+      // pages, breadcrumbs.
+      getWebsiteSchema: builder.query({
+        query: () => url("/schema/website"),
+        transformResponse: (response) => response?.data ?? null,
+        providesTags: ["SchemaManager"],
+      }),
+
+      saveWebsiteSchema: builder.mutation({
+        query: (body) => ({ url: url("/schema/website"), method: "PUT", body }),
+        transformResponse: (response) => response?.data ?? null,
+        invalidatesTags: ["SchemaManager"],
+      }),
+
+      // 06 Settings: header output, where it goes, SEO plugins.
+      getSchemaOutput: builder.query({
+        query: () => url("/schema/settings"),
+        transformResponse: (response) => response?.data ?? null,
+        providesTags: ["SchemaManager"],
+      }),
+
+      saveSchemaOutput: builder.mutation({
+        query: (body) => ({
+          url: url("/schema/settings"),
+          method: "PUT",
+          body,
+        }),
+        transformResponse: (response) => response?.data ?? null,
+        invalidatesTags: ["SchemaManager"],
+      }),
+
+      getSchemaPageMap: builder.query({
+        query: () => url("/schema/page-map"),
+        transformResponse: (response) => response?.data ?? null,
+        providesTags: ["SchemaManager"],
+      }),
+
+      runLiveCheck: builder.mutation({
+        query: () => ({ url: url("/schema/live-check"), method: "POST" }),
+        transformResponse: (response) => response?.data ?? null,
+        invalidatesTags: ["SchemaManager"],
+      }),
+
       // A tab's switch: on prints its schema, off keeps the details only.
       setSchemaTab: builder.mutation({
         query: ({ key, enabled }) => ({
@@ -91,6 +134,64 @@ export const schemaManagerApi = baseApi
         query: () => url("/schema/locations"),
         transformResponse: (response) => response?.data ?? [],
         providesTags: ["SchemaManager"],
+      }),
+
+      // The Locations list: every Google profile with its role, page,
+      // status and issues, the profiles found, and what setup offers.
+      getLocationRoster: builder.query({
+        query: () => url("/schema/locations/roster"),
+        transformResponse: (response) => response?.data ?? null,
+        providesTags: ["SchemaManager"],
+      }),
+
+      setupLocations: builder.mutation({
+        query: (body) => ({
+          url: url("/schema/locations/setup"),
+          method: "POST",
+          body,
+        }),
+        transformResponse: (response) => response?.data ?? null,
+        invalidatesTags: ["SchemaManager", "Location", "Schema", "Service"],
+      }),
+
+      // `generate` their branch schema, or `dismiss` ("Not now").
+      foundLocations: builder.mutation({
+        query: (action) => ({
+          url: url("/schema/locations/found"),
+          method: "POST",
+          body: { action },
+        }),
+        transformResponse: (response) => ({
+          roster: response?.data ?? null,
+          generated: response?.meta?.generated ?? 0,
+        }),
+        invalidatesTags: ["SchemaManager"],
+      }),
+
+      setLocationRole: builder.mutation({
+        query: ({ id, role }) => ({
+          url: url(`/schema/locations/${Number(id)}/role`),
+          method: "PUT",
+          body: { role },
+        }),
+        transformResponse: (response) => response?.data ?? null,
+        invalidatesTags: ["SchemaManager"],
+      }),
+
+      setLocationPage: builder.mutation({
+        query: ({ id, postId }) => ({
+          url: url(`/schema/locations/${Number(id)}/page`),
+          method: "PUT",
+          body: { post_id: postId },
+        }),
+        transformResponse: (response) => response?.data ?? null,
+        invalidatesTags: ["SchemaManager", "Location"],
+      }),
+
+      // A separate business's own schema, for its own website.
+      getSeparateSchema: builder.query({
+        query: (id) => url(`/schema/locations/${Number(id)}/separate`),
+        transformResponse: (response) => response?.data?.document ?? null,
       }),
 
       getLocationSchema: builder.query({
@@ -247,5 +348,17 @@ export const {
   useDeleteServiceSchemaMutation,
   useReorderServiceSchemasMutation,
   useImportSchemaPhotoMutation,
+  useGetLocationRosterQuery,
+  useSetupLocationsMutation,
+  useFoundLocationsMutation,
+  useSetLocationRoleMutation,
+  useSetLocationPageMutation,
+  useGetSeparateSchemaQuery,
+  useGetWebsiteSchemaQuery,
+  useSaveWebsiteSchemaMutation,
+  useGetSchemaOutputQuery,
+  useSaveSchemaOutputMutation,
+  useGetSchemaPageMapQuery,
+  useRunLiveCheckMutation,
   usePreviewSchemaMutation,
 } = schemaManagerApi;

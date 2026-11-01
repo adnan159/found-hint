@@ -35,8 +35,23 @@ export function tabSummaries({ plan, free, state, business }) {
         : pro,
     locations: plan.locations ? locationsSummary(state) : notYet,
     services: plan.services ? servicesSummary(state) : notYet,
-    website: notYet,
-    settings: __("Who publishes it", "foundhint-local-seo"),
+    website: plan.website
+      ? state?.tabs?.website?.ready
+        ? sprintf(
+            /* translators: 1: rows on, 2: all rows. */
+            __("%1$d of %2$d added", "foundhint-local-seo"),
+            state.tabs.website.on,
+            state.tabs.website.total,
+          )
+        : "…"
+      : notYet,
+    settings: plan.settings
+      ? state?.tabs?.settings?.ready
+        ? state.tabs.settings.enabled
+          ? __("Added to site header", "foundhint-local-seo")
+          : __("Header output off", "foundhint-local-seo")
+        : "…"
+      : __("Who publishes it", "foundhint-local-seo"),
   };
 }
 

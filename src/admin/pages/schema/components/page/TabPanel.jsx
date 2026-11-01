@@ -8,7 +8,9 @@ import OffPanel from "./OffPanel";
 import LocationTab from "../locations/LocationTab";
 import ServiceTab from "../services/ServiceTab";
 import { TABS } from "./TabBar";
+import OutputSettings from "../settings/OutputSettings";
 import SettingsTab from "../settings/SettingsTab";
+import WebsiteTab from "../website/WebsiteTab";
 
 // What a tab will do, for one Pro has not shipped yet.
 const COMING = {
@@ -77,6 +79,9 @@ function TabContent({
   business,
   organization,
   branches,
+  onAllLocations,
+  onOpenMain,
+  syncedAt,
   locationId,
   branchName,
   unsaved,
@@ -118,6 +123,9 @@ function TabContent({
         branches={branches.branches}
         branchId={branches.branchId}
         onBranch={branches.pickBranch}
+        onAllLocations={onAllLocations}
+        onOpenMain={onOpenMain}
+        syncedAt={syncedAt}
         state={branches.state}
         locked={!plan.locations}
         {...editing}
@@ -138,8 +146,17 @@ function TabContent({
     );
   }
 
+  if (tab === "website" && plan.website) {
+    return <WebsiteTab {...editing} />;
+  }
+
   if (tab === "settings") {
-    return <SettingsTab ownership={free.ownership ?? {}} />;
+    return (
+      <div className="fhint:grid fhint:min-w-0 fhint:grid-cols-[minmax(0,1fr)] fhint:gap-4">
+        {plan.settings ? <OutputSettings /> : null}
+        <SettingsTab ownership={free.ownership ?? {}} />
+      </div>
+    );
   }
 
   return (

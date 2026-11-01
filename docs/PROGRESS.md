@@ -2174,3 +2174,109 @@ LocalBusiness off).
 **Bug caught:** the database suite read the site's real tab switches, so
 it failed whenever the developer had switched a tab off.
 
+## Step 68 — Design update B: the Locations tab
+
+The Locations tab now opens on a list of every Google profile — main
+business, branches, separate businesses — with each one's page, output
+status and issues; branches open in an editor with the design's four
+sections; location setup assigns everything in three steps.
+
+**Shipped (Premium):** `LocationRoles` (roles, the list, issues, found
+profiles, setup, a separate business's own schema); `LocationSchema` — only
+branches are branches, a branch's own type, the Organization as a parent
+(only while it is on), inheritance switches, `set_page()`, the editor's
+extra state; `MainBusiness` keeps whether customers visit; six routes.
+**Shipped (free):** `LocationList`, `LocationSetup`, `SeparatePanel`,
+`BranchSections`, `lib/locations`; "Part of" moved into 03 Parent business
+(with the Organization added, "Not part of a group" kept); "All locations"
+stays on the tab; `LocationRepository` writes a location's page.
+
+**Verified:** Premium smoke 251, database 204, mutation-tested (one
+survivor, equivalent: removed profiles are never added to the visible
+rows). Free domain 142, database 721. Browser on the real site: the list
+(FoundHint main and live; the Pet Shop a branch needing a page, flagged
+for its other domain, found with a "separate" suggestion), the editor's
+sections, the parent change reaching the preview, the unsaved prompt on
+All locations, the wizard's three steps (cancelled). Nothing saved; the
+developer's switches restored.
+
+## Step 69 — Design update C: Settings, website structure, and live output
+
+FoundHint Premium now prints the site's schema itself (Step 5): each page
+gets its own graph — the Organization and LocalBusiness on their pages,
+each live branch on its page, each service on its page, the website on the
+home page, the page itself and its breadcrumb trail — in one script tag,
+in the head or the footer. Tab 05 Website structure and the Settings
+sections from the new design control it.
+
+**Shipped (Premium):** `Output` (cached entities with their placement,
+per-page nodes, page types), `Pieces\WebPage` (WebPage / AboutPage /
+ContactPage, BreadcrumbList), `SiteSettings` (website rows, output switch
+and position, page map, SEO plugins), `LiveCheck`, `Renderer` live with a
+placement filter; routes `schema/website`, `schema/settings`,
+`schema/page-map`, `schema/live-check`; tab summaries for 05 and 06;
+features `schema.website`, `schema.settings`, `schema.output`.
+**Shipped (free):** `WebsiteTab`, `OutputSettings` (above "Who publishes
+it"), messages.
+
+**Verified:** Premium smoke 273, database 224, mutation-tested (one
+survivor: the home page's trail is also dropped for being one step long).
+The live home page now prints Organization, ProfessionalService, WebSite
+and WebPage from Premium. Browser: tab 05's rows, Settings' sections, the
+page map with the real pages, Check my site.
+
+**Bugs caught:** the main-business question would have stopped the
+LocalBusiness printing until answered (it gates the screen only now); page
+paths lost `?p=` on a site without pretty permalinks; the database suite
+could leave a cache built from its test tables for the real site (it now
+restores the cache version and flushes). On this Docker setup the server
+cannot reach its own `localhost:8100`, so Check my site reports it could
+not reach the site; the comparison itself was verified on the real home
+page's HTML.
+
+## Step 70 — Design update D: "Outputs on"
+
+The branch editor's preview ends with the line from the design: "Outputs
+on: /its-page/", or why it prints nowhere yet ("no page yet. Assign one to
+publish.", not published yet, a shared page). `JsonPreview` takes it as
+`outputsOn`.
+
+**Bug caught:** a branch's `image` listed the brand's photos; the design
+says a branch's images always come from its own Google profile. Branches
+now print only their own photos imported into the Media Library, and the
+editor lists Images among what is never inherited. Premium database 226
+(the new check fails with the old behaviour); browser: the line and the
+preview without the brand's photos.
+
+This completes the design update (A–D).
+
+
+## Step 71 — Locations, Services and Settings matched to the design
+
+The screens now match `FoundHint Schema (1).html` in look and layout; no
+feature was removed.
+
+- **Locations list** (`LocationList`): the design's summary bar (icon,
+  counts, "Synced from Google … ago", Run location setup as a link,
+  Refresh from Google), the found-profiles banner, the six-column table
+  (rounded role, output and warning pills with dots; main row first with
+  "Main business — edit in tab 02"; light red background on blocked rows),
+  Edit / Change or Assign page / Open tab 02 / Open, the "…" menu and the
+  colour legend. The setup wizard, separate-business panel and the
+  one-location panel stay. `syncedAt` reaches the list through
+  `TabPanel` → `LocationTab`.
+- **Branch editor**: fields in three columns when the panel is wide
+  (name / phone / email, city / region / postcode, country / lat / long),
+  one column when narrow (a container query). Long field tags and Google
+  field paths wrap instead of spilling into the next column.
+- **Services**: with a service open, the list sits above its form and the
+  preview runs beside both (the editor's wrapper is `display: contents`,
+  so its form and preview are cells of the tab's grid). The list is never
+  remounted when switching services; on a narrow screen everything stacks.
+  Reordering, publish switches and everything else are unchanged.
+- **Settings**: status tags use the design's rounded pills.
+
+Lint, build and every smoke suite (free and Premium) pass. Docs: `SCHEMA-PLAN.md` §4 (shared pieces: pills, the two layouts, `JsonPreview`'s `outputsOn` and `className`) and its open items. Browser: list,
+editor, setup wizard and separate panel against the design at 1440px, the
+services layout at 1440px and phone width. The Pet Shop was made a branch
+to view the editor and set back to separate afterwards.

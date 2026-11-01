@@ -37,6 +37,8 @@ export default function SchemaPage() {
     business: hasPro("schema.business"),
     locations: hasPro("schema.locations"),
     services: hasPro("schema.services"),
+    website: hasPro("schema.website"),
+    settings: hasPro("schema.settings"),
     live: hasPro("schema.output"),
   };
 
@@ -44,7 +46,7 @@ export default function SchemaPage() {
   // The Business tab is the main location; the Location tab follows the
   // branch chosen there, and choosing a branch here switches the bar too.
   const { locationId, current, choose } = useSelectedLocation();
-  const { tab, go } = useSchemaTab(locationId);
+  const { tab, go, stay } = useSchemaTab(locationId);
   const unsaved = useUnsavedGuard({ go, choose });
   const branches = useLocationBranches({
     pro: plan.locations,
@@ -130,6 +132,12 @@ export default function SchemaPage() {
               switching={setTabState.isLoading}
               onToggle={toggle}
               branches={branches}
+              onAllLocations={() => {
+                stay();
+                choose(0);
+              }}
+              onOpenMain={() => go("localbusiness")}
+              syncedAt={state?.synced_at}
               locationId={locationId}
               branchName={
                 locationId ? current?.business_name || current?.name : ""
