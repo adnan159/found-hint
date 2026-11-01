@@ -129,6 +129,30 @@ export function LocationList({ roster, syncedAt, onEdit, onOpenMain }) {
     (item) => item.suggest === "separate",
   );
 
+  // "Open" on a separate business: its own view, like a branch's editor —
+  // details and actions on the left, its schema in the preview beside them.
+  if (separate) {
+    return (
+      <SeparatePanel
+        row={separate}
+        onBack={() => setSeparateId(null)}
+        onTreatAsBranch={() =>
+          run(
+            setRole({ id: separate.id, role: "branch" }).unwrap(),
+            sprintf(
+              /* translators: %s: a location. */
+              __(
+                "%s is a branch now. Give it a page to publish.",
+                "foundhint-local-seo",
+              ),
+              separate.name,
+            ),
+          ).then(() => setSeparateId(null))
+        }
+      />
+    );
+  }
+
   return (
     <div className="fhint:grid fhint:min-w-0 fhint:grid-cols-[minmax(0,1fr)] fhint:gap-4">
       <section className="fhint:flex fhint:flex-wrap fhint:items-center fhint:gap-3.5 fhint:border fhint:border-[#e6e3e3] fhint:bg-white fhint:px-5 fhint:py-3.5">
@@ -513,10 +537,7 @@ export function LocationList({ roster, syncedAt, onEdit, onOpenMain }) {
                   {isSeparate ? (
                     <button
                       type="button"
-                      aria-expanded={separateId === row.id}
-                      onClick={() =>
-                        setSeparateId(separateId === row.id ? null : row.id)
-                      }
+                      onClick={() => setSeparateId(row.id)}
                       className={TEXT_LINK}
                     >
                       {__("Open", "foundhint-local-seo")}
@@ -652,25 +673,6 @@ export function LocationList({ roster, syncedAt, onEdit, onOpenMain }) {
           </div>
         </section>
       )}
-
-      {separate ? (
-        <SeparatePanel
-          row={separate}
-          onTreatAsBranch={() =>
-            run(
-              setRole({ id: separate.id, role: "branch" }).unwrap(),
-              sprintf(
-                /* translators: %s: a location. */
-                __(
-                  "%s is a branch now. Give it a page to publish.",
-                  "foundhint-local-seo",
-                ),
-                separate.name,
-              ),
-            ).then(() => setSeparateId(null))
-          }
-        />
-      ) : null}
 
       {setupOpen ? (
         <LocationSetup

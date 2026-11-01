@@ -1,4 +1,4 @@
-import { useId, useState } from "react";
+import { useEffect, useId, useState } from "react";
 import { __, sprintf } from "@wordpress/i18n";
 import {
   ChevronLeftIcon,
@@ -16,6 +16,7 @@ import { focus } from "@/pages/profile/styles";
 import {
   useGetSchemaPagesQuery,
   useGetSchemaTypesQuery,
+  useCreateLocationPageMutation,
   useSetLocationPageMutation,
 } from "@/store/api/schemaManagerApi";
 import { BADGE, ROLES, STATUSES, TONES, issueText } from "../../lib/locations";
@@ -85,6 +86,20 @@ export function BranchSections({
   const ids = useId();
   const [parentOpen, setParentOpen] = useState(false);
   const [setPage, pageState] = useSetLocationPageMutation();
+  const [createLocationPage, createState] = useCreateLocationPageMutation();
+  const createPage = state.create_page ?? {};
+  // Which option card is in force: a page FoundHint made, any other page,
+  // or (no page yet) the card the user picked. "create" is only a choice
+  // until its button makes the page.
+  const [pickedMode, setMode] = useState(null);
+  const pageMode =
+    pickedMode ??
+    (createPage.created ? "create" : state.page ? "existing" : null);
+
+  // Another branch starts from its own page.
+  useEffect(() => {
+    setMode(null);
+  }, [state.id]);
   const { data: types = [] } = useGetSchemaTypesQuery(undefined, {
     skip: locked,
   });
@@ -115,6 +130,21 @@ export function BranchSections({
       : parent === "business"
         ? parents.business
         : null;
+
+  const makePage = async () => {
+    try {
+      await createLocationPage(state.id).unwrap();
+      setMode(null);
+      toast.success(
+        __(
+          "Page created and published. The branch's schema prints there.",
+          "foundhint-local-seo",
+        ),
+      );
+    } catch (error) {
+      toast.error(errorMessage(error));
+    }
+  };
 
   const choosePage = async (postId) => {
     try {
@@ -246,9 +276,108 @@ export function BranchSections({
           </span>
         </Heading>
         {locked ? null : (
+          <div
+            role="radiogroup"
+            aria-label={__("Location page", "foundhint-local-seo")}
+            className="fhint:grid fhint:grid-cols-[repeat(auto-fit,minmax(min(100%,240px),1fr))] fhint:gap-2"
+          >
+            {[
+              [
+                "create",
+                __("Create location page", "foundhint-local-seo"),
+                __(
+                  "FoundHint creates the page with this branch's address, hours and map, and adds the schema to it.",
+                  "foundhint-local-seo",
+                ),
+              ],
+              [
+                "existing",
+                __("Use an existing page", "foundhint-local-seo"),
+                __(
+                  "Pick a page you already have for this branch.",
+                  "foundhint-local-seo",
+                ),
+              ],
+            ].map(([key, text, body]) => (
+              <label
+                key={key}
+                className={cn(
+                  "fhint:flex fhint:cursor-pointer fhint:items-start fhint:gap-2.5 fhint:border fhint:px-[13px] fhint:py-[11px]",
+                  pageMode === key
+                    ? "fhint:border-[#FF6B35] fhint:bg-[#FFF8F4]"
+                    : "fhint:border-[#e6e3e3] fhint:bg-white",
+                )}
+              >
+                <input
+                  type="radio"
+                  name={`${ids}-page`}
+                  checked={pageMode === key}
+                  onChange={() => setMode(key)}
+                  className="fhint:mt-[3px] fhint:accent-[#FF6B35]"
+                />
+                <span className="fhint:grid fhint:min-w-0 fhint:gap-0.5">
+                  <span className="fhint:flex fhint:flex-wrap fhint:items-center fhint:gap-1.5">
+                    <strong className="fhint:text-[13.5px]">{text}</strong>
+                    {key === "create" ? (
+                      <span className={cn(BADGE, TONES.ok)}>
+                        {__("Recommended", "foundhint-local-seo")}
+                      </span>
+                    ) : null}
+                  </span>
+                  {key === "create" && createPage.path ? (
+                    <code className="fhint:justify-self-start fhint:truncate fhint:bg-[#f3f2f2] fhint:px-[7px] fhint:py-0.5 fhint:font-mono fhint:text-[12px] fhint:text-[#201e1d]">
+                      {createPage.created && page ? page.path : createPage.path}
+                    </code>
+                  ) : null}
+                  <span className="fhint:text-[12.5px] fhint:text-[#625e5e]">
+                    {body}
+                  </span>
+                </span>
+              </label>
+            ))}
+          </div>
+        )}
+        {!locked && pageMode === "create" && !createPage.created ? (
+          <div className="fhint:flex fhint:flex-wrap fhint:items-center fhint:gap-3 fhint:border fhint:border-[#e6e3e3] fhint:bg-[#faf9f9] fhint:px-[13px] fhint:py-2.5">
+            <span className="fhint:min-w-0 fhint:flex-[1_1_260px] fhint:text-[12.5px] fhint:text-[#444141]">
+              {page
+                ? sprintf(
+                    /* translators: 1: new page path, 2: current page path. */
+                    __(
+                      "Publishes a new page at %1$s and moves this branch's schema there from %2$s.",
+                      "foundhint-local-seo",
+                    ),
+                    createPage.path,
+                    page.path,
+                  )
+                : sprintf(
+                    /* translators: %s: new page path. */
+                    __(
+                      "Publishes a new page at %s. You can edit it in WordPress afterwards.",
+                      "foundhint-local-seo",
+                    ),
+                    createPage.path,
+                  )}
+            </span>
+            <button
+              type="button"
+              disabled={createState.isLoading}
+              onClick={makePage}
+              className={cn(
+                "fhint:inline-flex fhint:cursor-pointer fhint:items-center fhint:gap-[7px] fhint:border-0 fhint:bg-[#FF6B35] fhint:px-[15px] fhint:py-2 fhint:text-[13px] fhint:font-bold fhint:text-white fhint:hover:bg-[#E85A25] fhint:disabled:opacity-60",
+                focus,
+              )}
+            >
+              {createState.isLoading
+                ? __("Creating…", "foundhint-local-seo")
+                : __("Create and publish page", "foundhint-local-seo")}
+            </button>
+          </div>
+        ) : null}
+        {locked || pageMode === "create" ? null : (
           <label className="fhint:grid fhint:gap-1.5">
-            <span className="fhint:text-[13px] fhint:font-bold">
-              {__("Use an existing page", "foundhint-local-seo")}
+            <span className="fhint:sr-only">
+              {__("Existing page", "foundhint-local-seo")}
             </span>
             <select
               value={page?.post_id ?? ""}
@@ -275,6 +404,22 @@ export function BranchSections({
             </select>
           </label>
         )}
+        {!locked && pageMode === "create" && createPage.created && page ? (
+          <a
+            href={page.url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className={cn(
+              "fhint:justify-self-start fhint:text-[12.5px] fhint:font-bold fhint:text-[#D8521F]",
+              focus,
+            )}
+          >
+            {__("View the page", "foundhint-local-seo")}
+            <span className="fhint:sr-only">
+              {__("(opens in a new tab)", "foundhint-local-seo")}
+            </span>
+          </a>
+        ) : null}
         {page && !page.published ? (
           <span className="fhint:text-[12.5px] fhint:font-bold fhint:text-[#8a5a00]">
             {__(

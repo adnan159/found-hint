@@ -2280,3 +2280,53 @@ Lint, build and every smoke suite (free and Premium) pass. Docs: `SCHEMA-PLAN.md
 editor, setup wizard and separate panel against the design at 1440px, the
 services layout at 1440px and phone width. The Pet Shop was made a branch
 to view the editor and set back to separate afterwards.
+
+## Step 72 — A separate business opens beside its schema
+
+"Open" on a separate business used to add its warning and schema under
+the table, full width. It now replaces the list like Edit does for a
+branch: `SeparatePanel` has the "All locations" breadcrumb, the Separate
+and "Not on this site" pills, its name and address, the warning, three
+steps to publish it on its own website, Copy schema and Treat as a branch
+anyway on the left, and the JSON preview on the right ("Outputs on: not
+this site"). Focus moves to its heading. Browser: open, back, the preview
+beside the panel at 1440px. The Pet Shop was set to separate for the
+check and returned to branch afterwards.
+
+## Step 73 — Create location page, and the head-office notice
+
+The last two Locations items from the design.
+
+**Create location page.** Branch editor section 01 now has the design's
+two cards: *Create location page* (Recommended, showing
+`/locations/{branch}/`) and *Use an existing page* (the page picker).
+Picking "Create" shows one confirm, "Create and publish page", because it
+publishes real content. Premium's new `LocationPage` then publishes a page
+under a "Locations" parent (the site's own `/locations/` page if it has
+one), with the branch's description, address, phone (tel: link), opening
+hours (days nobody set are left out) and a map (an embed when there is a
+map pin, plus a Google Maps link), and assigns it like a picked page. The
+page is the owner's to edit from then on; FoundHint never rewrites it.
+Pages it made carry `_fhintpremium_location_page`, so the card shows as
+chosen. Route: `POST schema/locations/{id}/page`. Errors:
+`schema.location.page.no_name`, `fhintpremium_cannot_publish_pages`,
+`fhintpremium_page_not_created`.
+
+**Head-office notice.** When location setup says customers don't visit the
+main business, tab 02 is off. Its panel now says "Your main business is a
+head office. It's described in 01 Organization, and your branches link to
+it as their parent. Change this in location setup." with *Open 01
+Organization* and *Change in location setup*, and the tab reads "Head
+office · described in 01" instead of "Off · not printed". The turn-on
+button stays.
+
+**Tests.** Premium smoke 286 (+10: escaping, the one-line address, tel
+link, two periods, closed / 24 hours, unset days left out, embed only with
+a pin, slug and its fallback); database 237 (+7: published, under
+Locations, its details, "created" true and then false for another page,
+the main business refused; cleans up the pages it made). Every new check
+was mutation-tested and fails against broken code. The free harness's
+`esc_html` stand-in now really escapes (all free suites still pass).
+Browser: created the Pet Shop's page from the editor (branch went Live,
+its PetStore schema printed on the page), then deleted it; the head-office
+panel and its links.

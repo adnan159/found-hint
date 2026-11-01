@@ -28,7 +28,9 @@ export function tabSummaries({ plan, free, state, business }) {
       : pro,
     localbusiness: plan.business
       ? business
-        ? `${business.type} · ${placementLabel(business.placement)}`
+        ? business.main?.visit === "no"
+          ? __("Head office · described in 01", "foundhint-local-seo")
+          : `${business.type} · ${placementLabel(business.placement)}`
         : "…"
       : free?.graph?.["@graph"]?.[0]?.["@type"]
         ? `${free.graph["@graph"][0]["@type"]} · ${placementLabel("every_page")}`
@@ -45,6 +47,17 @@ export function tabSummaries({ plan, free, state, business }) {
           )
         : "…"
       : notYet,
+    // What a switched-off tab says instead of "Off · not printed": 02 under
+    // a head office customers don't visit (location setup).
+    offText:
+      plan.business && business?.main?.visit === "no"
+        ? {
+            localbusiness: __(
+              "Head office · described in 01",
+              "foundhint-local-seo",
+            ),
+          }
+        : {},
     settings: plan.settings
       ? state?.tabs?.settings?.ready
         ? state.tabs.settings.enabled

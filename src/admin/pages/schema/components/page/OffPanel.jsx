@@ -1,8 +1,15 @@
 import { useEffect, useRef } from "react";
 import { __, sprintf } from "@wordpress/i18n";
-import { PowerIcon } from "lucide-react";
+import { Building2Icon, PowerIcon } from "lucide-react";
 import { cn } from "cn";
-import { BADGES, muted, panel, pill, primaryAction } from "../styles";
+import {
+  BADGES,
+  linkAction,
+  muted,
+  panel,
+  pill,
+  primaryAction,
+} from "../styles";
 
 /** Each switched tab, in the words of its off state. */
 const COPY = {
@@ -54,6 +61,22 @@ const COPY = {
 };
 
 /**
+ * 02 off because location setup answered "No, head office only": the main
+ * business is described by 01 Organization, not a LocalBusiness (design:
+ * "Your main business is a head office.").
+ */
+const HEAD_OFFICE = {
+  title: () =>
+    __("Your main business is a head office.", "foundhint-local-seo"),
+  body: () =>
+    __(
+      "It's described in 01 Organization, and your branches link to it as their parent. Change this in location setup.",
+      "foundhint-local-seo",
+    ),
+  action: () => __("Turn on localbusiness schema", "foundhint-local-seo"),
+};
+
+/**
  * What a switched-off tab shows instead of its form: that it is off, what
  * turning it on does, and the button to do it. The saved details are kept
  * and come back as they were.
@@ -63,9 +86,21 @@ const COPY = {
  * @param {boolean}  props.locked   No Premium: the button is not offered.
  * @param {boolean}  props.busy     The switch is being saved.
  * @param {Function} props.onTurnOn Switch the tab on.
+ * @param {boolean}  props.headOffice 02: customers don't visit the main
+ *                                    business (location setup).
+ * @param {Function} props.onOpenTab  Open another tab by key.
  */
-export function OffPanel({ tab, locked, busy, onTurnOn }) {
-  const copy = COPY[tab];
+export function OffPanel({
+  tab,
+  locked,
+  busy,
+  onTurnOn,
+  headOffice = false,
+  onOpenTab,
+}) {
+  const office = tab === "localbusiness" && headOffice;
+  const copy = office ? HEAD_OFFICE : COPY[tab];
+  const Icon = office ? Building2Icon : PowerIcon;
   const heading = useRef(null);
 
   // Announced, and the place keyboard focus lands, when a tab goes off.
@@ -89,7 +124,7 @@ export function OffPanel({ tab, locked, busy, onTurnOn }) {
         aria-hidden="true"
         className="fhint:flex fhint:size-11 fhint:shrink-0 fhint:items-center fhint:justify-center fhint:bg-muted fhint:text-muted-strong"
       >
-        <PowerIcon className="fhint:size-5" />
+        <Icon className="fhint:size-5" />
       </span>
 
       <div className="fhint:grid fhint:min-w-0 fhint:flex-[1_1_320px] fhint:gap-1.5">
@@ -113,6 +148,24 @@ export function OffPanel({ tab, locked, busy, onTurnOn }) {
             "foundhint-local-seo",
           )}
         </p>
+        {office && onOpenTab ? (
+          <span className="fhint:mt-1 fhint:flex fhint:flex-wrap fhint:gap-4">
+            <button
+              type="button"
+              onClick={() => onOpenTab("organization")}
+              className={linkAction}
+            >
+              {__("Open 01 Organization", "foundhint-local-seo")}
+            </button>
+            <button
+              type="button"
+              onClick={() => onOpenTab("locations")}
+              className={linkAction}
+            >
+              {__("Change in location setup", "foundhint-local-seo")}
+            </button>
+          </span>
+        ) : null}
       </div>
 
       {locked ? null : (

@@ -65,6 +65,8 @@ export function TabPanel(props) {
         locked={!props.plan.business}
         busy={props.switching}
         onTurnOn={() => props.onToggle?.(props.tab, true)}
+        headOffice={props.business?.main?.visit === "no"}
+        onOpenTab={props.onOpenTab}
       />
     );
   }

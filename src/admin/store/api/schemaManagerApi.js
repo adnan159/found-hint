@@ -188,6 +188,16 @@ export const schemaManagerApi = baseApi
         invalidatesTags: ["SchemaManager", "Location"],
       }),
 
+      // "Create location page": a new page with the branch's details.
+      createLocationPage: builder.mutation({
+        query: (id) => ({
+          url: url(`/schema/locations/${Number(id)}/page`),
+          method: "POST",
+        }),
+        transformResponse: (response) => response?.data ?? null,
+        invalidatesTags: ["SchemaManager", "Location"],
+      }),
+
       // A separate business's own schema, for its own website.
       getSeparateSchema: builder.query({
         query: (id) => url(`/schema/locations/${Number(id)}/separate`),
@@ -353,6 +363,7 @@ export const {
   useFoundLocationsMutation,
   useSetLocationRoleMutation,
   useSetLocationPageMutation,
+  useCreateLocationPageMutation,
   useGetSeparateSchemaQuery,
   useGetWebsiteSchemaQuery,
   useSaveWebsiteSchemaMutation,

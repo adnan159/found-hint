@@ -137,6 +137,7 @@ export default function SchemaPage() {
                 choose(0);
               }}
               onOpenMain={() => go("localbusiness")}
+              onOpenTab={go}
               syncedAt={state?.synced_at}
               locationId={locationId}
               branchName={

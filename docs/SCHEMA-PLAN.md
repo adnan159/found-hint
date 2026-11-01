@@ -361,7 +361,7 @@ Built in order A → B → C → D (the 6-tab bar stays, by decision).
 **A. Choose your main business — done 2026-11-01**
 - [x] With more than one location and no choice yet, the Main business tab asks first: each Google profile (area, ★ rating, "Suggested" when its website is this site), or "My head office isn't on Google — enter details manually" (name required, address, website).
 - [x] A location chosen becomes the primary location across FoundHint; a head office typed here describes the LocalBusiness from those details (nothing from a listing it is not) and every location becomes a branch. Saved in the business row's `extras.main`; `GET/PUT schema/main` (`mode`: location | manual | ask).
-- [ ] "Your main business is a head office" status — with the setup wizard (B).
+- [x] "Your main business is a head office" status — tab 02, when location setup says customers don't visit: its off panel explains it (Open 01 Organization, Change in location setup) and its summary reads "Head office · described in 01". Done 2026-11-01.
 
 **B. Locations — done 2026-11-02**
 - [x] Roles per profile (`LocationRoles`, `extras.role` / `role_confirmed`): main, branch, separate (its own website — nothing published here), removed. An unconfirmed profile works as a branch, as before; only branches are branches (`LocationSchema::branches()`).
@@ -369,9 +369,9 @@ Built in order A → B → C → D (the 6-tab bar stays, by decision).
 - [x] "N more Google profiles found": Generate branch schema / Not now (hidden until another is found).
 - [x] Location setup, 3 steps: main business (or a head office typed by hand), do customers visit it (no → Organization on, LocalBusiness off), a role for each other profile with FoundHint's suggestion (another domain → Separate).
 - [x] Branch editor: All locations breadcrumb, role and status tags, alerts, 01 Location page (an existing page, saved at once; "used by …"), 02 Schema type (own subtype, never Organization), 03 Parent business (Organization 01, Main business 02, or none), 04 Inherit from brand (logo, social profiles, price range). Existing fields, print switch, branch pills and placement stay.
-- [x] Separate business: its own LocalBusiness schema at its website's `#business`, to copy there, or "Treat as a branch anyway".
+- [x] Separate business: its own LocalBusiness schema at its website's `#business`, to copy there, or "Treat as a branch anyway". "Open" replaces the list with its own view, like a branch's editor: details, the warning, three steps to publish it on its own site and the actions on the left, its schema in the preview beside them; "All locations" goes back.
 - [x] Routes: `GET schema/locations/roster`, `POST schema/locations/setup`, `POST schema/locations/found`, `PUT schema/locations/{id}/role`, `PUT schema/locations/{id}/page`, `GET schema/locations/{id}/separate`. Free: `LocationRepository` writes `wordpress_post_id`.
-- [ ] "Create location page" — in the design's data but not its markup; not built.
+- [x] "Create location page" — section 01's two cards (Create location page · Recommended, with its `/locations/{branch}/` path; Use an existing page). Creating asks once ("Create and publish page"), then publishes a page under `/locations/` with the branch's description, address, phone, hours and map, and assigns it (`LocationPage`, `POST schema/locations/{id}/page`). Done 2026-11-01.
 **C. Settings and site output — done 2026-11-02** (Step 5's core; the 6-tab bar kept, so the website rows are tab 05)
 - [x] Output live: `schema.output`, `schema.website`, `schema.settings` in `Features::active()`. `Output` builds the entities once (cached, invalidated by every schema save, settings save, `save_post`, `deleted_post`, theme switch and the data stamp) and gives each request its page's nodes as one `@graph` in `<script id="fhint-schema">`.
 - [x] What prints: a switched-on tab, an active entity (no drafts, paused branches or inactive services), on its placement; business types only while "Who publishes it" allows; WebSite / WebPage / BreadcrumbList only while FoundHint owns them. References to entities printed on other pages are kept.
