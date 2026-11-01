@@ -1,5 +1,6 @@
-import { useId } from "react";
+import { help } from "@/pages/profile/styles";
 import { cn } from "cn";
+import { useId } from "react";
 import {
   panel,
   panelBody,
@@ -7,7 +8,6 @@ import {
   panelHeader,
   panelTitle,
 } from "../styles";
-import { help } from "@/pages/profile/styles";
 
 /**
  * A card on the Reviews screen, drawn as a Business Profile section: an
