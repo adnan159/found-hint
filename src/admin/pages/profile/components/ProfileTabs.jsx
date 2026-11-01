@@ -60,7 +60,7 @@ export function ProfileTabs({
       <TabsList
         variant="line"
         aria-label={__("Profile sections", "foundhint-local-seo")}
-        className="fhint:h-auto! fhint:w-full fhint:flex-nowrap fhint:justify-start fhint:gap-1 fhint:overflow-x-auto fhint:overflow-y-hidden fhint:p-0 fhint:pb-[5px] fhint:shadow-[inset_0_-2px_0_var(--border)]"
+        className="fhint:h-auto! fhint:w-full fhint:flex-nowrap fhint:justify-start fhint:gap-1 fhint:overflow-x-auto fhint:overflow-y-hidden fhint:p-0 fhint:shadow-[inset_0_-2px_0_var(--border)]"
       >
         {tabs.map(({ id, icon: Icon, label }) => {
           const mark = TAB_STATUS_MARKS[getSectionState(id)];
@@ -69,7 +69,7 @@ export function ProfileTabs({
             <TabsTrigger
               key={id}
               value={id}
-              className="fhint:flex-none fhint:cursor-pointer fhint:rounded-none fhint:px-2.5 fhint:py-2 fhint:text-[13px] fhint:font-bold"
+              className="fhint:flex-none fhint:cursor-pointer fhint:rounded-none fhint:px-2.5 fhint:py-2 fhint:text-[13px] fhint:font-bold fhint:data-active:bg-primary! fhint:data-active:text-primary-foreground! fhint:after:hidden!"
             >
               <Icon aria-hidden="true" />
               {label}
@@ -77,7 +77,10 @@ export function ProfileTabs({
                 <span
                   className={cn(
                     "fhint:size-2 fhint:flex-none fhint:rounded-full",
-                    mark.tone,
+                    // An orange dot would vanish on the orange active tab.
+                    id === activeTab && mark.tone === "fhint:bg-primary"
+                      ? "fhint:bg-primary-foreground"
+                      : mark.tone,
                   )}
                 >
                   <span className="fhint:sr-only">{mark.label()}</span>

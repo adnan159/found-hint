@@ -53,6 +53,13 @@
   --color-foreground-soft: var(--foreground-soft);
   --color-link-accent: var(--link-accent);
   --color-success: var(--success);
+  --color-success-tint: var(--success-tint);
+  --color-destructive-tint: var(--destructive-tint);
+  --color-info: var(--info);
+  --color-info-tint: var(--info-tint);
+  --color-warning: var(--warning);
+  --color-warning-border: var(--warning-border);
+  --color-warning-foreground: var(--warning-foreground);
   --color-band-needs-work: var(--band-needs-work);
   --color-band-fair: var(--band-fair);
   --color-band-good: var(--band-good);
@@ -105,6 +112,38 @@
      by its 2px weight, not by a darker colour. Left undefined, it falls back
      to the text colour and every such rule turns near-black. */
   --divider: var(--border);
+  /* Restored: these were dropped when shadcn re-initialised the theme
+     (commit 2f7595c) while 150-odd classes still used them, so help text,
+     "Saved" ticks and score bands fell back to plain black. Values as they
+     were, measured from the prototype. */
+  /* Secondary text: help, captions, counts. */
+  --muted-strong: #605d5d;
+  /* Body copy a step darker than --muted-strong. */
+  --foreground-soft: #444141;
+  --link-accent: #d8521f;
+  /* Completed work is green, not the brand orange — orange is for things
+     that still want attention. */
+  --success: #157f4b;
+  --success-foreground: #ffffff;
+  /* Tag and badge tints: a good, bad or Google-sourced value. */
+  --success-tint: #e8f3ed;
+  --destructive-tint: #fbe9e6;
+  --info: #2a5d8f;
+  --info-tint: #e7eff6;
+  /* Amber "check this" warnings — softer than an error, and not the brand
+     accent, which marks what still wants doing. */
+  --warning: #fbf0de;
+  --warning-border: #f0d9ae;
+  --warning-foreground: #7a4a05;
+  /* The health score's bands. */
+  --band-needs-work: #c02718;
+  --band-fair: #b26a00;
+  --band-good: #157f4b;
+  --band-excellent: #157f4b;
+  --band-empty: #eae7e7;
+  /* Sidebar sub-items, and the quieter disclosure chevron. */
+  --sidebar-sub-foreground: #444141;
+  --sidebar-chevron: #9b9797;
   /* Plan-limit, "heads up" and "coming soon" notices — an accent-tinted
      band, not an error — measured from the prototype. Left undefined (they
      were lost once, in the tooltip commit), `bg-notice` is transparent and
@@ -141,12 +180,14 @@
   --chart-5: oklch(0.269 0 0);
   --sidebar: oklch(0.205 0 0);
   --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(70.45% 0.19257 39.216) sss;
+  --sidebar-primary: oklch(70.45% 0.19257 39.216);
   --sidebar-primary-foreground: oklch(0.98 0.016 73.684);
   --sidebar-accent: oklch(0.269 0 0);
   --sidebar-accent-foreground: oklch(0.985 0 0);
   --sidebar-border: oklch(1 0 0 / 10%);
   --sidebar-ring: oklch(0.556 0 0);
+  --sidebar-sub-foreground: oklch(0.708 0 0);
+  --sidebar-chevron: oklch(0.708 0 0);
 }
 
 @layer base {
@@ -243,6 +284,15 @@
   border-color: var(--destructive);
 }
 
+/* A read-only field keeps its edge when clicked: nothing in it can change,
+   so it should not look ready for typing. Read-only fields are kept out of
+   the Tab order (`tabIndex={-1}`), so no keyboard focus goes unseen. A
+   refused field stays red. */
+#fhint-app input[readonly]:not([aria-invalid="true"]):focus-visible,
+#fhint-app textarea[readonly]:not([aria-invalid="true"]):focus-visible {
+  border-color: var(--input);
+}
+
 #fhint-app input:focus,
 #fhint-app textarea:focus,
 #fhint-app select:focus {
@@ -270,6 +320,18 @@
 [data-slot="sidebar-nav"] a[aria-current="page"]:active,
 [data-slot="sidebar-nav"] a[aria-current="page"]:focus {
   color: var(--sidebar-accent-foreground);
+}
+
+/*
+ * The rest of the app's links keep their colours by marking them important
+ * (see `quietLink` in the profile styles). What is left of WordPress's focus
+ * treatment is the blue glow: dropped on a mouse click, leaving each link's
+ * own ring for the keyboard.
+ */
+#fhint-app a:focus:not(:focus-visible),
+[data-slot="dialog-content"] a:focus:not(:focus-visible) {
+  box-shadow: none;
+  outline: none;
 }
 
 [data-slot="sidebar-nav"] a:focus-visible {

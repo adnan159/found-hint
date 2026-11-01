@@ -44,19 +44,10 @@ const NAV_ITEMS = [
   // Locations and services are tabs of the Business profile — every
   // location is reached through its "Switch location" menu — so they have no
   // rows of their own here.
+  // The Schema screen has its own five tabs, so no sub-items here.
   {
     to: "/schema",
     label: () => __("Schema", "foundhint-local-seo"),
-    children: [
-      {
-        id: "schema-owner",
-        label: () => __("Who publishes it", "foundhint-local-seo"),
-      },
-      {
-        id: "schema-preview",
-        label: () => __("What gets published", "foundhint-local-seo"),
-      },
-    ],
   },
   {
     to: "/audit",

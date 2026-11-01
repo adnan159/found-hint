@@ -336,7 +336,7 @@ export function Composer({
                 type="button"
                 disabled
                 title={__(
-                  "Writing with AI is part of FoundHint Pro.",
+                  "Writing with AI is part of FoundHint Premium.",
                   "foundhint-local-seo",
                 )}
                 className="fhint:inline-flex fhint:cursor-not-allowed fhint:items-center fhint:justify-center fhint:gap-2 fhint:border-0 fhint:bg-card fhint:px-3 fhint:py-2 fhint:text-[12.5px] fhint:font-extrabold fhint:text-muted-foreground"
@@ -657,7 +657,7 @@ export function Composer({
                     aria-checked="false"
                     disabled
                     title={__(
-                      "Scheduling posts is part of FoundHint Pro.",
+                      "Scheduling posts is part of FoundHint Premium.",
                       "foundhint-local-seo",
                     )}
                     className={segment(false)}

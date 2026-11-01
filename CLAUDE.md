@@ -13,8 +13,16 @@ class with a static `init()` owning one subdirectory of classes. The admin
 is a Vite-built React SPA mounted on a single WordPress admin page.
 
 The data layer (business, locations, opening hours, services), its REST API
-and the admin screens for all of it are built. The audit engine and schema
-output are not — see `docs/PROGRESS.md` for exactly what is done and next.
+and the admin screens for all of it are built.
+
+**Schema Manager (built; Premium):** the six-tab Schema screen — 01
+Organization, 02 LocalBusiness (main business), 03 Locations (list, setup,
+branch editor), 04 Services, 05 Website structure, 06 Settings — each schema
+tab with an on/off switch. Premium prints the site's schema itself
+(`schema.output`): one `@graph` per page. Decisions, data model, the
+Free/Premium split and every checklist are in
+[`docs/SCHEMA-PLAN.md`](docs/SCHEMA-PLAN.md); open items are unticked there.
+See `docs/PROGRESS.md` for exactly what is done and how it was verified.
 
 The sibling `local-seo` plugin in this same directory is the reference for
 the *product*: its `docs/DATABASE.md`, `API.md` and `FEATURES.md` describe
@@ -330,14 +338,19 @@ through it, so a Pro tier raises a number instead of rewriting core. If
 Pro needs more, add narrow filters at the specific points it needs and
 document them; don't reintroduce a generic registry.
 
-**FoundHint Pro** is a separate add-on plugin (`../found-hint-pro`) that is
-**server-side only**: REST routes (`fhint-pro/v1`), data, jobs, limits.
+**FoundHint Pro** is a separate add-on plugin (`../found-hint-premium`) that is
+**server-side only**: REST routes (`fhint-premium/v1`), data, jobs, limits.
 **All UI — Pro screens included — lives in this plugin.** A Pro screen is
 wrapped in `<ProFeature feature="…" fallback={upsell}>` and shows only
 when Pro reports serving that feature through `fhint_admin_bootstrap_data`
 (`src/admin/lib/pro.js`). See [`docs/EXTENDING.md`](docs/EXTENDING.md).
 UI-side gating (`PRO` badges, greyed "PRO ONLY" rows, sample-data cards)
 is described in `docs/NAVIGATION.md`.
+
+Premium has its own release build, the same shape as this plugin's minus
+Vite: `npm run plugin:publish` in `../found-hint-premium` makes
+`found-hint-premium.zip` (see its `CLAUDE.md`). Ship the free release a
+Premium release depends on first.
 
 ## Never do
 

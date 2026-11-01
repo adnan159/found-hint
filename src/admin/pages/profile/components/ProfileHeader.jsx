@@ -9,6 +9,9 @@ export function ProfileHeader({
   onPublish,
   publishDisabled,
   publishHint,
+  onRefresh,
+  isRefreshing,
+  refreshDisabled,
 }) {
   return (
     <header className="fhint:-mx-4 fhint:-mt-6 fhint:flex fhint:flex-col">
@@ -17,6 +20,9 @@ export function ProfileHeader({
         onPublish={onPublish}
         publishDisabled={publishDisabled}
         publishHint={publishHint}
+        onRefresh={onRefresh}
+        isRefreshing={isRefreshing}
+        refreshDisabled={refreshDisabled}
       />
     </header>
   );

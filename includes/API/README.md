@@ -365,6 +365,10 @@ Writable: `name`, `slug`, `description`, `image_attachment_id`,
   URL. Send `slug` explicitly to change it.
 - A `price` requires a `currency`: `service.currency.required_with_price`.
 - `POST` returns `409 fhint_business_required` when no business exists.
+- `DELETE` also removes what the Schema Manager kept about the service —
+  its row in `fhint_schema_entities` and its providers and areas — so
+  nothing is left behind whether or not FoundHint Premium is active.
+  Deleting a location's own list does the same for every service on it.
 
 ### `POST /services/reorder`
 
@@ -419,7 +423,7 @@ Partial. Writable:
 |---|---|---|
 | `delete_data_on_uninstall` | boolean | Default **false**. Deleting the plugin to troubleshoot must not cost the operator their work, so removing data is opt-in. |
 | `log_retention_days` | integer | 1–365, default 30. |
-| `schema_mode` | string | `auto`, `plugin`, `seo_plugin`, `disabled`. Stored now; the schema engine that reads it is not built yet. |
+| `schema_mode` | string | `auto`, `plugin`, `seo_plugin`, `disabled`. Read by `App\Schema\Ownership` — the Schema screen's "Who publishes it": whether FoundHint publishes the business markup or leaves it to an SEO plugin that already does. |
 
 Settings are stored as one option (`fhint_settings`) in grouped form
 (`general`, `logs`, `schema`) and flattened for this route. **A key must

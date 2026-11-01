@@ -109,6 +109,28 @@ class Installer {
 
 		self::drop_old_service_slug_key();
 		self::remember_google_listings();
+		self::rename_veterinarian_type();
+	}
+
+	/**
+	 * "Veterinarian" was offered as a business type, but schema.org has no
+	 * such type — the real one is VeterinaryCare — so a vet's markup named
+	 * a type Google does not know. Stored values are renamed once; on an
+	 * up-to-date site this matches no rows.
+	 *
+	 * @return void
+	 */
+	private static function rename_veterinarian_type() {
+		global $wpdb;
+
+		if ( ! Tables::exists( Tables::BUSINESS ) ) {
+			return;
+		}
+
+		$table = Tables::name( Tables::BUSINESS );
+
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+		$wpdb->query( $wpdb->prepare( "UPDATE {$table} SET business_type = %s WHERE business_type = %s", 'VeterinaryCare', 'Veterinarian' ) );
 	}
 
 	/**

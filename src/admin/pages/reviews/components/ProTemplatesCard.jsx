@@ -24,11 +24,11 @@ export function ProTemplatesCard() {
         />
         {data
           ? sprintf(
-              /* translators: %s: the FoundHint Pro version. */
-              __("FoundHint Pro %s is active.", "foundhint-local-seo"),
+              /* translators: %s: the FoundHint Premium version. */
+              __("FoundHint Premium %s is active.", "foundhint-local-seo"),
               data.version,
             )
-          : __("Loading FoundHint Pro…", "foundhint-local-seo")}
+          : __("Loading FoundHint Premium…", "foundhint-local-seo")}
       </p>
     </SectionCard>
   );

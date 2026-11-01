@@ -408,6 +408,7 @@ export default function GooglePage() {
               </Button>
               <Button
                 variant="outline"
+                className="fhint:text-foreground!"
                 render={
                   <a
                     href={GOOGLE_CONSOLE_URL}
@@ -524,6 +525,7 @@ export default function GooglePage() {
             </Button>
             <Button
               variant="outline"
+              className="fhint:text-foreground!"
               render={
                 <a
                   href={GOOGLE_CONSOLE_URL}

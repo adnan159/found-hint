@@ -109,7 +109,7 @@ export function DescriptionField({
         aria-describedby={`${descriptionId}-help`}
         className={cn(
           input,
-          "fhint:resize-y fhint:p-[11px] fhint:text-[13.5px] fhint:leading-[1.55]",
+          "fhint:resize-y fhint:text-[13.5px] fhint:leading-[1.55]",
         )}
       />
       <div id={`${descriptionId}-help`} className="fhint:grid fhint:gap-1.5">
@@ -141,7 +141,7 @@ export function DescriptionField({
           {history.map((version) => (
             <li
               key={version.id}
-              className="fhint:m-0 fhint:flex fhint:flex-wrap fhint:items-start fhint:gap-3 fhint:border-b fhint:border-b-[#e6e3e3] fhint:px-3.5 fhint:py-[11px] fhint:last:border-b-0"
+              className="fhint:m-0 fhint:flex fhint:flex-wrap fhint:items-start fhint:gap-3 fhint:border-b fhint:border-b-border fhint:px-3.5 fhint:py-[11px] fhint:last:border-b-0"
             >
               <span className="fhint:w-[110px] fhint:flex-none fhint:text-[12.5px] fhint:font-bold fhint:text-muted-strong">
                 {formatWhen(version.created_at)}

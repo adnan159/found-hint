@@ -137,7 +137,7 @@ export function PostRow({ post, onEdit }) {
               target="_blank"
               rel="noopener noreferrer"
               className={cn(
-                "fhint:inline-flex fhint:items-center fhint:gap-1 fhint:text-muted-strong fhint:underline fhint:underline-offset-2",
+                "fhint:inline-flex fhint:items-center fhint:gap-1 fhint:text-muted-strong! fhint:underline fhint:underline-offset-2",
                 focus,
               )}
             >

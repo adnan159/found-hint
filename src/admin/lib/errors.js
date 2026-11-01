@@ -78,6 +78,255 @@ const MESSAGES = {
       "Google accepts an opening date up to one year ahead.",
       "foundhint-local-seo",
     ),
+  // Schema Manager — Business.
+  "schema.business.kind.invalid": () =>
+    __("Choose Organization or LocalBusiness.", "foundhint-local-seo"),
+  "schema.business.type.invalid": () =>
+    __("Choose a business type from the list.", "foundhint-local-seo"),
+  "schema.business.name.required": () =>
+    __("Enter the name customers know you by.", "foundhint-local-seo"),
+  "schema.business.name.too_long": () =>
+    __("A name can be 200 characters at most.", "foundhint-local-seo"),
+  "schema.business.url.invalid": () =>
+    __(
+      "Enter a full web address, starting with https://",
+      "foundhint-local-seo",
+    ),
+  "schema.business.logo.invalid": () =>
+    __("Enter the full web address of your logo image.", "foundhint-local-seo"),
+  "schema.business.map_url.invalid": () =>
+    __(
+      "Use a Google Maps link, such as https://maps.google.com/?cid=…",
+      "foundhint-local-seo",
+    ),
+  "schema.business.telephone.invalid": () =>
+    __(
+      "Enter a phone number with its country code, such as +880 1712-345670.",
+      "foundhint-local-seo",
+    ),
+  "schema.business.price_range.too_long": () =>
+    __("A price range can be 100 characters at most.", "foundhint-local-seo"),
+  "schema.business.description.too_long": () =>
+    __("Google allows 750 characters in a description.", "foundhint-local-seo"),
+  "schema.business.street_address.too_long": () =>
+    __("That address line is too long.", "foundhint-local-seo"),
+  "schema.business.locality.too_long": () =>
+    __("That city name is too long.", "foundhint-local-seo"),
+  "schema.business.region.too_long": () =>
+    __("That region name is too long.", "foundhint-local-seo"),
+  "schema.business.postal_code.too_long": () =>
+    __("That postal code is too long.", "foundhint-local-seo"),
+  "schema.business.country.invalid": () =>
+    __(
+      "Use the two-letter country code, such as BD or US.",
+      "foundhint-local-seo",
+    ),
+  "schema.business.latitude.invalid": () =>
+    __("Latitude is a number between -90 and 90.", "foundhint-local-seo"),
+  "schema.business.longitude.invalid": () =>
+    __("Longitude is a number between -180 and 180.", "foundhint-local-seo"),
+  "schema.business.areas_served.too_many": () =>
+    __("List up to 50 places.", "foundhint-local-seo"),
+  "schema.business.social.invalid": () =>
+    __(
+      "Put one link per line, each starting with https://",
+      "foundhint-local-seo",
+    ),
+  "schema.business.legal_name.too_long": () =>
+    __("A legal name can be 200 characters at most.", "foundhint-local-seo"),
+  "schema.business.alternate_name.too_long": () =>
+    __(
+      "An alternate name can be 200 characters at most.",
+      "foundhint-local-seo",
+    ),
+  "schema.business.founder.too_long": () =>
+    __(
+      "A founder's name can be 200 characters at most.",
+      "foundhint-local-seo",
+    ),
+  "schema.business.email.invalid": () =>
+    __(
+      "Enter an email address, such as hello@example.com.",
+      "foundhint-local-seo",
+    ),
+  "schema.business.contact_email.invalid": () =>
+    __(
+      "Enter an email address, such as support@example.com.",
+      "foundhint-local-seo",
+    ),
+  "schema.business.founding_date.invalid": () =>
+    __(
+      "Enter the date as YYYY-MM-DD, such as 2019-03-01. A year, or a year and month, also works.",
+      "foundhint-local-seo",
+    ),
+  "schema.business.founding_date.future": () =>
+    __("A founding date can't be in the future.", "foundhint-local-seo"),
+  "schema.business.knows_about.too_long": () =>
+    __("Keep each topic to 100 characters or fewer.", "foundhint-local-seo"),
+  "schema.business.knows_about.too_many": () =>
+    __(
+      "List 10 topics at most — the ones you are really known for.",
+      "foundhint-local-seo",
+    ),
+  "schema.business.contact_type.invalid": () =>
+    __("Choose a contact type from the list.", "foundhint-local-seo"),
+  "schema.business.contact_telephone.invalid": () =>
+    __(
+      "Enter a phone number with 7 to 15 digits, such as +880 1518-984873.",
+      "foundhint-local-seo",
+    ),
+  "schema.business.contact_telephone.not_international": () =>
+    __(
+      "Add the country code, such as +880 1518-984873, or set the country, so the number can be written in international form.",
+      "foundhint-local-seo",
+    ),
+  "schema.business.contact_languages.too_long": () =>
+    __("Keep each language to 40 characters or fewer.", "foundhint-local-seo"),
+  "schema.business.contact_languages.too_many": () =>
+    __("List 10 languages at most.", "foundhint-local-seo"),
+  "schema.business.social.too_many": () =>
+    __("List 20 profile links at most.", "foundhint-local-seo"),
+  "schema.website.page.required": () =>
+    __(
+      "Choose the page for this row, or switch it off.",
+      "foundhint-local-seo",
+    ),
+  "schema.website.page.invalid": () =>
+    __("Choose a published page.", "foundhint-local-seo"),
+  "schema.website.name.too_long": () =>
+    __("A name can be 200 characters at most.", "foundhint-local-seo"),
+  "schema.output.placement.invalid": () =>
+    __("Choose the head or the end of the page.", "foundhint-local-seo"),
+  "schema.location.role.invalid": () =>
+    __("Choose Branch or Separate.", "foundhint-local-seo"),
+  "schema.location.role.not_a_profile": () =>
+    __("That isn't one of your other Google profiles.", "foundhint-local-seo"),
+  "schema.location.type.invalid": () =>
+    __("Choose a business type from the list.", "foundhint-local-seo"),
+  "schema.location.page.not_found": () =>
+    __("That page no longer exists. Choose another.", "foundhint-local-seo"),
+  "schema.location.page.no_name": () =>
+    __(
+      "Give this branch a name first; the page is named after it.",
+      "foundhint-local-seo",
+    ),
+  "schema.main.location.invalid": () =>
+    __("Choose one of your locations.", "foundhint-local-seo"),
+  "schema.main.name.required": () =>
+    __("Enter your head office's name.", "foundhint-local-seo"),
+  "schema.main.name.too_long": () =>
+    __("A name can be 200 characters at most.", "foundhint-local-seo"),
+  "schema.main.address.too_long": () =>
+    __("An address can be 255 characters at most.", "foundhint-local-seo"),
+  "schema.main.website.invalid": () =>
+    __(
+      "Enter the website's full address, starting with https://.",
+      "foundhint-local-seo",
+    ),
+  "schema.business.telephone.not_international": () =>
+    __(
+      "Add the country code, such as +880 1518-984873, or set the country, so the number can be written in international form.",
+      "foundhint-local-seo",
+    ),
+  "schema.business.logo.external": () =>
+    __(
+      "Choose the logo from your Media Library, so your site serves it.",
+      "foundhint-local-seo",
+    ),
+  "schema.business.images.external": () =>
+    __(
+      "Choose photos from your Media Library, so your site serves them.",
+      "foundhint-local-seo",
+    ),
+  fhintpremium_photo_not_found: () =>
+    __("That photo is not on your Google profile.", "foundhint-local-seo"),
+  fhintpremium_photo_download_failed: () =>
+    __(
+      "The photo could not be downloaded from Google. Try again.",
+      "foundhint-local-seo",
+    ),
+  fhintpremium_photo_not_image: () =>
+    __("Google sent something that is not a photo.", "foundhint-local-seo"),
+  fhintpremium_photo_import_failed: () =>
+    __(
+      "The photo could not be added to your Media Library.",
+      "foundhint-local-seo",
+    ),
+  "schema.business.images.invalid": () =>
+    __("Every image must be a web address.", "foundhint-local-seo"),
+  "schema.business.images.too_many": () =>
+    __("Choose up to 10 images.", "foundhint-local-seo"),
+  "schema.business.visit_mode.invalid": () =>
+    __("Choose where customers visit you.", "foundhint-local-seo"),
+  "schema.business.extra.invalid": () =>
+    __("That value is not one this field accepts.", "foundhint-local-seo"),
+  "schema.location.email.invalid": () =>
+    __(
+      "Enter an email address, such as branch@example.com.",
+      "foundhint-local-seo",
+    ),
+  "schema.location.branch_code.too_long": () =>
+    __("A branch code can be 60 characters at most.", "foundhint-local-seo"),
+  "schema.location.parent.invalid": () =>
+    __("Choose your business, or not part of a group.", "foundhint-local-seo"),
+  "schema.location.status.invalid": () =>
+    __("Switch the branch on or off.", "foundhint-local-seo"),
+  "schema.service.name.required": () =>
+    __("Give the service a name.", "foundhint-local-seo"),
+  "schema.service.name.too_long": () =>
+    __("A service name can be 255 characters at most.", "foundhint-local-seo"),
+  "schema.service.description.too_long": () =>
+    __(
+      "Keep the short description to 300 characters or fewer.",
+      "foundhint-local-seo",
+    ),
+  "schema.service.service_type.too_long": () =>
+    __("A category can be 100 characters at most.", "foundhint-local-seo"),
+  "schema.service.status.invalid": () =>
+    __("Switch the service on or off.", "foundhint-local-seo"),
+  "schema.service.image.invalid": () =>
+    __(
+      "Enter the image's full web address, starting with https://.",
+      "foundhint-local-seo",
+    ),
+  "schema.service.provider.invalid": () =>
+    __("Choose who provides this service.", "foundhint-local-seo"),
+  "schema.service.provider.branch_required": () =>
+    __("Choose at least one branch.", "foundhint-local-seo"),
+  "schema.service.person.too_long": () =>
+    __(
+      "A provider's name can be 200 characters at most.",
+      "foundhint-local-seo",
+    ),
+  "schema.service.person.invalid": () =>
+    __("Choose a person or a partner company.", "foundhint-local-seo"),
+  "schema.service.areas.too_many": () =>
+    __("A service can list 20 places at most.", "foundhint-local-seo"),
+  "schema.service.areas.too_long": () =>
+    __("A place name can be 191 characters at most.", "foundhint-local-seo"),
+  "schema.service.areas.invalid": () =>
+    __("Choose what kind of place it is.", "foundhint-local-seo"),
+  "schema.service.page.invalid": () =>
+    __(
+      "Enter the page's full web address, starting with https://.",
+      "foundhint-local-seo",
+    ),
+  "schema.service.page.not_found": () =>
+    __("That page no longer exists. Choose another.", "foundhint-local-seo"),
+  "schema.service.pricing.invalid": () =>
+    __("Choose how the price is shown.", "foundhint-local-seo"),
+  "schema.service.price.required": () =>
+    __("Enter a price, or choose No price.", "foundhint-local-seo"),
+  "schema.service.price.invalid": () =>
+    __("Enter a price as a number, such as 1500.", "foundhint-local-seo"),
+  "schema.service.price_max.required": () =>
+    __("Enter the top of the range.", "foundhint-local-seo"),
+  "schema.service.price_max.below_min": () =>
+    __("The top of the range must be above its start.", "foundhint-local-seo"),
+  "schema.service.currency.invalid": () =>
+    __("Choose a currency.", "foundhint-local-seo"),
+  "schema.placement.invalid": () =>
+    __("Choose where the schema is added.", "foundhint-local-seo"),
   // Posts.
   "post.type.invalid": () =>
     __("Choose update, event or offer.", "foundhint-local-seo"),
@@ -357,7 +606,12 @@ const MESSAGES = {
  * @return {string} Human-readable message.
  */
 export function messageForCode(code) {
-  const entry = MESSAGES[code];
+  // A branch field shares the business field's wording.
+  const entry =
+    MESSAGES[code] ??
+    (String(code).startsWith("schema.location.")
+      ? MESSAGES[String(code).replace("schema.location.", "schema.business.")]
+      : undefined);
 
   return entry ? entry() : code;
 }
@@ -418,6 +672,21 @@ export function errorMessage(error) {
       __("Add your business details first.", "foundhint-local-seo"),
     fhint_location_not_found: () =>
       __("That location no longer exists.", "foundhint-local-seo"),
+    fhintpremium_cannot_publish_pages: () =>
+      __(
+        "Your account can't publish pages, so FoundHint can't create one. Use an existing page instead.",
+        "foundhint-local-seo",
+      ),
+    fhintpremium_page_not_created: () =>
+      __(
+        "The page couldn't be created. Try again, or use an existing page.",
+        "foundhint-local-seo",
+      ),
+    fhintpremium_google_required: () =>
+      __(
+        "Connect your Google Business Profile to set up schema.",
+        "foundhint-local-seo",
+      ),
     fhint_post_not_found: () =>
       __(
         "That post no longer exists. Sync posts to see the latest.",

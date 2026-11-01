@@ -1,8 +1,10 @@
 import { cn } from "cn";
-import { input, quietButton, smallInput } from "@/pages/profile/styles";
+import { textInput } from "@/lib/fieldStyles";
+import { quietButton } from "@/pages/profile/styles";
 
 /**
- * Borders for controls inside the Reviews dialogs.
+ * Borders for buttons inside the Reviews dialogs; fields take the same
+ * firm edge from `lib/fieldStyles`.
  *
  * The theme's own border colour is a very pale grey; on a white dialog over
  * a dark backdrop it nearly disappears, and buttons stop reading as buttons.
@@ -21,8 +23,6 @@ export const dialogButton = cn(
   "fhint:hover:bg-muted fhint:disabled:border-[#e2dcda] fhint:disabled:hover:bg-card",
 );
 
-// Fields also take `fhint-firm-edge`: index.css restates every field's
-// border colour above any utility, and that class is what it lets through.
-export const dialogInput = cn(firm(input), "fhint-firm-edge");
+export const dialogInput = textInput({ firm: true });
 
-export const dialogSmallInput = cn(firm(smallInput), "fhint-firm-edge");
+export const dialogSmallInput = textInput({ size: "sm", firm: true });

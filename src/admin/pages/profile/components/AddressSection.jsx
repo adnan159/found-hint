@@ -1,6 +1,6 @@
 import { __, sprintf } from "@wordpress/i18n";
 import { ExternalLinkIcon, MapPinIcon } from "lucide-react";
-import { quietButton } from "../styles";
+import { quietLink } from "../styles";
 import MapPreview, { mapQuery } from "./MapPreview";
 import TextField from "./TextField";
 import ServiceAreaField from "./address/ServiceAreaField";
@@ -68,7 +68,7 @@ export function AddressSection({
       {locked ? (
         <div
           role="note"
-          className="fhint:border fhint:border-[#F0D9AE] fhint:bg-[#FBF0DE] fhint:px-[15px] fhint:py-[13px] fhint:text-[13px] fhint:leading-normal fhint:text-[#7a4a05]"
+          className="fhint:border fhint:border-warning-border fhint:bg-warning fhint:px-[15px] fhint:py-[13px] fhint:text-[13px] fhint:leading-normal fhint:text-warning-foreground"
         >
           {__(
             "For your safety, Google does not let apps change a verified address. To move your address, update it in your Google Business Profile and FoundHint will pick up the change on the next sync.",
@@ -133,7 +133,7 @@ export function AddressSection({
             href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(mapQuery({ latitude, longitude, query: mapSearch }))}`}
             target="_blank"
             rel="noopener noreferrer"
-            className={quietButton}
+            className={quietLink}
           >
             {__("Open in Maps", "foundhint-local-seo")}
             <ExternalLinkIcon aria-hidden="true" className="fhint:size-3" />
@@ -144,7 +144,7 @@ export function AddressSection({
             href="https://business.google.com/"
             target="_blank"
             rel="noopener noreferrer"
-            className={quietButton}
+            className={quietLink}
           >
             {__("Change address on Google", "foundhint-local-seo")}
             <ExternalLinkIcon aria-hidden="true" className="fhint:size-3" />

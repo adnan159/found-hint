@@ -73,7 +73,7 @@ export function AutoReplySetup({ onClose }) {
     <ReviewsDialog
       title={__("Set up auto-reply", "foundhint-local-seo")}
       description={__(
-        "A preview of the auto-reply settings, which are coming in FoundHint Pro.",
+        "A preview of the auto-reply settings, which are coming in FoundHint Premium.",
         "foundhint-local-seo",
       )}
       onClose={onClose}
@@ -81,7 +81,10 @@ export function AutoReplySetup({ onClose }) {
       note={
         <span className="fhint:flex fhint:items-center fhint:gap-2">
           <SoonTag />
-          {__("Auto-reply is coming in FoundHint Pro.", "foundhint-local-seo")}
+          {__(
+            "Auto-reply is coming in FoundHint Premium.",
+            "foundhint-local-seo",
+          )}
         </span>
       }
       footer={

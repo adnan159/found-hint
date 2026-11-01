@@ -204,7 +204,7 @@ export default function Posts() {
               type="button"
               disabled
               title={__(
-                "Scheduling posts from a CSV file is part of FoundHint Pro.",
+                "Scheduling posts from a CSV file is part of FoundHint Premium.",
                 "foundhint-local-seo",
               )}
               className={proButton}
@@ -220,7 +220,7 @@ export default function Posts() {
               type="button"
               disabled
               title={__(
-                "Writing with AI is part of FoundHint Pro.",
+                "Writing with AI is part of FoundHint Premium.",
                 "foundhint-local-seo",
               )}
               className={proButton}

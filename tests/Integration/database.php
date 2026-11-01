@@ -167,7 +167,7 @@ check( ! empty( $changes ), 'the first run creates tables' );
 $missing = Tables::missing();
 
 check_same( array(), $missing, 'every declared table exists after installation' );
-check_same( 15, count( Tables::all() ), 'all fifteen tables are declared' );
+check_same( 19, count( Tables::all() ), 'all nineteen tables are declared' );
 
 foreach ( array_keys( Tables::all() ) as $key ) {
 	check( Tables::exists( $key ), "table {$key} exists in MySQL" );
@@ -2128,6 +2128,17 @@ $fhint_migrate->setAccessible( true );
 $fhint_migrate->invoke( null );
 
 check_same( 'locations/reconnect-1', LocationRepository::find( (int) $fhint_other['id'] )['google_location_name'], 'the migration gives an already-linked location its memory' );
+
+// "Veterinarian" is not a schema.org type: stored values become VeterinaryCare.
+$fhint_type_before = BusinessRepository::get()['business_type'];
+$wpdb->update( Tables::name( Tables::BUSINESS ), array( 'business_type' => 'Veterinarian' ), array( 'id' => BusinessRepository::current_id() ) );
+$fhint_rename = new ReflectionMethod( FHINT\Installer::class, 'rename_veterinarian_type' );
+$fhint_rename->setAccessible( true );
+$fhint_rename->invoke( null );
+check_same( 'VeterinaryCare', BusinessRepository::get()['business_type'], 'a stored Veterinarian type becomes VeterinaryCare' );
+$fhint_rename->invoke( null );
+check_same( 'VeterinaryCare', BusinessRepository::get()['business_type'], 'and running it again changes nothing' );
+$wpdb->update( Tables::name( Tables::BUSINESS ), array( 'business_type' => $fhint_type_before ), array( 'id' => BusinessRepository::current_id() ) );
 
 // Leave the table as the later sections expect it.
 LocationRepository::delete( (int) $fhint_shop['id'] );

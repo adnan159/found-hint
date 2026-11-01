@@ -1,7 +1,7 @@
 import { __ } from "@wordpress/i18n";
 import { Link } from "react-router";
 import { cn } from "cn";
-import { focus, help, primaryButton } from "../styles";
+import { focus, help, primaryButton, primaryLink } from "../styles";
 
 const pill = (on) =>
   cn(
@@ -20,7 +20,7 @@ function Box({ on }) {
         "fhint:grid fhint:size-[15px] fhint:flex-none fhint:place-items-center fhint:rounded-[3px] fhint:border fhint:text-[10px] fhint:font-extrabold fhint:text-primary-foreground",
         on
           ? "fhint:border-primary fhint:bg-primary"
-          : "fhint:border-[#9b9797] fhint:bg-card",
+          : "fhint:border-muted-foreground fhint:bg-card",
       )}
     >
       {on ? "✓" : ""}
@@ -204,10 +204,7 @@ export function AttributesSection({
                 : __("Read from Google", "foundhint-local-seo")}
             </button>
           ) : (
-            <Link
-              to="/google"
-              className={cn(primaryButton, "fhint:no-underline")}
-            >
+            <Link to="/google" className={primaryLink}>
               {__("Connect Google", "foundhint-local-seo")}
             </Link>
           )}

@@ -44,6 +44,15 @@ class Admin {
 
 		array_unshift( $links, $settings_link );
 
+		// Without Premium installed: where to get it.
+		if ( ! defined( 'FHINTPREMIUM_VERSION' ) ) {
+			$links[] = sprintf(
+				'<a href="%s" target="_blank" rel="noopener noreferrer" style="color:#D8521F;font-weight:700;">%s</a>',
+				esc_url( (string) apply_filters( 'fhint_upgrade_url', 'https://foundhint.com/pricing/' ) ),
+				esc_html__( 'Get Pro', 'foundhint-local-seo' )
+			);
+		}
+
 		return $links;
 	}
 }

@@ -120,7 +120,7 @@ export function ServicesSection({ model, onChange, errors, services }) {
             return (
               <li
                 key={item.id ?? `new-${index}`}
-                className="fhint:m-0 fhint:flex fhint:flex-wrap fhint:items-start fhint:gap-3 fhint:border-b fhint:border-b-[#eae7e7] fhint:px-3.5 fhint:py-3 fhint:last:border-b-0"
+                className="fhint:m-0 fhint:flex fhint:flex-wrap fhint:items-start fhint:gap-3 fhint:border-b fhint:border-b-border fhint:px-3.5 fhint:py-3 fhint:last:border-b-0"
               >
                 <div className="fhint:grid fhint:min-w-[200px] fhint:flex-1 fhint:gap-1">
                   <span className="fhint:flex fhint:flex-wrap fhint:items-center fhint:gap-2">

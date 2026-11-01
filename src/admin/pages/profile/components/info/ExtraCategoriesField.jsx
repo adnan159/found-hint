@@ -2,6 +2,7 @@ import { useId, useState } from "react";
 import { __, sprintf } from "@wordpress/i18n";
 import Hint from "@/components/Hint";
 import { cn } from "cn";
+import { chipBox, chipBoxInput } from "@/lib/fieldStyles";
 import { errorText, focus, label } from "../../styles";
 import CategorySearch from "../CategorySearch";
 
@@ -43,7 +44,7 @@ export function ExtraCategoriesField({ model, onChange, errors, max }) {
       </div>
       <div
         className={cn(
-          "fhint:flex fhint:flex-wrap fhint:items-center fhint:gap-1.5 fhint:border fhint:border-input fhint:p-[7px]",
+          chipBox,
           errors?.secondary_categories && "fhint:border-destructive",
         )}
       >
@@ -91,7 +92,7 @@ export function ExtraCategoriesField({ model, onChange, errors, max }) {
                 )
               : __("Type a category and choose it", "foundhint-local-seo")
           }
-          inputClassName="fhint:w-full fhint:border-0 fhint:bg-transparent fhint:p-1.5 fhint:text-[13px] fhint:outline-none"
+          inputClassName={cn(chipBoxInput, "fhint:w-full fhint:text-[13px]")}
           onType={setExtraDraft}
           onChoose={(category) => {
             onChange({
