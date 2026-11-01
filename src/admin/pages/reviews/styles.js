@@ -1,5 +1,5 @@
 import { cn } from "cn";
-import { input } from "@/pages/profile/styles";
+import { focus, input } from "@/pages/profile/styles";
 
 /**
  * The Reviews screen's look — the Business Profile's and the Schema
@@ -11,9 +11,6 @@ import { input } from "@/pages/profile/styles";
  */
 export {
   dialogButton,
-  panel,
-  panelChip,
-  panelHeader,
   panelTitle,
   primaryAction,
 } from "@/pages/schema/components/styles";
@@ -25,5 +22,12 @@ export {
  */
 export const dialogInput = cn(input, "fhint-focus-accent");
 
-/** A panel's body: the profile section's padding. */
-export const panelBody = "fhint:grid fhint:gap-5 fhint:p-5";
+/**
+ * A small square icon button: Edit and Delete beside a review's reply and
+ * beside a post. The icon is the label's picture; each button carries its
+ * words for screen readers.
+ */
+export const iconButton = cn(
+  "fhint:grid fhint:size-7 fhint:cursor-pointer fhint:place-items-center fhint:border fhint:border-border fhint:bg-card fhint:text-muted-strong fhint:hover:text-foreground fhint:disabled:cursor-not-allowed",
+  focus,
+);

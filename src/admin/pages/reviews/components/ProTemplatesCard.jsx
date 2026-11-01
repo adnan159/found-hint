@@ -2,7 +2,7 @@ import { __, sprintf } from "@wordpress/i18n";
 import { BadgeCheckIcon, MessageSquareTextIcon } from "lucide-react";
 import RequestError from "@/components/RequestError";
 import { useGetProStatusQuery } from "@/store/api/proApi";
-import Panel from "./Panel";
+import Panel from "@/components/Panel";
 
 /**
  * Reply templates with FoundHint Pro active — shown in place of the

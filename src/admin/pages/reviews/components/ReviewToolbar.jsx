@@ -2,7 +2,7 @@ import { __, sprintf } from "@wordpress/i18n";
 import { DownloadIcon, MessageSquareIcon } from "lucide-react";
 import Hint from "@/components/Hint";
 import { dialogButton } from "../styles";
-import Panel from "./Panel";
+import Panel from "@/components/Panel";
 
 /**
  * Which reviews are showing: "Showing 1 to 10 of 24". Said under the

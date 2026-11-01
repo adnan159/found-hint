@@ -3,15 +3,17 @@ import { cn } from "cn";
 import { useId } from "react";
 import {
   panel,
-  panelBody,
   panelChip,
   panelHeader,
   panelTitle,
-} from "../styles";
+} from "@/pages/schema/components/styles";
 
 /**
- * A card on the Reviews screen, drawn as a Business Profile section: an
- * icon, the title and its chip over the heavier 2px rule, then the body.
+ * A card drawn as a Business Profile section: an icon, the title (with an
+ * optional line under it) and its chip over the heavier 2px rule, then the
+ * body. Reviews and Posts & Scheduling build their screens from it.
+ *
+ * A panel with no children is its heading row alone.
  *
  * @param {Object}                    props
  * @param {import('react').ElementType} [props.icon]  Lucide icon.
@@ -41,13 +43,13 @@ export function Panel({
       <div
         className={cn(
           panelHeader,
-          "fhint:box-border fhint:min-h-[64px] fhint:py-2",
+          "fhint:box-border fhint:min-h-16 fhint:py-2",
         )}
       >
         {Icon ? (
           <span
             aria-hidden="true"
-            className="fhint:grid fhint:size-[22px] fhint:flex-none fhint:place-items-center fhint:text-muted-strong"
+            className="fhint:grid fhint:size-5.5 fhint:flex-none fhint:place-items-center fhint:text-muted-strong"
           >
             <Icon className="fhint:size-4" />
           </span>
@@ -83,7 +85,11 @@ export function Panel({
           </div>
         ) : null}
       </div>
-      <div className={cn(panelBody, bodyClassName)}>{children}</div>
+      {children ? (
+        <div className={cn("fhint:grid fhint:gap-5 fhint:p-5", bodyClassName)}>
+          {children}
+        </div>
+      ) : null}
     </section>
   );
 }

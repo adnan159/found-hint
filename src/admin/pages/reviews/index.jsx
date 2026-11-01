@@ -1,15 +1,15 @@
 import { useMemo, useState } from "react";
 import { __ } from "@wordpress/i18n";
 import RequestError from "@/components/RequestError";
+import ListFooter from "@/components/ListFooter";
 import ProFeature from "@/components/ProFeature";
 import ProTemplatesCard from "./components/ProTemplatesCard";
 import ReplyDialog from "./components/ReplyDialog";
 import ReviewFilters from "./components/ReviewFilters";
 import ReviewList from "./components/ReviewList";
-import ReviewListFooter from "./components/ReviewListFooter";
 import ReviewsHeader from "./components/ReviewsHeader";
 import ReviewsNotice from "./components/ReviewsNotice";
-import ReviewToolbar from "./components/ReviewToolbar";
+import ReviewToolbar, { showingText } from "./components/ReviewToolbar";
 import TemplatesCard from "./components/TemplatesCard";
 import useReviewActions from "./hooks/useReviewActions";
 import useReviewList from "./hooks/useReviewList";
@@ -102,10 +102,8 @@ export default function Reviews() {
               />
 
               {list.total ? (
-                <ReviewListFooter
-                  from={list.from}
-                  to={list.to}
-                  total={list.total}
+                <ListFooter
+                  summary={showingText(list)}
                   page={list.page}
                   pages={list.pages}
                   perPage={list.perPage}

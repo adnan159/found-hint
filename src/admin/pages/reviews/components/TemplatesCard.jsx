@@ -10,7 +10,7 @@ import { cn } from "cn";
 import { focus, help, linkButton, tag, tagTones } from "@/pages/profile/styles";
 import { sampleTemplates } from "../lib/templates";
 import SoonTag from "./SoonTag";
-import Panel from "./Panel";
+import Panel from "@/components/Panel";
 import TemplateDialog from "./TemplateDialog";
 
 /**

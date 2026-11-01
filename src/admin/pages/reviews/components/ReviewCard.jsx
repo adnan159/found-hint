@@ -20,17 +20,12 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { errorMessage } from "@/lib/errors";
-import { focus, tag, tagTones } from "@/pages/profile/styles";
-import { panelTitle, primaryAction } from "../styles";
+import { tag, tagTones } from "@/pages/profile/styles";
+import { iconButton, panelTitle, primaryAction } from "../styles";
 import { useDeleteReviewReplyMutation } from "@/store/api/reviewsApi";
 import { formatDate, initialsOf } from "../lib/replies";
 import ReviewPhotos from "./ReviewPhotos";
 import Stars from "./Stars";
-
-const iconButton = cn(
-  "fhint:grid fhint:size-7 fhint:cursor-pointer fhint:place-items-center fhint:border fhint:border-border fhint:bg-card fhint:text-muted-strong fhint:hover:text-foreground fhint:disabled:cursor-not-allowed",
-  focus,
-);
 
 /**
  * The reviewer's photo from Google, or their initials when there is none

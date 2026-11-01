@@ -1,7 +1,7 @@
 import { __ } from "@wordpress/i18n";
 import { MessageSquareIcon } from "lucide-react";
 import { Empty, EmptyDescription, EmptyTitle } from "@/components/ui/empty";
-import Panel from "./Panel";
+import Panel from "@/components/Panel";
 
 /**
  * Why there are no reviews to show, in a Reviews panel: no Google
