@@ -4,10 +4,16 @@
 step finishes: what shipped, and how it was verified — the evidence, not the
 intent. Name any bug the verification caught.
 
-Last updated: step 65. The data layer, its REST API and the admin screens
-for everything it covers exist. The Schema Manager's Business, Location and
-Service tabs are built in FoundHint Premium; its front-end output (Step 5
-of `docs/SCHEMA-PLAN.md`) is not.
+Last updated: step 75. The data layer, its REST API and the admin screens
+for everything it covers exist. The Schema Manager is built in FoundHint
+Premium and matches the design (`FoundHint Schema (1).html`): six tabs —
+01 Organization, 02 LocalBusiness, 03 Locations (list, setup, branch
+editor, separate businesses, "Create location page"), 04 Services, 05
+Website structure, 06 Settings — and Premium prints the site's schema
+itself, one `@graph` per page. Premium builds its own release zip with
+`npm run plugin:publish`. What is still open is the unticked items in
+`docs/SCHEMA-PLAN.md`: the WP-Cron live check, SoftwareApplication (Q4),
+Step 6's QA and release checks, and the last "Pro" → "Premium" copy.
 
 ## Step 0 · Scaffold — done
 
@@ -2174,3 +2180,227 @@ LocalBusiness off).
 **Bug caught:** the database suite read the site's real tab switches, so
 it failed whenever the developer had switched a tab off.
 
+## Step 68 — Design update B: the Locations tab
+
+The Locations tab now opens on a list of every Google profile — main
+business, branches, separate businesses — with each one's page, output
+status and issues; branches open in an editor with the design's four
+sections; location setup assigns everything in three steps.
+
+**Shipped (Premium):** `LocationRoles` (roles, the list, issues, found
+profiles, setup, a separate business's own schema); `LocationSchema` — only
+branches are branches, a branch's own type, the Organization as a parent
+(only while it is on), inheritance switches, `set_page()`, the editor's
+extra state; `MainBusiness` keeps whether customers visit; six routes.
+**Shipped (free):** `LocationList`, `LocationSetup`, `SeparatePanel`,
+`BranchSections`, `lib/locations`; "Part of" moved into 03 Parent business
+(with the Organization added, "Not part of a group" kept); "All locations"
+stays on the tab; `LocationRepository` writes a location's page.
+
+**Verified:** Premium smoke 251, database 204, mutation-tested (one
+survivor, equivalent: removed profiles are never added to the visible
+rows). Free domain 142, database 721. Browser on the real site: the list
+(FoundHint main and live; the Pet Shop a branch needing a page, flagged
+for its other domain, found with a "separate" suggestion), the editor's
+sections, the parent change reaching the preview, the unsaved prompt on
+All locations, the wizard's three steps (cancelled). Nothing saved; the
+developer's switches restored.
+
+## Step 69 — Design update C: Settings, website structure, and live output
+
+FoundHint Premium now prints the site's schema itself (Step 5): each page
+gets its own graph — the Organization and LocalBusiness on their pages,
+each live branch on its page, each service on its page, the website on the
+home page, the page itself and its breadcrumb trail — in one script tag,
+in the head or the footer. Tab 05 Website structure and the Settings
+sections from the new design control it.
+
+**Shipped (Premium):** `Output` (cached entities with their placement,
+per-page nodes, page types), `Pieces\WebPage` (WebPage / AboutPage /
+ContactPage, BreadcrumbList), `SiteSettings` (website rows, output switch
+and position, page map, SEO plugins), `LiveCheck`, `Renderer` live with a
+placement filter; routes `schema/website`, `schema/settings`,
+`schema/page-map`, `schema/live-check`; tab summaries for 05 and 06;
+features `schema.website`, `schema.settings`, `schema.output`.
+**Shipped (free):** `WebsiteTab`, `OutputSettings` (above "Who publishes
+it"), messages.
+
+**Verified:** Premium smoke 273, database 224, mutation-tested (one
+survivor: the home page's trail is also dropped for being one step long).
+The live home page now prints Organization, ProfessionalService, WebSite
+and WebPage from Premium. Browser: tab 05's rows, Settings' sections, the
+page map with the real pages, Check my site.
+
+**Bugs caught:** the main-business question would have stopped the
+LocalBusiness printing until answered (it gates the screen only now); page
+paths lost `?p=` on a site without pretty permalinks; the database suite
+could leave a cache built from its test tables for the real site (it now
+restores the cache version and flushes). On this Docker setup the server
+cannot reach its own `localhost:8100`, so Check my site reports it could
+not reach the site; the comparison itself was verified on the real home
+page's HTML.
+
+## Step 70 — Design update D: "Outputs on"
+
+The branch editor's preview ends with the line from the design: "Outputs
+on: /its-page/", or why it prints nowhere yet ("no page yet. Assign one to
+publish.", not published yet, a shared page). `JsonPreview` takes it as
+`outputsOn`.
+
+**Bug caught:** a branch's `image` listed the brand's photos; the design
+says a branch's images always come from its own Google profile. Branches
+now print only their own photos imported into the Media Library, and the
+editor lists Images among what is never inherited. Premium database 226
+(the new check fails with the old behaviour); browser: the line and the
+preview without the brand's photos.
+
+This completes the design update (A–D).
+
+
+## Step 71 — Locations, Services and Settings matched to the design
+
+The screens now match `FoundHint Schema (1).html` in look and layout; no
+feature was removed.
+
+- **Locations list** (`LocationList`): the design's summary bar (icon,
+  counts, "Synced from Google … ago", Run location setup as a link,
+  Refresh from Google), the found-profiles banner, the six-column table
+  (rounded role, output and warning pills with dots; main row first with
+  "Main business — edit in tab 02"; light red background on blocked rows),
+  Edit / Change or Assign page / Open tab 02 / Open, the "…" menu and the
+  colour legend. The setup wizard, separate-business panel and the
+  one-location panel stay. `syncedAt` reaches the list through
+  `TabPanel` → `LocationTab`.
+- **Branch editor**: fields in three columns when the panel is wide
+  (name / phone / email, city / region / postcode, country / lat / long),
+  one column when narrow (a container query). Long field tags and Google
+  field paths wrap instead of spilling into the next column.
+- **Services**: with a service open, the list sits above its form and the
+  preview runs beside both (the editor's wrapper is `display: contents`,
+  so its form and preview are cells of the tab's grid). The list is never
+  remounted when switching services; on a narrow screen everything stacks.
+  Reordering, publish switches and everything else are unchanged.
+- **Settings**: status tags use the design's rounded pills.
+
+Lint, build and every smoke suite (free and Premium) pass. Docs: `SCHEMA-PLAN.md` §4 (shared pieces: pills, the two layouts, `JsonPreview`'s `outputsOn` and `className`) and its open items. Browser: list,
+editor, setup wizard and separate panel against the design at 1440px, the
+services layout at 1440px and phone width. The Pet Shop was made a branch
+to view the editor and set back to separate afterwards.
+
+## Step 72 — A separate business opens beside its schema
+
+"Open" on a separate business used to add its warning and schema under
+the table, full width. It now replaces the list like Edit does for a
+branch: `SeparatePanel` has the "All locations" breadcrumb, the Separate
+and "Not on this site" pills, its name and address, the warning, three
+steps to publish it on its own website, Copy schema and Treat as a branch
+anyway on the left, and the JSON preview on the right ("Outputs on: not
+this site"). Focus moves to its heading. Browser: open, back, the preview
+beside the panel at 1440px. The Pet Shop was set to separate for the
+check and returned to branch afterwards.
+
+## Step 73 — Create location page, and the head-office notice
+
+The last two Locations items from the design.
+
+**Create location page.** Branch editor section 01 now has the design's
+two cards: *Create location page* (Recommended, showing
+`/locations/{branch}/`) and *Use an existing page* (the page picker).
+Picking "Create" shows one confirm, "Create and publish page", because it
+publishes real content. Premium's new `LocationPage` then publishes a page
+under a "Locations" parent (the site's own `/locations/` page if it has
+one), with the branch's description, address, phone (tel: link), opening
+hours (days nobody set are left out) and a map (an embed when there is a
+map pin, plus a Google Maps link), and assigns it like a picked page. The
+page is the owner's to edit from then on; FoundHint never rewrites it.
+Pages it made carry `_fhintpremium_location_page`, so the card shows as
+chosen. Route: `POST schema/locations/{id}/page`. Errors:
+`schema.location.page.no_name`, `fhintpremium_cannot_publish_pages`,
+`fhintpremium_page_not_created`.
+
+**Head-office notice.** When location setup says customers don't visit the
+main business, tab 02 is off. Its panel now says "Your main business is a
+head office. It's described in 01 Organization, and your branches link to
+it as their parent. Change this in location setup." with *Open 01
+Organization* and *Change in location setup*, and the tab reads "Head
+office · described in 01" instead of "Off · not printed". The turn-on
+button stays.
+
+**Tests.** Premium smoke 286 (+10: escaping, the one-line address, tel
+link, two periods, closed / 24 hours, unset days left out, embed only with
+a pin, slug and its fallback); database 237 (+7: published, under
+Locations, its details, "created" true and then false for another page,
+the main business refused; cleans up the pages it made). Every new check
+was mutation-tested and fails against broken code. The free harness's
+`esc_html` stand-in now really escapes (all free suites still pass).
+Browser: created the Pet Shop's page from the editor (branch went Live,
+its PetStore schema printed on the page), then deleted it; the head-office
+panel and its links.
+
+## Step 74 — Services matched to the design
+
+**Look.** With a service open, the list and its editor are one card, as in
+the design: header, "Services offered" with its counts, the rows in their
+own bordered box, then the black "Editing" bar and the sections (orange
+numbers, 15px titles, 2px dark dividers). Rows use the design's rounded
+"From Google" / "N to check" pills, a green Active or grey Inactive, an
+orange edge and tint on the open service, and fade when inactive. Field
+tags are rounded pills; area chips have a dark border and the Add button is
+black. Nothing was removed: reordering (drag and arrows), the checks list,
+the featured-image choice and Remove service stay. New file:
+`components/services/pills.js`.
+
+**Selects were grey.** The shared field style greys anything matching CSS
+`:read-only`, which every `<select>` does; the Services editor now
+overrides it so its selects are white like the design's. (Other screens
+still use the shared style unchanged.)
+
+**Google photo as the image.** The Image select lists the list owner's
+synced Google photos by role ("Google photo: Cover 1", "Gallery 2" …;
+`options.photos` from `ServiceSchema::photo_choices()`). Saving copies the
+photo into the Media Library before anything is written (`with_photo()` →
+`Media::import`, which accepts only that profile's photos), so a failed
+download leaves no half-saved service. The service stores the local URL in
+`image_url` and the Google URL in `extras.image_source`; the schema prints
+the local copy only, and a preview never downloads.
+
+**No-areas warning.** `no_areas` ("No service areas yet. Add the places
+you actually serve.") joins the service warnings, shown with the others
+under 04 and counted in "N to check".
+
+**Tests.** Premium database 243 (+6: no_areas and clearing it, a Google
+photo must be an address, a photo not on the profile is refused with
+nothing saved, a preview never prints Google's address, photos offered);
+one existing check now expects `no_areas` too. Each was mutation-tested.
+Browser: the list and editor beside the design at 1440px; picked "Google
+photo: Gallery 1", saved — the schema's image became
+`/wp-content/uploads/…/data-center-management-photo.jpg` and the choice
+survived a reload; then set back to No image and the copied file deleted.
+
+## Step 75 — Settings checked against the design
+
+Compared tab 06 with the design's Settings at 1440px. Changed:
+
+- **Add to my site header**: the design's 34px icon box (orange on
+  #FFF1EB) and an ⓘ hint beside the title. The "Where in the page" select
+  is white — it was greyed by the shared field style's `:read-only` rule,
+  which every `<select>` matches.
+- **Works with your SEO plugin**: active plugins one per row; the
+  supported ones that aren't installed share one row, as in the design
+  ("Rank Math, All in One SEO, SEOPress — Supported. Not installed." ·
+  Ready). The Yoast fix box uses the design's colours and an orange
+  button.
+
+Kept on purpose: the header's one-line description, each page's path and
+"Your other N pages get: …" in What goes where (the design shows names
+only), Who publishes it, and What gets added showing the single
+`<script id="fhint-schema">` @graph that Premium really prints (the
+design draws one script per section).
+
+**Bug fixed**: tab 02's summary said "Head office · described in 01"
+whenever location setup recorded that customers don't visit, even with
+the LocalBusiness tab switched on and printing. It now shows only while
+the tab is off; switched on, it names the type as before.
+
+Browser: the header, select, plugin rows and tab 02's summary on the dev
+site. The Yoast box needs Yoast active, so only its styles changed.

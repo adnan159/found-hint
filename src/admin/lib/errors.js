@@ -186,6 +186,30 @@ const MESSAGES = {
     __("List 10 languages at most.", "foundhint-local-seo"),
   "schema.business.social.too_many": () =>
     __("List 20 profile links at most.", "foundhint-local-seo"),
+  "schema.website.page.required": () =>
+    __(
+      "Choose the page for this row, or switch it off.",
+      "foundhint-local-seo",
+    ),
+  "schema.website.page.invalid": () =>
+    __("Choose a published page.", "foundhint-local-seo"),
+  "schema.website.name.too_long": () =>
+    __("A name can be 200 characters at most.", "foundhint-local-seo"),
+  "schema.output.placement.invalid": () =>
+    __("Choose the head or the end of the page.", "foundhint-local-seo"),
+  "schema.location.role.invalid": () =>
+    __("Choose Branch or Separate.", "foundhint-local-seo"),
+  "schema.location.role.not_a_profile": () =>
+    __("That isn't one of your other Google profiles.", "foundhint-local-seo"),
+  "schema.location.type.invalid": () =>
+    __("Choose a business type from the list.", "foundhint-local-seo"),
+  "schema.location.page.not_found": () =>
+    __("That page no longer exists. Choose another.", "foundhint-local-seo"),
+  "schema.location.page.no_name": () =>
+    __(
+      "Give this branch a name first; the page is named after it.",
+      "foundhint-local-seo",
+    ),
   "schema.main.location.invalid": () =>
     __("Choose one of your locations.", "foundhint-local-seo"),
   "schema.main.name.required": () =>
@@ -648,6 +672,16 @@ export function errorMessage(error) {
       __("Add your business details first.", "foundhint-local-seo"),
     fhint_location_not_found: () =>
       __("That location no longer exists.", "foundhint-local-seo"),
+    fhintpremium_cannot_publish_pages: () =>
+      __(
+        "Your account can't publish pages, so FoundHint can't create one. Use an existing page instead.",
+        "foundhint-local-seo",
+      ),
+    fhintpremium_page_not_created: () =>
+      __(
+        "The page couldn't be created. Try again, or use an existing page.",
+        "foundhint-local-seo",
+      ),
     fhintpremium_google_required: () =>
       __(
         "Connect your Google Business Profile to set up schema.",

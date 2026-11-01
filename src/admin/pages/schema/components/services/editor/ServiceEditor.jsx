@@ -145,13 +145,18 @@ export function ServiceEditor({
   const document = locked ? state.node : preview.document;
 
   return (
-    <div className="fhint:flex fhint:flex-wrap fhint:items-start fhint:gap-4">
+    // `contents`: the form and the preview are cells of ServiceTab's grid,
+    // so the list sits above the form and the preview beside both (design).
+    <div className="fhint:contents">
       <section
         ref={top}
         aria-label={__("Service editor", "foundhint-local-seo")}
         className={cn(
           panel,
-          "fhint:min-w-0 fhint:flex-[1_1_580px] fhint:scroll-mt-4",
+          "fhint:min-w-0 fhint:scroll-mt-4 fhint:border-t-0 fhint:@4xl:col-start-1",
+          // Selects count as read-only to CSS, so the shared field style
+          // greys them; the design's are white.
+          "fhint:[&_select:not(:disabled)]:bg-white fhint:[&_select:not(:disabled)]:text-[#201e1d]",
         )}
       >
         <EditorBar
@@ -251,6 +256,7 @@ export function ServiceEditor({
         live={live && !dirty && values.status === "active"}
         loading={preview.loading && !document}
         dirty={dirty}
+        className="fhint:mt-4 fhint:@4xl:col-start-2 fhint:@4xl:row-span-2 fhint:@4xl:row-start-1 fhint:@4xl:mt-0 fhint:@4xl:self-start"
       />
 
       <RemoveDialog

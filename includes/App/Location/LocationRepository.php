@@ -412,6 +412,8 @@ class LocationRepository {
 			'timezone'       => (string) $record['timezone'],
 			'status'         => (string) $record['status'],
 			'is_primary'     => ! empty( $record['is_primary'] ) ? 1 : 0,
+			// The page about this location (Schema Manager: its branch page).
+			'wordpress_post_id'    => isset( $record['wordpress_post_id'] ) ? max( 0, (int) $record['wordpress_post_id'] ) : 0,
 			'business_name'        => isset( $record['business_name'] ) ? (string) $record['business_name'] : '',
 			'description'          => isset( $record['description'] ) ? (string) $record['description'] : '',
 			// NULL until the location has links of its own; see the table docblock.

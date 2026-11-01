@@ -49,7 +49,7 @@ export const muted = help;
 // WordPress gives every admin `<code>` a 1px side margin, which left the
 // caption box narrower than the input above it.
 export const caption =
-  "fhint:m-0 fhint:font-mono fhint:text-[11px] fhint:text-muted-foreground";
+  "fhint:m-0 fhint:font-mono fhint:text-[11px] fhint:break-all fhint:text-muted-foreground";
 
 /** An amber note: something will not print as the owner may expect. */
 export const warningNote =

@@ -1,7 +1,8 @@
 import { __, sprintf } from "@wordpress/i18n";
 import { cn } from "cn";
 import Hint from "@/components/Hint";
-import { BADGES, card, chip, label, muted, pill } from "../../styles";
+import { card, chip, label, muted } from "../../styles";
+import { FIELD_PILL, PILL_TONES } from "../pills";
 import { EditorSection } from "./EditorSection";
 import { FieldError } from "./FieldError";
 
@@ -144,7 +145,7 @@ export function ProviderSection({ form, options, list }) {
             <label htmlFor={field("person")} className={label}>
               {__("Specific provider", "foundhint-local-seo")}
             </label>
-            <span className={cn(pill, BADGES.optional)}>
+            <span className={cn(FIELD_PILL, PILL_TONES.optional)}>
               {__("Optional", "foundhint-local-seo")}
             </span>
             <Hint

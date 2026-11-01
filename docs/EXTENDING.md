@@ -30,7 +30,7 @@ server: without Pro, the `fhint-premium/v1` routes do not exist.
 |---|---|---|
 | `fhint_loaded` | action | Pro wires its modules here (priority 20), after checking this plugin's version. |
 | `fhint_limits` | filter | Plan ceilings (`App\Core\Limits`). Pro sets every one to 0 = unlimited. |
-| `fhint_schema_document` | filter `( null, $context )` | Return a JSON-LD document (with `@graph`) to print instead of the free LocalBusiness markup; `null` keeps it. `$context` = `{ post_id, url, is_front_page }`. Feeds and embeds never print. Pro's Schema Manager uses it from Step 5 (`schema.output`). |
+| `fhint_schema_document` | filter `( null, $context )` | Return a JSON-LD document (with `@graph`) to print instead of the free LocalBusiness markup; `null` keeps it. `$context` = `{ post_id, url, is_front_page }`. Feeds and embeds never print. Premium's Schema Manager uses it while `schema.output` is on: one graph per page, or an empty one when "Add to my site header" is off. |
 | `fhint_schema_placement` | filter `( 'head' )` | `head` (wp_head) or `footer` (wp_footer, before `</body>`). |
 | `fhint_upgrade_url` | filter | Where "Upgrade to Pro" links (`window.FHINT.upgrade_url`). |
 | `fhint_admin_bootstrap_data` | filter | Pro adds `pro: { version, rest_url, features }` to `window.FHINT`, read by `src/admin/lib/pro.js`. The app's own keys cannot be removed or overwritten. Page source — never a secret. |
@@ -51,10 +51,10 @@ listed here — not a general registry.
 The posts table already has what Pro's posts need: `status` `scheduled`,
 `scheduled_at`, and `source` (`ai`, `csv`, `blog` — allowed on a request
 once Pro adds them through the `fhint_post_sources` filter).
-| `schema.business` | Schema → 01 Business schema | The five-tab screen, locked, filled with the free markup | Editable tab; Pro's `fhint-premium/v1/schema/*` routes |
-| `schema.locations` · `schema.services` | Schema tabs 02–03 | The tab locked, filled with the free markup | Editable tabs (shipped) |
-| `schema.website` · `schema.settings` | Schema tabs 04–05 | "Pro" | Each when its step ships (docs/SCHEMA-PLAN.md) |
-| `schema.output` | Front-end markup | Free LocalBusiness markup | Pro's per-page graph replaces it |
+| `schema.business` | Schema → 01 Organization and 02 LocalBusiness (main business) | The six-tab screen, locked, filled with the free markup | Editable tabs, their switches and the main-business choice; Premium's `fhint-premium/v1/schema/*` routes |
+| `schema.locations` · `schema.services` | Schema tabs 03–04 | The tab locked, filled with the free markup | Editable tabs (shipped): the Locations list, setup and branch editor; services |
+| `schema.website` · `schema.settings` | Schema tabs 05–06 | "Pro" (05); "Who publishes it" only (06) | Website structure rows; header output, live check, What goes where, SEO plugins (shipped) |
+| `schema.output` | Front-end markup | Free LocalBusiness markup | Premium's per-page graph replaces it (shipped); "Add to my site header" off prints nothing |
 
 The Schema Manager's tables (`fhint_schema_entities`, `…_service_providers`,
 `…_service_areas`, `…_page_index`) are created and dropped by this plugin

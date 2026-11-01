@@ -1,9 +1,9 @@
-import { useId } from "react";
 import Hint from "@/components/Hint";
+import { useId } from "react";
 
 /** The small grey number before each section's title: 01, 02… */
 export const sectionNumber =
-  "fhint:font-mono fhint:text-[11px] fhint:text-muted-foreground";
+  "fhint:text-[12px] fhint:font-bold fhint:text-[#D8521F]";
 
 /**
  * One numbered section of the service editor: number, title, an optional
@@ -15,9 +15,9 @@ export function EditorSection({ number, title, hint, children }) {
   return (
     <section
       aria-labelledby={id}
-      className="fhint:grid fhint:gap-3 fhint:border-t fhint:border-t-border fhint:px-5 fhint:py-4"
+      className="fhint:grid fhint:gap-3.5 fhint:border-t-2 fhint:border-t-[#201e1d] fhint:px-5 fhint:py-[18px] fhint:first-of-type:border-t-0"
     >
-      <div className="fhint:flex fhint:items-center fhint:gap-2">
+      <div className="fhint:flex fhint:items-center fhint:gap-2.5">
         <span className={sectionNumber}>{number}</span>
         <h3 id={id} className="fhint:m-0 fhint:text-sm fhint:font-bold">
           {title}

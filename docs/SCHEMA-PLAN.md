@@ -173,7 +173,10 @@ No row = defaults (derived type, no overrides, active, default placement).
 ```php
 'schema' => array(
 	'mode'      => 'auto',            // existing
-	'enabled'   => true,              // Settings tab master toggle
+	'enabled'   => true,              // Settings tab master toggle ("Add to my site header")
+	'tabs'      => array(             // each schema tab's switch (website: website.enabled)
+		'organization' => false, 'localbusiness' => true, 'locations' => true, 'services' => true,
+	),
 	'placement' => 'head',            // head | footer
 	'owners'    => array(),           // { Type: 'fhint' | '<plugin key>' }
 	'website'   => array( 'enabled' => true, 'name' => '', 'alternate_name' => '' ),
@@ -184,8 +187,15 @@ No row = defaults (derived type, no overrides, active, default placement).
 ),
 ```
 
-Live-check results are a cache, not a preference: Pro keeps them in a
-transient.
+Live-check results and the built output are caches, not preferences:
+Premium keeps them in transients (`fhintpremium_live_check`, and
+`fhintpremium_schema_site_*` keyed by the data stamp and the
+`fhintpremium_schema_version` counter).
+
+Per-entity choices that are not preferences live on the settings rows'
+`extras`: the business row's `main` (main business, head office, whether
+customers visit) and `found_dismissed`; each location's `role`,
+`role_confirmed`, `parent`, `inherit`.
 
 **Uninstall** drops the four tables with the others; Pro's uninstall never
 touches them (they belong to Free).
@@ -198,19 +208,25 @@ All in `src/admin/pages/schema/`:
 
 | Piece | From the design |
 |---|---|
-| `SchemaShell` | Header ("Synced from Google {ago}" + Refresh from Google → existing `POST /profile/google/refresh`), the five-step tab bar with live summaries, unsaved-changes guard ("Save, discard, or stay") |
-| `FieldRow` | Label, badges (Required by Google / …for a storefront / Recommended / Optional / From Google / Edited here), Edit ↔ Use Google's value, caption `gbp.path · property`, disagreement note |
-| `JsonPreview` | Live dot, `@type` chip, property count, syntax-coloured JSON from the **server** (`POST …/schema/preview`, debounced 400 ms), Copy schema, Test with Google, Check with Schema.org, "Save first to test the live page", "copy and paste into the Code tab" tip on a non-public site |
+| `SchemaShell` | Header ("Synced from Google {ago}" + Refresh from Google → existing `POST /profile/google/refresh`), the six-tab bar with live summaries and an on/off switch on each schema tab, unsaved-changes guard ("Save, discard, or stay") |
+| `FieldRow` | Label, badges (Required by Google / …for a storefront / Recommended / Optional / From Google / Edited here), Edit ↔ Use Google's value, caption `gbp.path · property`, disagreement note. Long badges and captions wrap inside narrow (three-column) rows |
+| `JsonPreview` | Live dot, `@type` chip, property count, syntax-coloured JSON from the **server** (`POST …/schema/preview`, debounced 400 ms), Copy schema, Test with Google, Check with Schema.org, "Save first to test the live page", "copy and paste into the Code tab" tip on a non-public site. `outputsOn` adds the "Outputs on: /page/" line (branches); `className` lets a tab place it in its own grid (Services: beside the list and the form) |
 | `PlacementCards` | Every page (with page count) / Home page only / Pages I choose + page chips; service variant |
 | `PageChips` / `PagePicker` | Searchable published pages with "Used by …" |
 | `SaveBar` | Saved and live / unsaved changes / saving |
 | `ProLock` | The locked state: inputs read-only, PRO tags, upgrade prompt; preview shows `GET /schema` (free markup) |
 | `ConnectScreen` | "Connect your Google Business Profile to set up schema" + Connect Google |
 | `schemaApi.js` | Pro endpoints via absolute URLs (`proRestUrl()`), like `proApi.js` |
+| Location pills (`lib/locations.js`) | `BADGE`, `TONES`, `DOTS`: the design's rounded pills for role, output status and warnings, also used by Settings' status tags |
+| Two-column layout | Form left, sticky preview right. Locations and Business use a wrapping flex row; Services is a container-query grid (list above the form, preview beside both, `ServiceEditor`'s wrapper is `display: contents`) so the list is never remounted when switching services |
 
 ---
 
 ## 5. Steps
+
+Tab numbers in Steps 0–3 are the original five-tab ones. The screen now has
+six: 01 Organization, 02 LocalBusiness (main business), 03 Locations, 04
+Services, 05 Website structure, 06 Settings (see "Two business tabs" below).
 
 Each step ends the same way: Free + Pro PHPCS clean; Pro smoke suite and a
 Pro database suite (new: `found-hint-premium/tests/Integration/schema.php`,
@@ -289,6 +305,19 @@ business country), Add this schema to.
 
 **Done when** two services on one page get distinct `@id`s and a warning; offers match the pricing model; no service creates a business node.
 
+**Design match (FoundHint Schema (1).html) — done 2026-11-01** (PROGRESS step 74)
+- [x] One card: header (16px title, Add a service), "Services offered" + counts, the rows in a bordered list, the black "Editing" bar (Remove service outlined), then the sections — orange numbers, 15px titles, 2px dark dividers. The preview stays beside both.
+- [x] Rows: rounded "From Google" and "N to check" pills, green "Active" / grey "Inactive", the open service with an orange edge and tint, an inactive row faded. Reorder arrows, drag and the checks list are kept.
+- [x] Field tags as rounded pills (Required black, From Google blue, Optional grey); white selects; area chips with a dark border and a black Add button.
+- [x] Image: the list owner's Google photos ("Google photo: Cover 1", "Gallery 2" …) besides No image, the page's featured image and a URL. Saving copies the photo into the Media Library first (only that profile's photos; a failed download saves nothing) and the schema prints the local copy, never Google's address; previews never download.
+- [x] Warning "No service areas yet. Add the places you actually serve." (`no_areas`).
+
+**Settings design match — done 2026-11-01** (PROGRESS step 75)
+- [x] Add to my site header: the design's icon box and ⓘ; the Where-in-the-page select is white.
+- [x] Works with your SEO plugin: each active plugin on its own row, every supported one not installed on one shared row ("Supported. Not installed." · Ready); the Yoast fix box in the design's colours with an orange "I've switched it off, check again".
+- [x] Kept, beyond the design: the header's description, page paths in What goes where, "Your other N pages get: …", Who publishes it, and the single `@graph` script in What gets added (what really prints).
+- [x] Fix: tab 02's "Head office · described in 01" shows only while the tab is off; with LocalBusiness on it names its type.
+
 ### QA fixes — Organization schema (report of 2026-10-29) — done 2026-11-01
 
 The QA report (`FoundHint Organization Schema — QA Test Report`, 8 defects)
@@ -306,7 +335,7 @@ tested the Business tab set to Organization. Fixed in the Business tab:
 
 **Still open from the report**
 - [ ] SoftwareApplication node (it describes FoundHint itself) — decide: a general opt-in section, or foundhint.com only (Q4).
-- [ ] The live site prints these only once Step 5's renderer ships; until then the markup is what "Copy schema" gives.
+- [x] The live site prints these — Step 5's renderer shipped (`schema.output`, done 2026-11-01).
 - [ ] Duplicate Organization with Yoast / Rank Math (WP-009) — Step 5's compat work.
 - [ ] The report's 43 manual tests in a real admin (saving, security, caching, theme switch, multisite).
 
@@ -338,33 +367,55 @@ switch in the tab bar.
   old `?tab=business` link opens it. The renderer (Step 5) must honour the
   switches.
 
-### Design update (FoundHint Schema (1).html) — in progress
+### Design update (FoundHint Schema (1).html) — done 2026-11-02
 
 Built in order A → B → C → D (the 6-tab bar stays, by decision).
 
 **A. Choose your main business — done 2026-11-01**
 - [x] With more than one location and no choice yet, the Main business tab asks first: each Google profile (area, ★ rating, "Suggested" when its website is this site), or "My head office isn't on Google — enter details manually" (name required, address, website).
 - [x] A location chosen becomes the primary location across FoundHint; a head office typed here describes the LocalBusiness from those details (nothing from a listing it is not) and every location becomes a branch. Saved in the business row's `extras.main`; `GET/PUT schema/main` (`mode`: location | manual | ask).
-- [ ] "Your main business is a head office" status — with the setup wizard (B).
+- [x] "Your main business is a head office" status — tab 02, when location setup says customers don't visit: its off panel explains it (Open 01 Organization, Change in location setup) and its summary reads "Head office · described in 01". Done 2026-11-01.
 
-**B. Locations** — list of profiles (role, page, status, issues, actions), location setup wizard, "more profiles found", branch editor (create or pick a page, parent picker, inherit switches, issue alerts), separate-website profiles.
-**C. Settings** — header output and position, live check, website structure rows, "What goes where", SEO plugin conflicts (with Step 5).
-**D. Preview** — "Outputs on: {page}".
+**B. Locations — done 2026-11-02**
+- [x] Roles per profile (`LocationRoles`, `extras.role` / `role_confirmed`): main, branch, separate (its own website — nothing published here), removed. An unconfirmed profile works as a branch, as before; only branches are branches (`LocationSchema::branches()`).
+- [x] The list: summary, every profile with role, assigned page, output status (Live, Needs a page, Blocked, Paused, Not on this site), issues (no or unpublished page, shared page, missing details — blocking; other domain, duplicate phone or address — warning; missing map pin or hours — recommended) and actions (Edit, Assign/Change page, Open tab 02, Open; menu: Pause/Resume output, Re-sync from Google, Remove from schema). One location: "Your main business schema covers it" with "Add another location" steps.
+- [x] "N more Google profiles found": Generate branch schema / Not now (hidden until another is found).
+- [x] Location setup, 3 steps: main business (or a head office typed by hand), do customers visit it (no → Organization on, LocalBusiness off), a role for each other profile with FoundHint's suggestion (another domain → Separate).
+- [x] Branch editor: All locations breadcrumb, role and status tags, alerts, 01 Location page (an existing page, saved at once; "used by …"), 02 Schema type (own subtype, never Organization), 03 Parent business (Organization 01, Main business 02, or none), 04 Inherit from brand (logo, social profiles, price range). Existing fields, print switch, branch pills and placement stay.
+- [x] Separate business: its own LocalBusiness schema at its website's `#business`, to copy there, or "Treat as a branch anyway". "Open" replaces the list with its own view, like a branch's editor: details, the warning, three steps to publish it on its own site and the actions on the left, its schema in the preview beside them; "All locations" goes back.
+- [x] Routes: `GET schema/locations/roster`, `POST schema/locations/setup`, `POST schema/locations/found`, `PUT schema/locations/{id}/role`, `PUT schema/locations/{id}/page`, `GET schema/locations/{id}/separate`. Free: `LocationRepository` writes `wordpress_post_id`.
+- [x] "Create location page" — section 01's two cards (Create location page · Recommended, with its `/locations/{branch}/` path; Use an existing page). Creating asks once ("Create and publish page"), then publishes a page under `/locations/` with the branch's description, address, phone, hours and map, and assigns it (`LocationPage`, `POST schema/locations/{id}/page`). Done 2026-11-01.
+**C. Settings and site output — done 2026-11-02** (Step 5's core; the 6-tab bar kept, so the website rows are tab 05)
+- [x] Output live: `schema.output`, `schema.website`, `schema.settings` in `Features::active()`. `Output` builds the entities once (cached, invalidated by every schema save, settings save, `save_post`, `deleted_post`, theme switch and the data stamp) and gives each request its page's nodes as one `@graph` in `<script id="fhint-schema">`.
+- [x] What prints: a switched-on tab, an active entity (no drafts, paused branches or inactive services), on its placement; business types only while "Who publishes it" allows; WebSite / WebPage / BreadcrumbList only while FoundHint owns them. References to entities printed on other pages are kept.
+- [x] 05 Website structure: WebSite (home), WebPage (every page), AboutPage / ContactPage on their page (suggested by slug), BreadcrumbList (page parents, a post's category); `GET/PUT schema/website`.
+- [x] 06 Settings: Add to my site header (off → nothing prints, free markup included), Where in the page (head / footer), Check my site (fetches the home page, compares types: missing, duplicates by another plugin), What gets added, What goes where (`GET schema/page-map`), Works with your SEO plugin (Yoast, Rank Math, AIOSEO, SEOPress, Slim SEO, The SEO Framework, WooCommerce; Yoast Local fix steps). "Who publishes it" kept. `GET/PUT schema/settings`, `POST schema/live-check`.
+- [ ] Live check on save and daily (WP-Cron) — on demand only for now.
+**D. Preview — done 2026-11-02**
+- [x] "Outputs on:" under the branch editor's preview: the branch's page, or "no page yet. Assign one to publish." (also: not published yet, shared page).
+- [x] A branch's images are its own (its Google photos imported into the Media Library), never the brand's — the design's "Always from this location's Google profile".
 
-### Step 4 — Website structure (tab 04)
+**Design match — done 2026-11-01** (PROGRESS step 71)
+- [x] Locations list and branch editor styled to the design (summary bar, found banner, table, pills, legend; fields in three columns). Location setup kept.
+- [x] Services: list above the form, preview beside both.
+- [x] Settings: the design's status pills.
+
+### Step 4 — Website structure (tab 05) — done 2026-11-02
 
 **Free UI**: the five rows — toggle, type chip, description, "Added to"
 (page select for About and Contact, auto-detected by slug and confirmed by
 the user).
 
 **Pro**
-- [ ] `Pieces\WebSite` (built early for QA D5 — still to place: home only; `publisher` → `#business` / `#organization`; no SearchAction), `Pieces\WebPage` (SEO title/description when an SEO plugin provides them; `isPartOf`, `about` / `mainEntity`, `primaryImageOfPage`, `breadcrumb`), AboutPage/ContactPage replacing WebPage on their page, `Pieces\Breadcrumb` from the real hierarchy (page parents; post → category).
-- [ ] An unpublished About/Contact page stops its type and raises an issue.
-- [ ] REST: `GET/PUT schema/website`.
+- [x] `Pieces\WebSite` on the home page only; `publisher` → `#organization` when it is on, else `#business`; no SearchAction.
+- [x] `Pieces\WebPage` — `isPartOf`, `about`, `primaryImageOfPage`, `breadcrumb`, dates; AboutPage/ContactPage replacing WebPage on their page; the trail (`WebPage::breadcrumb`) from page parents, a post's category.
+- [ ] SEO-plugin title/description in WebPage — uses the WordPress title and excerpt for now.
+- [x] An About/Contact row switched on needs a published page (`schema.website.page.required` / `.invalid`); suggested by slug until saved.
+- [x] REST: `GET/PUT schema/website`.
 
 **Done when** the home page carries WebSite + WebPage(`about` → business); breadcrumb positions follow the real hierarchy.
 
-### Step 5 — Settings (tab 05) and output
+### Step 5 — Settings (tab 06) and output — done 2026-11-02 (open items below)
 
 **Free UI**: Add to my site header (On/Off), Where in the page, live status
 box + Check my site, What gets added (one tag), What goes where (chips with
@@ -373,12 +424,15 @@ tab or page JSON), Works with your SEO plugin (rows, status chips, fix
 panel, "I've switched it off, check again").
 
 **Pro**
-- [ ] `Resolver` + `fhint_schema_page_index` rebuild on save; `GET schema/page-map`.
-- [ ] `Compat\*` — Yoast, Rank Math, AIOSEO, SEOPress, WooCommerce, The SEO Framework, Schema Pro: active? emits which types? fix steps; owner per type in `schema.owners`; "Integrate" only where a filter is verified against current versions.
-- [ ] `LiveCheck` — fetch home + one page per page-map row (own host only, 10 s, no cookies), parse every JSON-LD block, compare expected vs found; on save and daily via WP-Cron; never on a front-end request.
-- [ ] `Renderer` — per-request graph from the index, one script tag, head or footer, skips admin/feed/REST/404/password/noindex/non-public; per-post cache key bumped on save, `save_post`, `deleted_post`, `transition_post_status`; purge known page caches.
-- [ ] Add `schema.output` to `Features::active()` — from here Pro's graph replaces the free one.
-- [ ] REST: `GET/PUT schema/settings`, `GET schema/compat`, `POST schema/live-check`, `GET schema/live-check/{job}`.
+- [x] `GET schema/page-map` — built from `Output` (cached entities + their placement) rather than a `fhint_schema_page_index` table; the table stays unused for now.
+- [ ] Amber in What goes where for a page with two conflicting entities; click a row to open its tab.
+- [x] SEO plugins (`SiteSettings::plugins()` on the free plugin's `Ownership::detected()`): Yoast (Local → duplicate, core → overlaps on website/page), Rank Math, AIOSEO, SEOPress, Slim SEO, The SEO Framework, WooCommerce; Yoast's fix steps; owner per type in `schema.owners` respected by the output.
+- [ ] Schema Pro detection; "Integrate" (switching another plugin's output off through its filters).
+- [x] `LiveCheck` — fetches the home page (own host, 10 s, no cookies), parses every JSON-LD block, compares expected vs found (missing; duplicates printed by another plugin); on demand, never on a front-end request.
+- [ ] Check one page per page-map row too; run on save and daily via WP-Cron.
+- [x] `Renderer` — per-request graph, one script tag, head or footer (see "C. Settings and site output"). Still to do: purging known page caches.
+- [x] Add `schema.output` to `Features::active()` — Premium's graph now replaces the free one.
+- [x] REST: `GET/PUT schema/settings` (plugins included — no separate `schema/compat`), `POST schema/live-check` (synchronous — no job route).
 
 **Done when** exactly one FoundHint script per page; output off removes only ours; the owner choice is respected; turning Pro off brings the free markup back.
 
@@ -389,6 +443,7 @@ panel, "I've switched it off, check again").
 - [ ] `</script><script>alert(1)</script>` in every text field renders harmlessly.
 - [ ] Zero extra queries per page on a warm object cache; works behind page caching.
 - [ ] Readme: Free section unchanged; Pro section describes the manager.
+- [ ] Rename the Schema screen's remaining "Pro" copy to "Premium" — user-facing strings in `SaveBar` ("FoundHint Pro's full schema output") and `SchemaHeader` ("part of FoundHint Pro").
 - [ ] Free release (tables + screens + hooks) **before** the Pro release that needs them.
 
 ---

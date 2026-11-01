@@ -99,7 +99,8 @@ export function TabBar({
                 {unsaved
                   ? __("Unsaved changes", "foundhint-local-seo")
                   : off
-                    ? __("Off · not printed", "foundhint-local-seo")
+                    ? (summaries.offText?.[key] ??
+                      __("Off · not printed", "foundhint-local-seo"))
                     : summaries[key]}
               </span>
             </button>

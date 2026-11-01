@@ -1,7 +1,8 @@
 import { __ } from "@wordpress/i18n";
 import { cn } from "cn";
 import { MAX_DESCRIPTION } from "../../../lib/service";
-import { BADGES, caption, label, muted, pill } from "../../styles";
+import { caption, label, muted } from "../../styles";
+import { FIELD_PILL, PILL_TONES } from "../pills";
 import { EditorSection } from "./EditorSection";
 import { FieldError } from "./FieldError";
 
@@ -13,12 +14,46 @@ import { FieldError } from "./FieldError";
  *                                   control }` from the editor.
  * @param {boolean} props.fromGoogle The name came from the profile.
  * @param {Object}  props.options    The editor's options (categories,
- *                                   whether the page has a featured image).
+ *                                   whether the page has a featured image,
+ *                                   the list's Google photos).
  * @param {Object}  props.nameRef    Focused for a new service.
  */
 export function BasicsSection({ form, fromGoogle, options, nameRef }) {
   const { values, set, locked, errors, field, control } = form;
   const categories = options.categories ?? [];
+  // Design: the profile's Google photos are offered by name. A saved photo
+  // no longer on the profile stays listed, so the choice still shows.
+  const photos = [...(options.photos ?? [])];
+
+  if (
+    values.image.mode === "google" &&
+    values.image.url &&
+    !photos.some((photo) => photo.url === values.image.url)
+  ) {
+    photos.push({
+      url: values.image.url,
+      label: __("Google photo (saved)", "foundhint-local-seo"),
+    });
+  }
+
+  const imageValue =
+    values.image.mode === "google"
+      ? `google:${values.image.url}`
+      : values.image.mode;
+  const pickImage = (choice) => {
+    if (choice.startsWith("google:")) {
+      set({ image: { mode: "google", url: choice.slice(7) } });
+    } else if (choice === "url") {
+      set({
+        image: {
+          mode: "url",
+          url: values.image.mode === "url" ? values.image.url : "",
+        },
+      });
+    } else {
+      set({ image: { mode: choice, url: "" } });
+    }
+  };
 
   return (
     <EditorSection
@@ -35,11 +70,11 @@ export function BasicsSection({ form, fromGoogle, options, nameRef }) {
             <label htmlFor={field("name")} className={label}>
               {__("Service name", "foundhint-local-seo")}
             </label>
-            <span className={cn(pill, BADGES.required)}>
+            <span className={cn(FIELD_PILL, PILL_TONES.required)}>
               {__("Required", "foundhint-local-seo")}
             </span>
             {fromGoogle ? (
-              <span className={cn(pill, BADGES.google)}>
+              <span className={cn(FIELD_PILL, PILL_TONES.google)}>
                 {__("From Google", "foundhint-local-seo")}
               </span>
             ) : null}
@@ -142,17 +177,15 @@ export function BasicsSection({ form, fromGoogle, options, nameRef }) {
             <label htmlFor={field("image")} className={label}>
               {__("Image", "foundhint-local-seo")}
             </label>
-            <span className={cn(pill, BADGES.optional)}>
+            <span className={cn(FIELD_PILL, PILL_TONES.optional)}>
               {__("Optional", "foundhint-local-seo")}
             </span>
           </span>
           <select
             id={field("image")}
-            value={values.image.mode}
+            value={imageValue}
             disabled={locked}
-            onChange={(event) =>
-              set({ image: { ...values.image, mode: event.target.value } })
-            }
+            onChange={(event) => pickImage(event.target.value)}
             className={cn(control("image"), "fhint:pr-8!")}
           >
             <option value="none">
@@ -166,10 +199,23 @@ export function BasicsSection({ form, fromGoogle, options, nameRef }) {
                 )}
               </option>
             ) : null}
+            {photos.map((photo) => (
+              <option key={photo.url} value={`google:${photo.url}`}>
+                {photo.label}
+              </option>
+            ))}
             <option value="url">
-              {__("An image address (URL)", "foundhint-local-seo")}
+              {__("Enter an image URL", "foundhint-local-seo")}
             </option>
           </select>
+          {values.image.mode === "google" ? (
+            <span className={cn(muted, "fhint:m-0")}>
+              {__(
+                "Copied to your Media Library when you save, so your site serves it.",
+                "foundhint-local-seo",
+              )}
+            </span>
+          ) : null}
           {values.image.mode === "featured" && !options.featured ? (
             <span className="fhint:text-sm fhint:text-warning-foreground">
               {__(

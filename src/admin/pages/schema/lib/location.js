@@ -5,14 +5,30 @@ export const EMPTY_LOCATION_DRAFT = { overrides: {}, reset: [] };
 
 /** The field groups, in the order they are shown. */
 export const LOCATION_GROUPS = [
-  ["branch", () => __("Branch", "foundhint-local-seo")],
+  ["info", () => __("Business information", "foundhint-local-seo")],
   ["address", () => __("Address", "foundhint-local-seo")],
-  ["contact", () => __("Contact", "foundhint-local-seo")],
-  ["hours", () => __("Hours", "foundhint-local-seo")],
+  ["reach", () => __("Hours and reach", "foundhint-local-seo")],
+  ["code", () => __("Branch code", "foundhint-local-seo")],
+];
+
+/** Fields that take a whole row. */
+export const LOCATION_FULL_ROW = [
+  "description",
+  "street_address",
+  "map_url",
+  "hours",
+  "areas_served",
 ];
 
 // Settings kept beside the field overrides.
-const SETTINGS = ["parent", "status", "placement", "post_ids"];
+const SETTINGS = [
+  "parent",
+  "status",
+  "placement",
+  "post_ids",
+  "schema_type",
+  "inherit",
+];
 
 /** Whether the draft holds any change. */
 export function isLocationDraftDirty(draft) {

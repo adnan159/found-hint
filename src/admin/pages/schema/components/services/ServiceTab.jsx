@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { cn } from "cn";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
   useGetBlankServiceSchemaQuery,
@@ -111,41 +112,57 @@ export function ServiceTab({
     return <Skeleton className="fhint:h-[50vh] fhint:w-full" />;
   }
 
-  return (
-    <div className="fhint:grid fhint:min-w-0 fhint:grid-cols-[minmax(0,1fr)] fhint:gap-4">
-      <ServiceList
-        list={list}
-        services={services}
-        limits={index?.limits}
-        branchName={branchName}
-        selected={current}
-        locked={locked}
-        onPick={(id) => id !== current && guard(() => open(id))}
-        onAdd={() => guard(() => open("new"))}
-      />
+  const listPanel = (
+    <ServiceList
+      list={list}
+      services={services}
+      limits={index?.limits}
+      branchName={branchName}
+      selected={current}
+      locked={locked}
+      onPick={(id) => id !== current && guard(() => open(id))}
+      onAdd={() => guard(() => open("new"))}
+    />
+  );
 
-      {editorState ? (
-        <ServiceEditor
-          key={`${list}-${current}`}
-          list={list}
-          state={editorState}
-          isNew={current === "new"}
-          locked={locked}
-          live={live}
-          onDirtyChange={onDirtyChange}
-          saveRef={saveRef}
-          onSaved={(id) => {
-            if (id && id !== current) {
-              setAdded(id);
-              setSelected(id);
-            }
-          }}
-          onRemoved={() => setSelected(null)}
-          reveal={reveal}
-        />
-      ) : current ? (
-        <Skeleton className="fhint:h-[40vh] fhint:w-full" />
-      ) : null}
+  // Design: with a service open, the list sits above its form and the
+  // preview runs beside both; on a narrow screen everything stacks.
+  return (
+    <div className="fhint:@container fhint:min-w-0">
+      <div
+        className={cn(
+          "fhint:grid fhint:min-w-0 fhint:grid-cols-[minmax(0,1fr)] fhint:items-start fhint:gap-4",
+          // With a service open, the list and its form are one card (no
+          // gap between them); the preview keeps its distance.
+          current &&
+            "fhint:gap-y-0 fhint:@4xl:grid-cols-[minmax(0,1.45fr)_minmax(0,1fr)]",
+        )}
+      >
+        <div className="fhint:min-w-0 fhint:@4xl:col-start-1">{listPanel}</div>
+
+        {editorState ? (
+          <ServiceEditor
+            key={`${list}-${current}`}
+            list={list}
+            state={editorState}
+            isNew={current === "new"}
+            locked={locked}
+            live={live}
+            onDirtyChange={onDirtyChange}
+            saveRef={saveRef}
+            onSaved={(id) => {
+              if (id && id !== current) {
+                setAdded(id);
+                setSelected(id);
+              }
+            }}
+            onRemoved={() => setSelected(null)}
+            reveal={reveal}
+          />
+        ) : current ? (
+          <Skeleton className="fhint:h-[40vh] fhint:w-full fhint:@4xl:col-start-1" />
+        ) : null}
+      </div>
     </div>
   );
 }

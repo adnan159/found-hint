@@ -15,11 +15,14 @@ is a Vite-built React SPA mounted on a single WordPress admin page.
 The data layer (business, locations, opening hours, services), its REST API
 and the admin screens for all of it are built.
 
-**Schema Manager (in progress):** the five-tab Schema screen is planned in
-[`docs/SCHEMA-PLAN.md`](docs/SCHEMA-PLAN.md) — decisions, data model, the
-Free/Pro split and the step-by-step checklist. Work through it in order and
-tick each step as it lands. The audit engine and schema
-output are not — see `docs/PROGRESS.md` for exactly what is done and next.
+**Schema Manager (built; Premium):** the six-tab Schema screen — 01
+Organization, 02 LocalBusiness (main business), 03 Locations (list, setup,
+branch editor), 04 Services, 05 Website structure, 06 Settings — each schema
+tab with an on/off switch. Premium prints the site's schema itself
+(`schema.output`): one `@graph` per page. Decisions, data model, the
+Free/Premium split and every checklist are in
+[`docs/SCHEMA-PLAN.md`](docs/SCHEMA-PLAN.md); open items are unticked there.
+See `docs/PROGRESS.md` for exactly what is done and how it was verified.
 
 The sibling `local-seo` plugin in this same directory is the reference for
 the *product*: its `docs/DATABASE.md`, `API.md` and `FEATURES.md` describe
@@ -358,6 +361,11 @@ when Pro reports serving that feature through `fhint_admin_bootstrap_data`
 (`src/admin/lib/pro.js`). See [`docs/EXTENDING.md`](docs/EXTENDING.md).
 UI-side gating (`PRO` badges, greyed "PRO ONLY" rows, sample-data cards)
 is described in `docs/NAVIGATION.md`.
+
+Premium has its own release build, the same shape as this plugin's minus
+Vite: `npm run plugin:publish` in `../found-hint-premium` makes
+`found-hint-premium.zip` (see its `CLAUDE.md`). Ship the free release a
+Premium release depends on first.
 
 ## Never do
 

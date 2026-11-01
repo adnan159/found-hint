@@ -288,7 +288,7 @@ function esc_html__( $text, $domain = null ) {
 	return $text;
 }
 function esc_html( $text ) {
-	return $text;
+	return htmlspecialchars( (string) $text, ENT_QUOTES, 'UTF-8', false );
 }
 
 // -- $wpdb ----------------------------------------------------------------

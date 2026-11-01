@@ -1,9 +1,9 @@
-import { useState } from "react";
-import { __ } from "@wordpress/i18n";
-import { ChevronDownIcon } from "lucide-react";
-import { cn } from "cn";
 import Hint from "@/components/Hint";
 import { focus } from "@/pages/profile/styles";
+import { __ } from "@wordpress/i18n";
+import { cn } from "cn";
+import { ChevronDownIcon } from "lucide-react";
+import { useState } from "react";
 import { currencyOptions, pricingSummary } from "../../../lib/service";
 import { label, muted } from "../../styles";
 import { sectionNumber } from "./EditorSection";
@@ -21,19 +21,19 @@ export function OptionalDetails({ form }) {
   const setPricing = (changes) => set({ pricing: { ...pricing, ...changes } });
 
   return (
-    <section className="fhint:border-t fhint:border-t-border">
+    <section className="fhint:border-t-2 fhint:border-t-[#201e1d]">
       <button
         type="button"
         aria-expanded={open}
         aria-controls={field("optional")}
         onClick={() => setOpen((current) => !current)}
         className={cn(
-          "fhint:flex fhint:w-full fhint:cursor-pointer fhint:items-center fhint:gap-2 fhint:border-0 fhint:bg-transparent fhint:px-5 fhint:py-4 fhint:text-left",
+          "fhint:flex fhint:w-full fhint:cursor-pointer fhint:items-center fhint:gap-2.5 fhint:border-0 fhint:bg-transparent fhint:px-5 fhint:py-[18px] fhint:text-left fhint:text-[#201e1d]",
           focus,
         )}
       >
         <span className={sectionNumber}>05</span>
-        <strong className="fhint:text-sm">
+        <strong className="fhint:text-[15px]">
           {__("Optional details", "foundhint-local-seo")}
         </strong>
         <span className={cn(muted, "fhint:flex-1")}>

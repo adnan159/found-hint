@@ -66,6 +66,11 @@ const action = cn(
   focus,
 );
 
+/**
+ * The preview panel. `outputsOn` — `{ text, ok }` — names the page the
+ * schema prints on (the branch editor's "Outputs on: /gulshan/"), or why it
+ * prints nowhere yet; left out, the line is not shown.
+ */
 export function JsonPreview({
   document,
   rootType,
@@ -73,6 +78,8 @@ export function JsonPreview({
   loading,
   testUrl,
   dirty,
+  outputsOn,
+  className,
 }) {
   const json = document ? JSON.stringify(document, null, 2) : "";
   const lines = useMemo(() => (json ? json.split("\n") : []), [json]);
@@ -96,7 +103,10 @@ export function JsonPreview({
   return (
     <aside
       aria-label={__("JSON-LD preview", "foundhint-local-seo")}
-      className="fhint:sticky fhint:top-4 fhint:min-w-0 fhint:flex-[1_1_380px] fhint:border fhint:border-border fhint:bg-[#1d1b1a] fhint:text-white"
+      className={cn(
+        "fhint:sticky fhint:top-4 fhint:min-w-0 fhint:flex-[1_1_380px] fhint:border fhint:border-border fhint:bg-[#1d1b1a] fhint:text-white",
+        className,
+      )}
     >
       <div className="fhint:flex fhint:flex-wrap fhint:items-center fhint:gap-2.5 fhint:border-b fhint:border-b-[#34302f] fhint:px-[18px] fhint:py-[13px]">
         <span
@@ -156,6 +166,22 @@ export function JsonPreview({
           </p>
         )}
       </div>
+
+      {outputsOn ? (
+        <div className="fhint:flex fhint:flex-wrap fhint:items-baseline fhint:gap-2 fhint:border-t fhint:border-t-[#34302f] fhint:px-[18px] fhint:py-2.5 fhint:text-[12.5px]">
+          <span className="fhint:text-[#9b9797]">
+            {__("Outputs on:", "foundhint-local-seo")}
+          </span>
+          <code
+            className={cn(
+              "fhint:min-w-0 fhint:font-mono fhint:break-all",
+              outputsOn.ok ? "fhint:text-white" : "fhint:text-[#F2C27B]",
+            )}
+          >
+            {outputsOn.text}
+          </code>
+        </div>
+      ) : null}
 
       <div className="fhint:grid fhint:grid-cols-[repeat(auto-fit,minmax(min(100%,150px),1fr))] fhint:gap-2.5 fhint:border-t fhint:border-t-border fhint:bg-card fhint:px-[18px] fhint:py-3.5">
         <button

@@ -1,8 +1,8 @@
-import { useState } from "react";
-import { __, sprintf } from "@wordpress/i18n";
-import { XIcon } from "lucide-react";
-import { cn } from "cn";
 import { focus } from "@/pages/profile/styles";
+import { __, sprintf } from "@wordpress/i18n";
+import { cn } from "cn";
+import { XIcon } from "lucide-react";
+import { useState } from "react";
 import { AREA_TYPES, areaTypeLabel, withArea } from "../../../lib/service";
 import { chip, input, muted } from "../../styles";
 import { EditorSection } from "./EditorSection";
@@ -125,7 +125,10 @@ export function AreasSection({ form, suggestions = [] }) {
             type="button"
             disabled={!name.trim()}
             onClick={addTyped}
-            className={chip(false)}
+            className={cn(
+              "fhint:cursor-pointer fhint:border-0 fhint:bg-[#201e1d] fhint:px-4 fhint:py-[9px] fhint:text-[13px] fhint:font-bold fhint:text-white fhint:disabled:cursor-not-allowed fhint:disabled:opacity-50",
+              focus,
+            )}
           >
             {__("Add", "foundhint-local-seo")}
           </button>

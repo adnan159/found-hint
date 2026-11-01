@@ -6,8 +6,8 @@ export function fieldLabel(key, scope = "business") {
     const branch = {
       name: __("Branch name", "foundhint-local-seo"),
       branch_code: __("Branch code", "foundhint-local-seo"),
-      telephone: __("Phone", "foundhint-local-seo"),
-      email: __("Email", "foundhint-local-seo"),
+      telephone: __("Phone number", "foundhint-local-seo"),
+      email: __("Branch email", "foundhint-local-seo"),
       url: __("Branch page URL", "foundhint-local-seo"),
     }[key];
 

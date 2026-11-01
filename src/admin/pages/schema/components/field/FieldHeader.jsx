@@ -30,7 +30,13 @@ export function FieldHeader({
         {name}
       </label>
       {requirement ? (
-        <span className={cn(pill, BADGES[badgeTone(field.badge, visitMode)])}>
+        <span
+          className={cn(
+            pill,
+            "fhint:max-w-full fhint:whitespace-normal",
+            BADGES[badgeTone(field.badge, visitMode)],
+          )}
+        >
           {requirement}
         </span>
       ) : null}

@@ -1,50 +1,14 @@
-import { __, sprintf } from "@wordpress/i18n";
+import { __ } from "@wordpress/i18n";
 import { cn } from "cn";
-import { caption, chip, input, label, muted } from "../styles";
-
-const PARENT_ID = "fhint-location-parent";
+import { chip, label, muted } from "../styles";
 
 /**
- * The branch's place in the group: what it is part of
- * (parentOrganization), and the other branches in it.
+ * The other branches in this branch's group. What it is part of
+ * (parentOrganization) is chosen in "03 Parent business" above the fields.
  */
-export function BranchGroupFields({
-  parent,
-  parentName,
-  sisters,
-  locked,
-  onParent,
-}) {
+export function BranchGroupFields({ parent, sisters }) {
   return (
     <>
-      <div className="fhint:grid fhint:min-w-0 fhint:content-start fhint:gap-1.5">
-        <label htmlFor={PARENT_ID} className={label}>
-          {__("Part of", "foundhint-local-seo")}
-        </label>
-        <select
-          id={PARENT_ID}
-          value={parent}
-          disabled={locked}
-          onChange={(event) => onParent(event.target.value)}
-          aria-describedby={`${PARENT_ID}-hint`}
-          className={cn(input(locked ? "locked" : "open"), "fhint:pr-8!")}
-        >
-          <option value="business">
-            {sprintf(
-              /* translators: %s: the business name. */
-              __("%s (Business schema)", "foundhint-local-seo"),
-              parentName,
-            )}
-          </option>
-          <option value="none">
-            {__("Not part of a group", "foundhint-local-seo")}
-          </option>
-        </select>
-        <code id={`${PARENT_ID}-hint`} className={caption}>
-          parentOrganization
-        </code>
-      </div>
-
       <div className="fhint:grid fhint:min-w-0 fhint:content-start fhint:gap-1.5">
         <span className={label}>
           {__("Sister branches", "foundhint-local-seo")}
