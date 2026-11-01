@@ -19,7 +19,7 @@ export function SaveBar({ dirty, saving, status, live, onSave }) {
         : live
           ? __("Saved and live on your site.", "foundhint-local-seo")
           : __(
-              "Saved. Your site keeps its current markup until FoundHint Pro's full schema output is switched on.",
+              "Saved. Your site keeps its current markup until FoundHint Premium's full schema output is switched on.",
               "foundhint-local-seo",
             );
 

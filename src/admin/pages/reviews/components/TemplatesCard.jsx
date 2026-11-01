@@ -149,7 +149,7 @@ export function TemplatesCard() {
         type="button"
         disabled
         title={__(
-          "Importing templates is part of FoundHint Pro.",
+          "Importing templates is part of FoundHint Premium.",
           "foundhint-local-seo",
         )}
         className="fhint:inline-flex fhint:cursor-not-allowed fhint:items-center fhint:gap-2 fhint:border fhint:border-dashed fhint:border-input fhint:bg-card fhint:px-3 fhint:py-2 fhint:text-[12.5px] fhint:font-extrabold fhint:text-muted-foreground"

@@ -19,7 +19,7 @@ export function SoonTag({ kind = "soon", className }) {
       )}
     >
       {kind === "pro"
-        ? __("Pro", "foundhint-local-seo")
+        ? __("Premium", "foundhint-local-seo")
         : __("Coming soon", "foundhint-local-seo")}
     </span>
   );

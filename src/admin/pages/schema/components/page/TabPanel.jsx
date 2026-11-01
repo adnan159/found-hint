@@ -4,6 +4,7 @@ import { lockedBusinessState } from "../../lib/schema";
 import BusinessTab from "../business/BusinessTab";
 import MainBusinessPicker from "../business/MainBusinessPicker";
 import ComingSoonTab from "./ComingSoonTab";
+import PremiumTab from "./PremiumTab";
 import OffPanel from "./OffPanel";
 import LocationTab from "../locations/LocationTab";
 import ServiceTab from "../services/ServiceTab";
@@ -161,7 +162,14 @@ function TabContent({
     );
   }
 
-  return (
+  // Without Premium (or its licence): the tab's Premium panel. With it, a
+  // tab whose step has not shipped yet says so.
+  return !plan.business ? (
+    <PremiumTab
+      title={TABS.find(([key]) => key === tab)[1]()}
+      body={COMING[tab]?.()}
+    />
+  ) : (
     <ComingSoonTab
       title={TABS.find(([key]) => key === tab)[1]()}
       body={COMING[tab]?.()}

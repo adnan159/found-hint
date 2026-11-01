@@ -12,10 +12,10 @@ import { focus } from "@/pages/profile/styles";
  * detail and prints nothing. Settings has none.
  */
 export const TABS = [
-  ["organization", () => __("Organization schema", "foundhint-local-seo")],
-  ["localbusiness", () => __("LocalBusiness schema", "foundhint-local-seo")],
-  ["locations", () => __("Location schema", "foundhint-local-seo")],
-  ["services", () => __("Service schema", "foundhint-local-seo")],
+  ["organization", () => __("Organization", "foundhint-local-seo")],
+  ["localbusiness", () => __("LocalBusiness", "foundhint-local-seo")],
+  ["locations", () => __("Locations", "foundhint-local-seo")],
+  ["services", () => __("Services", "foundhint-local-seo")],
   ["website", () => __("Website structure", "foundhint-local-seo")],
   ["settings", () => __("Settings", "foundhint-local-seo")],
 ];
@@ -112,7 +112,7 @@ export function TabBar({
                   disabled={locked}
                   onCheckedChange={(next) => onToggle?.(key, next)}
                   aria-label={sprintf(
-                    /* translators: %s: a schema tab, e.g. "Organization schema". */
+                    /* translators: %s: a schema tab, e.g. "Organization". */
                     __("Publish %s", "foundhint-local-seo"),
                     title(),
                   )}

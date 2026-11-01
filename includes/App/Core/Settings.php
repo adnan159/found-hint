@@ -47,25 +47,24 @@ class Settings {
 				// ignores them. Pro sanitises every value before saving.
 				'enabled'     => true,
 				// Each schema tab's switch (the website's is website.enabled).
-				// Off keeps the details and prints nothing. The Organization
-				// starts off: a business is a LocalBusiness until the brand is
-				// described too.
+				// Off keeps the details and prints nothing. Every tab starts
+				// off: nothing is published until the owner switches it on.
 				'tabs'        => array(
 					'organization'  => false,
-					'localbusiness' => true,
-					'locations'     => true,
-					'services'      => true,
+					'localbusiness' => false,
+					'locations'     => false,
+					'services'      => false,
 				),
 				// head | footer — inside <head>, or just before </body>.
 				'placement'   => 'head',
 				'website'     => array(
-					'enabled'        => true,
+					'enabled'        => false,
 					// Blank: the business name from Google.
 					'name'           => '',
 					'alternate_name' => '',
 				),
 				'webpage'     => array(
-					'enabled' => true,
+					'enabled' => false,
 				),
 				'about'       => array(
 					'enabled' => false,

@@ -122,6 +122,49 @@ export function WebsiteTab({ live, onDirtyChange, saveRef }) {
     }
   };
 
+  // A row's switch saves at once, like the tab switches. A page row turned
+  // on with no page to use yet waits in the draft for its page and Save.
+  const toggle = async (item, value, next) => {
+    const changes =
+      item.page && next && !value.post_id && value.suggested
+        ? { enabled: next, post_id: value.suggested }
+        : { enabled: next };
+
+    if (item.page && next && !(changes.post_id || value.post_id)) {
+      set(item.key, changes);
+      return;
+    }
+
+    const rowChanges = { ...(draft[item.key] ?? {}), ...changes };
+
+    try {
+      saveState.reset();
+      await save({ [item.key]: rowChanges }).unwrap();
+      setDraft((current) => {
+        const rest = { ...current };
+
+        delete rest[item.key];
+
+        return rest;
+      });
+      toast.success(
+        next
+          ? sprintf(
+              /* translators: %s: e.g. "Your website". */
+              __("%s is added to your site.", "foundhint-local-seo"),
+              item.label,
+            )
+          : sprintf(
+              /* translators: %s: e.g. "Your website". */
+              __("%s is off your site.", "foundhint-local-seo"),
+              item.label,
+            ),
+      );
+    } catch (error) {
+      toast.error(errorMessage(error));
+    }
+  };
+
   if (saveRef) {
     saveRef.current = { save: onSave, discard: () => setDraft({}) };
   }
@@ -231,14 +274,8 @@ export function WebsiteTab({ live, onDirtyChange, saveRef }) {
 
               <Switch
                 checked={on}
-                onCheckedChange={(next) =>
-                  set(
-                    item.key,
-                    item.page && next && !value.post_id && value.suggested
-                      ? { enabled: next, post_id: value.suggested }
-                      : { enabled: next },
-                  )
-                }
+                disabled={saveState.isLoading}
+                onCheckedChange={(next) => toggle(item, value, next)}
                 aria-label={sprintf(
                   /* translators: %s: e.g. "WebSite". */
                   __("%s schema", "foundhint-local-seo"),

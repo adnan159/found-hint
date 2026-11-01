@@ -174,18 +174,23 @@ No row = defaults (derived type, no overrides, active, default placement).
 'schema' => array(
 	'mode'      => 'auto',            // existing
 	'enabled'   => true,              // Settings tab master toggle ("Add to my site header")
-	'tabs'      => array(             // each schema tab's switch (website: website.enabled)
-		'organization' => false, 'localbusiness' => true, 'locations' => true, 'services' => true,
+	'tabs'      => array(             // each schema tab's switch (website: website.enabled); all start off
+		'organization' => false, 'localbusiness' => false, 'locations' => false, 'services' => false,
 	),
 	'placement' => 'head',            // head | footer
 	'owners'    => array(),           // { Type: 'fhint' | '<plugin key>' }
-	'website'   => array( 'enabled' => true, 'name' => '', 'alternate_name' => '' ),
-	'webpage'   => array( 'enabled' => true ),
+	'website'   => array( 'enabled' => false, 'name' => '', 'alternate_name' => '' ),
+	'webpage'   => array( 'enabled' => false ),
 	'about'     => array( 'enabled' => false, 'post_id' => 0 ),
 	'contact'   => array( 'enabled' => false, 'post_id' => 0 ),
 	'breadcrumbs' => array( 'enabled' => false ),
 ),
 ```
+
+Nothing publishes until the owner switches it on (2026-11-02): every tab,
+the website and each page start off; a service is off until switched on in
+Schema (no schema settings row → inactive); the Organization starts on the
+home page, the LocalBusiness on every page.
 
 Live-check results and the built output are caches, not preferences:
 Premium keeps them in transients (`fhintpremium_live_check`, and
@@ -443,7 +448,7 @@ panel, "I've switched it off, check again").
 - [ ] `</script><script>alert(1)</script>` in every text field renders harmlessly.
 - [ ] Zero extra queries per page on a warm object cache; works behind page caching.
 - [ ] Readme: Free section unchanged; Pro section describes the manager.
-- [ ] Rename the Schema screen's remaining "Pro" copy to "Premium" — user-facing strings in `SaveBar` ("FoundHint Pro's full schema output") and `SchemaHeader` ("part of FoundHint Pro").
+- [x] Rename the remaining "Pro" copy to "Premium" — the Schema notice, SaveBar, the locked tab summaries, and the reviews screen's auto-reply, templates and badge. Done 2026-11-01.
 - [ ] Free release (tables + screens + hooks) **before** the Pro release that needs them.
 
 ---
@@ -466,6 +471,6 @@ the first free release, so free users see the manager from day one.
 | # | Question | Default if not answered |
 |---|---|---|
 | Q1 | Business images: hotlink Google's photo URLs, or import them to the Media Library (doc 13.4)? | **Settled 2026-11-01 (QA D4):** import — schema images are always served from this site. |
-| Q2 | Pro licensing/updates are not built yet. Ship the Schema Manager before them? | Build the features; licensing is a separate track. |
+| Q2 | Pro licensing/updates are not built yet. Ship the Schema Manager before them? | Built 2026-11-01 with Freemius (PROGRESS step 76): no licence, no Premium features, routes or output. |
 | Q3 | Free release number for Step 0. | 1.2.0 |
 | Q4 | SoftwareApplication (QA report): a general opt-in section for software businesses, or only foundhint.com's own markup? | Not built until decided. |

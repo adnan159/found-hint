@@ -64,7 +64,7 @@ export function BlogCard({ blogPosts }) {
         type="button"
         disabled
         title={__(
-          "Sharing your blog is part of FoundHint Pro.",
+          "Sharing your blog is part of FoundHint Premium.",
           "foundhint-local-seo",
         )}
         className={quietButton}

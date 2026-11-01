@@ -243,7 +243,7 @@ export function PhotoField({
           type="button"
           disabled
           title={__(
-            "AI photos are part of FoundHint Pro.",
+            "AI photos are part of FoundHint Premium.",
             "foundhint-local-seo",
           )}
           className={optionButton}

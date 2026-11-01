@@ -271,7 +271,7 @@ export function ReviewCard({ review, selected, onSelect, onReply }) {
             type="button"
             disabled
             title={__(
-              "AI replies are coming in FoundHint Pro.",
+              "AI replies are coming in FoundHint Premium.",
               "foundhint-local-seo",
             )}
             className={quietButton}

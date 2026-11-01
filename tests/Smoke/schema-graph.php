@@ -540,9 +540,11 @@ $tag = \FHINT\Frontend\Schema::script_tag( Graph::from_parts( nap() ) );
 
 check( false !== strpos( $tag, '<script type="application/ld+json" id="fhint-schema">' ), 'the tag declares the ld+json type' );
 check( false !== strpos( $tag, '</script>' ), 'and is closed' );
+check( 0 === strpos( trim( $tag ), '<!-- This site uses FoundHint Local SEO' ), 'the page source names the plugin before it' );
+check( '<!-- / FoundHint Local SEO -->' === substr( trim( $tag ), -strlen( '<!-- / FoundHint Local SEO -->' ) ), 'and closes the block after it' );
 check( false !== strpos( $tag, 'Northside Dental Care' ), 'and carries the business name' );
 
-$payload = trim( str_replace( array( '<script type="application/ld+json" id="fhint-schema">', '</script>' ), '', $tag ) );
+$payload = preg_match( '#<script type="application/ld\+json" id="fhint-schema">(.*)</script>#s', $tag, $fhint_match ) ? $fhint_match[1] : '';
 
 check( null !== json_decode( $payload, true ), 'what is printed between the tags is valid JSON' );
 
@@ -565,7 +567,7 @@ check( false === strpos( $tag, '<img' ), 'nor smuggle a tag of any kind into the
 check( false !== strpos( $tag, '\\u003C' ), 'because < is encoded as \\u003C' );
 
 // Escaped, not discarded — the value still decodes back intact.
-$payload = trim( str_replace( array( '<script type="application/ld+json" id="fhint-schema">', '</script>' ), '', $tag ) );
+$payload = preg_match( '#<script type="application/ld\+json" id="fhint-schema">(.*)</script>#s', $tag, $fhint_match ) ? $fhint_match[1] : '';
 $decoded = json_decode( $payload, true );
 
 check_same(

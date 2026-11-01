@@ -49,7 +49,7 @@ export function TemplateDialog({ template, rating, count, onClose }) {
           : __("New reply template", "foundhint-local-seo")
       }
       description={__(
-        "Reply templates are part of FoundHint Pro.",
+        "Reply templates are part of FoundHint Premium.",
         "foundhint-local-seo",
       )}
       onClose={onClose}
@@ -69,7 +69,7 @@ export function TemplateDialog({ template, rating, count, onClose }) {
             type="button"
             disabled
             title={__(
-              "Saving templates is part of FoundHint Pro.",
+              "Saving templates is part of FoundHint Premium.",
               "foundhint-local-seo",
             )}
             className={primaryButton}
@@ -82,7 +82,7 @@ export function TemplateDialog({ template, rating, count, onClose }) {
       <p className="fhint:m-0 fhint:flex fhint:items-center fhint:gap-2 fhint:text-[12.5px] fhint:text-muted-strong">
         <SoonTag kind="pro" />
         {__(
-          "Saving your own templates comes with FoundHint Pro.",
+          "Saving your own templates comes with FoundHint Premium.",
           "foundhint-local-seo",
         )}
       </p>

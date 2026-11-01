@@ -1,12 +1,12 @@
 import { __, sprintf } from "@wordpress/i18n";
-import { RefreshCwIcon, SparklesIcon } from "lucide-react";
+import { KeyRoundIcon, RefreshCwIcon, SparklesIcon } from "lucide-react";
 import { useEffect, useRef } from "react";
 import { useDispatch } from "react-redux";
 import { toast } from "sonner";
 import { cn } from "cn";
 import Hint from "@/components/Hint";
 import { errorMessage } from "@/lib/errors";
-import { upgradeUrl } from "@/lib/pro";
+import { activateUrl, licenseInactive, upgradeUrl } from "@/lib/pro";
 import { pillButton } from "@/pages/profile/components/header/styles";
 import { focus } from "@/pages/profile/styles";
 import { useRefreshFromGoogleMutation } from "@/store/api/profileApi";
@@ -79,41 +79,73 @@ export function SchemaHeader({
 }
 
 /**
- * Without Pro: what the Schema Manager adds, and the way to get it.
+ * Without Premium: what the Schema Manager adds, and the way to get it.
+ * With Premium installed but its licence not active: the way to activate it.
  */
 function UpgradeNotice() {
+  const inactive = licenseInactive() && activateUrl();
+
   return (
     <div className="fhint:flex fhint:flex-wrap fhint:items-center fhint:gap-3 fhint:border fhint:border-notice-border fhint:bg-notice fhint:px-4 fhint:py-3 fhint:text-notice-foreground">
-      <SparklesIcon
-        aria-hidden="true"
-        className="fhint:size-4 fhint:flex-none fhint:text-primary"
-      />
+      {inactive ? (
+        <KeyRoundIcon
+          aria-hidden="true"
+          className="fhint:size-4 fhint:flex-none fhint:text-primary"
+        />
+      ) : (
+        <SparklesIcon
+          aria-hidden="true"
+          className="fhint:size-4 fhint:flex-none fhint:text-primary"
+        />
+      )}
       <span className="fhint:min-w-0 fhint:flex-[1_1_320px] fhint:text-[13px] fhint:leading-normal">
         <strong>
-          {__(
-            "The Schema Manager is part of FoundHint Pro.",
-            "foundhint-local-seo",
-          )}
+          {inactive
+            ? __(
+                "Activate your FoundHint Premium licence.",
+                "foundhint-local-seo",
+              )
+            : __(
+                "The Schema Manager is part of FoundHint Premium.",
+                "foundhint-local-seo",
+              )}
         </strong>{" "}
-        {__(
-          "Below is the markup your site prints today. Pro lets you edit it, add locations, services and your website's structure, and choose where each prints.",
-          "foundhint-local-seo",
-        )}
+        {inactive
+          ? __(
+              "Premium is installed but its licence isn't active, so the Schema Manager is locked and your site prints the free markup. Activate it on the Plugins screen; everything you saved comes back as it was.",
+              "foundhint-local-seo",
+            )
+          : __(
+              "Below is the markup your site prints today. Premium lets you edit it, add locations, services and your website's structure, and choose where each prints.",
+              "foundhint-local-seo",
+            )}
       </span>
-      <a
-        href={upgradeUrl()}
-        target="_blank"
-        rel="noopener noreferrer"
-        className={cn(
-          button,
-          "fhint:border-0 fhint:bg-primary fhint:text-white!",
-        )}
-      >
-        {__("Upgrade to Pro", "foundhint-local-seo")}
-        <span className="fhint:sr-only">
-          {__("(opens in a new tab)", "foundhint-local-seo")}
-        </span>
-      </a>
+      {inactive ? (
+        <a
+          href={activateUrl()}
+          className={cn(
+            button,
+            "fhint:border-0 fhint:bg-primary fhint:text-white!",
+          )}
+        >
+          {__("Activate licence", "foundhint-local-seo")}
+        </a>
+      ) : (
+        <a
+          href={upgradeUrl()}
+          target="_blank"
+          rel="noopener noreferrer"
+          className={cn(
+            button,
+            "fhint:border-0 fhint:bg-primary fhint:text-white!",
+          )}
+        >
+          {__("Upgrade to Premium", "foundhint-local-seo")}
+          <span className="fhint:sr-only">
+            {__("(opens in a new tab)", "foundhint-local-seo")}
+          </span>
+        </a>
+      )}
     </div>
   );
 }

@@ -3,6 +3,7 @@ import RequestError from "@/components/RequestError";
 import useSelectedLocation from "@/hooks/useSelectedLocation";
 import { hasPro } from "@/lib/pro";
 import { useGetSchemaQuery } from "@/store/api/schemaApi";
+import { __, sprintf } from "@wordpress/i18n";
 import { toast } from "sonner";
 import { errorMessage } from "@/lib/errors";
 import {
@@ -12,7 +13,7 @@ import {
 } from "@/store/api/schemaManagerApi";
 import ConnectGoogleNotice from "./components/page/ConnectGoogleNotice";
 import SchemaHeader from "./components/page/SchemaHeader";
-import TabBar from "./components/page/TabBar";
+import TabBar, { TABS } from "./components/page/TabBar";
 import TabPanel from "./components/page/TabPanel";
 import UnsavedDialog from "./components/page/UnsavedDialog";
 import useLocationBranches from "./hooks/useLocationBranches";
@@ -77,6 +78,25 @@ export default function SchemaPage() {
     const run = async () => {
       try {
         await setTab({ key, enabled: on }).unwrap();
+
+        const name = TABS.find(([tabKey]) => tabKey === key)?.[1]() ?? key;
+
+        toast.success(
+          on
+            ? sprintf(
+                /* translators: %s: a schema tab, e.g. "Organization". */
+                __("%s is on and added to your site.", "foundhint-local-seo"),
+                name,
+              )
+            : sprintf(
+                /* translators: %s: a schema tab, e.g. "Organization". */
+                __(
+                  "%s is off. Nothing from it is added to your site.",
+                  "foundhint-local-seo",
+                ),
+                name,
+              ),
+        );
       } catch (error) {
         toast.error(errorMessage(error));
       }

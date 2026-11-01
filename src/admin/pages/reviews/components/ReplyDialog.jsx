@@ -144,7 +144,7 @@ export function ReplyDialog({ review, context, templates, onClose }) {
               type="button"
               disabled
               title={__(
-                "Your own templates are part of FoundHint Pro.",
+                "Your own templates are part of FoundHint Premium.",
                 "foundhint-local-seo",
               )}
               className={cn(dialogButton, "fhint:font-bold")}
@@ -234,7 +234,7 @@ export function ReplyDialog({ review, context, templates, onClose }) {
         >
           <SoonTag />
           {__(
-            "AI replies are coming in FoundHint Pro. Nothing is sent until you press Publish.",
+            "AI replies are coming in FoundHint Premium. Nothing is sent until you press Publish.",
             "foundhint-local-seo",
           )}
         </span>

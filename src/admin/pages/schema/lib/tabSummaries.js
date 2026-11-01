@@ -16,7 +16,7 @@ import { placementLabel } from "./schema";
  * @return {Object} Summary text by tab key.
  */
 export function tabSummaries({ plan, free, state, business }) {
-  const pro = __("Pro", "foundhint-local-seo");
+  const pro = __("Premium", "foundhint-local-seo");
   const soon = __("Coming in a later update", "foundhint-local-seo");
   const notYet = plan.business ? soon : pro;
 

@@ -2404,3 +2404,94 @@ the tab is off; switched on, it names the type as before.
 
 Browser: the header, select, plugin rows and tab 02's summary on the dev
 site. The Yoast box needs Yoast active, so only its styles changed.
+
+## Step 76 — Premium licensing with Freemius
+
+**Shipped (Premium):**
+- `freemius/wordpress-sdk` 2.13.5 as a Composer runtime dependency, and
+  `includes/freemius.php` with the dashboard's `fhp_fs()` initialisation
+  (product 43715), loaded with the plugin file. Two changes from the
+  dashboard snippet: the SDK path is Composer's, and the
+  `wp_org_gatekeeper` line is left out (Premium is premium-only; the free
+  plugin is its own WordPress.org plugin).
+- `App\Core\License`: `active()` (licence or trial, failing closed),
+  `state()` (`{ active, activate_url, account_url }`), `required()`.
+- Without a licence: no features (the app shows upsells), no schema output
+  (the site prints the free markup), and every route refuses with 403
+  `fhintpremium_license_required`. `GET status` still answers and reports
+  the licence. Saved data is kept.
+- The release zip now ships `composer.lock`, so it installs the exact SDK
+  version tested (1.10 MB with the SDK).
+
+**Shipped (free):** `licenseInactive()` / `activateUrl()` in `lib/pro.js`;
+the Schema screen's notice says "Activate your FoundHint Premium licence"
+with an Activate licence button (to the Plugins screen, where Freemius puts
+activation) when Premium is installed but not activated, and "Upgrade to
+Premium" without Premium. The last user-facing "Pro" strings became
+"Premium".
+
+**Verified:** Premium smoke 18 (+3: no features and `active: false`
+without a licence, no invented activation link without the SDK); database
+248 (+5: no features, routes refused with `license_required`, status still
+answers without a key, features back with a licence). Each new check was
+mutation-tested (failing open, ungated features, ungated routes, a status
+that needed a licence). On the dev site a real licence was activated
+through Freemius and Premium unlocked; forcing the licence off (a
+temporary must-use plugin, removed after) locked the Schema screen with
+the activation notice, and the home page fell back to the free markup
+(ProfessionalService, OfferCatalog, PetStore) — and back to Premium's
+Organization, ProfessionalService, WebSite, WebPage when removed. phpcs
+needed one documented exception: Freemius's own names (`fhp_fs`,
+`$fhp_fs`, `fhp_fs_loaded`).
+
+## Step 77 — Review round: names, defaults, switches, page source
+
+Changes asked for after testing:
+
+- **Tab names** without "schema": Organization, LocalBusiness, Locations,
+  Services (Website structure and Settings unchanged).
+- **Organization preview** shows the Organization alone. The WebSite node
+  (added to the business preview in QA D5) belongs to 05 Website structure
+  and prints from there; it is still published by the business.
+- **Website structure switches save at once** (toast, no Save needed),
+  like the tab switches. Turning on About or Contact with no page to use
+  yet still waits for its page and Save. (The tab-bar switches already
+  saved at once — verified against the server.)
+- **Organization starts on the home page**; the LocalBusiness keeps every
+  page.
+- **Everything starts off**: every tab, the website and each page
+  (`Settings::defaults()`), and every service — a service publishes only
+  once switched on in Schema (`ServiceSchema::view()`: a saved service with
+  no schema settings row is inactive; the list reads the same). On an
+  existing site this turns off services that were never saved in Schema;
+  on the dev site 2 of 15 stay on.
+- **Website tab without Premium** (or its licence) shows a locked Premium
+  panel (`PremiumTab`: Get Premium, or Activate licence) instead of
+  "Coming soon".
+- **Page source**: the JSON-LD sits between `<!-- This site uses FoundHint
+  Local SEO vX - https://foundhint.com/ -->` and `<!-- / FoundHint Local
+  SEO -->` (`Frontend\Schema::script_tag()`, so free and Premium output
+  both).
+- **Get Pro → foundhint.com/pricing/**: the default `fhint_upgrade_url`,
+  and a "Get Pro" link on the Plugins screen while Premium isn't installed.
+
+**Verified:** free smoke (schema-graph +2: the opening and closing
+comments) and database 721; Premium database 253 (updated: single-node
+previews, defaults all off; new: WebPage off, Organization on the home
+page, a never-saved service off and switched on, the website published by
+the business). Mutation-tested: Organization on every page, services on by
+default, WebSite back in the preview, a missing closing comment, the free
+defaults turning a tab on. Browser: renamed tabs; a Breadcrumbs switch
+saved to the server with no Save (and turned back off); the Organization
+preview without WebSite; the home page source with both comments; the
+Website tab's Premium panel with the licence forced off (temporary
+must-use plugin, removed).
+
+## Step 78 — Tab switches confirm their save
+
+The tab-bar switches already saved at once (`PUT schema/tabs`); they now
+also say so: "Services is on and added to your site." / "Services is off.
+Nothing from it is added to your site." (errors still show their message).
+The off panel's "Turn on" uses the same path, so it confirms too.
+Browser: Services switched off and on, each time the toast showed and the
+setting changed on the server.

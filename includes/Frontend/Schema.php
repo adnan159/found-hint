@@ -167,7 +167,13 @@ class Schema {
 			return '';
 		}
 
-		return "\n" . '<script type="application/ld+json" id="fhint-schema">' . $json . '</script>' . "\n";
+		// Marked in the page source, as SEO plugins do, so whoever reads it
+		// sees which plugin printed the structured data.
+		$version = defined( 'FHINT_VERSION' ) ? ' v' . FHINT_VERSION : '';
+
+		return "\n" . '<!-- This site uses FoundHint Local SEO' . $version . ' - https://foundhint.com/ -->' . "\n"
+			. '<script type="application/ld+json" id="fhint-schema">' . $json . '</script>' . "\n"
+			. '<!-- / FoundHint Local SEO -->' . "\n";
 	}
 
 	/**
