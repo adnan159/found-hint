@@ -61,7 +61,13 @@ export function FieldRow({
         photos={photos}
         onChange={onChange}
       />
-      <FieldNotes id={id} field={field} error={error} missing={missing} />
+      <FieldNotes
+        id={id}
+        field={field}
+        value={value}
+        error={error}
+        missing={missing}
+      />
     </div>
   );
 }

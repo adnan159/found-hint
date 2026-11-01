@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { __ } from "@wordpress/i18n";
+import { __, sprintf } from "@wordpress/i18n";
 import { toast } from "sonner";
 import { cn } from "cn";
 import { errorMessage, fieldErrors } from "@/lib/errors";
@@ -11,11 +11,11 @@ import useOverrideDraft from "../../hooks/useOverrideDraft";
 import useSchemaPreview from "../../hooks/useSchemaPreview";
 import {
   EMPTY_BUSINESS_DRAFT,
+  NOT_FOR_ORGANIZATION,
   isBusinessDraftDirty,
   missingBusinessFields,
 } from "../../lib/business";
 import BusinessFields from "./BusinessFields";
-import SchemaKindPicker from "./SchemaKindPicker";
 import JsonPreview from "../shared/JsonPreview";
 import PlacementCards from "../shared/PlacementCards";
 import SaveBar from "../shared/SaveBar";
@@ -25,6 +25,12 @@ import { panel } from "../styles";
 import SubtypePicker from "./SubtypePicker";
 
 const TITLE_ID = "fhint-schema-business-title";
+
+// The tab's own words, by kind.
+const NAMES = {
+  organization: () => __("organization schema", "foundhint-local-seo"),
+  localbusiness: () => __("local business schema", "foundhint-local-seo"),
+};
 
 /**
  * 01 Business schema — who the business is (doc §5).
@@ -37,7 +43,14 @@ const TITLE_ID = "fhint-schema-business-title";
  * The parts: `components/business/` (schema type, fields), `PanelHeading`, the shared
  * `useOverrideDraft` and `useSchemaPreview` hooks, and `lib/business`.
  */
-export function BusinessTab({ state, locked, live, onDirtyChange, saveRef }) {
+export function BusinessTab({
+  kind = "localbusiness",
+  state,
+  locked,
+  live,
+  onDirtyChange,
+  saveRef,
+}) {
   const [save, saveState] = useSaveBusinessSchemaMutation();
   const { data: types = [] } = useGetSchemaTypesQuery(undefined, {
     skip: locked,
@@ -57,15 +70,15 @@ export function BusinessTab({ state, locked, live, onDirtyChange, saveRef }) {
   }, [dirty, onDirtyChange]);
 
   const preview = useSchemaPreview({
-    entity: "business",
+    entity: kind === "organization" ? "organization" : "business",
     draft,
     dirty,
     state,
     skip: locked,
   });
 
-  // What is in force: the draft's choice, else the saved one.
-  const kind = draft.schema_kind ?? state.schema_kind;
+  // What is in force: the draft's choice, else the saved one. The kind is
+  // the tab's own: Organization and LocalBusiness are separate tabs.
   const type = draft.schema_type || state.type;
   const visitMode =
     draft.visit_mode ?? state.extras?.visit_mode ?? "storefront";
@@ -80,23 +93,33 @@ export function BusinessTab({ state, locked, live, onDirtyChange, saveRef }) {
     visitMode,
   );
 
-  // An Organization shows its information group and its social links.
+  // An Organization leaves out what it never prints (hours, price, map)
+  // and its photos — the brand is shown by its logo.
   const fields = state.fields
     .map(draftApi.source)
     .filter(
       (field) =>
-        !organization || field.group === "info" || field.key === "social",
+        !organization ||
+        !(NOT_FOR_ORGANIZATION.includes(field.key) || field.key === "images"),
+    )
+    // Nothing in an Organization's address is required.
+    .map((field) =>
+      organization && field.badge === "storefront"
+        ? { ...field, badge: "optional" }
+        : field,
     );
 
   const onSave = async () => {
     try {
-      const result = await save(draft).unwrap();
+      const result = await save({ kind, ...draft }).unwrap();
 
       clear();
       toast.success(
         result?.status === "draft"
           ? __("Saved as a draft.", "foundhint-local-seo")
-          : __("Business schema saved.", "foundhint-local-seo"),
+          : organization
+            ? __("Organization schema saved.", "foundhint-local-seo")
+            : __("LocalBusiness schema saved.", "foundhint-local-seo"),
       );
     } catch {
       toast.error(__("Some fields need attention.", "foundhint-local-seo"));
@@ -117,7 +140,11 @@ export function BusinessTab({ state, locked, live, onDirtyChange, saveRef }) {
       >
         <PanelHeading
           id={TITLE_ID}
-          title={__("Business schema", "foundhint-local-seo")}
+          title={
+            organization
+              ? __("Organization schema", "foundhint-local-seo")
+              : __("LocalBusiness schema", "foundhint-local-seo")
+          }
           description={
             organization
               ? __(
@@ -130,12 +157,6 @@ export function BusinessTab({ state, locked, live, onDirtyChange, saveRef }) {
                 )
           }
           counter={state.counter}
-        />
-
-        <SchemaKindPicker
-          value={kind}
-          locked={locked}
-          onChange={(next) => set({ schema_kind: next })}
         />
 
         {organization ? null : (
@@ -160,6 +181,7 @@ export function BusinessTab({ state, locked, live, onDirtyChange, saveRef }) {
           locked={locked}
           missing={missing}
           visitMode={visitMode}
+          organization={organization}
           onVisitMode={(next) => set({ visit_mode: next })}
           errors={errors}
           photos={state.photos}
@@ -184,8 +206,12 @@ export function BusinessTab({ state, locked, live, onDirtyChange, saveRef }) {
         />
 
         <PlacementCards
-          title={__("Add business schema to", "foundhint-local-seo")}
-          name="fhint-business-placement"
+          title={sprintf(
+            /* translators: %s: "organization schema" or "local business schema". */
+            __("Add %s to", "foundhint-local-seo"),
+            NAMES[organization ? "organization" : "localbusiness"](),
+          )}
+          name={`fhint-${organization ? "organization" : "business"}-placement`}
           value={draft.placement ?? state.placement}
           postIds={draft.post_ids ?? state.post_ids}
           locked={locked}
@@ -215,7 +241,11 @@ export function BusinessTab({ state, locked, live, onDirtyChange, saveRef }) {
 
       <JsonPreview
         document={document}
-        rootType={document?.["@type"] ?? ""}
+        // With the website beside it the document is a @graph; the
+        // business is its first node.
+        rootType={
+          document?.["@type"] ?? document?.["@graph"]?.[0]?.["@type"] ?? ""
+        }
         live={live && !dirty && state.status === "active"}
         loading={preview.loading && !document}
         dirty={dirty}

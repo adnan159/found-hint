@@ -246,7 +246,7 @@ Google), Details for {type}, Add business schema to.
 **Pro**
 - [x] `schema_types.json` — curated local types, each with its parent, Google-category matches and extras (Dentist: `isAcceptingNewPatients`, `medicalSpecialty`; Restaurant: `servesCuisine`, `menu`, `acceptsReservations`; …); filter `fhint_schema_types`.
 - [x] `Provenance` (`BusinessFields`) — each field's Google value from the business/primary location (already Google-synced) and its `gbp.*` path; overrides layered on top; `google_seen` comparison.
-- [x] `Pieces\Business` — doc §5 fields; `image[]` from chosen listing photos; `hasMap` from `cid`; special hours (next 90 days); type extras; Organization hides address/hours.
+- [x] `Pieces\Business` — doc §5 fields; `image[]` from chosen photos (now Media Library only — see QA fixes); `hasMap` from `cid`; special hours (next 90 days); type extras; Organization hides address/hours.
 - [x] Single-location rule: one business node, no Organization; `#organization` only for Organization or a parent with branches.
 - [x] REST: `GET/PUT schema/business` (`draft` flag), `POST schema/preview`, `GET schema/pages`, `GET schema/state` (summaries for the tab bar, sync time, connection).
 - [x] Validation on save (doc §11.2): URL, phone, email, coordinates, price range; missing required fields keep it `draft`.
@@ -268,7 +268,7 @@ the business.
 
 **Done when** each branch has its own `@id`, address, geo, hours; deactivating keeps the data and stops output; unknown hours are never published.
 
-### Step 3 — Service schema (tab 03)
+### Step 3 — Service schema (tab 03) — done 2026-10-29
 
 **Free UI**: list (From Google badge, "to check" badge with its message on
 hover/expand, meta line, status toggle that saves at once, drag to reorder,
@@ -280,12 +280,76 @@ details (No price / Fixed / Starting at / Range, currency default from the
 business country), Add this schema to.
 
 **Pro**
-- [ ] `Pieces\Service` — `provider` → business/branch `@id`s; `Person` (or `Organization`) node with `worksFor`; `areaServed` typed places; `offers` per pricing model; `url` + `@id` from the service page.
-- [ ] Page warnings (doc §7.2): general page, page shared (`page_shared`), not published, other host, not canonical.
-- [ ] Service categories per business type (in `schema_types.json`).
-- [ ] REST: `GET/POST schema/services`, `PUT/PATCH/DELETE schema/services/{id}`, `PUT schema/services/order`. Services stay in `fhint_services` (name, description, image, price, url, status, order); schema extras go to `fhint_schema_entities` / providers / areas.
+- [x] `Pieces\Service` — `provider` → business/branch `@id`s; `Person` node with `worksFor` (a partner company joins the providers instead); `areaServed` typed places; `offers` per pricing model; `url` + `@id` from the service page (a page on another host never lends its address).
+- [x] Page warnings (doc §7.2): no page, general page, page shared (`page_shared`), not published, other host, not canonical; plus no pages chosen and a provider branch switched off.
+- [x] Service categories per business type (in `schema_types.json`).
+- [x] REST: `GET/POST schema/services` (`list` = 0 or a branch id), `GET schema/services/blank`, `GET/PUT/PATCH/DELETE schema/services/{id}`, `PUT schema/services/order`, `preview` with `entity: service`. Services stay in `fhint_services` (name, description, image, price, currency, url, status, order); schema extras go to `fhint_schema_entities` / providers / areas.
+- [x] The tab follows the top-bar location: the main location shows the business's list, a branch its own (provided by that branch by default).
+- [x] Free: deleting a service anywhere also clears its schema settings, providers and areas.
 
 **Done when** two services on one page get distinct `@id`s and a warning; offers match the pricing model; no service creates a business node.
+
+### QA fixes — Organization schema (report of 2026-10-29) — done 2026-11-01
+
+The QA report (`FoundHint Organization Schema — QA Test Report`, 8 defects)
+tested the Business tab set to Organization. Fixed in the Business tab:
+
+- [x] **D1 logo** — chosen from the Media Library; printed as an `ImageObject` at `{home}#logo` with width and height; default the theme's custom logo, else the site icon; nothing printed without one.
+- [x] **D2 phone** — printed in international form (`Phone::international()`: the country's calling code, its trunk prefix dropped; `+880-1518-984873`). A typed number that cannot be converted is refused (`*.telephone.not_international`); the field shows "Printed as …". Branches and the contact point too.
+- [x] **D3 avatar** — Google account pictures (`/a/`, `/a-/`) are never offered or printed.
+- [x] **D4 hotlinking** — logo and photos must be on this site (`*.external`); Google photos are imported to the Media Library first (`POST schema/media/import`, only photos the listing has, deduplicated by source); a Google address saved before is dropped from the output.
+- [x] **D5 isolated entity** — the business preview is a `@graph` with a `WebSite` (`Pieces\WebSite`, `{home}#website`) whose `publisher` points at `#organization` / `#business`; switched off by `schema.website.enabled`. Part of Step 4 brought forward.
+- [x] **D6 missing fields** — groups "About the business" (legal name, alternate name, email, founding date, founder, knowsAbout) and "Contact point" (type, phone, email, languages); an Organization may print an address and areas served. Legal name, email and founding date start from the business record. Each prints only when filled.
+- [x] **D7 sameAs** — links tidied (tracking parameters and fragments removed), one entry per profile, at most 20; the field lists the platforms found and suggests common missing ones.
+- [x] **D8 description** — live count against 150–300 characters and a warning for a two-word phrase used 3+ times (guidance only; 750 stays the hard limit).
+- [x] The document finaliser keeps references to nested entities (`image: { "@id": "#logo" }`).
+
+**Still open from the report**
+- [ ] SoftwareApplication node (it describes FoundHint itself) — decide: a general opt-in section, or foundhint.com only (Q4).
+- [ ] The live site prints these only once Step 5's renderer ships; until then the markup is what "Copy schema" gives.
+- [ ] Duplicate Organization with Yoast / Rank Math (WP-009) — Step 5's compat work.
+- [ ] The report's 43 manual tests in a real admin (saving, security, caching, theme switch, multisite).
+
+### Two business tabs and tab switches — done 2026-11-01
+
+The Business tab is split into **01 Organization schema** (the brand,
+`#organization`) and **02 LocalBusiness schema** (the place, `#business`);
+the tabs after them move up one number. Every schema tab has an on/off
+switch in the tab bar.
+
+- [x] Each business tab keeps its own settings row (`entity_kind`
+  `organization` / `business`); both start from the same stored records. The
+  kind picker is gone — the tab is the kind (`?kind=` on `schema/business`,
+  `entity: organization` on preview).
+- [x] A row saved as Organization before the split moves to the
+  Organization tab once, on first read (Organization on, LocalBusiness off).
+- [x] The Organization has no photos field (its image is the logo); the
+  LocalBusiness, Location and Service keep theirs.
+- [x] With both on, the LocalBusiness has `parentOrganization` →
+  `#organization`; the website's publisher is the Organization when it is
+  on, else the LocalBusiness, else nobody.
+- [x] Switches (`Tabs`, `PUT schema/tabs`): `schema.tabs.{organization,
+  localbusiness, locations, services}` and the existing
+  `schema.website.enabled`. Off keeps the details, prints and links nothing;
+  the tab's form is replaced by an off panel ("… schema is off", what turning
+  it on does, "Turn on … schema"). Switching off the open tab with unsaved
+  changes asks Save / Discard / Stay first. The Organization starts off. Settings has no switch.
+- [x] URLs: `#/schema?tab=organization`; LocalBusiness is the default and an
+  old `?tab=business` link opens it. The renderer (Step 5) must honour the
+  switches.
+
+### Design update (FoundHint Schema (1).html) — in progress
+
+Built in order A → B → C → D (the 6-tab bar stays, by decision).
+
+**A. Choose your main business — done 2026-11-01**
+- [x] With more than one location and no choice yet, the Main business tab asks first: each Google profile (area, ★ rating, "Suggested" when its website is this site), or "My head office isn't on Google — enter details manually" (name required, address, website).
+- [x] A location chosen becomes the primary location across FoundHint; a head office typed here describes the LocalBusiness from those details (nothing from a listing it is not) and every location becomes a branch. Saved in the business row's `extras.main`; `GET/PUT schema/main` (`mode`: location | manual | ask).
+- [ ] "Your main business is a head office" status — with the setup wizard (B).
+
+**B. Locations** — list of profiles (role, page, status, issues, actions), location setup wizard, "more profiles found", branch editor (create or pick a page, parent picker, inherit switches, issue alerts), separate-website profiles.
+**C. Settings** — header output and position, live check, website structure rows, "What goes where", SEO plugin conflicts (with Step 5).
+**D. Preview** — "Outputs on: {page}".
 
 ### Step 4 — Website structure (tab 04)
 
@@ -294,7 +358,7 @@ business country), Add this schema to.
 the user).
 
 **Pro**
-- [ ] `Pieces\WebSite` (home only; `publisher` → `#business` / `#organization`; no SearchAction), `Pieces\WebPage` (SEO title/description when an SEO plugin provides them; `isPartOf`, `about` / `mainEntity`, `primaryImageOfPage`, `breadcrumb`), AboutPage/ContactPage replacing WebPage on their page, `Pieces\Breadcrumb` from the real hierarchy (page parents; post → category).
+- [ ] `Pieces\WebSite` (built early for QA D5 — still to place: home only; `publisher` → `#business` / `#organization`; no SearchAction), `Pieces\WebPage` (SEO title/description when an SEO plugin provides them; `isPartOf`, `about` / `mainEntity`, `primaryImageOfPage`, `breadcrumb`), AboutPage/ContactPage replacing WebPage on their page, `Pieces\Breadcrumb` from the real hierarchy (page parents; post → category).
 - [ ] An unpublished About/Contact page stops its type and raises an issue.
 - [ ] REST: `GET/PUT schema/website`.
 
@@ -346,6 +410,7 @@ the first free release, so free users see the manager from day one.
 
 | # | Question | Default if not answered |
 |---|---|---|
-| Q1 | Business images: hotlink Google's photo URLs, or import them to the Media Library (doc 13.4)? | Use Google's URLs (they are the listing's own photos); revisit if they expire. |
+| Q1 | Business images: hotlink Google's photo URLs, or import them to the Media Library (doc 13.4)? | **Settled 2026-11-01 (QA D4):** import — schema images are always served from this site. |
 | Q2 | Pro licensing/updates are not built yet. Ship the Schema Manager before them? | Build the features; licensing is a separate track. |
 | Q3 | Free release number for Step 0. | 1.2.0 |
+| Q4 | SoftwareApplication (QA report): a general opt-in section for software businesses, or only foundhint.com's own markup? | Not built until decided. |

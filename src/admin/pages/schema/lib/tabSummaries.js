@@ -12,7 +12,7 @@ import { placementLabel } from "./schema";
  *                                Pro serves.
  * @param {Object}  data.free     The free plugin's schema (`GET schema`).
  * @param {Object}  data.state    Premium's Schema Manager state.
- * @param {Object}  data.business Premium's Business tab.
+ * @param {Object}  data.business Premium's LocalBusiness tab.
  * @return {Object} Summary text by tab key.
  */
 export function tabSummaries({ plan, free, state, business }) {
@@ -21,9 +21,14 @@ export function tabSummaries({ plan, free, state, business }) {
   const notYet = plan.business ? soon : pro;
 
   return {
-    business: plan.business
+    organization: plan.business
+      ? state?.tabs?.organization
+        ? `Organization · ${placementLabel(state.tabs.organization.placement)}`
+        : "…"
+      : pro,
+    localbusiness: plan.business
       ? business
-        ? `${business.schema_kind === "organization" ? "Organization" : business.type} · ${placementLabel(business.placement)}`
+        ? `${business.type} · ${placementLabel(business.placement)}`
         : "…"
       : free?.graph?.["@graph"]?.[0]?.["@type"]
         ? `${free.graph["@graph"][0]["@type"]} · ${placementLabel("every_page")}`

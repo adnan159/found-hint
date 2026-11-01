@@ -36,6 +36,16 @@ export function fieldLabel(key, scope = "business") {
       hours: __("Opening hours", "foundhint-local-seo"),
       areas_served: __("Areas served", "foundhint-local-seo"),
       social: __("Social profiles", "foundhint-local-seo"),
+      legal_name: __("Legal name", "foundhint-local-seo"),
+      alternate_name: __("Alternate name", "foundhint-local-seo"),
+      email: __("Email", "foundhint-local-seo"),
+      founding_date: __("Founding date", "foundhint-local-seo"),
+      founder: __("Founder", "foundhint-local-seo"),
+      knows_about: __("Topics you are known for", "foundhint-local-seo"),
+      contact_type: __("Contact type", "foundhint-local-seo"),
+      contact_telephone: __("Contact phone", "foundhint-local-seo"),
+      contact_email: __("Contact email", "foundhint-local-seo"),
+      contact_languages: __("Languages spoken", "foundhint-local-seo"),
     }[key] ?? key
   );
 }

@@ -52,7 +52,8 @@ The posts table already has what Pro's posts need: `status` `scheduled`,
 `scheduled_at`, and `source` (`ai`, `csv`, `blog` — allowed on a request
 once Pro adds them through the `fhint_post_sources` filter).
 | `schema.business` | Schema → 01 Business schema | The five-tab screen, locked, filled with the free markup | Editable tab; Pro's `fhint-premium/v1/schema/*` routes |
-| `schema.locations` · `schema.services` · `schema.website` · `schema.settings` | Schema tabs 02–05 | "Pro" | Each when its step ships (docs/SCHEMA-PLAN.md) |
+| `schema.locations` · `schema.services` | Schema tabs 02–03 | The tab locked, filled with the free markup | Editable tabs (shipped) |
+| `schema.website` · `schema.settings` | Schema tabs 04–05 | "Pro" | Each when its step ships (docs/SCHEMA-PLAN.md) |
 | `schema.output` | Front-end markup | Free LocalBusiness markup | Pro's per-page graph replaces it |
 
 The Schema Manager's tables (`fhint_schema_entities`, `…_service_providers`,

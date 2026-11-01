@@ -46,17 +46,42 @@ export const schemaManagerApi = baseApi
         }),
       }),
 
+      // The Business schema's two tabs: `localbusiness` (the place, the
+      // default) and `organization` (the brand).
       getBusinessSchema: builder.query({
-        query: () => url("/schema/business"),
+        query: (kind = "localbusiness") => url("/schema/business", { kind }),
         transformResponse: (response) => response?.data ?? null,
         providesTags: ["SchemaManager"],
       }),
 
       saveBusinessSchema: builder.mutation({
-        query: (body) => ({
-          url: url("/schema/business"),
+        query: ({ kind = "localbusiness", ...body }) => ({
+          url: url("/schema/business", { kind }),
           method: "PUT",
           body,
+        }),
+        transformResponse: (response) => response?.data ?? null,
+        invalidatesTags: ["SchemaManager"],
+      }),
+
+      // Which business is the main one: a location (it becomes the primary
+      // location everywhere), a head office typed here, or ask again.
+      setMainBusiness: builder.mutation({
+        query: (body) => ({
+          url: url("/schema/main"),
+          method: "PUT",
+          body,
+        }),
+        transformResponse: (response) => response?.data ?? null,
+        invalidatesTags: ["SchemaManager", "Location", "Schema", "Service"],
+      }),
+
+      // A tab's switch: on prints its schema, off keeps the details only.
+      setSchemaTab: builder.mutation({
+        query: ({ key, enabled }) => ({
+          url: url("/schema/tabs"),
+          method: "PUT",
+          body: { key, enabled },
         }),
         transformResponse: (response) => response?.data ?? null,
         invalidatesTags: ["SchemaManager"],
@@ -177,6 +202,18 @@ export const schemaManagerApi = baseApi
         invalidatesTags: ["Service", "Schema"],
       }),
 
+      // Copy one of the listing's Google photos into the Media Library, so
+      // schema serves it from this site.
+      importSchemaPhoto: builder.mutation({
+        query: (photoUrl) => ({
+          url: url("/schema/media/import"),
+          method: "POST",
+          body: { url: photoUrl },
+        }),
+        transformResponse: (response) => response?.data ?? null,
+        invalidatesTags: ["SchemaManager"],
+      }),
+
       // The markup for an entity, unsaved changes included. A mutation, not
       // a query: every keystroke is a new draft, and none is worth caching.
       previewSchema: builder.mutation({
@@ -196,6 +233,8 @@ export const {
   useGetSchemaPagesQuery,
   useGetBusinessSchemaQuery,
   useSaveBusinessSchemaMutation,
+  useSetSchemaTabMutation,
+  useSetMainBusinessMutation,
   useGetLocationSchemasQuery,
   useGetLocationSchemaQuery,
   useSaveLocationSchemaMutation,
@@ -207,5 +246,6 @@ export const {
   useSetServiceStatusMutation,
   useDeleteServiceSchemaMutation,
   useReorderServiceSchemasMutation,
+  useImportSchemaPhotoMutation,
   usePreviewSchemaMutation,
 } = schemaManagerApi;

@@ -29,9 +29,14 @@ defined( 'ABSPATH' ) || exit;
  * `inactive` (kept, not printed).
  *
  * @column id          Primary key.
- * @column entity_kind business | location | service.
- * @column entity_id   Row id in fhint_business / fhint_locations / fhint_services.
- * @column schema_kind Business only: localbusiness | organization. '' for others.
+ * @column entity_kind business (the LocalBusiness tab) | organization (the
+ *                     Organization tab — the brand) | location | service.
+ * @column entity_id   Row id in fhint_business (business and organization) /
+ *                     fhint_locations / fhint_services.
+ * @column schema_kind localbusiness on a business row, organization on an
+ *                     organization row; '' for others. A business row saved as
+ *                     organization before the two tabs split is moved to its
+ *                     own organization row the first time it is read.
  * @column schema_type Schema.org type chosen on the screen, e.g. 'Dentist'.
  *                     '' = derive it from the Google category.
  * @column overrides   JSON object { field: value } — values typed on the Schema

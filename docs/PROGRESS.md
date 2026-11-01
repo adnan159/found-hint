@@ -4,8 +4,10 @@
 step finishes: what shipped, and how it was verified — the evidence, not the
 intent. Name any bug the verification caught.
 
-Last updated: step 3. The data layer, its REST API and the admin screens
-for everything it covers exist. The audit engine and schema output do not.
+Last updated: step 65. The data layer, its REST API and the admin screens
+for everything it covers exist. The Schema Manager's Business, Location and
+Service tabs are built in FoundHint Premium; its front-end output (Step 5
+of `docs/SCHEMA-PLAN.md`) is not.
 
 ## Step 0 · Scaffold — done
 
@@ -2031,3 +2033,144 @@ A switch with unsaved changes — from the bar or a pill — goes through the
 Save / Discard / Stay prompt (a guard on the shared selection).
 Verified on the real bundle: bar → Location tab + `location_id: 2` refresh,
 bar → Business tab, prompt keeps the branch until Discard, pill → bar.
+
+## Step 64 — Schema Manager Step 3: Service schema
+
+The Service tab: a list per location (the main location's services, or a
+branch's own list — the top bar decides) and an editor for one service.
+
+**Shipped (Premium):** `Pieces\Service` (`provider` → the business or
+branch `@id`s; a named Person `worksFor` the provider, a partner company
+joins the providers; `areaServed` typed places; `offers` as a fixed price,
+a starting price or a range; `@id` `{page}#service-{slug}`, never another
+site's address); `ServiceSchema` (list, editor state, create, save, the
+list switch, delete, reorder, preview, page checks); `ServiceRelations`
+(providers and areas tables, written as whole lists); routes
+`schema/services`, `schema/services/blank`, `schema/services/{id}`
+(GET/PUT/PATCH/DELETE), `schema/services/order`; `schema.services` feature;
+tab summary "N active · M to check". Services stay on the free plugin's
+records (name, description, price, currency, page URL, on/off — shared with
+the Profile screen and Google); only schema's own details go to the schema
+tables.
+**Shipped (free):** `ServiceRepository` deleting a service — or a branch's
+list — also clears its schema settings, providers and areas; the Service
+tab (list with badges, checks on demand, a switch that saves at once, drag
+and up/down reordering; editor sections 01–05 and placement); the editor
+scrolls into view and focuses the name when opened from the list.
+
+**Verified:** Premium smoke 159 and database 103, every rule
+mutation-tested (two survivors explained: "No price" already blanks the
+price, Premium has no service limit). In the browser, against the real dev
+site: add a service (a refused backwards range first), the preview's
+`PriceSpecification`, the switch (one PATCH), remove (its schema rows gone
+from the database), a branch's empty list and its defaults (the branch as
+provider, pet-store categories).
+
+**Bugs caught:** service and location `@id`s built from `?page_id=` links
+lost the query, so on a site without pretty permalinks every page looked
+like the home page — `IdFactory::page()` now keeps the arguments that name
+a page. A just-added service briefly showed another one until the list
+refreshed. "Add a service" opened the editor out of sight below a long
+list.
+
+## Step 65 — Organization schema QA fixes (D1–D8)
+
+The QA report on the Organization output (1 critical, 4 high defects) —
+all eight fixed in the Business tab (`docs/SCHEMA-PLAN.md`, "QA fixes").
+
+**Shipped (Premium):** `Media` (avatar filter, self-hosted check, Google
+photo import with an allow-list and dedupe by source, default logo, image
+sizes); `Phone` (international form from the country's calling code and
+trunk prefix; save check; "Printed as" note); `Pieces\WebSite`; the logo as
+an `ImageObject` at `#logo`, `image` falling back to it; ten new business
+fields (identity and contact point) with their validation; an
+Organization's optional address and areas; profile links tidied and
+deduplicated; `POST schema/media/import`; the business preview as a
+`@graph` with the website; nested `@id`s resolvable in documents.
+**Shipped (free):** Media Library logo and photo pickers (with "+ Add" for
+Google photos), the new field groups and controls, an Organization's field
+set (no hours, price, coordinates or map), phone, description and
+profile-link guidance under their fields, messages for every new code.
+
+**Verified:** Premium smoke 244 and database 124, mutation-tested (the
+one survivor is a deliberate second safeguard: avatars are also caught by
+the self-hosted rule). On real data: 7 Google photos → 6 offered (one
+avatar); an import saved a 1600×899 JPEG and a second import reused it; a
+foreign URL was refused; the phone `01518-984873` prints as
+`+880-1518-984873` (the branch as `+880-1335-521022`); the preview links
+`WebSite.publisher` to the business; the description guidance flags the
+report's own case (320 characters, "local seo" ×3). Browser: pickers,
+import, preview, new groups. Choosing inside the Media Library window was
+simulated — the browser pane is not logged in to WordPress.
+
+**Bugs caught:** a reference to the nested logo was dropped by the
+document finaliser; branches would have printed the new logo object as the
+text "Array"; repeated topics kept the last spelling instead of the first;
+an Organization's address fields still said "Required by Google for a
+storefront".
+
+**Still open:** the SoftwareApplication node (a decision), live output
+(Step 5), duplicate detection with SEO plugins, and the report's manual
+tests.
+
+## Step 66 — Organization and LocalBusiness as two tabs; tab switches
+
+The Business tab became two schema tabs — Organization (the brand) and
+LocalBusiness (the place) — each with its own fields and saved settings,
+and every schema tab gained an on/off switch in the tab bar.
+
+**Shipped (Premium):** `BusinessSchema` takes a kind (default
+LocalBusiness, so branches, services and the tab state are unchanged); the
+organization settings row and a one-time move of an old Organization row;
+`Tabs`; `PUT schema/tabs`; `?kind=` on `schema/business`; preview
+`entity: organization`; `parentOrganization` on the place when the brand is
+on; the website's publisher follows the switches; the tab state reports
+them.
+**Shipped (free):** `schema.tabs.*` settings; six tabs with switches ("Off ·
+not printed"); the off notice; the Business tab fixed to its kind (no kind
+picker); the Organization without photos; LocalBusiness the default tab.
+
+**Verified:** Premium smoke 246 and database 145, mutation-tested
+(survivors explained: equivalent defaults and a redundant assignment).
+Browser on the real site: six tabs, the Organization off by default with
+its notice and no photos field, switching it on links the LocalBusiness
+preview (`parentOrganization`, website `publisher` → `#organization`), no
+console errors.
+
+**Bug caught:** the off notice's wrapper let the page scroll sideways (the
+grid stretched to the preview's longest line).
+
+**Then:** a switched-off tab shows only an off panel in place of its form
+(icon, "… schema is off" with an Off tag, what turning it on does, "Turn on
+… schema"); its heading takes focus. Switching off the open tab with
+unsaved changes goes through Save / Discard / Stay. Verified in the
+browser: the panel alone, Turn on brings the form back, an unsaved edit
+then Off prompts, Discard switches off and saves nothing.
+
+## Step 67 — Design update A: choose your main business
+
+From the new design (`FoundHint Schema (1).html`): with more than one
+Google profile, the Main business tab first asks which one is the main
+business — the one that represents the brand on this website — or takes a
+head office that is not on Google, typed by hand.
+
+**Shipped (Premium):** `MainBusiness` (the choice in `extras.main`;
+candidates with area, rating and a "suggested" mark; choosing a location
+makes it the primary location; a manual head office); `BusinessFields::manual()`
+(the head office's values — nothing from a listing it is not); every
+location a branch under a manual head office; `GET/PUT schema/main`; the
+tab state carries `main`. The database suite now starts from default
+settings (settings live in the real options table).
+**Shipped (free):** `MainBusinessPicker` in place of the Main business form
+while a choice is needed; messages for its codes.
+
+**Verified:** Premium smoke 251, database 164, mutation-tested (both
+survivors of the first run closed by new tests). Browser on the real site:
+two profiles with ratings, the manual option's Continue disabled until a
+name is typed, choosing FoundHint opens the form with "FoundHint is your
+main business. Its fields are below." State restored afterwards (asking,
+LocalBusiness off).
+
+**Bug caught:** the database suite read the site's real tab switches, so
+it failed whenever the developer had switched a tab off.
+
