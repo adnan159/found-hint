@@ -153,6 +153,11 @@ export function warningText(warning) {
         ),
         warning.canonical,
       );
+    case "no_areas":
+      return __(
+        "No service areas yet. Add the places you actually serve.",
+        "foundhint-local-seo",
+      );
     case "no_pages":
       return __(
         "No pages chosen yet, so this service prints nowhere.",

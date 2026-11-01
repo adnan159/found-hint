@@ -4,10 +4,16 @@
 step finishes: what shipped, and how it was verified — the evidence, not the
 intent. Name any bug the verification caught.
 
-Last updated: step 65. The data layer, its REST API and the admin screens
-for everything it covers exist. The Schema Manager's Business, Location and
-Service tabs are built in FoundHint Premium; its front-end output (Step 5
-of `docs/SCHEMA-PLAN.md`) is not.
+Last updated: step 75. The data layer, its REST API and the admin screens
+for everything it covers exist. The Schema Manager is built in FoundHint
+Premium and matches the design (`FoundHint Schema (1).html`): six tabs —
+01 Organization, 02 LocalBusiness, 03 Locations (list, setup, branch
+editor, separate businesses, "Create location page"), 04 Services, 05
+Website structure, 06 Settings — and Premium prints the site's schema
+itself, one `@graph` per page. Premium builds its own release zip with
+`npm run plugin:publish`. What is still open is the unticked items in
+`docs/SCHEMA-PLAN.md`: the WP-Cron live check, SoftwareApplication (Q4),
+Step 6's QA and release checks, and the last "Pro" → "Premium" copy.
 
 ## Step 0 · Scaffold — done
 
@@ -2330,3 +2336,71 @@ was mutation-tested and fails against broken code. The free harness's
 Browser: created the Pet Shop's page from the editor (branch went Live,
 its PetStore schema printed on the page), then deleted it; the head-office
 panel and its links.
+
+## Step 74 — Services matched to the design
+
+**Look.** With a service open, the list and its editor are one card, as in
+the design: header, "Services offered" with its counts, the rows in their
+own bordered box, then the black "Editing" bar and the sections (orange
+numbers, 15px titles, 2px dark dividers). Rows use the design's rounded
+"From Google" / "N to check" pills, a green Active or grey Inactive, an
+orange edge and tint on the open service, and fade when inactive. Field
+tags are rounded pills; area chips have a dark border and the Add button is
+black. Nothing was removed: reordering (drag and arrows), the checks list,
+the featured-image choice and Remove service stay. New file:
+`components/services/pills.js`.
+
+**Selects were grey.** The shared field style greys anything matching CSS
+`:read-only`, which every `<select>` does; the Services editor now
+overrides it so its selects are white like the design's. (Other screens
+still use the shared style unchanged.)
+
+**Google photo as the image.** The Image select lists the list owner's
+synced Google photos by role ("Google photo: Cover 1", "Gallery 2" …;
+`options.photos` from `ServiceSchema::photo_choices()`). Saving copies the
+photo into the Media Library before anything is written (`with_photo()` →
+`Media::import`, which accepts only that profile's photos), so a failed
+download leaves no half-saved service. The service stores the local URL in
+`image_url` and the Google URL in `extras.image_source`; the schema prints
+the local copy only, and a preview never downloads.
+
+**No-areas warning.** `no_areas` ("No service areas yet. Add the places
+you actually serve.") joins the service warnings, shown with the others
+under 04 and counted in "N to check".
+
+**Tests.** Premium database 243 (+6: no_areas and clearing it, a Google
+photo must be an address, a photo not on the profile is refused with
+nothing saved, a preview never prints Google's address, photos offered);
+one existing check now expects `no_areas` too. Each was mutation-tested.
+Browser: the list and editor beside the design at 1440px; picked "Google
+photo: Gallery 1", saved — the schema's image became
+`/wp-content/uploads/…/data-center-management-photo.jpg` and the choice
+survived a reload; then set back to No image and the copied file deleted.
+
+## Step 75 — Settings checked against the design
+
+Compared tab 06 with the design's Settings at 1440px. Changed:
+
+- **Add to my site header**: the design's 34px icon box (orange on
+  #FFF1EB) and an ⓘ hint beside the title. The "Where in the page" select
+  is white — it was greyed by the shared field style's `:read-only` rule,
+  which every `<select>` matches.
+- **Works with your SEO plugin**: active plugins one per row; the
+  supported ones that aren't installed share one row, as in the design
+  ("Rank Math, All in One SEO, SEOPress — Supported. Not installed." ·
+  Ready). The Yoast fix box uses the design's colours and an orange
+  button.
+
+Kept on purpose: the header's one-line description, each page's path and
+"Your other N pages get: …" in What goes where (the design shows names
+only), Who publishes it, and What gets added showing the single
+`<script id="fhint-schema">` @graph that Premium really prints (the
+design draws one script per section).
+
+**Bug fixed**: tab 02's summary said "Head office · described in 01"
+whenever location setup recorded that customers don't visit, even with
+the LocalBusiness tab switched on and printing. It now shows only while
+the tab is off; switched on, it names the type as before.
+
+Browser: the header, select, plugin rows and tab 02's summary on the dev
+site. The Yoast box needs Yoast active, so only its styles changed.

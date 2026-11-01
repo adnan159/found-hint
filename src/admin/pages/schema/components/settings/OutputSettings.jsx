@@ -1,7 +1,9 @@
 import { useId } from "react";
 import { __, _n, sprintf } from "@wordpress/i18n";
+import { PanelTopIcon } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "cn";
+import Hint from "@/components/Hint";
 import { Switch } from "@/components/ui/switch";
 import { errorMessage } from "@/lib/errors";
 import {
@@ -13,7 +15,14 @@ import {
 import { relative } from "../../lib/schema";
 import { BADGE, TONES } from "../../lib/locations";
 import PanelHeading from "../shared/PanelHeading";
-import { dialogButton, input, label, muted, panel } from "../styles";
+import {
+  dialogButton,
+  input,
+  label,
+  muted,
+  panel,
+  primaryAction,
+} from "../styles";
 
 const VERDICTS = {
   duplicate: [() => __("Duplicate found", "foundhint-local-seo"), "warn"],
@@ -52,6 +61,27 @@ function pluginNote(plugin) {
           )
         : __("Active. No overlap.", "foundhint-local-seo");
   }
+}
+
+/**
+ * The plugin rows (design): each one active on this site on its own row,
+ * then every supported one that isn't installed on a single row.
+ */
+function pluginRows(plugins) {
+  const active = plugins.filter((plugin) => plugin.active);
+  const absent = plugins.filter((plugin) => !plugin.active);
+
+  return absent.length
+    ? [
+        ...active,
+        {
+          id: "not-installed",
+          name: absent.map((plugin) => plugin.name).join(", "),
+          active: false,
+          verdict: "ready",
+        },
+      ]
+    : active;
 }
 
 /**
@@ -108,13 +138,28 @@ export function OutputSettings() {
     <div className="fhint:grid fhint:min-w-0 fhint:gap-4">
       <section className={cn(panel, "fhint:min-w-0")}>
         <div className="fhint:flex fhint:flex-wrap fhint:items-center fhint:gap-3 fhint:border-b fhint:border-b-border fhint:px-5 fhint:py-4">
+          <span
+            aria-hidden="true"
+            className="fhint:grid fhint:size-[34px] fhint:shrink-0 fhint:place-items-center fhint:bg-[#FFF1EB] fhint:text-[#D8521F]"
+          >
+            <PanelTopIcon className="fhint:size-[18px]" />
+          </span>
           <span className="fhint:grid fhint:min-w-0 fhint:flex-[1_1_300px] fhint:gap-0.5">
-            <h2
-              id={`${ids}-header`}
-              className="fhint:m-0 fhint:text-[16px] fhint:font-bold"
-            >
-              {__("Add to my site header", "foundhint-local-seo")}
-            </h2>
+            <span className="fhint:flex fhint:items-center fhint:gap-2">
+              <h2
+                id={`${ids}-header`}
+                className="fhint:m-0 fhint:text-[16px] fhint:font-bold"
+              >
+                {__("Add to my site header", "foundhint-local-seo")}
+              </h2>
+              <Hint
+                about={__("Add to my site header", "foundhint-local-seo")}
+                text={__(
+                  "One switch for all of it: FoundHint adds every schema you turned on to your pages as JSON-LD. Off, nothing is added.",
+                  "foundhint-local-seo",
+                )}
+              />
+            </span>
             <span className={muted}>
               {__(
                 "FoundHint prints every schema you set up into the pages you picked. Nothing to copy or paste.",
@@ -166,7 +211,10 @@ export function OutputSettings() {
                     )
                   }
                   aria-describedby={`${ids}-hook-hint`}
-                  className={cn(input("open"), "fhint:pr-8!")}
+                  className={cn(
+                    input("open"),
+                    "fhint:pr-8! fhint:not-disabled:bg-white! fhint:not-disabled:text-[#201e1d]!",
+                  )}
                 >
                   <option value="head">
                     {__("Inside <head> (recommended)", "foundhint-local-seo")}
@@ -372,7 +420,7 @@ export function OutputSettings() {
           </span>
         </div>
         <ul className="fhint:m-0 fhint:list-none fhint:p-0">
-          {(output.plugins ?? []).map((plugin) => {
+          {pluginRows(output.plugins ?? []).map((plugin) => {
             const [text, tone] = VERDICTS[plugin.verdict] ?? VERDICTS.none;
 
             return (
@@ -390,7 +438,7 @@ export function OutputSettings() {
           })}
         </ul>
         {conflicts.some((plugin) => plugin.id === "yoast") ? (
-          <div className="fhint:flex fhint:flex-wrap fhint:items-center fhint:gap-3 fhint:border-t fhint:border-t-border fhint:bg-warning-tint fhint:px-5 fhint:py-3 fhint:text-[13px]">
+          <div className="fhint:flex fhint:flex-wrap fhint:items-center fhint:gap-3 fhint:border-t fhint:border-t-[#FFC9AF] fhint:bg-[#FFF8F4] fhint:px-5 fhint:py-3.5 fhint:text-[13px]">
             <span className="fhint:min-w-0 fhint:flex-[1_1_320px]">
               <strong>
                 {__(
@@ -407,7 +455,7 @@ export function OutputSettings() {
               type="button"
               onClick={runCheck}
               disabled={checkState.isLoading}
-              className={dialogButton}
+              className={primaryAction}
             >
               {checkState.isLoading
                 ? __("Checking…", "foundhint-local-seo")

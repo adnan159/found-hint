@@ -305,6 +305,19 @@ business country), Add this schema to.
 
 **Done when** two services on one page get distinct `@id`s and a warning; offers match the pricing model; no service creates a business node.
 
+**Design match (FoundHint Schema (1).html) — done 2026-11-01** (PROGRESS step 74)
+- [x] One card: header (16px title, Add a service), "Services offered" + counts, the rows in a bordered list, the black "Editing" bar (Remove service outlined), then the sections — orange numbers, 15px titles, 2px dark dividers. The preview stays beside both.
+- [x] Rows: rounded "From Google" and "N to check" pills, green "Active" / grey "Inactive", the open service with an orange edge and tint, an inactive row faded. Reorder arrows, drag and the checks list are kept.
+- [x] Field tags as rounded pills (Required black, From Google blue, Optional grey); white selects; area chips with a dark border and a black Add button.
+- [x] Image: the list owner's Google photos ("Google photo: Cover 1", "Gallery 2" …) besides No image, the page's featured image and a URL. Saving copies the photo into the Media Library first (only that profile's photos; a failed download saves nothing) and the schema prints the local copy, never Google's address; previews never download.
+- [x] Warning "No service areas yet. Add the places you actually serve." (`no_areas`).
+
+**Settings design match — done 2026-11-01** (PROGRESS step 75)
+- [x] Add to my site header: the design's icon box and ⓘ; the Where-in-the-page select is white.
+- [x] Works with your SEO plugin: each active plugin on its own row, every supported one not installed on one shared row ("Supported. Not installed." · Ready); the Yoast fix box in the design's colours with an orange "I've switched it off, check again".
+- [x] Kept, beyond the design: the header's description, page paths in What goes where, "Your other N pages get: …", Who publishes it, and the single `@graph` script in What gets added (what really prints).
+- [x] Fix: tab 02's "Head office · described in 01" shows only while the tab is off; with LocalBusiness on it names its type.
+
 ### QA fixes — Organization schema (report of 2026-10-29) — done 2026-11-01
 
 The QA report (`FoundHint Organization Schema — QA Test Report`, 8 defects)

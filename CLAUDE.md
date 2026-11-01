@@ -347,6 +347,11 @@ when Pro reports serving that feature through `fhint_admin_bootstrap_data`
 UI-side gating (`PRO` badges, greyed "PRO ONLY" rows, sample-data cards)
 is described in `docs/NAVIGATION.md`.
 
+Premium has its own release build, the same shape as this plugin's minus
+Vite: `npm run plugin:publish` in `../found-hint-premium` makes
+`found-hint-premium.zip` (see its `CLAUDE.md`). Ship the free release a
+Premium release depends on first.
+
 ## Never do
 
 - Put business logic in a dispatcher, a REST controller, or an admin class —

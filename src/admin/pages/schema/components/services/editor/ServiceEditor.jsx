@@ -153,7 +153,10 @@ export function ServiceEditor({
         aria-label={__("Service editor", "foundhint-local-seo")}
         className={cn(
           panel,
-          "fhint:min-w-0 fhint:scroll-mt-4 fhint:@4xl:col-start-1",
+          "fhint:min-w-0 fhint:scroll-mt-4 fhint:border-t-0 fhint:@4xl:col-start-1",
+          // Selects count as read-only to CSS, so the shared field style
+          // greys them; the design's are white.
+          "fhint:[&_select:not(:disabled)]:bg-white fhint:[&_select:not(:disabled)]:text-[#201e1d]",
         )}
       >
         <EditorBar
@@ -253,7 +256,7 @@ export function ServiceEditor({
         live={live && !dirty && values.status === "active"}
         loading={preview.loading && !document}
         dirty={dirty}
-        className="fhint:@4xl:col-start-2 fhint:@4xl:row-span-2 fhint:@4xl:row-start-1 fhint:@4xl:self-start"
+        className="fhint:mt-4 fhint:@4xl:col-start-2 fhint:@4xl:row-span-2 fhint:@4xl:row-start-1 fhint:@4xl:mt-0 fhint:@4xl:self-start"
       />
 
       <RemoveDialog

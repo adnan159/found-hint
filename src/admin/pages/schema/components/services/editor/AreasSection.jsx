@@ -57,7 +57,7 @@ export function AreasSection({ form, suggestions = [] }) {
         {areas.map((area) => (
           <li
             key={`${area.type}-${area.name}`}
-            className="fhint:inline-flex fhint:items-center fhint:gap-1.5 fhint:border fhint:border-input fhint:bg-card fhint:py-1 fhint:pr-1 fhint:pl-2.5 fhint:text-[12.5px]"
+            className="fhint:inline-flex fhint:items-center fhint:gap-2 fhint:border fhint:border-[#201e1d] fhint:bg-white fhint:py-[5px] fhint:pr-1.5 fhint:pl-[11px] fhint:text-[13px]"
           >
             <strong>{area.name}</strong>
             <span className="fhint:text-[11.5px] fhint:text-muted-strong">
@@ -125,7 +125,10 @@ export function AreasSection({ form, suggestions = [] }) {
             type="button"
             disabled={!name.trim()}
             onClick={addTyped}
-            className={chip(false)}
+            className={cn(
+              "fhint:cursor-pointer fhint:border-0 fhint:bg-[#201e1d] fhint:px-4 fhint:py-[9px] fhint:text-[13px] fhint:font-bold fhint:text-white fhint:disabled:cursor-not-allowed fhint:disabled:opacity-50",
+              focus,
+            )}
           >
             {__("Add", "foundhint-local-seo")}
           </button>

@@ -21,19 +21,19 @@ export function OptionalDetails({ form }) {
   const setPricing = (changes) => set({ pricing: { ...pricing, ...changes } });
 
   return (
-    <section className="fhint:border-t fhint:border-t-border">
+    <section className="fhint:border-t-2 fhint:border-t-[#201e1d]">
       <button
         type="button"
         aria-expanded={open}
         aria-controls={field("optional")}
         onClick={() => setOpen((current) => !current)}
         className={cn(
-          "fhint:flex fhint:w-full fhint:cursor-pointer fhint:items-center fhint:gap-2 fhint:border-0 fhint:bg-transparent fhint:px-5 fhint:py-4 fhint:text-left",
+          "fhint:flex fhint:w-full fhint:cursor-pointer fhint:items-center fhint:gap-2.5 fhint:border-0 fhint:bg-transparent fhint:px-5 fhint:py-[18px] fhint:text-left fhint:text-[#201e1d]",
           focus,
         )}
       >
         <span className={sectionNumber}>05</span>
-        <strong className="fhint:text-[14px]">
+        <strong className="fhint:text-[15px]">
           {__("Optional details", "foundhint-local-seo")}
         </strong>
         <span className={cn(muted, "fhint:flex-1")}>

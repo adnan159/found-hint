@@ -106,38 +106,42 @@ export function ServiceList({
         onAdd={onAdd}
       />
 
-      <ListSummary
-        branchName={list ? branchName : ""}
-        active={active}
-        inactive={services.length - active}
-      />
+      <div className="fhint:grid fhint:gap-2.5 fhint:px-5 fhint:pt-3.5 fhint:pb-[18px]">
+        <ListSummary
+          branchName={list ? branchName : ""}
+          active={active}
+          inactive={services.length - active}
+        />
 
-      {!services.length ? (
-        <EmptyList locked={locked} list={list} branchName={branchName} />
-      ) : (
-        <ul
-          className="fhint:m-0 fhint:list-none fhint:p-0"
-          aria-label={__("Services", "foundhint-local-seo")}
-        >
-          {services.map((service, index) => (
-            <ServiceRow
-              key={service.id}
-              service={service}
-              first={index === 0}
-              last={index === services.length - 1}
-              current={service.id === selected}
-              expanded={open === service.id}
-              dragged={dragging === index}
-              locked={locked}
-              drag={dragHandlers(index)}
-              onMove={(step) => move(index, index + step)}
-              onPick={() => onPick(service.id)}
-              onExpand={() => setOpen(open === service.id ? null : service.id)}
-              onToggle={(on) => toggle(service, on)}
-            />
-          ))}
-        </ul>
-      )}
+        {!services.length ? (
+          <EmptyList locked={locked} list={list} branchName={branchName} />
+        ) : (
+          <ul
+            className="fhint:m-0 fhint:list-none fhint:border fhint:border-[#e6e3e3] fhint:p-0"
+            aria-label={__("Services", "foundhint-local-seo")}
+          >
+            {services.map((service, index) => (
+              <ServiceRow
+                key={service.id}
+                service={service}
+                first={index === 0}
+                last={index === services.length - 1}
+                current={service.id === selected}
+                expanded={open === service.id}
+                dragged={dragging === index}
+                locked={locked}
+                drag={dragHandlers(index)}
+                onMove={(step) => move(index, index + step)}
+                onPick={() => onPick(service.id)}
+                onExpand={() =>
+                  setOpen(open === service.id ? null : service.id)
+                }
+                onToggle={(on) => toggle(service, on)}
+              />
+            ))}
+          </ul>
+        )}
+      </div>
     </section>
   );
 }

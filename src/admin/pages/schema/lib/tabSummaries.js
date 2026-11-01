@@ -28,9 +28,7 @@ export function tabSummaries({ plan, free, state, business }) {
       : pro,
     localbusiness: plan.business
       ? business
-        ? business.main?.visit === "no"
-          ? __("Head office · described in 01", "foundhint-local-seo")
-          : `${business.type} · ${placementLabel(business.placement)}`
+        ? `${business.type} · ${placementLabel(business.placement)}`
         : "…"
       : free?.graph?.["@graph"]?.[0]?.["@type"]
         ? `${free.graph["@graph"][0]["@type"]} · ${placementLabel("every_page")}`

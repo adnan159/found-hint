@@ -4,7 +4,7 @@ import { cn } from "cn";
 import { Switch } from "@/components/ui/switch";
 import { focus } from "@/pages/profile/styles";
 import { serviceMetaLine, warningText } from "../../../lib/service";
-import { BADGES, pill } from "../../styles";
+import { PILL_TONES, ROW_PILL } from "../pills";
 
 const iconButton = cn(
   "fhint:inline-flex fhint:cursor-pointer fhint:items-center fhint:justify-center fhint:border fhint:border-border fhint:bg-card fhint:p-1 fhint:text-muted-strong fhint:disabled:cursor-default fhint:disabled:opacity-40",
@@ -53,12 +53,19 @@ export function ServiceRow({
       draggable={!locked}
       {...drag}
       className={cn(
-        "fhint:border-b fhint:border-b-border fhint:last:border-b-0",
-        current && "fhint:bg-notice",
+        "fhint:border-b fhint:border-b-[#f0eeee] fhint:last:border-b-0",
+        current
+          ? "fhint:bg-[#FFF8F4] fhint:shadow-[inset_3px_0_0_#FF6B35]"
+          : "fhint:bg-white",
         dragged && "fhint:opacity-50",
       )}
     >
-      <div className="fhint:flex fhint:items-center fhint:gap-2 fhint:px-3 fhint:py-2.5">
+      <div
+        className={cn(
+          "fhint:flex fhint:items-center fhint:gap-3 fhint:px-3.5 fhint:py-[11px]",
+          !on && "fhint:opacity-70",
+        )}
+      >
         {locked ? null : (
           <span className="fhint:flex fhint:items-center fhint:gap-1">
             <GripVerticalIcon
@@ -99,20 +106,19 @@ export function ServiceRow({
           onClick={onPick}
           aria-current={current ? "true" : undefined}
           className={cn(
-            "fhint:grid fhint:min-w-0 fhint:flex-1 fhint:cursor-pointer fhint:gap-0.5 fhint:border-0 fhint:bg-transparent fhint:p-1 fhint:text-left",
-            !on && "fhint:opacity-60",
+            "fhint:grid fhint:min-w-0 fhint:flex-1 fhint:cursor-pointer fhint:gap-0.5 fhint:border-0 fhint:bg-transparent fhint:p-0 fhint:text-left fhint:text-[#201e1d]",
             focus,
           )}
         >
-          <span className="fhint:flex fhint:flex-wrap fhint:items-center fhint:gap-1.5">
+          <span className="fhint:flex fhint:flex-wrap fhint:items-center fhint:gap-2">
             <strong className="fhint:text-[13.5px]">{name}</strong>
             {service.from_google ? (
-              <span className={cn(pill, BADGES.google)}>
+              <span className={cn(ROW_PILL, PILL_TONES.google)}>
                 {__("From Google", "foundhint-local-seo")}
               </span>
             ) : null}
           </span>
-          <span className="fhint:truncate fhint:text-[12.5px] fhint:text-muted-strong">
+          <span className="fhint:truncate fhint:text-[12px] fhint:text-[#625e5e]">
             {serviceMetaLine(service)}
           </span>
         </button>
@@ -123,8 +129,9 @@ export function ServiceRow({
             aria-expanded={expanded}
             onClick={onExpand}
             className={cn(
-              pill,
-              "fhint:cursor-pointer fhint:border-0 fhint:bg-warning fhint:text-warning-foreground",
+              ROW_PILL,
+              PILL_TONES.warn,
+              "fhint:cursor-pointer fhint:border-0",
               focus,
             )}
           >
@@ -141,7 +148,12 @@ export function ServiceRow({
           </button>
         ) : null}
 
-        <span className="fhint:hidden fhint:w-[52px] fhint:text-right fhint:text-[12.5px] fhint:text-muted-strong fhint:sm:inline">
+        <span
+          className={cn(
+            "fhint:hidden fhint:w-[52px] fhint:text-right fhint:text-[12px] fhint:font-bold fhint:sm:inline",
+            on ? "fhint:text-[#157F4B]" : "fhint:text-[#9b9797]",
+          )}
+        >
           {on
             ? __("Active", "foundhint-local-seo")
             : __("Inactive", "foundhint-local-seo")}
