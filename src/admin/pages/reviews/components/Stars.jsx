@@ -1,8 +1,12 @@
 import { __, _n, sprintf } from "@wordpress/i18n";
+import { cn } from "cn";
+import { StarIcon } from "lucide-react";
 
 /**
- * A star rating, drawn and said. The stars are decoration; the words
- * beside them, for screen readers, are the rating.
+ * A star rating, drawn and said: five Lucide stars, the rating's worth
+ * filled in the star colour and the rest in grey — the same star the reply
+ * templates use. The stars are decoration; the words beside them, for
+ * screen readers, are the rating.
  */
 export function Stars({ value }) {
   const rating = Number(value) || 0;
@@ -16,14 +20,19 @@ export function Stars({ value }) {
   }
 
   return (
-    <span className="fhint:inline-flex fhint:items-center">
-      <span
-        aria-hidden="true"
-        className="fhint:text-[13px] fhint:tracking-[1px]"
-      >
-        <span className="fhint:text-[#C27A1B]">{"★".repeat(rating)}</span>
-        <span className="fhint:text-[#D9D3D0]">{"★".repeat(5 - rating)}</span>
-      </span>
+    <span className="fhint:inline-flex fhint:items-center fhint:gap-0.5">
+      {Array.from({ length: 5 }, (_, index) => (
+        <StarIcon
+          key={index}
+          aria-hidden="true"
+          className={cn(
+            "fhint:size-3 fhint:flex-none",
+            index < rating
+              ? "fhint:fill-[#C27A1B] fhint:text-[#C27A1B]"
+              : "fhint:fill-[#D9D3D0] fhint:text-[#D9D3D0]",
+          )}
+        />
+      ))}
       <span className="fhint:sr-only">
         {sprintf(
           /* translators: %d: a star rating from 1 to 5. */

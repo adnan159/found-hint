@@ -1,10 +1,8 @@
 import { __, _n, sprintf } from "@wordpress/i18n";
-import { cn } from "cn";
 import { ExternalLinkIcon, StarIcon } from "lucide-react";
-import { Link } from "react-router";
 import LocationSwitcher, { switcherEntries } from "./LocationSwitcher";
 import { thumb } from "@/pages/profile/components/photos/lib";
-import { pillButton, pillLink } from "./styles";
+import { pillLink } from "./styles";
 import { HeaderActionsSlot } from "@/context/HeaderActions";
 
 /**
@@ -107,18 +105,15 @@ export function BusinessBar({
 
       <div className="fhint:flex fhint:flex-wrap fhint:items-center fhint:gap-2">
         {reviews ? (
-          <Link
-            to="/reviews"
-            className={cn(
-              pillButton,
-              "fhint:border-warning-border fhint:bg-warning fhint:text-warning-foreground! fhint:hover:bg-warning-border",
-            )}
-          >
+          // The listing's rating on Google: a statement, not a control, so
+          // it is drawn as a badge — no pointer, no hover. Reviews has its
+          // own entry in the sidebar.
+          <span className="fhint:inline-flex fhint:h-9 fhint:items-center fhint:gap-2 fhint:rounded-full fhint:border fhint:border-warning-border fhint:bg-warning fhint:px-4 fhint:text-[13px] fhint:leading-none fhint:whitespace-nowrap fhint:text-warning-foreground">
             <StarIcon
               aria-hidden="true"
-              className="fhint:size-3.5 fhint:fill-current"
+              className="fhint:size-3.5 fhint:flex-none fhint:fill-current"
             />
-            <span className="fhint:font-extrabold">
+            <span className="fhint:-mb-0.5 fhint:font-extrabold">
               <span className="fhint:sr-only">
                 {__("Rated", "foundhint-local-seo")}{" "}
               </span>
@@ -128,7 +123,7 @@ export function BusinessBar({
                 {__("out of 5", "foundhint-local-seo")}
               </span>
             </span>
-            <span className="fhint:font-semibold">
+            <span className="fhint:-mb-0.5 fhint:font-semibold">
               ·{" "}
               {sprintf(
                 /* translators: %d: number of reviews. */
@@ -141,7 +136,7 @@ export function BusinessBar({
                 reviews.count,
               )}
             </span>
-          </Link>
+          </span>
         ) : null}
 
         {/* The screen below can add its own buttons here — Reviews' Sync. */}

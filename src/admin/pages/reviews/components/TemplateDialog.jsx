@@ -1,12 +1,21 @@
 import { useId, useRef, useState } from "react";
 import { __, sprintf } from "@wordpress/i18n";
 import { cn } from "cn";
-import { label, primaryButton } from "@/pages/profile/styles";
-import { dialogButton, dialogInput, dialogSmallInput } from "../styles";
+import { PlusIcon } from "lucide-react";
+import { focus, help, label } from "@/pages/profile/styles";
+import { dialogButton, dialogInput, primaryAction } from "../styles";
 import { PLACEHOLDERS } from "../lib/replies";
 import { TEMPLATE_LIMIT } from "../lib/templates";
 import ReviewsDialog from "./ReviewsDialog";
 import SoonTag from "./SoonTag";
+
+// A placeholder to insert: a pill that takes the accent on hover.
+const insertChip = cn(
+  "fhint:group fhint:inline-flex fhint:cursor-pointer fhint:items-center fhint:gap-1 fhint:rounded-full fhint:border fhint:border-input fhint:bg-card fhint:px-2.5 fhint:py-1 fhint:font-mono fhint:text-[11.5px] fhint:font-semibold fhint:text-foreground fhint:transition-colors",
+  "fhint:hover:border-primary fhint:hover:bg-notice fhint:hover:text-notice-foreground",
+  "fhint:active:scale-[0.97]",
+  focus,
+);
 
 /**
  * Adding or editing a reply template.
@@ -53,6 +62,7 @@ export function TemplateDialog({ template, rating, count, onClose }) {
         "foundhint-local-seo",
       )}
       onClose={onClose}
+      width="fhint:sm:max-w-[680px]"
       note={sprintf(
         /* translators: 1: templates used, 2: the most allowed, 3: a star rating. */
         __("%1$d of %2$d used for %3$d-star reviews", "foundhint-local-seo"),
@@ -72,7 +82,7 @@ export function TemplateDialog({ template, rating, count, onClose }) {
               "Saving templates is part of FoundHint Pro.",
               "foundhint-local-seo",
             )}
-            className={primaryButton}
+            className={primaryAction}
           >
             {__("Save template", "foundhint-local-seo")}
           </button>
@@ -160,23 +170,39 @@ export function TemplateDialog({ template, rating, count, onClose }) {
         />
       </span>
 
-      <div className="fhint:flex fhint:flex-wrap fhint:items-center fhint:gap-1.5">
-        <span className={cn(label, "fhint:mr-1")}>
-          {__("Insert", "foundhint-local-seo")}
-        </span>
-        {PLACEHOLDERS.map((placeholder) => (
-          <button
-            key={placeholder}
-            type="button"
-            onClick={() => insert(placeholder)}
-            className={cn(
-              dialogSmallInput,
-              "fhint:cursor-pointer fhint:font-mono fhint:text-[11.5px] fhint:font-bold fhint:hover:bg-muted",
+      <div
+        role="group"
+        aria-labelledby={`${id}-insert`}
+        aria-describedby={`${id}-insert-help`}
+        className="fhint:grid fhint:gap-2.5 fhint:bg-[#faf6f4] fhint:px-4 fhint:py-3.5"
+      >
+        <div className="fhint:flex fhint:flex-wrap fhint:items-baseline fhint:gap-x-2 fhint:gap-y-0.5">
+          <span id={`${id}-insert`} className={label}>
+            {__("Insert a detail", "foundhint-local-seo")}
+          </span>
+          <span id={`${id}-insert-help`} className={help}>
+            {__(
+              "Added where the cursor is, and swapped for the real details when you reply.",
+              "foundhint-local-seo",
             )}
-          >
-            {placeholder}
-          </button>
-        ))}
+          </span>
+        </div>
+        <div className="fhint:flex fhint:flex-wrap fhint:gap-2">
+          {PLACEHOLDERS.map((placeholder) => (
+            <button
+              key={placeholder}
+              type="button"
+              onClick={() => insert(placeholder)}
+              className={insertChip}
+            >
+              <PlusIcon
+                aria-hidden="true"
+                className="fhint:size-3 fhint:text-muted-strong fhint:transition-colors fhint:group-hover:text-primary"
+              />
+              {placeholder}
+            </button>
+          ))}
+        </div>
       </div>
     </ReviewsDialog>
   );

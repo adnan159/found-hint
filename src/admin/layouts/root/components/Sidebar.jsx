@@ -44,6 +44,14 @@ const NAV_ITEMS = [
   // Locations and services are tabs of the Business profile — every
   // location is reached through its "Switch location" menu — so they have no
   // rows of their own here.
+  {
+    to: "/reviews",
+    label: () => __("Reviews", "foundhint-local-seo"),
+  },
+  {
+    to: "/posts",
+    label: () => __("Posts & Scheduling", "foundhint-local-seo"),
+  },
   // The Schema screen has its own five tabs, so no sub-items here.
   {
     to: "/schema",
@@ -59,14 +67,6 @@ const NAV_ITEMS = [
         label: () => __("What to fix", "foundhint-local-seo"),
       },
     ],
-  },
-  {
-    to: "/reviews",
-    label: () => __("Reviews", "foundhint-local-seo"),
-  },
-  {
-    to: "/posts",
-    label: () => __("Posts & Scheduling", "foundhint-local-seo"),
   },
   {
     to: "/google",

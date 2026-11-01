@@ -284,6 +284,22 @@
   border-color: var(--destructive);
 }
 
+/* A field whose focus is shown by the brand accent — the reply box: its
+   grey edge stays as it is, and an orange outline sits 2px outside it.
+   Drawn here as a shadow rather than with ring utilities, because the
+   WordPress and admin rules that clear a focused field's shadow outrank
+   them. After the focus rule above, which it overrides; a refused field
+   still turns red. */
+#fhint-app .fhint-focus-accent:focus-visible:not([aria-invalid="true"]),
+[data-slot="dialog-content"]
+  .fhint-focus-accent:focus-visible:not([aria-invalid="true"]) {
+  border-color: var(--input);
+  box-shadow:
+    0 0 0 2px var(--popover),
+    0 0 0 4px var(--primary);
+  outline: none;
+}
+
 /* A read-only field keeps its edge when clicked: nothing in it can change,
    so it should not look ready for typing. Read-only fields are kept out of
    the Tab order (`tabIndex={-1}`), so no keyboard focus goes unseen. A

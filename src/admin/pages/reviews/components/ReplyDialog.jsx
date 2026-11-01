@@ -1,16 +1,27 @@
 import { useId, useState } from "react";
 import { __, _n, sprintf } from "@wordpress/i18n";
-import { SparklesIcon } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "cn";
 import { errorMessage, fieldErrors } from "@/lib/errors";
-import { errorText, help, label, primaryButton } from "@/pages/profile/styles";
-import { dialogButton, dialogInput } from "../styles";
+import { errorText, focus, label } from "@/pages/profile/styles";
+import { dialogButton, dialogInput, primaryAction } from "../styles";
 import { useSaveReviewReplyMutation } from "@/store/api/reviewsApi";
-import { MAX_BYTES, builtInReply, bytes, firstNameOf } from "../lib/replies";
+import {
+  MAX_BYTES,
+  builtInReply,
+  bytes,
+  fillPlaceholders,
+  firstNameOf,
+  formatDate,
+} from "../lib/replies";
 import ReviewsDialog from "./ReviewsDialog";
-import SoonTag from "./SoonTag";
 import Stars from "./Stars";
+
+// A quick template: a rounded pill that fills the reply when pressed.
+const pill = cn(
+  "fhint:inline-flex fhint:cursor-pointer fhint:items-center fhint:rounded-full fhint:border fhint:border-input fhint:bg-card fhint:px-3.5 fhint:py-1.5 fhint:text-[12.5px] fhint:font-bold fhint:text-foreground fhint:hover:bg-muted",
+  focus,
+);
 
 /**
  * Writing, or rewriting, the reply to one review.
@@ -19,9 +30,9 @@ import Stars from "./Stars";
  * it, so the footer says so and nothing is sent until "Publish reply". The
  * reply shown on the card afterwards is what Google accepted.
  *
- * Quick templates for the review's star rating come first. The built-in
- * reply works now; the owner's own templates are FoundHint Pro, and AI
- * replies are coming soon — both drawn, neither pretending to work.
+ * Quick templates for the review's star rating come first: pressing one
+ * fills the reply with this review's details — the reviewer's first name,
+ * the location and its city — ready to edit before it is published.
  */
 export function ReplyDialog({ review, context, templates, onClose }) {
   const id = useId();
@@ -78,6 +89,7 @@ export function ReplyDialog({ review, context, templates, onClose }) {
         "foundhint-local-seo",
       )}
       onClose={onClose}
+      width="fhint:sm:max-w-[680px]"
       note={__(
         "Publishing posts this reply on your Google profile.",
         "foundhint-local-seo",
@@ -96,7 +108,7 @@ export function ReplyDialog({ review, context, templates, onClose }) {
             type="submit"
             form={`${id}-form`}
             disabled={saving || !draft.trim() || tooLong}
-            className={primaryButton}
+            className={primaryAction}
           >
             {saving
               ? __("Publishing…", "foundhint-local-seo")
@@ -115,6 +127,11 @@ export function ReplyDialog({ review, context, templates, onClose }) {
               : review.reviewer_name}
           </strong>
           <Stars value={rating} />
+          {review.reviewed_at ? (
+            <span className="fhint:text-[12px] fhint:text-muted-strong">
+              {formatDate(review.reviewed_at)}
+            </span>
+          ) : null}
         </span>
         <span className="fhint:text-[13px] fhint:leading-relaxed">
           {review.comment ||
@@ -142,24 +159,22 @@ export function ReplyDialog({ review, context, templates, onClose }) {
             <button
               key={template.id}
               type="button"
-              disabled
-              title={__(
-                "Your own templates are part of FoundHint Pro.",
-                "foundhint-local-seo",
-              )}
-              className={cn(dialogButton, "fhint:font-bold")}
+              onClick={() => {
+                reset();
+                setDraft(fillPlaceholders(template.text, review, context));
+              }}
+              className={pill}
             >
               {template.name}
             </button>
           ))}
-          {forRating.length ? <SoonTag kind="pro" /> : null}
           <button
             type="button"
             onClick={() => {
               reset();
               setDraft(builtInReply(review, context));
             }}
-            className={cn(dialogButton, "fhint:font-bold")}
+            className={pill}
           >
             {__("Built-in reply", "foundhint-local-seo")}
           </button>
@@ -217,28 +232,6 @@ export function ReplyDialog({ review, context, templates, onClose }) {
           </span>
         ) : null}
       </form>
-
-      <div className="fhint:flex fhint:flex-wrap fhint:items-center fhint:gap-3">
-        <button
-          type="button"
-          disabled
-          className={dialogButton}
-          aria-describedby={`${id}-ai`}
-        >
-          <SparklesIcon aria-hidden="true" className="fhint:size-3.5" />
-          {__("AI suggestion", "foundhint-local-seo")}
-        </button>
-        <span
-          id={`${id}-ai`}
-          className={cn(help, "fhint:flex fhint:items-center fhint:gap-2")}
-        >
-          <SoonTag />
-          {__(
-            "AI replies are coming in FoundHint Pro. Nothing is sent until you press Publish.",
-            "foundhint-local-seo",
-          )}
-        </span>
-      </div>
     </ReviewsDialog>
   );
 }

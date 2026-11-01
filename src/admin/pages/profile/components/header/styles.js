@@ -6,6 +6,9 @@ import { focus } from "../../styles";
 // which business this is and the form that edits it.
 export const pillButton = cn(
   "fhint:inline-flex fhint:h-9 fhint:cursor-pointer fhint:items-center fhint:gap-2 fhint:rounded-full fhint:border fhint:border-border fhint:bg-card fhint:px-4 fhint:text-[13px] fhint:font-bold fhint:whitespace-nowrap fhint:text-foreground fhint:no-underline fhint:hover:bg-muted fhint:disabled:cursor-not-allowed fhint:disabled:text-muted-foreground",
+  // A tight line box so the label centres on the icon; the icon keeps its
+  // place and only the text moves.
+  "fhint:leading-none",
   focus,
 );
 

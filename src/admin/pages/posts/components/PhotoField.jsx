@@ -13,7 +13,7 @@ import { errorMessage, fieldErrors } from "@/lib/errors";
 import { errorText, focus, help, label } from "@/pages/profile/styles";
 import ReviewsDialog from "@/pages/reviews/components/ReviewsDialog";
 import SoonTag from "@/pages/reviews/components/SoonTag";
-import { dialogButton } from "@/pages/reviews/styles";
+import { dialogButton } from "../styles";
 import {
   useGetPostPhotosQuery,
   useUploadPostPhotoMutation,

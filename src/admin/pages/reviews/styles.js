@@ -1,28 +1,29 @@
 import { cn } from "cn";
-import { textInput } from "@/lib/fieldStyles";
-import { quietButton } from "@/pages/profile/styles";
+import { input } from "@/pages/profile/styles";
 
 /**
- * Borders for buttons inside the Reviews dialogs; fields take the same
- * firm edge from `lib/fieldStyles`.
+ * The Reviews screen's look — the Business Profile's and the Schema
+ * Manager's, by construction.
  *
- * The theme's own border colour is a very pale grey; on a white dialog over
- * a dark backdrop it nearly disappears, and buttons stop reading as buttons.
- * The design draws these edges firmly, so they are set here — for the
- * dialogs only, leaving every other screen as it is. A disabled button
- * keeps a lighter edge, so it still reads as not available.
+ * Panels, their heading rows, fields and dialog buttons are imported from
+ * the Schema Manager's styles (which take them from the profile), never
+ * spelled out again here. Change the profile's look and this screen follows.
  */
-const EDGE = "fhint:border-[#b9b2af]";
+export {
+  dialogButton,
+  panel,
+  panelChip,
+  panelHeader,
+  panelTitle,
+  primaryAction,
+} from "@/pages/schema/components/styles";
 
-// Swapped, not added: with both border colours on an element, whichever the
-// stylesheet happens to list later wins, and the theme's pale one is later.
-const firm = (classes) => classes.replace("fhint:border-input", EDGE);
+/**
+ * A field in a Reviews dialog: the profile's field, with the brand accent
+ * on focus (`fhint-focus-accent` in `index.css`) — the grey edge stays and
+ * an orange outline sits just outside it.
+ */
+export const dialogInput = cn(input, "fhint-focus-accent");
 
-export const dialogButton = cn(
-  firm(quietButton),
-  "fhint:hover:bg-muted fhint:disabled:border-[#e2dcda] fhint:disabled:hover:bg-card",
-);
-
-export const dialogInput = textInput({ firm: true });
-
-export const dialogSmallInput = textInput({ size: "sm", firm: true });
+/** A panel's body: the profile section's padding. */
+export const panelBody = "fhint:grid fhint:gap-5 fhint:p-5";

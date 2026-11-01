@@ -31,7 +31,7 @@ import {
   primaryButton,
 } from "@/pages/profile/styles";
 import SoonTag from "@/pages/reviews/components/SoonTag";
-import { dialogButton, dialogInput } from "@/pages/reviews/styles";
+import { dialogButton, dialogInput } from "../styles";
 import {
   useCreatePostMutation,
   useUpdatePostMutation,
