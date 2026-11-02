@@ -5,7 +5,7 @@ import { cn } from "cn";
 import { errorMessage } from "@/lib/errors";
 import { focus } from "@/pages/profile/styles";
 import { useImportSchemaPhotoMutation } from "@/store/api/schemaManagerApi";
-import { chooseImages, hasMediaLibrary } from "../../lib/media";
+import { chooseImages, hasMediaLibrary } from "@/lib/media";
 import { chip, muted } from "../styles";
 
 const MAX = 10;

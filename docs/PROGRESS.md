@@ -2495,3 +2495,70 @@ Nothing from it is added to your site." (errors still show their message).
 The off panel's "Turn on" uses the same path, so it confirms too.
 Browser: Services switched off and on, each time the toast showed and the
 setting changed on the server.
+
+## Step 79 — Photos from the Media Library; the locked Schema screen
+
+**Photos.** On the Business Profile's Photos tab, "Upload logo", "Upload
+cover photo", "Upload another" and the gallery's "Add photos" open the
+WordPress Media Library (JPEG and PNG only, the types Google takes; several
+at once for the gallery). The chosen image is used as it is —
+`POST /profile/media` takes `attachment_id` instead of a file
+(`MediaUpload::add_attachment()`), checked against Google's size and
+dimension limits from the file itself. Dropping files on a slot still
+uploads them, and without the library on the page the file picker is used.
+
+Fixed on the way: removing a waiting photo deleted its attachment, which
+would have deleted an image the owner picked from their library. Files
+FoundHint uploads now carry `_fhint_uploaded`, and only those are deleted.
+
+The Media Library helpers moved from `pages/schema/lib/media.js` to the
+shared `lib/media.js` (with a `types` filter).
+
+**Locked Schema.** Without Premium, each schema tab shows sample content
+(a made-up dentist, never the site's data), blurred and hidden from
+assistive technology, under a card: "The Schema Manager is a Premium
+feature" with **Unlock with Premium** → foundhint.com/pricing/ (new tab).
+With Premium installed but its licence inactive, the same card offers
+**Activate licence**. Settings stays usable — "Who publishes it" is free —
+and keeps the header notice; the other tabs drop it, so the button is not
+shown twice. New component: `components/page/LockedSchema.jsx`.
+
+**Verified:** free database 728 (+7: a library image becomes a waiting
+photo in its role, an undersized one and a missing one are refused,
+removing it keeps the owner's image, an uploaded one is still deleted);
+mutation-tested (discard deleting library images, never deleting uploads,
+skipping the size check). Browser: the gallery button opened the Media
+Library with "Add to gallery"; the Schema screen without Premium (forced
+through a temporary must-use plugin, removed) showed the blurred sample
+and the card, with Unlock with Premium linking to foundhint.com/pricing/,
+and Activate licence when Premium was installed but unlicensed; Settings
+kept "Who publishes it".
+
+## Step 80 — The lock covers only the schema preview
+
+Step 79's lock blurred the whole tab. Now, without Premium, every tab shows
+its real content read-only as before (fields visible, none editable), and
+only the JSON-LD preview is locked: `JsonPreview` takes `locked` and hands
+off to `shared/LockedPreview.jsx` — the panel's frame, sample markup
+blurred and hidden from assistive technology, and a card "Schema preview is
+a Premium feature" with **Unlock with Premium** (foundhint.com/pricing/, new
+tab), or **Activate licence** when Premium is installed but unlicensed.
+Business, Location and Service tabs pass `locked`. `LockedSchema.jsx` is
+removed and the header's upgrade notice is back on every locked tab.
+
+Browser (Premium hidden through a temporary must-use plugin, removed):
+LocalBusiness 21 fields, Organization 15, Services 27 — none editable — and
+the card only in the preview; the unlock link goes to the pricing page.
+
+## Step 81 — Premium highlighted on the schema tabs
+
+Without Premium, a schema tab whose summary is just "Premium" shows it as
+an orange pill with a sparkle icon (brand #D8521F on #FFF1EB) instead of
+plain grey text. `tabSummaries()` now returns `premium: { key: true }` for
+those tabs, so `TabBar` styles them without comparing translated text.
+LocalBusiness keeps its free summary (the free plugin prints that schema)
+and Settings keeps "Who publishes it". Browser: Organization, Locations,
+Services and Website structure carry the pill with Premium hidden.
+LocalBusiness now carries the Premium pill too: without Premium its summary
+is "Premium" rather than the free markup's type (`tabSummaries()` no longer
+takes `free`).

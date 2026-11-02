@@ -46,6 +46,28 @@ export function usePhotoActions(locationId, onChanged) {
     setBusy(false);
   };
 
+  // Images chosen in the Media Library: kept as they are, one at a time.
+  const addFromLibrary = (role) => async (images) => {
+    setBusy(true);
+    setProblems([]);
+
+    const refused = [];
+
+    for (const image of images) {
+      try {
+        await addPhoto({ attachmentId: image.id, role, locationId }).unwrap();
+      } catch (error) {
+        refused.push({
+          name: image.url ? image.url.split("/").pop() : "",
+          message: fieldErrors(error).file ?? errorMessage(error),
+        });
+      }
+    }
+
+    setProblems(refused);
+    setBusy(false);
+  };
+
   const remove = async (photos) => {
     setBusy(true);
     setProblems([]);
@@ -90,7 +112,7 @@ export function usePhotoActions(locationId, onChanged) {
     }
   };
 
-  return { busy, sending, problems, add, remove, upload };
+  return { busy, sending, problems, add, addFromLibrary, remove, upload };
 }
 
 export default usePhotoActions;

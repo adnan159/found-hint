@@ -17,10 +17,11 @@ export function hasMediaLibrary() {
  * @param {string}  options.title    Frame title.
  * @param {string}  options.button   Confirm button text.
  * @param {boolean} options.multiple Allow several.
+ * @param {string[]} options.types   Only these MIME types (default: any image).
  * @return {Promise<Object[]>} The chosen images, `{ id, url, width, height }`,
  *                             or `[]` when the frame is closed.
  */
-export function chooseImages({ title, button, multiple = false }) {
+export function chooseImages({ title, button, multiple = false, types }) {
   return new Promise((resolve) => {
     if (!hasMediaLibrary()) {
       resolve([]);
@@ -30,7 +31,7 @@ export function chooseImages({ title, button, multiple = false }) {
     const frame = window.wp.media({
       title,
       button: { text: button ?? __("Use this image", "foundhint-local-seo") },
-      library: { type: "image" },
+      library: { type: types?.length ? types : "image" },
       multiple: multiple ? "add" : false,
     });
     let chosen = false;

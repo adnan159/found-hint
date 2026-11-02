@@ -97,10 +97,17 @@ class ProfileGoogle extends AbstractController {
 						array_merge(
 							$location,
 							array(
-								'role' => array(
+								'role'          => array(
 									'type'    => 'string',
 									'default' => MediaRepository::ROLE_GALLERY,
 									'enum'    => MediaRepository::roles(),
+								),
+								// An image already in the Media Library,
+								// instead of an uploaded file.
+								'attachment_id' => array(
+									'type'    => 'integer',
+									'minimum' => 0,
+									'default' => 0,
 								),
 							)
 						)
@@ -185,12 +192,15 @@ class ProfileGoogle extends AbstractController {
 			return $location;
 		}
 
-		$files  = $request->get_file_params();
-		$result = MediaUpload::add(
-			(int) $location['id'],
-			(string) $request->get_param( 'role' ),
-			isset( $files['file'] ) && is_array( $files['file'] ) ? $files['file'] : array()
-		);
+		$files      = $request->get_file_params();
+		$attachment = (int) $request->get_param( 'attachment_id' );
+		$result     = $attachment
+			? MediaUpload::add_attachment( (int) $location['id'], (string) $request->get_param( 'role' ), $attachment )
+			: MediaUpload::add(
+				(int) $location['id'],
+				(string) $request->get_param( 'role' ),
+				isset( $files['file'] ) && is_array( $files['file'] ) ? $files['file'] : array()
+			);
 
 		if ( $result instanceof ValidationResult ) {
 			return $this->validation_error( $result );

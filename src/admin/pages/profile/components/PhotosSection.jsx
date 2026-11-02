@@ -17,10 +17,8 @@ import usePhotoActions from "./photos/usePhotoActions";
  * one at a time so each can say whether Google took it.
  */
 export function PhotosSection({ media, google, locationId, onChanged }) {
-  const { busy, sending, problems, add, remove, upload } = usePhotoActions(
-    locationId,
-    onChanged,
-  );
+  const { busy, sending, problems, add, addFromLibrary, remove, upload } =
+    usePhotoActions(locationId, onChanged);
 
   const gallery = media?.gallery ?? [];
   const waiting = media?.pending ?? [];
@@ -51,6 +49,7 @@ export function PhotosSection({ media, google, locationId, onChanged }) {
           waiting={waitingFor("logo")}
           disabled={busy}
           onFiles={add("logo")}
+          onAttachments={addFromLibrary("logo")}
         />
         <PhotoSlot
           title={__("Cover photo", "foundhint-local-seo")}
@@ -60,6 +59,7 @@ export function PhotosSection({ media, google, locationId, onChanged }) {
           waiting={waitingFor("cover")}
           disabled={busy}
           onFiles={add("cover")}
+          onAttachments={addFromLibrary("cover")}
           wide
         />
 
@@ -68,6 +68,7 @@ export function PhotosSection({ media, google, locationId, onChanged }) {
           multiple
           disabled={busy}
           onFiles={add("gallery")}
+          onAttachments={addFromLibrary("gallery")}
           label={__("Choose photos for your gallery", "foundhint-local-seo")}
           className="fhint:grid fhint:cursor-pointer fhint:content-start fhint:justify-items-start fhint:gap-2.5 fhint:rounded-[12px] fhint:border fhint:border-dashed fhint:border-primary/40 fhint:bg-primary/5 fhint:p-4 fhint:text-left fhint:transition-colors fhint:hover:bg-primary/10"
           draggingClassName="fhint:border-primary fhint:bg-primary/15"

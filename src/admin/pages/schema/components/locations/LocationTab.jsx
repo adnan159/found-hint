@@ -316,6 +316,7 @@ export function LocationTab({
       </section>
 
       <JsonPreview
+        locked={locked}
         document={document}
         rootType={document?.["@type"] ?? ""}
         live={live && !dirty && state.status === "active"}

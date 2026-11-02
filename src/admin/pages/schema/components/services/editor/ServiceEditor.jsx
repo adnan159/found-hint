@@ -251,6 +251,7 @@ export function ServiceEditor({
       </section>
 
       <JsonPreview
+        locked={locked}
         document={document}
         rootType="Service"
         live={live && !dirty && values.status === "active"}

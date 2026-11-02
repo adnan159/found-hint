@@ -4,6 +4,7 @@ import { cn } from "cn";
 import { label, quietButton, tag, tagTones } from "../../styles";
 import { STATES, thumb } from "./lib";
 import Picker from "./Picker";
+import { hasMediaLibrary } from "@/lib/media";
 
 /**
  * One of the listing's two named photos — the logo or the cover — as a
@@ -23,6 +24,7 @@ export function PhotoSlot({
   wide,
   disabled,
   onFiles,
+  onAttachments,
 }) {
   const shown = waiting ?? photo;
   const status = waiting
@@ -66,6 +68,7 @@ export function PhotoSlot({
           droppable
           disabled={disabled}
           onFiles={onFiles}
+          onAttachments={onAttachments}
           className={zone}
           draggingClassName="fhint:border-primary fhint:bg-primary/10"
           label={sprintf(
@@ -95,7 +98,12 @@ export function PhotoSlot({
               <span className="fhint:text-[11.5px] fhint:text-muted-strong">
                 {__("or", "foundhint-local-seo")}{" "}
                 <span className="fhint:underline">
-                  {__("browse files", "foundhint-local-seo")}
+                  {onAttachments && hasMediaLibrary()
+                    ? __(
+                        "choose from your media library",
+                        "foundhint-local-seo",
+                      )
+                    : __("browse files", "foundhint-local-seo")}
                 </span>
               </span>
             </span>
@@ -105,7 +113,17 @@ export function PhotoSlot({
 
       {shown ? (
         <span>
-          <Picker disabled={disabled} onFiles={onFiles} className={quietButton}>
+          <Picker
+            disabled={disabled}
+            onFiles={onFiles}
+            onAttachments={onAttachments}
+            label={sprintf(
+              /* translators: %s: "Logo" or "Cover photo". */
+              __("Choose another %s", "foundhint-local-seo"),
+              title.toLowerCase(),
+            )}
+            className={quietButton}
+          >
             <UploadIcon aria-hidden="true" className="fhint:size-3.5" />
             {__("Upload another", "foundhint-local-seo")}
           </Picker>

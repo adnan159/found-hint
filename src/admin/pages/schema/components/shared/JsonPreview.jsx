@@ -5,6 +5,7 @@ import { toast } from "sonner";
 import { cn } from "cn";
 import { focus } from "@/pages/profile/styles";
 import { countProperties, isPublicSite } from "../../lib/schema";
+import LockedPreview from "./LockedPreview";
 
 /**
  * The JSON-LD the site prints for this entity — built by the server, the
@@ -80,6 +81,7 @@ export function JsonPreview({
   dirty,
   outputsOn,
   className,
+  locked = false,
 }) {
   const json = document ? JSON.stringify(document, null, 2) : "";
   const lines = useMemo(() => (json ? json.split("\n") : []), [json]);
@@ -99,6 +101,12 @@ export function JsonPreview({
       );
     }
   };
+
+  // Without Premium: sample markup under the unlock card, here only — the
+  // rest of the tab stays visible and read-only.
+  if (locked) {
+    return <LockedPreview className={className} />;
+  }
 
   return (
     <aside

@@ -240,6 +240,7 @@ export function BusinessTab({
       </section>
 
       <JsonPreview
+        locked={locked}
         document={document}
         // With the website beside it the document is a @graph; the
         // business is its first node.
