@@ -4,7 +4,7 @@ import { focus, linkButton, smallInput } from "../../styles";
 
 const choice = (on) =>
   cn(
-    "fhint:cursor-pointer fhint:border fhint:px-[11px] fhint:py-1.5 fhint:text-[12.5px]",
+    "fhint:cursor-pointer fhint:border fhint:px-[11px] fhint:py-1.5 fhint:text-sm",
     on
       ? "fhint:border-primary fhint:bg-notice fhint:font-extrabold fhint:text-notice-foreground"
       : "fhint:border-border fhint:bg-card fhint:font-semibold fhint:text-foreground-soft",
@@ -69,7 +69,7 @@ export function DayTimes({ day, onChange, errors, name }) {
                   )}
                   className={smallInput}
                 />
-                <span className="fhint:text-[12.5px] fhint:text-muted-strong">
+                <span className="fhint:text-sm fhint:text-muted-strong">
                   {__("to", "foundhint-local-seo")}
                 </span>
                 <input

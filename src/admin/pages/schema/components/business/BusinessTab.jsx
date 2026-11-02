@@ -222,7 +222,7 @@ export function BusinessTab({
         {saveState.error && !Object.keys(errors).length ? (
           <p
             role="alert"
-            className="fhint:mx-5 fhint:mb-3 fhint:text-[13px] fhint:text-destructive"
+            className="fhint:mx-5 fhint:mb-3 fhint:text-sm fhint:text-destructive"
           >
             {errorMessage(saveState.error)}
           </p>
@@ -240,6 +240,7 @@ export function BusinessTab({
       </section>
 
       <JsonPreview
+        locked={locked}
         document={document}
         // With the website beside it the document is a @graph; the
         // business is its first node.

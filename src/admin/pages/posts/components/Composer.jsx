@@ -3,12 +3,8 @@ import { __, sprintf } from "@wordpress/i18n";
 import {
   CalendarClockIcon,
   FileIcon,
-  GlobeIcon,
   LightbulbIcon,
-  PencilIcon,
-  PlusIcon,
   SendIcon,
-  SparklesIcon,
   XIcon,
   ZapIcon,
   EyeIcon,
@@ -23,19 +19,14 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { errorMessage, fieldErrors } from "@/lib/errors";
-import {
-  errorText,
-  focus,
-  help,
-  label,
-  primaryButton,
-} from "@/pages/profile/styles";
+import { errorText, focus, help, label } from "@/pages/profile/styles";
 import SoonTag from "@/pages/reviews/components/SoonTag";
-import { dialogButton, dialogInput } from "@/pages/reviews/styles";
+import { choice, dialogButton, dialogInput, primaryAction } from "../styles";
 import {
   useCreatePostMutation,
   useUpdatePostMutation,
 } from "@/store/api/postsApi";
+import LinkInput from "./LinkInput";
 import PhotoField from "./PhotoField";
 import PostPreview from "./PostPreview";
 import TypeIcon from "./TypeIcon";
@@ -49,15 +40,6 @@ import {
   typeHint,
   typeLabel,
 } from "../lib/posts";
-
-const segment = (on) =>
-  cn(
-    "fhint:inline-flex fhint:cursor-pointer fhint:items-center fhint:gap-1.5 fhint:border-0 fhint:px-3 fhint:py-1.5 fhint:text-[12.5px] fhint:font-extrabold fhint:disabled:cursor-not-allowed",
-    on
-      ? "fhint:bg-card fhint:text-foreground fhint:shadow-sm"
-      : "fhint:bg-transparent fhint:text-muted-strong fhint:disabled:text-muted-foreground",
-    focus,
-  );
 
 /** One labelled input with its counter and error. */
 function Field({ id, title, required, count, max, error, hint, children }) {
@@ -107,7 +89,7 @@ function Field({ id, title, required, count, max, error, hint, children }) {
  * @param {Object}   props.post         The post being edited, or a starting point for a new one.
  * @param {string}   props.locationName Google location resource name.
  * @param {string}   props.businessName The listing's name, for the preview.
- * @param {string}   props.website      The listing's website, for "Use my website address".
+ * @param {string}   props.website      The listing's website, for the link fields' globe button.
  * @param {Function} props.onClose      Close.
  */
 export function Composer({
@@ -228,19 +210,9 @@ export function Composer({
     <Dialog open onOpenChange={(open) => (open ? null : onClose())}>
       <DialogContent
         showCloseButton={false}
-        className="fhint:flex fhint:max-h-[calc(100vh-3rem)] fhint:w-[calc(100vw-2rem)] fhint:flex-col fhint:gap-0 fhint:rounded-none fhint:border fhint:border-[#b9b2af] fhint:p-0 fhint:shadow-2xl fhint:ring-0 fhint:sm:max-w-[960px]"
+        className="fhint:flex fhint:max-h-[calc(100vh-8rem)] fhint:w-[calc(100vw-2rem)] fhint:flex-col fhint:gap-0 fhint:rounded-none fhint:border fhint:border-[#b9b2af] fhint:p-0 fhint:shadow-2xl fhint:ring-0 fhint:sm:max-w-[1200px]"
       >
-        <div className="fhint:flex fhint:flex-none fhint:items-center fhint:gap-3 fhint:border-b fhint:border-b-border fhint:px-5 fhint:py-3.5">
-          <span
-            aria-hidden="true"
-            className="fhint:grid fhint:size-8 fhint:place-items-center fhint:border fhint:border-border fhint:bg-muted"
-          >
-            {isNew ? (
-              <PlusIcon className="fhint:size-4" />
-            ) : (
-              <PencilIcon className="fhint:size-4" />
-            )}
-          </span>
+        <div className="fhint:flex fhint:flex-none fhint:items-center fhint:gap-4 fhint:border-b fhint:border-b-border fhint:px-5 fhint:py-4">
           <div className="fhint:grid fhint:min-w-0 fhint:flex-1">
             <DialogTitle className="fhint:m-0 fhint:text-[17px] fhint:leading-tight fhint:font-extrabold">
               {isNew
@@ -250,7 +222,7 @@ export function Composer({
                   : __("Finish post", "foundhint-local-seo")}
             </DialogTitle>
             {businessName ? (
-              <span className="fhint:truncate fhint:text-[12.5px] fhint:text-muted-strong">
+              <span className="fhint:truncate fhint:text-sm fhint:text-muted-strong">
                 {sprintf(
                   /* translators: %s: the Google listing's name. */
                   __("For %s", "foundhint-local-seo"),
@@ -308,9 +280,7 @@ export function Composer({
                   iconClassName="fhint:size-3.5"
                 />
                 <span className="fhint:grid fhint:min-w-0">
-                  <strong className="fhint:text-[13px]">
-                    {typeLabel(option)}
-                  </strong>
+                  <strong className="fhint:text-sm">{typeLabel(option)}</strong>
                   <span className="fhint:truncate fhint:text-[11.5px] fhint:text-muted-strong">
                     {typeHint(option)}
                   </span>
@@ -320,37 +290,13 @@ export function Composer({
           })}
         </div>
 
-        <div className="fhint:grid fhint:min-h-0 fhint:flex-1 fhint:overflow-y-auto fhint:md:grid-cols-[minmax(0,1fr)_minmax(0,0.85fr)]">
+        <div className="modern-scroll fhint:grid fhint:min-h-0 fhint:flex-1 fhint:overflow-y-auto fhint:md:grid-cols-[minmax(0,1fr)_minmax(0,0.7fr)] fhint:md:grid-rows-[minmax(0,1fr)] fhint:md:overflow-hidden">
           <form
             id={`${id}-form`}
             onSubmit={submit}
             noValidate
-            className="fhint:grid fhint:content-start fhint:gap-4 fhint:px-5 fhint:py-4"
+            className="modern-scroll fhint:grid fhint:auto-rows-max fhint:content-start fhint:gap-4 fhint:px-5 fhint:py-4 fhint:md:min-h-0 fhint:md:overflow-y-auto"
           >
-            <div
-              role="group"
-              aria-label={__("How to write", "foundhint-local-seo")}
-              className="fhint:grid fhint:grid-cols-2 fhint:border fhint:border-[#b9b2af]"
-            >
-              <button
-                type="button"
-                disabled
-                title={__(
-                  "Writing with AI is part of FoundHint Premium.",
-                  "foundhint-local-seo",
-                )}
-                className="fhint:inline-flex fhint:cursor-not-allowed fhint:items-center fhint:justify-center fhint:gap-2 fhint:border-0 fhint:bg-card fhint:px-3 fhint:py-2 fhint:text-[12.5px] fhint:font-extrabold fhint:text-muted-foreground"
-              >
-                <SparklesIcon aria-hidden="true" className="fhint:size-3.5" />
-                {__("Write with AI", "foundhint-local-seo")}
-                <SoonTag kind="pro" />
-              </button>
-              <span className="fhint:inline-flex fhint:items-center fhint:justify-center fhint:gap-2 fhint:bg-foreground fhint:px-3 fhint:py-2 fhint:text-[12.5px] fhint:font-extrabold fhint:text-background">
-                <PencilIcon aria-hidden="true" className="fhint:size-3.5" />
-                {__("Write it myself", "foundhint-local-seo")}
-              </span>
-            </div>
-
             {dated ? (
               <Field
                 id={`${id}-title`}
@@ -404,7 +350,7 @@ export function Composer({
             >
               <textarea
                 id={`${id}-summary`}
-                rows={5}
+                rows={6}
                 value={form.summary}
                 onChange={(event) => set({ summary: event.target.value })}
                 aria-invalid={errors.summary ? true : undefined}
@@ -493,29 +439,16 @@ export function Composer({
                     )}
                     error={errors.redeem_url}
                   >
-                    <input
+                    <LinkInput
                       id={`${id}-redeem_url`}
-                      type="url"
+                      website={website}
                       value={form.redeem_url}
-                      onChange={(event) =>
-                        set({ redeem_url: event.target.value })
-                      }
+                      onChange={(redeem_url) => set({ redeem_url })}
                       aria-invalid={errors.redeem_url ? true : undefined}
                       aria-describedby={describedBy("redeem_url")}
-                      placeholder="https://"
-                      className={dialogInput}
                     />
                   </Field>
                 </div>
-                <button
-                  type="button"
-                  onClick={() => set({ redeem_url: website })}
-                  disabled={!website}
-                  className={cn(dialogButton, "fhint:justify-self-start")}
-                >
-                  <GlobeIcon aria-hidden="true" className="fhint:size-3.5" />
-                  {__("Use my website address", "foundhint-local-seo")}
-                </button>
                 <Field
                   id={`${id}-terms`}
                   title={__(
@@ -568,17 +501,13 @@ export function Composer({
                       required
                       error={errors.cta_url}
                     >
-                      <input
+                      <LinkInput
                         id={`${id}-cta_url`}
-                        type="url"
+                        website={website}
                         value={form.cta_url}
-                        onChange={(event) =>
-                          set({ cta_url: event.target.value })
-                        }
+                        onChange={(cta_url) => set({ cta_url })}
                         aria-invalid={errors.cta_url ? true : undefined}
                         aria-describedby={describedBy("cta_url")}
-                        placeholder="https://"
-                        className={dialogInput}
                       />
                     </Field>
                   ) : null}
@@ -590,16 +519,6 @@ export function Composer({
                       "foundhint-local-seo",
                     )}
                   </span>
-                ) : form.cta_type ? (
-                  <button
-                    type="button"
-                    onClick={() => set({ cta_url: website })}
-                    disabled={!website}
-                    className={cn(dialogButton, "fhint:justify-self-start")}
-                  >
-                    <GlobeIcon aria-hidden="true" className="fhint:size-3.5" />
-                    {__("Use my website address", "foundhint-local-seo")}
-                  </button>
                 ) : null}
               </>
             )}
@@ -639,14 +558,14 @@ export function Composer({
                 <div
                   role="radiogroup"
                   aria-label={__("When to publish", "foundhint-local-seo")}
-                  className="fhint:inline-flex fhint:justify-self-start fhint:gap-1 fhint:bg-muted fhint:p-1"
+                  className="fhint:flex fhint:flex-wrap fhint:gap-2"
                 >
                   <button
                     type="button"
                     role="radio"
                     aria-checked={when === "now"}
                     onClick={() => setWhen("now")}
-                    className={segment(when === "now")}
+                    className={choice(when === "now")}
                   >
                     <ZapIcon aria-hidden="true" className="fhint:size-3.5" />
                     {__("Now", "foundhint-local-seo")}
@@ -660,7 +579,7 @@ export function Composer({
                       "Scheduling posts is part of FoundHint Premium.",
                       "foundhint-local-seo",
                     )}
-                    className={segment(false)}
+                    className={choice(false)}
                   >
                     <CalendarClockIcon
                       aria-hidden="true"
@@ -674,7 +593,7 @@ export function Composer({
                     role="radio"
                     aria-checked={when === "draft"}
                     onClick={() => setWhen("draft")}
-                    className={segment(when === "draft")}
+                    className={choice(when === "draft")}
                   >
                     <FileIcon aria-hidden="true" className="fhint:size-3.5" />
                     {__("Draft", "foundhint-local-seo")}
@@ -697,7 +616,7 @@ export function Composer({
             {requestError ? (
               <p
                 role="alert"
-                className="fhint:m-0 fhint:border fhint:border-destructive/40 fhint:bg-[#FBE9E6] fhint:px-3 fhint:py-2.5 fhint:text-[13px] fhint:text-destructive"
+                className="fhint:m-0 fhint:border fhint:border-destructive/40 fhint:bg-destructive-tint fhint:px-3 fhint:py-2.5 fhint:text-sm fhint:text-destructive"
               >
                 {savedId && isNew === false && !post?.id
                   ? __(
@@ -712,14 +631,19 @@ export function Composer({
 
           <aside
             aria-label={__("Preview", "foundhint-local-seo")}
-            className="fhint:grid fhint:content-start fhint:gap-3 fhint:border-t fhint:border-t-border fhint:bg-[#faf6f4] fhint:px-5 fhint:py-4 fhint:md:border-t-0 fhint:md:border-l fhint:md:border-l-border"
+            className="modern-scroll fhint:grid fhint:auto-rows-max fhint:content-start fhint:gap-3 fhint:md:min-h-0 fhint:md:overflow-y-auto fhint:border-t fhint:border-t-border fhint:bg-[#faf6f4] fhint:px-5 fhint:py-4 fhint:md:border-t-0 fhint:md:border-l fhint:md:border-l-border"
           >
-            <span className="fhint:flex fhint:items-center fhint:gap-2 fhint:text-[11.5px] fhint:font-extrabold fhint:tracking-[0.08em] fhint:text-muted-strong fhint:uppercase">
-              <EyeIcon aria-hidden="true" className="fhint:size-3.5" />
+            <span
+              className={cn(label, "fhint:flex fhint:items-center fhint:gap-2")}
+            >
+              <EyeIcon
+                aria-hidden="true"
+                className="fhint:size-4 fhint:text-muted-strong"
+              />
               {__("Live preview on Google", "foundhint-local-seo")}
             </span>
             <PostPreview post={form} businessName={businessName} />
-            <p className="fhint:m-0 fhint:flex fhint:gap-2 fhint:border fhint:border-[#cfe3d6] fhint:bg-[#eef6f1] fhint:px-3 fhint:py-2.5 fhint:text-[12.5px]">
+            <p className="fhint:m-0 fhint:flex fhint:gap-2 fhint:border fhint:border-success/25 fhint:bg-success-tint fhint:px-3 fhint:py-2.5 fhint:text-sm">
               <LightbulbIcon
                 aria-hidden="true"
                 className="fhint:mt-0.5 fhint:size-3.5 fhint:flex-none"
@@ -736,7 +660,7 @@ export function Composer({
         </div>
 
         <div className="fhint:flex fhint:flex-none fhint:flex-wrap fhint:items-center fhint:gap-3 fhint:border-t fhint:border-t-border fhint:px-5 fhint:py-3.5">
-          <span className="fhint:min-w-0 fhint:flex-1 fhint:text-[12.5px] fhint:text-muted-strong">
+          <span className="fhint:min-w-0 fhint:flex-1 fhint:text-sm fhint:text-muted-strong">
             {onGoogle || when === "now"
               ? __(
                   "Publishing posts this on your Google profile.",
@@ -757,7 +681,7 @@ export function Composer({
               type="submit"
               form={`${id}-form`}
               disabled={saving}
-              className={primaryButton}
+              className={primaryAction}
             >
               <SendIcon aria-hidden="true" className="fhint:size-3.5" />
               {primaryLabel}

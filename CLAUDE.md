@@ -283,6 +283,21 @@ route in `routes.jsx` and an entry in the sidebar; do not add
   `components.json` is configured (`style: base-vega`, `prefix: fhint`,
   `baseColor: neutral`, Lucide icons, JSX not TSX). Twenty primitives are
   already in `src/admin/components/ui/`.
+- **Never let a React component file grow past 150 lines.** Before it does,
+  split it: data and side effects into a hook (`<screen>/hooks/`), pure
+  helpers into `<screen>/lib/`, and each visual block into its own
+  component. A screen's `index.jsx` lays the screen out and little else —
+  `pages/reviews/` is the worked example. Generated `components/ui/**` files
+  are exempt.
+- **Use Tailwind's spacing scale, never a bracketed pixel value, for
+  spacing and sizing.** Tailwind v4 takes any multiple of `0.25` (one unit
+  is 4px), so every whole pixel has a scale class: divide by 4. Write
+  `fhint:size-5.5` (22px), not `fhint:size-[22px]`; `fhint:size-3.25`
+  (13px), not `fhint:size-[13px]`; likewise `fhint:px-5.5` over
+  `fhint:px-[22px]` and `fhint:min-h-17` over `fhint:min-h-[68px]`. This
+  covers `size`, `w`, `h`, `min-*`/`max-*`, padding, margin, gap, inset and
+  translate. Brackets stay only where there is no spacing scale — a font
+  size like `fhint:text-[12.5px]`, letter-spacing, a colour.
 
 ### Working with generated components
 

@@ -54,7 +54,7 @@ export function PostPreview({ post, businessName }) {
             {(businessName || "?").trim().charAt(0).toUpperCase()}
           </span>
           <span className="fhint:grid fhint:min-w-0">
-            <strong className="fhint:truncate fhint:text-[13.5px]">
+            <strong className="fhint:truncate fhint:text-sm">
               {businessName}
             </strong>
             <span className="fhint:text-[12px] fhint:text-muted-strong">
@@ -68,13 +68,13 @@ export function PostPreview({ post, businessName }) {
         </div>
 
         {dated && post.title ? (
-          <strong className="fhint:text-[14px] fhint:leading-snug">
+          <strong className="fhint:text-sm fhint:leading-snug">
             {post.title}
           </strong>
         ) : null}
 
         {dated && (starts || ends) ? (
-          <span className="fhint:text-[12.5px] fhint:font-bold">
+          <span className="fhint:text-sm fhint:font-bold">
             {post.topic_type === "offer"
               ? sprintf(
                   /* translators: 1: start date, 2: end date. */
@@ -91,7 +91,7 @@ export function PostPreview({ post, businessName }) {
           </span>
         ) : null}
 
-        <p className="fhint:m-0 fhint:text-[13px] fhint:leading-relaxed fhint:break-words fhint:whitespace-pre-line fhint:text-muted-strong">
+        <p className="fhint:m-0 fhint:text-sm fhint:leading-relaxed fhint:break-words fhint:whitespace-pre-line fhint:text-muted-strong">
           {post.summary ||
             __(
               "Start typing and your post will appear here.",
@@ -106,7 +106,7 @@ export function PostPreview({ post, businessName }) {
         ) : null}
 
         {button ? (
-          <span className="fhint:inline-flex fhint:items-center fhint:gap-1 fhint:text-[13px] fhint:font-extrabold fhint:text-primary">
+          <span className="fhint:inline-flex fhint:items-center fhint:gap-1 fhint:text-sm fhint:font-extrabold fhint:text-primary">
             {button}
             <ArrowRightIcon aria-hidden="true" className="fhint:size-3.5" />
           </span>

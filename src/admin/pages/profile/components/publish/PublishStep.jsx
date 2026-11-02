@@ -21,7 +21,7 @@ export function PublishStep({ step, index, state, failure }) {
   return (
     <li className="fhint:m-0 fhint:grid fhint:gap-2 fhint:border fhint:border-border fhint:px-3.5 fhint:py-3">
       <span className="fhint:flex fhint:flex-wrap fhint:items-center fhint:gap-2">
-        <strong className="fhint:text-[13.5px]">
+        <strong className="fhint:text-sm">
           {sprintf(
             /* translators: 1: step number, 2: what the step sends. */
             __("Step %1$d: %2$s", "foundhint-local-seo"),
@@ -56,7 +56,7 @@ export function PublishStep({ step, index, state, failure }) {
                 : __("Waiting", "foundhint-local-seo")}
         </span>
       </span>
-      <ul className="fhint:m-0 fhint:grid fhint:list-none fhint:gap-1 fhint:p-0 fhint:text-[12.5px] fhint:text-foreground-soft">
+      <ul className="fhint:m-0 fhint:grid fhint:list-none fhint:gap-1 fhint:p-0 fhint:text-sm fhint:text-foreground-soft">
         {step.fields.map((change) => (
           <li key={change.field} className="fhint:m-0">
             {fieldName(change.field)}

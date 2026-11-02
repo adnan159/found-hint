@@ -91,17 +91,17 @@ function Findings({ issues, onFix, onIgnore, busyId }) {
                   ? SEVERITY_LABELS[issue.severity]()
                   : issue.severity}
               </Badge>
-              <span className="fhint:text-[13px] fhint:font-bold">
+              <span className="fhint:text-sm fhint:font-bold">
                 {issue.message}
               </span>
             </div>
             {issue.recommendation ? (
-              <p className="fhint:mt-1 fhint:max-w-[76ch] fhint:text-[12.5px] fhint:text-muted-strong">
+              <p className="fhint:mt-1 fhint:max-w-[76ch] fhint:text-sm fhint:text-muted-strong">
                 {issue.recommendation}
               </p>
             ) : null}
             {issue.context?.found && issue.context?.expected ? (
-              <p className="fhint:mt-1 fhint:text-[12.5px] fhint:text-muted-strong">
+              <p className="fhint:mt-1 fhint:text-sm fhint:text-muted-strong">
                 {sprintf(
                   /* translators: 1: value here, 2: value on Google. */
                   __("Here: %1$s · Google: %2$s", "foundhint-local-seo"),
@@ -313,7 +313,7 @@ export default function AuditPage() {
         <div className="fhint:mt-5 fhint:flex fhint:flex-col fhint:gap-3">
           {Object.entries(audit.category_scores ?? {}).map(([name, cat]) => (
             <div key={name} className="fhint:flex fhint:flex-col fhint:gap-1">
-              <div className="fhint:flex fhint:items-baseline fhint:justify-between fhint:text-[12.5px]">
+              <div className="fhint:flex fhint:items-baseline fhint:justify-between fhint:text-sm">
                 <span className="fhint:font-bold">
                   {CATEGORY_LABELS[name] ? CATEGORY_LABELS[name]() : name}
                 </span>
@@ -370,7 +370,7 @@ export default function AuditPage() {
             "foundhint-local-seo",
           )}
         >
-          <ul className="fhint:flex fhint:flex-col fhint:gap-1.5 fhint:text-[13px]">
+          <ul className="fhint:flex fhint:flex-col fhint:gap-1.5 fhint:text-sm">
             {data.passes.map((pass) => (
               <li
                 key={pass.id}

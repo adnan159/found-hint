@@ -4328,6 +4328,56 @@ if ( $admins ) {
 	wp_set_current_user( 0 );
 }
 
+// -- Photos from the Media Library ------------------------------------------
+//
+// An image picked in the Media Library becomes a photo waiting for Google,
+// checked like an upload. Discarding it must never delete the owner's image;
+// a file FoundHint uploaded itself is deleted with its photo.
+
+$fhint_media_location = LocationRepository::create( array( 'name' => 'Media branch' ) );
+$fhint_media_loc_id   = (int) $fhint_media_location['id'];
+$fhint_uploads        = wp_upload_dir();
+$fhint_make_image     = function ( $name, $side ) use ( $fhint_uploads ) {
+	$path  = trailingslashit( $fhint_uploads['path'] ) . $name;
+	$image = imagecreatetruecolor( $side, $side );
+	for ( $x = 0; $x < $side; $x += 2 ) {
+		for ( $y = 0; $y < $side; $y += 2 ) {
+			imagesetpixel( $image, $x, $y, wp_rand( 0, 0xFFFFFF ) );
+		}
+	}
+	imagejpeg( $image, $path, 95 );
+	imagedestroy( $image );
+	$id = wp_insert_attachment( array( 'post_mime_type' => 'image/jpeg', 'post_title' => $name, 'post_status' => 'inherit' ), $path );
+	update_attached_file( $id, $path );
+	return (int) $id;
+};
+
+$fhint_library_image = $fhint_make_image( 'fhint-test-library.jpg', 400 );
+$fhint_small_image   = $fhint_make_image( 'fhint-test-small.jpg', 120 );
+register_shutdown_function(
+	function () use ( $fhint_library_image, $fhint_small_image ) {
+		wp_delete_attachment( $fhint_library_image, true );
+		wp_delete_attachment( $fhint_small_image, true );
+	}
+);
+
+$fhint_from_library = \FHINT\App\Media\MediaUpload::add_attachment( $fhint_media_loc_id, 'logo', $fhint_library_image );
+check( is_array( $fhint_from_library ) && (int) $fhint_from_library['attachment_id'] === $fhint_library_image, 'a Media Library image becomes a waiting photo, using that same image' );
+check_same( 'logo', $fhint_from_library['role'] ?? null, 'in the role it was chosen for' );
+check( \FHINT\App\Media\MediaUpload::add_attachment( $fhint_media_loc_id, 'gallery', $fhint_small_image ) instanceof \FHINT\App\Core\ValidationResult, "an image smaller than Google's minimum is refused, like an upload" );
+check( is_wp_error( \FHINT\App\Media\MediaUpload::add_attachment( $fhint_media_loc_id, 'gallery', 999999 ) ), 'an image that is not in the library is refused' );
+
+\FHINT\App\Media\MediaUpload::remove( (int) $fhint_from_library['id'], $fhint_media_loc_id );
+check( 'attachment' === get_post_type( $fhint_library_image ) && file_exists( (string) get_attached_file( $fhint_library_image ) ), "removing the photo never deletes the owner's image" );
+check_same( array(), MediaRepository::for_location( $fhint_media_loc_id ), 'only the waiting photo is gone' );
+
+// A file FoundHint uploaded itself goes with its photo, as before.
+$fhint_owned = $fhint_make_image( 'fhint-test-owned.jpg', 400 );
+update_post_meta( $fhint_owned, \FHINT\App\Media\MediaUpload::OWNED_META, 1 );
+$fhint_owned_photo = \FHINT\App\Media\MediaUpload::add_attachment( $fhint_media_loc_id, 'gallery', $fhint_owned );
+\FHINT\App\Media\MediaUpload::remove( (int) $fhint_owned_photo['id'], $fhint_media_loc_id );
+check( null === get_post( $fhint_owned ), 'a file FoundHint uploaded is deleted with its photo' );
+
 // -- Summary ---------------------------------------------------------------
 
 $passed = $GLOBALS['__passed'];

@@ -10,7 +10,7 @@ export function HoursGrid({ hours }) {
 
   if (!days.length) {
     return (
-      <span className="fhint:text-[13px] fhint:text-muted-strong">
+      <span className="fhint:text-sm fhint:text-muted-strong">
         {__("No opening hours yet.", "foundhint-local-seo")}
       </span>
     );
@@ -44,12 +44,12 @@ export function HoursGrid({ hours }) {
             key={day.day_name}
             className="fhint:-mr-px fhint:-mb-px fhint:grid fhint:min-w-0 fhint:gap-0.5 fhint:border-r fhint:border-b fhint:border-border fhint:px-[11px] fhint:py-2"
           >
-            <dt className="fhint:text-[12.5px] fhint:text-muted-strong">
+            <dt className="fhint:text-sm fhint:text-muted-strong">
               {day.day_name}
             </dt>
             <dd
               className={cn(
-                "fhint:m-0 fhint:text-[13px] fhint:font-bold",
+                "fhint:m-0 fhint:text-sm fhint:font-bold",
                 !day.configured || closed
                   ? "fhint:text-muted-strong"
                   : "fhint:text-foreground",

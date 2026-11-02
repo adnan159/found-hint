@@ -72,7 +72,7 @@ export function RequirementStatus({ kind, visitMode, missing }) {
           ok ? "fhint:bg-success" : "fhint:bg-warning-foreground",
         )}
       />
-      <span className="fhint:text-[13px] fhint:leading-normal">
+      <span className="fhint:text-sm fhint:leading-normal">
         <strong>{title}</strong> {body}
       </span>
     </div>

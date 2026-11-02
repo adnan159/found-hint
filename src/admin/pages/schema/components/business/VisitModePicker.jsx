@@ -47,7 +47,7 @@ export function VisitModePicker({ value, locked, onChange }) {
               // WordPress pulls every admin radio up 4px.
               className="fhint:m-0! fhint:accent-primary"
             />
-            <span className="fhint:text-[13px]">{text}</span>
+            <span className="fhint:text-sm">{text}</span>
           </label>
         ))}
       </div>

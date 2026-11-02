@@ -53,7 +53,7 @@ export const caption =
 
 /** An amber note: something will not print as the owner may expect. */
 export const warningNote =
-  "fhint:mx-5 fhint:mt-0 fhint:mb-3 fhint:text-[12.5px] fhint:font-semibold fhint:text-warning-foreground";
+  "fhint:mx-5 fhint:mt-0 fhint:mb-3 fhint:text-sm fhint:font-semibold fhint:text-warning-foreground";
 
 /** A field's error, or the note that it is required and empty. */
 export const fieldError = errorText;
@@ -101,7 +101,7 @@ export const card = (on) =>
 /** A toggle chip — chosen: dark. */
 export const chip = (on) =>
   cn(
-    "fhint:cursor-pointer fhint:border fhint:px-3 fhint:py-1.5 fhint:text-[12.5px] fhint:font-bold fhint:disabled:cursor-default fhint:disabled:opacity-60",
+    "fhint:cursor-pointer fhint:border fhint:px-3 fhint:py-1.5 fhint:text-sm fhint:font-bold fhint:disabled:cursor-default fhint:disabled:opacity-60",
     on
       ? "fhint:border-foreground fhint:bg-foreground fhint:text-background"
       : "fhint:border-input fhint:bg-card fhint:text-foreground",
@@ -111,17 +111,17 @@ export const chip = (on) =>
 /** The bordered secondary button: Stay, Discard, Keep it. The profile's. */
 export const dialogButton = cn(
   quietButton,
-  "fhint:px-4 fhint:py-[9px] fhint:text-[13px]",
+  "fhint:px-4 fhint:py-[9px] fhint:text-sm",
 );
 
 /** The filled main action: Save, Add a service. The profile's. */
 export const primaryAction = cn(
   primaryButton,
-  "fhint:px-4 fhint:py-[9px] fhint:text-[13px]",
+  "fhint:px-4 fhint:py-[9px] fhint:text-sm",
 );
 
 /** A text-only action beside a field: Edit, Use Google's value. */
 export const linkAction = cn(
-  "fhint:cursor-pointer fhint:border-0 fhint:bg-transparent fhint:p-0 fhint:text-[12.5px] fhint:font-bold fhint:text-link-accent fhint:hover:underline",
+  "fhint:cursor-pointer fhint:border-0 fhint:bg-transparent fhint:p-0 fhint:text-sm fhint:font-bold fhint:text-link-accent fhint:hover:underline",
   focus,
 );

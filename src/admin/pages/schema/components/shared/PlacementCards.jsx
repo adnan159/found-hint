@@ -80,7 +80,7 @@ export function PlacementCards({
               className="fhint:m-0! fhint:mt-px! fhint:flex-none fhint:accent-primary"
             />
             <span>
-              <strong className="fhint:block fhint:text-[13.5px] fhint:leading-5">
+              <strong className="fhint:block fhint:text-sm fhint:leading-5">
                 {text}
               </strong>
               <span className={muted}>{body}</span>
@@ -132,7 +132,7 @@ export function PlacementCards({
             ) : null}
           </div>
           {homeWarning && !homeChosen ? (
-            <span className="fhint:text-[12.5px] fhint:font-semibold fhint:text-warning-foreground">
+            <span className="fhint:text-sm fhint:font-semibold fhint:text-warning-foreground">
               {__(
                 "Your home page needs the business so the website can name its publisher. FoundHint will still add it there.",
                 "foundhint-local-seo",

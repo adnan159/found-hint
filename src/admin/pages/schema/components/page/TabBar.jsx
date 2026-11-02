@@ -1,5 +1,6 @@
 import { __, sprintf } from "@wordpress/i18n";
 import { cn } from "cn";
+import { SparklesIcon } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
 import { focus } from "@/pages/profile/styles";
 
@@ -83,7 +84,7 @@ export function TabBar({
               </span>
               <strong
                 className={cn(
-                  "fhint:text-[14px]",
+                  "fhint:text-sm",
                   off && "fhint:text-muted-strong",
                 )}
               >
@@ -91,17 +92,25 @@ export function TabBar({
               </strong>
               <span
                 className={cn(
-                  "fhint:text-[12.5px]",
+                  "fhint:text-sm",
                   "fhint:text-muted-strong",
                   unsaved && "fhint:font-bold",
                 )}
               >
-                {unsaved
-                  ? __("Unsaved changes", "foundhint-local-seo")
-                  : off
-                    ? (summaries.offText?.[key] ??
-                      __("Off · not printed", "foundhint-local-seo"))
-                    : summaries[key]}
+                {unsaved ? (
+                  __("Unsaved changes", "foundhint-local-seo")
+                ) : off ? (
+                  (summaries.offText?.[key] ??
+                  __("Off · not printed", "foundhint-local-seo"))
+                ) : summaries.premium?.[key] ? (
+                  // A Premium tab without Premium: the brand's badge.
+                  <span className="fhint:inline-flex fhint:items-center fhint:gap-1 fhint:rounded-full fhint:bg-[#FFF1EB] fhint:px-2 fhint:py-0.5 fhint:text-[11.5px] fhint:font-bold fhint:text-[#D8521F]">
+                    <SparklesIcon aria-hidden="true" className="fhint:size-3" />
+                    {summaries[key]}
+                  </span>
+                ) : (
+                  summaries[key]
+                )}
               </span>
             </button>
 

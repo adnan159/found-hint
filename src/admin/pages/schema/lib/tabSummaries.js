@@ -10,17 +10,16 @@ import { placementLabel } from "./schema";
  * @param {Object}  data
  * @param {Object}  data.plan     `{ business, locations, services }`: what
  *                                Pro serves.
- * @param {Object}  data.free     The free plugin's schema (`GET schema`).
  * @param {Object}  data.state    Premium's Schema Manager state.
  * @param {Object}  data.business Premium's LocalBusiness tab.
  * @return {Object} Summary text by tab key.
  */
-export function tabSummaries({ plan, free, state, business }) {
+export function tabSummaries({ plan, state, business }) {
   const pro = __("Premium", "foundhint-local-seo");
   const soon = __("Coming in a later update", "foundhint-local-seo");
   const notYet = plan.business ? soon : pro;
 
-  return {
+  const summaries = {
     organization: plan.business
       ? state?.tabs?.organization
         ? `Organization · ${placementLabel(state.tabs.organization.placement)}`
@@ -30,9 +29,7 @@ export function tabSummaries({ plan, free, state, business }) {
       ? business
         ? `${business.type} · ${placementLabel(business.placement)}`
         : "…"
-      : free?.graph?.["@graph"]?.[0]?.["@type"]
-        ? `${free.graph["@graph"][0]["@type"]} · ${placementLabel("every_page")}`
-        : pro,
+      : pro,
     locations: plan.locations ? locationsSummary(state) : notYet,
     services: plan.services ? servicesSummary(state) : notYet,
     website: plan.website
@@ -64,6 +61,15 @@ export function tabSummaries({ plan, free, state, business }) {
         : "…"
       : __("Who publishes it", "foundhint-local-seo"),
   };
+
+  // Tabs that only say "Premium": the tab bar shows them as a badge.
+  summaries.premium = Object.fromEntries(
+    Object.entries(summaries)
+      .filter(([, text]) => text === pro)
+      .map(([key]) => [key, true]),
+  );
+
+  return summaries;
 }
 
 function locationsSummary(state) {

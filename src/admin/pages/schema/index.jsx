@@ -131,7 +131,7 @@ export default function SchemaPage() {
         <>
           <TabBar
             current={tab}
-            summaries={tabSummaries({ plan, free, state, business })}
+            summaries={tabSummaries({ plan, state, business })}
             dirty={unsaved.dirty}
             enabled={state?.enabled}
             locked={!plan.business}

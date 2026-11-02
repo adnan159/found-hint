@@ -98,7 +98,7 @@ export function ProviderSection({ form, options, list }) {
                 className="fhint:m-0! fhint:mt-px! fhint:flex-none fhint:accent-primary"
               />
               <span>
-                <strong className="fhint:block fhint:text-[13.5px] fhint:leading-5">
+                <strong className="fhint:block fhint:text-sm fhint:leading-5">
                   {text}
                 </strong>
                 <span className={muted}>{body}</span>

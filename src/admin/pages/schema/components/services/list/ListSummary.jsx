@@ -10,9 +10,7 @@ export function ListSummary({ branchName, active, inactive }) {
         {__("Services offered", "foundhint-local-seo")}
       </span>
       {branchName ? (
-        <span className="fhint:text-[12.5px] fhint:font-bold fhint:text-[#D8521F]">
-          {branchName}
-        </span>
+        <span className="fhint:text-sm fhint:font-bold">{branchName}</span>
       ) : null}
       <span className="fhint:text-[12px] fhint:text-[#625e5e]">
         {sprintf(

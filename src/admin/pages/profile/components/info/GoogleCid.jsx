@@ -25,10 +25,10 @@ export function GoogleCid({ cid, mapped }) {
   return (
     <div className="fhint:flex fhint:flex-wrap fhint:items-center fhint:gap-3 fhint:border fhint:border-border fhint:bg-muted fhint:px-[15px] fhint:py-[13px]">
       <div className="fhint:min-w-0 fhint:flex-1">
-        <strong className="fhint:block fhint:text-[13px]">
+        <strong className="fhint:block fhint:text-sm">
           {__("Google CID", "foundhint-local-seo")}
         </strong>
-        <span className="fhint:text-[12.5px] fhint:text-muted-strong">
+        <span className="fhint:text-sm fhint:text-muted-strong">
           {cid
             ? __(
                 "Google's own ID for this listing on Maps. You cannot change it, but some directories and tools ask for it.",

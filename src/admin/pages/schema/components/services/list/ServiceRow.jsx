@@ -1,8 +1,8 @@
-import { __, _n, sprintf } from "@wordpress/i18n";
-import { ArrowDownIcon, ArrowUpIcon, GripVerticalIcon } from "lucide-react";
-import { cn } from "cn";
 import { Switch } from "@/components/ui/switch";
 import { focus } from "@/pages/profile/styles";
+import { __, _n, sprintf } from "@wordpress/i18n";
+import { cn } from "cn";
+import { ArrowDownIcon, ArrowUpIcon, GripVerticalIcon } from "lucide-react";
 import { serviceMetaLine, warningText } from "../../../lib/service";
 import { PILL_TONES, ROW_PILL } from "../pills";
 
@@ -110,15 +110,15 @@ export function ServiceRow({
             focus,
           )}
         >
-          <span className="fhint:flex fhint:flex-wrap fhint:items-center fhint:gap-2">
-            <strong className="fhint:text-[13.5px]">{name}</strong>
+          <span className="fhint:flex fhint:flex-wrap fhint:items-center fhint:gap-1.5">
+            <strong className="fhint:text-sm">{name}</strong>
             {service.from_google ? (
               <span className={cn(ROW_PILL, PILL_TONES.google)}>
                 {__("From Google", "foundhint-local-seo")}
               </span>
             ) : null}
           </span>
-          <span className="fhint:truncate fhint:text-[12px] fhint:text-[#625e5e]">
+          <span className="fhint:truncate fhint:text-sm fhint:text-muted-strong">
             {serviceMetaLine(service)}
           </span>
         </button>
@@ -148,12 +148,7 @@ export function ServiceRow({
           </button>
         ) : null}
 
-        <span
-          className={cn(
-            "fhint:hidden fhint:w-[52px] fhint:text-right fhint:text-[12px] fhint:font-bold fhint:sm:inline",
-            on ? "fhint:text-[#157F4B]" : "fhint:text-[#9b9797]",
-          )}
-        >
+        <span className="fhint:hidden fhint:w-[52px] fhint:text-right fhint:text-sm fhint:text-muted-strong fhint:sm:inline">
           {on
             ? __("Active", "foundhint-local-seo")
             : __("Inactive", "foundhint-local-seo")}
@@ -175,7 +170,7 @@ export function ServiceRow({
           {checks.map((warning) => (
             <li
               key={`${warning.code}-${warning.branch ?? ""}`}
-              className="fhint:text-[12.5px] fhint:text-warning-foreground"
+              className="fhint:text-sm fhint:text-warning-foreground"
             >
               {warningText(warning)}
             </li>

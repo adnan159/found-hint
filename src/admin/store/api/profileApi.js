@@ -119,10 +119,17 @@ export const profileApi = baseApi.injectEndpoints({
     }),
 
     addPhoto: builder.mutation({
-      query: ({ file, role = "gallery", locationId = 0 }) => {
+      // A file to upload, or `attachmentId`: an image already in the Media
+      // Library.
+      query: ({ file, attachmentId = 0, role = "gallery", locationId = 0 }) => {
         const body = new FormData();
 
-        body.append("file", file);
+        if (attachmentId) {
+          body.append("attachment_id", String(attachmentId));
+        } else {
+          body.append("file", file);
+        }
+
         body.append("role", role);
 
         if (locationId) {

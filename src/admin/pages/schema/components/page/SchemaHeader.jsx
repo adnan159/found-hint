@@ -14,7 +14,7 @@ import { schemaManagerApi } from "@/store/api/schemaManagerApi";
 import { relative } from "../../lib/schema";
 
 const button = cn(
-  "fhint:inline-flex fhint:cursor-pointer fhint:items-center fhint:gap-2 fhint:border fhint:border-input fhint:bg-card fhint:px-3 fhint:py-2 fhint:text-[13px] fhint:font-bold fhint:text-foreground fhint:no-underline fhint:disabled:cursor-wait",
+  "fhint:inline-flex fhint:cursor-pointer fhint:items-center fhint:gap-2 fhint:border fhint:border-input fhint:bg-card fhint:px-3 fhint:py-2 fhint:text-sm fhint:font-bold fhint:text-foreground fhint:no-underline fhint:disabled:cursor-wait",
   focus,
 );
 
@@ -45,7 +45,7 @@ export function SchemaHeader({
     <>
       <div className="fhint:-mx-4 fhint:-mt-6 fhint:box-border fhint:flex fhint:min-h-[68px] fhint:flex-wrap fhint:items-center fhint:gap-x-4 fhint:gap-y-3 fhint:border-b fhint:border-b-border fhint:px-4 fhint:py-2.5">
         <div className="fhint:min-w-45 fhint:flex-1">
-          <p className="fhint:m-0 fhint:text-[12.5px] fhint:font-semibold fhint:text-muted-strong">
+          <p className="fhint:m-0 fhint:text-sm fhint:font-semibold fhint:text-muted-strong">
             {__("FoundHint / Schema", "foundhint-local-seo")}
           </p>
           <div className="fhint:flex fhint:items-center fhint:gap-1.5">
@@ -98,7 +98,7 @@ function UpgradeNotice() {
           className="fhint:size-4 fhint:flex-none fhint:text-primary"
         />
       )}
-      <span className="fhint:min-w-0 fhint:flex-[1_1_320px] fhint:text-[13px] fhint:leading-normal">
+      <span className="fhint:min-w-0 fhint:flex-[1_1_320px] fhint:text-sm fhint:leading-normal">
         <strong>
           {inactive
             ? __(
@@ -174,7 +174,7 @@ function RefreshActions({ syncedAt, locationId }) {
   return (
     <div className="fhint:flex fhint:flex-wrap fhint:items-center fhint:gap-3.5">
       {syncedAt ? (
-        <span className="fhint:text-[12.5px] fhint:text-muted-strong">
+        <span className="fhint:text-sm fhint:text-muted-strong">
           {sprintf(
             /* translators: %s: e.g. "2 hours ago". */
             __("Synced from Google %s", "foundhint-local-seo"),

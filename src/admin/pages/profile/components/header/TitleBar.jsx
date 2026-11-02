@@ -46,7 +46,7 @@ export function TitleBar({
       )}
     >
       <div className="fhint:min-w-45 fhint:flex-1">
-        <p className="fhint:m-0 fhint:text-[12.5px] fhint:font-semibold fhint:text-muted-strong">
+        <p className="fhint:m-0 fhint:text-sm fhint:font-semibold fhint:text-muted-strong">
           {__("FoundHint / Business Profile", "foundhint-local-seo")}
         </p>
         <div className="fhint:flex fhint:items-center fhint:gap-1.5">
@@ -96,7 +96,7 @@ export function TitleBar({
           ) : null}
           <span
             className={cn(
-              "fhint:inline-flex fhint:h-9 fhint:items-center fhint:gap-2 fhint:rounded-full fhint:px-4 fhint:text-[13px] fhint:font-bold fhint:whitespace-nowrap",
+              "fhint:inline-flex fhint:h-9 fhint:items-center fhint:gap-2 fhint:rounded-full fhint:px-4 fhint:text-sm fhint:font-bold fhint:whitespace-nowrap",
               google.mapped
                 ? "fhint:bg-success-tint fhint:text-success"
                 : "fhint:bg-muted fhint:text-muted-strong",

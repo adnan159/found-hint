@@ -16,7 +16,7 @@ export function ConnectGoogleNotice() {
           "foundhint-local-seo",
         )}
       </h2>
-      <p className="fhint:m-0 fhint:max-w-[60ch] fhint:text-[13.5px] fhint:leading-relaxed fhint:text-foreground-soft">
+      <p className="fhint:m-0 fhint:max-w-[60ch] fhint:text-sm fhint:leading-relaxed fhint:text-foreground-soft">
         {__(
           "Your schema is built from your Business Profile: name, address, phone and hours come from Google, and you can edit any of them for your website. Nothing changes on your site until you connect.",
           "foundhint-local-seo",

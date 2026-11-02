@@ -79,7 +79,7 @@ export function ServicesStep({ onDone, onBack, onSkip }) {
               key={service.id}
               className="fhint:flex fhint:items-center fhint:gap-3 fhint:border-b fhint:border-b-border fhint:px-4 fhint:py-2.5 fhint:last:border-b-0"
             >
-              <span className="fhint:text-[13px] fhint:font-bold">
+              <span className="fhint:text-sm fhint:font-bold">
                 {service.name}
               </span>
               <Button
@@ -100,7 +100,7 @@ export function ServicesStep({ onDone, onBack, onSkip }) {
           ))}
         </ul>
       ) : (
-        <p className="fhint:text-[13px] fhint:text-muted-strong">
+        <p className="fhint:text-sm fhint:text-muted-strong">
           {__(
             "Nothing listed yet. Add the things people actually come to you for.",
             "foundhint-local-seo",
@@ -109,7 +109,7 @@ export function ServicesStep({ onDone, onBack, onSkip }) {
       )}
 
       {!canAdd && limits ? (
-        <p className="fhint:text-[13px] fhint:text-muted-strong">
+        <p className="fhint:text-sm fhint:text-muted-strong">
           {sprintf(
             /* translators: %d: number of services included in the plan. */
             __(

@@ -1,7 +1,7 @@
 import { __ } from "@wordpress/i18n";
 import { ImageIcon } from "lucide-react";
 import { cn } from "cn";
-import { chooseImages, hasMediaLibrary } from "../../lib/media";
+import { chooseImages, hasMediaLibrary } from "@/lib/media";
 import { chip, linkAction, muted } from "../styles";
 
 /**

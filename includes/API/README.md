@@ -854,9 +854,9 @@ the others are still stored. The request fails only when nothing arrived.
 
 | Route | |
 |---|---|
-| `POST /profile/media` | Multipart: `file`, `role` (`logo`, `cover`, `gallery`), `location_id`. Keeps the photo in the media library as **waiting**. Sends nothing to Google. |
+| `POST /profile/media` | Multipart: `file` **or** `attachment_id` (an image already in the Media Library), `role` (`logo`, `cover`, `gallery`), `location_id`. Keeps the photo as **waiting**; a library image is checked against Google's limits like an upload (`404 fhint_media_not_found` when it is gone). Sends nothing to Google. |
 | `POST /profile/media/{id}/publish` | Sends one waiting photo to Google. One request per photo, so each reports for itself. |
-| `DELETE /profile/media/{id}` | Forgets a photo that has not been sent, and deletes its file. `409 fhint_media_on_google` for one that has. |
+| `DELETE /profile/media/{id}` | Forgets a photo that has not been sent. Deletes its file only when FoundHint uploaded it (attachment meta `_fhint_uploaded`); an image picked from the Media Library is kept. `409 fhint_media_on_google` for one that has been sent. |
 
 All three answer with the whole profile. Waiting photos are under
 `data.media.pending` with `state` `pending`, `uploading` or `failed` (and

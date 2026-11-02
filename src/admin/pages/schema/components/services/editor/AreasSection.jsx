@@ -1,8 +1,8 @@
-import { useState } from "react";
-import { __, sprintf } from "@wordpress/i18n";
-import { XIcon } from "lucide-react";
-import { cn } from "cn";
 import { focus } from "@/pages/profile/styles";
+import { __, sprintf } from "@wordpress/i18n";
+import { cn } from "cn";
+import { XIcon } from "lucide-react";
+import { useState } from "react";
 import { AREA_TYPES, areaTypeLabel, withArea } from "../../../lib/service";
 import { chip, input, muted } from "../../styles";
 import { EditorSection } from "./EditorSection";
@@ -57,7 +57,7 @@ export function AreasSection({ form, suggestions = [] }) {
         {areas.map((area) => (
           <li
             key={`${area.type}-${area.name}`}
-            className="fhint:inline-flex fhint:items-center fhint:gap-2 fhint:border fhint:border-[#201e1d] fhint:bg-white fhint:py-[5px] fhint:pr-1.5 fhint:pl-[11px] fhint:text-[13px]"
+            className="fhint:inline-flex fhint:items-center fhint:gap-1.5 fhint:border fhint:border-input fhint:bg-card fhint:py-1 fhint:pr-1 fhint:pl-2.5 fhint:text-sm"
           >
             <strong>{area.name}</strong>
             <span className="fhint:text-[11.5px] fhint:text-muted-strong">
