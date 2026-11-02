@@ -57,8 +57,12 @@ msgstr ""
 msgid "FoundHint"
 msgstr ""
 
-#: includes/Admin.php:42 src/admin/layouts/root/components/Sidebar.jsx:99 src/admin/pages/schema/components/page/TabBar.jsx:20 src/admin/pages/settings/index.jsx:87 src/admin/pages/settings/index.jsx:96
+#: includes/Admin.php:42 src/admin/layouts/root/components/Sidebar.jsx:99 src/admin/pages/schema/components/page/TabBar.jsx:21 src/admin/pages/settings/index.jsx:87 src/admin/pages/settings/index.jsx:96
 msgid "Settings"
+msgstr ""
+
+#: includes/Admin.php:52
+msgid "Get Pro"
 msgstr ""
 
 #: includes/App/Audit/Fixes/FixRunner.php:78
@@ -613,43 +617,47 @@ msgstr ""
 msgid "This server has no libsodium, so Google tokens are stored without encryption."
 msgstr ""
 
-#: includes/App/Media/MediaUpload.php:93 includes/App/Post/PostMedia.php:64
+#: includes/App/Media/MediaUpload.php:100 includes/App/Post/PostMedia.php:64
 msgid "No photo arrived. Choose the file again."
 msgstr ""
 
-#: includes/App/Media/MediaUpload.php:131 includes/App/Post/PostMedia.php:101
+#: includes/App/Media/MediaUpload.php:138 includes/App/Post/PostMedia.php:101
 msgid "The photo could not be added to your media library."
 msgstr ""
 
-#: includes/App/Media/MediaUpload.php:164
-msgid "The photo could not be saved."
-msgstr ""
-
-#: includes/App/Media/MediaUpload.php:189
-msgid "This photo is on Google. Remove it from your Google Business Profile."
-msgstr ""
-
-#: includes/App/Media/MediaUpload.php:223
-msgid "This photo is already on Google."
+#: includes/App/Media/MediaUpload.php:167
+msgid "That image is no longer in your media library."
 msgstr ""
 
 #: includes/App/Media/MediaUpload.php:231
+msgid "The photo could not be saved."
+msgstr ""
+
+#: includes/App/Media/MediaUpload.php:256
+msgid "This photo is on Google. Remove it from your Google Business Profile."
+msgstr ""
+
+#: includes/App/Media/MediaUpload.php:290
+msgid "This photo is already on Google."
+msgstr ""
+
+#: includes/App/Media/MediaUpload.php:298
 msgid "The file is no longer in your media library."
 msgstr ""
 
-#: includes/App/Media/MediaUpload.php:276
+#: includes/App/Media/MediaUpload.php:343
 msgid "A photo was sent to Google."
 msgstr ""
 
-#: includes/App/Media/MediaUpload.php:344
+#: includes/App/Media/MediaUpload.php:411
 msgid "Google did not take the photo. Try again."
 msgstr ""
 
-#: includes/App/Media/MediaUpload.php:362
+#: includes/App/Media/MediaUpload.php:429
 msgid "That photo no longer exists."
 msgstr ""
 
-#: includes/App/Media/MediaUpload.php:393
+#: includes/App/Media/MediaUpload.php:462
 msgid "Google did not confirm the photo."
 msgstr ""
 
@@ -685,7 +693,7 @@ msgstr ""
 msgid "Google took the post, but it could not be saved here. Sync posts to see it."
 msgstr ""
 
-#: includes/App/Post/PostSync.php:93 src/admin/pages/posts/index.jsx:119
+#: includes/App/Post/PostSync.php:93 src/admin/pages/posts/hooks/usePostList.js:87
 msgid "Read %d post from Google."
 msgid_plural "Read %d posts from Google."
 msgstr[0] ""
@@ -751,13 +759,13 @@ msgstr ""
 msgid "There are no Google locations to read reviews for yet. Read your Google profile first."
 msgstr ""
 
-#: includes/App/Review/ReviewSync.php:94 src/admin/components/location-bar/BusinessBar.jsx:135
+#: includes/App/Review/ReviewSync.php:94 src/admin/components/location-bar/BusinessBar.jsx:130
 msgid "%d review"
 msgid_plural "%d reviews"
 msgstr[0] ""
 msgstr[1] ""
 
-#: src/admin/components/ComingSoonBanner.jsx:36 src/admin/pages/reviews/components/SoonTag.jsx:23
+#: src/admin/components/ComingSoonBanner.jsx:36 src/admin/pages/reviews/components/SoonTag.jsx:39
 msgid "Coming soon"
 msgstr ""
 
@@ -797,19 +805,23 @@ msgstr ""
 msgid "That did not save"
 msgstr ""
 
-#: src/admin/components/location-bar/BusinessBar.jsx:72 src/admin/pages/schema/components/locations/LocationList.jsx:303
+#: src/admin/components/ScreenTitleBar.jsx:47
+msgid "FoundHint / %s"
+msgstr ""
+
+#: src/admin/components/location-bar/BusinessBar.jsx:70 src/admin/pages/schema/components/locations/LocationList.jsx:303
 msgid "Your business"
 msgstr ""
 
-#: src/admin/components/location-bar/BusinessBar.jsx:123
+#: src/admin/components/location-bar/BusinessBar.jsx:118
 msgid "Rated"
 msgstr ""
 
-#: src/admin/components/location-bar/BusinessBar.jsx:128
+#: src/admin/components/location-bar/BusinessBar.jsx:123
 msgid "out of 5"
 msgstr ""
 
-#: src/admin/components/location-bar/BusinessBar.jsx:167 src/admin/pages/posts/components/PostRow.jsx:144
+#: src/admin/components/location-bar/BusinessBar.jsx:162 src/admin/pages/posts/components/PostRow.jsx:99
 msgid "View on Google"
 msgstr ""
 
@@ -845,28 +857,28 @@ msgstr ""
 msgid "Business"
 msgstr ""
 
-#: src/admin/layouts/root/components/Sidebar.jsx:50 src/admin/pages/audit/index.jsx:44 src/admin/pages/schema/components/page/SchemaHeader.jsx:57 src/admin/pages/schema/components/page/SchemaHeader.jsx:60
-msgid "Schema"
-msgstr ""
-
-#: src/admin/layouts/root/components/Sidebar.jsx:54 src/admin/pages/audit/index.jsx:168 src/admin/pages/audit/index.jsx:237 src/admin/pages/audit/index.jsx:264
-msgid "SEO audit"
-msgstr ""
-
-#: src/admin/layouts/root/components/Sidebar.jsx:56 src/admin/pages/audit/index.jsx:294
-msgid "Score"
-msgstr ""
-
-#: src/admin/layouts/root/components/Sidebar.jsx:59 src/admin/pages/audit/index.jsx:340
-msgid "What to fix"
-msgstr ""
-
-#: src/admin/layouts/root/components/Sidebar.jsx:65 src/admin/pages/reviews/index.jsx:234 src/admin/pages/reviews/index.jsx:239 src/admin/pages/reviews/index.jsx:255
+#: src/admin/layouts/root/components/Sidebar.jsx:49 src/admin/pages/reviews/components/ReviewsHeader.jsx:14 src/admin/pages/reviews/components/ReviewsNotice.jsx:18
 msgid "Reviews"
 msgstr ""
 
-#: src/admin/layouts/root/components/Sidebar.jsx:69 src/admin/pages/posts/index.jsx:158
+#: src/admin/layouts/root/components/Sidebar.jsx:53 src/admin/pages/posts/components/PostsHeader.jsx:40
 msgid "Posts & Scheduling"
+msgstr ""
+
+#: src/admin/layouts/root/components/Sidebar.jsx:58 src/admin/pages/audit/index.jsx:44 src/admin/pages/schema/components/page/SchemaHeader.jsx:57 src/admin/pages/schema/components/page/SchemaHeader.jsx:60
+msgid "Schema"
+msgstr ""
+
+#: src/admin/layouts/root/components/Sidebar.jsx:62 src/admin/pages/audit/index.jsx:168 src/admin/pages/audit/index.jsx:237 src/admin/pages/audit/index.jsx:264
+msgid "SEO audit"
+msgstr ""
+
+#: src/admin/layouts/root/components/Sidebar.jsx:64 src/admin/pages/audit/index.jsx:294
+msgid "Score"
+msgstr ""
+
+#: src/admin/layouts/root/components/Sidebar.jsx:67 src/admin/pages/audit/index.jsx:340
+msgid "What to fix"
 msgstr ""
 
 #: src/admin/layouts/root/components/Sidebar.jsx:73
@@ -1379,7 +1391,7 @@ msgstr ""
 msgid "Write a reply before posting it."
 msgstr ""
 
-#: src/admin/lib/errors.js:388 src/admin/pages/reviews/components/ReplyDialog.jsx:38
+#: src/admin/lib/errors.js:388 src/admin/pages/reviews/components/ReplyDialog.jsx:49
 msgid "That reply is too long for Google. Shorten it and try again."
 msgstr ""
 
@@ -1663,6 +1675,10 @@ msgstr ""
 msgid "Something went wrong. Try again."
 msgstr ""
 
+#: src/admin/lib/media.js:33
+msgid "Use this image"
+msgstr ""
+
 #: src/admin/pages/audit/index.jsx:34 src/admin/pages/dashboard/components/ScoreCard.jsx:29
 msgid "Needs work"
 msgstr ""
@@ -1857,7 +1873,7 @@ msgstr ""
 msgid "In your own words, e.g. Grocery Store."
 msgstr ""
 
-#: src/admin/pages/business/index.jsx:293 src/admin/pages/google/components/ImportFromGoogle.jsx:57 src/admin/pages/posts/components/Composer.jsx:388 src/admin/pages/profile/components/publish/labels.js:11 src/admin/pages/profile/components/services/ServiceDescriptionField.jsx:17 src/admin/pages/schema/lib/schema.js:27
+#: src/admin/pages/business/index.jsx:293 src/admin/pages/google/components/ImportFromGoogle.jsx:57 src/admin/pages/posts/components/Composer.jsx:334 src/admin/pages/profile/components/publish/labels.js:11 src/admin/pages/profile/components/services/ServiceDescriptionField.jsx:17 src/admin/pages/schema/lib/schema.js:27
 msgid "Description"
 msgstr ""
 
@@ -2241,7 +2257,7 @@ msgstr ""
 msgid "Not started"
 msgstr ""
 
-#: src/admin/pages/dashboard/index.jsx:279 src/admin/pages/schema/components/locations/LocationList.jsx:375
+#: src/admin/pages/dashboard/index.jsx:279 src/admin/pages/schema/components/locations/LocationList.jsx:375 src/admin/pages/schema/components/page/TabBar.jsx:18
 msgid "Locations"
 msgstr ""
 
@@ -2249,7 +2265,7 @@ msgstr ""
 msgid "%d added"
 msgstr ""
 
-#: src/admin/pages/dashboard/index.jsx:289 src/admin/pages/google/components/ImportFromGoogle.jsx:71 src/admin/pages/profile/components/publish/labels.js:21 src/admin/pages/profile/tabs.jsx:192 src/admin/pages/schema/components/services/list/ServiceList.jsx:121 src/admin/pages/setup/components/DoneStep.jsx:9
+#: src/admin/pages/dashboard/index.jsx:289 src/admin/pages/google/components/ImportFromGoogle.jsx:71 src/admin/pages/profile/components/publish/labels.js:21 src/admin/pages/profile/tabs.jsx:192 src/admin/pages/schema/components/page/TabBar.jsx:19 src/admin/pages/schema/components/services/list/ServiceList.jsx:121
 msgid "Services"
 msgstr ""
 
@@ -2393,7 +2409,7 @@ msgstr ""
 msgid "In FoundHint"
 msgstr ""
 
-#: src/admin/pages/google/components/ImportFromGoogle.jsx:281 src/admin/pages/profile/components/photos/PhotoSlot.jsx:34
+#: src/admin/pages/google/components/ImportFromGoogle.jsx:281 src/admin/pages/profile/components/photos/PhotoSlot.jsx:36
 msgid "On Google"
 msgstr ""
 
@@ -2625,227 +2641,237 @@ msgstr ""
 msgid "Page not found"
 msgstr ""
 
-#: src/admin/pages/posts/components/Composer.jsx:199
+#: src/admin/pages/posts/components/BlogCard.jsx:20
+msgid "Share your blog on Google"
+msgstr ""
+
+#: src/admin/pages/posts/components/BlogCard.jsx:22
+msgid "Turn your WordPress blog posts into Google Business Profile updates."
+msgstr ""
+
+#: src/admin/pages/posts/components/BlogCard.jsx:43
+msgid "Sharing your blog is part of FoundHint Premium."
+msgstr ""
+
+#: src/admin/pages/posts/components/BlogCard.jsx:50
+msgid "Share Website Blog"
+msgstr ""
+
+#: src/admin/pages/posts/components/BlogCard.jsx:31
+msgid "%d published post on your site"
+msgid_plural "%d published posts on your site"
+msgstr[0] ""
+msgstr[1] ""
+
+#: src/admin/pages/posts/components/Composer.jsx:181
 msgid "Your post was updated on Google."
 msgstr ""
 
-#: src/admin/pages/posts/components/Composer.jsx:201 src/admin/pages/posts/components/PostRow.jsx:53
+#: src/admin/pages/posts/components/Composer.jsx:183 src/admin/pages/posts/components/PostFailedNote.jsx:24
 msgid "Your post was published on Google."
 msgstr ""
 
-#: src/admin/pages/posts/components/Composer.jsx:202
+#: src/admin/pages/posts/components/Composer.jsx:184
 msgid "Draft saved."
 msgstr ""
 
-#: src/admin/pages/posts/components/Composer.jsx:217 src/admin/pages/profile/components/PublishDialog.jsx:143 src/admin/pages/profile/components/publish/PublishStep.jsx:51
+#: src/admin/pages/posts/components/Composer.jsx:199 src/admin/pages/profile/components/PublishDialog.jsx:143 src/admin/pages/profile/components/publish/PublishStep.jsx:51
 msgid "Sending…"
 msgstr ""
 
-#: src/admin/pages/posts/components/Composer.jsx:219
+#: src/admin/pages/posts/components/Composer.jsx:201
 msgid "Update on Google"
 msgstr ""
 
-#: src/admin/pages/posts/components/Composer.jsx:221
+#: src/admin/pages/posts/components/Composer.jsx:203
 msgid "Save draft"
 msgstr ""
 
-#: src/admin/pages/posts/components/Composer.jsx:222
+#: src/admin/pages/posts/components/Composer.jsx:204
 msgid "Publish to Google"
 msgstr ""
 
-#: src/admin/pages/posts/components/Composer.jsx:247 src/admin/pages/posts/index.jsx:238
+#: src/admin/pages/posts/components/Composer.jsx:219 src/admin/pages/posts/components/PostsHeader.jsx:81
 msgid "New post"
 msgstr ""
 
-#: src/admin/pages/posts/components/Composer.jsx:249
+#: src/admin/pages/posts/components/Composer.jsx:221
 msgid "Edit post"
 msgstr ""
 
-#: src/admin/pages/posts/components/Composer.jsx:250
+#: src/admin/pages/posts/components/Composer.jsx:222
 msgid "Finish post"
 msgstr ""
 
-#: src/admin/pages/posts/components/Composer.jsx:256
+#: src/admin/pages/posts/components/Composer.jsx:228
 msgid "For %s"
 msgstr ""
 
-#: src/admin/pages/posts/components/Composer.jsx:263
+#: src/admin/pages/posts/components/Composer.jsx:235
 msgid "Write a post for your Google Business Profile. A preview of how Google shows it is beside the form."
 msgstr ""
 
-#: src/admin/pages/posts/components/Composer.jsx:276 src/admin/pages/profile/components/PublishDialog.jsx:123 src/admin/pages/profile/components/ServiceDialog.jsx:133 src/admin/pages/reviews/components/ReviewsDialog.jsx:59
+#: src/admin/pages/posts/components/Composer.jsx:248 src/admin/pages/profile/components/PublishDialog.jsx:123 src/admin/pages/profile/components/ServiceDialog.jsx:133 src/admin/pages/reviews/components/ReviewsDialog.jsx:59
 msgid "Close"
 msgstr ""
 
-#: src/admin/pages/posts/components/Composer.jsx:283 src/admin/pages/posts/components/PostFilters.jsx:62
+#: src/admin/pages/posts/components/Composer.jsx:255 src/admin/pages/posts/components/PostFilters.jsx:72
 msgid "Post type"
 msgstr ""
 
-#: src/admin/pages/posts/components/Composer.jsx:332
-msgid "How to write"
-msgstr ""
-
-#: src/admin/pages/posts/components/Composer.jsx:338 src/admin/pages/posts/index.jsx:222
-msgid "Writing with AI is part of FoundHint Pro."
-msgstr ""
-
-#: src/admin/pages/posts/components/Composer.jsx:345 src/admin/pages/posts/index.jsx:229
-msgid "Write with AI"
-msgstr ""
-
-#: src/admin/pages/posts/components/Composer.jsx:350
-msgid "Write it myself"
-msgstr ""
-
-#: src/admin/pages/posts/components/Composer.jsx:359
+#: src/admin/pages/posts/components/Composer.jsx:305
 msgid "Event title"
 msgstr ""
 
-#: src/admin/pages/posts/components/Composer.jsx:360
+#: src/admin/pages/posts/components/Composer.jsx:306
 msgid "Offer title"
 msgstr ""
 
-#: src/admin/pages/posts/components/Composer.jsx:375
+#: src/admin/pages/posts/components/Composer.jsx:321
 msgid "e.g. Free kids check-up day"
 msgstr ""
 
-#: src/admin/pages/posts/components/Composer.jsx:376
+#: src/admin/pages/posts/components/Composer.jsx:322
 msgid "e.g. 20% off teeth whitening"
 msgstr ""
 
-#: src/admin/pages/posts/components/Composer.jsx:395
+#: src/admin/pages/posts/components/Composer.jsx:341
 msgid "Say what it is, who it is for, and what to do next."
 msgstr ""
 
-#: src/admin/pages/posts/components/Composer.jsx:399
+#: src/admin/pages/posts/components/Composer.jsx:345
 msgid "Aim for 150 to 300 characters. Lead with the most useful detail."
 msgstr ""
 
-#: src/admin/pages/posts/components/Composer.jsx:414
+#: src/admin/pages/posts/components/Composer.jsx:360
 msgid "What is new? Write it the way you would tell a customer at the front desk."
 msgstr ""
 
-#: src/admin/pages/posts/components/Composer.jsx:418
+#: src/admin/pages/posts/components/Composer.jsx:364
 msgid "What is happening, who it is for, and anything people should bring."
 msgstr ""
 
-#: src/admin/pages/posts/components/Composer.jsx:422
+#: src/admin/pages/posts/components/Composer.jsx:368
 msgid "What the deal is, who can get it, and how."
 msgstr ""
 
-#: src/admin/pages/posts/components/Composer.jsx:436
+#: src/admin/pages/posts/components/Composer.jsx:382
 msgid "Starts"
 msgstr ""
 
-#: src/admin/pages/posts/components/Composer.jsx:452
+#: src/admin/pages/posts/components/Composer.jsx:398
 msgid "Ends"
 msgstr ""
 
-#: src/admin/pages/posts/components/Composer.jsx:474
+#: src/admin/pages/posts/components/Composer.jsx:420
 msgid "Coupon code (optional)"
 msgstr ""
 
-#: src/admin/pages/posts/components/Composer.jsx:484
+#: src/admin/pages/posts/components/Composer.jsx:430
 msgid "e.g. SMILE20"
 msgstr ""
 
-#: src/admin/pages/posts/components/Composer.jsx:490
+#: src/admin/pages/posts/components/Composer.jsx:436
 msgid "Link to redeem (optional)"
 msgstr ""
 
-#: src/admin/pages/posts/components/Composer.jsx:517 src/admin/pages/posts/components/Composer.jsx:601
-msgid "Use my website address"
-msgstr ""
-
-#: src/admin/pages/posts/components/Composer.jsx:521
+#: src/admin/pages/posts/components/Composer.jsx:454
 msgid "Terms and conditions (optional)"
 msgstr ""
 
-#: src/admin/pages/posts/components/Composer.jsx:533
+#: src/admin/pages/posts/components/Composer.jsx:466
 msgid "e.g. New patients only. One per person."
 msgstr ""
 
-#: src/admin/pages/posts/components/Composer.jsx:546
+#: src/admin/pages/posts/components/Composer.jsx:479
 msgid "Button"
 msgstr ""
 
-#: src/admin/pages/posts/components/Composer.jsx:567
+#: src/admin/pages/posts/components/Composer.jsx:500
 msgid "Button link"
 msgstr ""
 
-#: src/admin/pages/posts/components/Composer.jsx:588
+#: src/admin/pages/posts/components/Composer.jsx:517
 msgid "The button calls the phone number on your Google profile."
 msgstr ""
 
-#: src/admin/pages/posts/components/Composer.jsx:625
+#: src/admin/pages/posts/components/Composer.jsx:544
 msgid "The photo was added to your Google profile's Photos, and this post uses it from there."
 msgstr ""
 
-#: src/admin/pages/posts/components/Composer.jsx:637 src/admin/pages/posts/components/Composer.jsx:641
+#: src/admin/pages/posts/components/Composer.jsx:556 src/admin/pages/posts/components/Composer.jsx:560
 msgid "When to publish"
 msgstr ""
 
-#: src/admin/pages/posts/components/Composer.jsx:652
+#: src/admin/pages/posts/components/Composer.jsx:571
 msgid "Now"
 msgstr ""
 
-#: src/admin/pages/posts/components/Composer.jsx:659
-msgid "Scheduling posts is part of FoundHint Pro."
+#: src/admin/pages/posts/components/Composer.jsx:578
+msgid "Scheduling posts is part of FoundHint Premium."
 msgstr ""
 
-#: src/admin/pages/posts/components/Composer.jsx:669
+#: src/admin/pages/posts/components/Composer.jsx:588
 msgid "Schedule"
 msgstr ""
 
-#: src/admin/pages/posts/components/Composer.jsx:680 src/admin/pages/posts/components/PostFilters.jsx:20 src/admin/pages/posts/lib/posts.js:48
+#: src/admin/pages/posts/components/Composer.jsx:599 src/admin/pages/posts/components/PostFilters.jsx:21 src/admin/pages/posts/lib/posts.js:48
 msgid "Draft"
 msgstr ""
 
-#: src/admin/pages/posts/components/Composer.jsx:685
+#: src/admin/pages/posts/components/Composer.jsx:604
 msgid "Saved here only. Nothing goes to Google until you finish it."
 msgstr ""
 
-#: src/admin/pages/posts/components/Composer.jsx:689
+#: src/admin/pages/posts/components/Composer.jsx:608
 msgid "Goes live when you press Publish. Google can take a few minutes to show it."
 msgstr ""
 
-#: src/admin/pages/posts/components/Composer.jsx:703
+#: src/admin/pages/posts/components/Composer.jsx:622
 msgid "Google did not take the post. It is saved here, so you can fix it and try again."
 msgstr ""
 
-#: src/admin/pages/posts/components/Composer.jsx:714
+#: src/admin/pages/posts/components/Composer.jsx:633
 msgid "Preview"
 msgstr ""
 
-#: src/admin/pages/posts/components/Composer.jsx:719
+#: src/admin/pages/posts/components/Composer.jsx:643
 msgid "Live preview on Google"
 msgstr ""
 
-#: src/admin/pages/posts/components/Composer.jsx:728
+#: src/admin/pages/posts/components/Composer.jsx:652
 msgid "Tip:"
 msgstr ""
 
-#: src/admin/pages/posts/components/Composer.jsx:729
+#: src/admin/pages/posts/components/Composer.jsx:653
 msgid "posts with a photo usually get more clicks than posts without one."
 msgstr ""
 
-#: src/admin/pages/posts/components/Composer.jsx:741
+#: src/admin/pages/posts/components/Composer.jsx:665
 msgid "Publishing posts this on your Google profile."
 msgstr ""
 
-#: src/admin/pages/posts/components/Composer.jsx:745
+#: src/admin/pages/posts/components/Composer.jsx:669
 msgid "Drafts are kept on this site only."
 msgstr ""
 
-#: src/admin/pages/posts/components/Composer.jsx:754 src/admin/pages/posts/components/PhotoField.jsx:57 src/admin/pages/profile/components/PublishDialog.jsx:124 src/admin/pages/profile/components/ServiceDialog.jsx:200 src/admin/pages/reviews/components/AutoReplySetup.jsx:90 src/admin/pages/reviews/components/ReplyDialog.jsx:93
+#: src/admin/pages/posts/components/Composer.jsx:678 src/admin/pages/posts/components/PhotoField.jsx:57 src/admin/pages/profile/components/PublishDialog.jsx:124 src/admin/pages/profile/components/ServiceDialog.jsx:200 src/admin/pages/reviews/components/ReplyDialog.jsx:105 src/admin/pages/reviews/components/TemplateDialog.jsx:76
 msgid "Cancel"
 msgstr ""
 
-#: src/admin/pages/posts/components/PhotoField.jsx:38 src/admin/pages/posts/components/PhotoField.jsx:280
+#: src/admin/pages/posts/components/LinkInput.jsx:17
+msgid "Use my website address"
+msgstr ""
+
+#: src/admin/pages/posts/components/LinkInput.jsx:18
+msgid "No website on your Google profile"
+msgstr ""
+
+#: src/admin/pages/posts/components/PhotoField.jsx:38 src/admin/pages/posts/components/PhotoField.jsx:250
 msgid "Customer photos"
 msgstr ""
 
-#: src/admin/pages/posts/components/PhotoField.jsx:39 src/admin/pages/posts/components/PhotoField.jsx:269
+#: src/admin/pages/posts/components/PhotoField.jsx:39 src/admin/pages/posts/components/PhotoField.jsx:242
 msgid "Your gallery"
 msgstr ""
 
@@ -2881,130 +2907,178 @@ msgstr ""
 msgid "This location has no photos on Google yet. Add them on the Business screen's Photos tab."
 msgstr ""
 
-#: src/admin/pages/posts/components/PhotoField.jsx:166
+#: src/admin/pages/posts/components/PhotoField.jsx:161
 msgid "Photo"
 msgstr ""
 
-#: src/admin/pages/posts/components/PhotoField.jsx:168
+#: src/admin/pages/posts/components/PhotoField.jsx:163
 msgid "Recommended. Posts with a photo get more clicks."
 msgstr ""
 
-#: src/admin/pages/posts/components/PhotoField.jsx:179
+#: src/admin/pages/posts/components/PhotoField.jsx:175
 msgid "The chosen photo"
 msgstr ""
 
-#: src/admin/pages/posts/components/PhotoField.jsx:207
-msgid "Google cannot open photos stored on this site, because it is not on the public internet. Choose one from Your gallery or Customer photos instead."
-msgstr ""
-
-#: src/admin/pages/posts/components/PhotoField.jsx:221
+#: src/admin/pages/posts/components/PhotoField.jsx:191
 msgid "Remove photo"
 msgstr ""
 
-#: src/admin/pages/posts/components/PhotoField.jsx:239 src/admin/pages/profile/components/photos/PendingPhotos.jsx:81 src/admin/pages/profile/components/photos/lib.js:31
+#: src/admin/pages/posts/components/PhotoField.jsx:202
+msgid "Upload a photo for this post"
+msgstr ""
+
+#: src/admin/pages/posts/components/PhotoField.jsx:215
+msgid "Upload a different photo"
+msgstr ""
+
+#: src/admin/pages/posts/components/PhotoField.jsx:216
+msgid "Upload a photo"
+msgstr ""
+
+#: src/admin/pages/posts/components/PhotoField.jsx:219
+msgid "Drop a JPG or PNG here, or choose one from your computer."
+msgstr ""
+
+#: src/admin/pages/posts/components/PhotoField.jsx:228 src/admin/pages/profile/components/photos/PendingPhotos.jsx:81 src/admin/pages/profile/components/photos/lib.js:31
 msgid "Uploading…"
 msgstr ""
 
-#: src/admin/pages/posts/components/PhotoField.jsx:240
-msgid "Upload"
+#: src/admin/pages/posts/components/PhotoField.jsx:229
+msgid "Choose photo"
 msgstr ""
 
-#: src/admin/pages/posts/components/PhotoField.jsx:245
-msgid "AI photos are part of FoundHint Pro."
+#: src/admin/pages/posts/components/PhotoField.jsx:234
+msgid "Or use one already on Google:"
 msgstr ""
 
-#: src/admin/pages/posts/components/PhotoField.jsx:256
-msgid "Make with AI"
+#: src/admin/pages/posts/components/PhotoField.jsx:279
+msgid "Google cannot open photos stored on this site, because it is not on the public internet. Choose one from Your gallery or Customer photos instead."
 msgstr ""
 
-#: src/admin/pages/posts/components/PhotoField.jsx:286
+#: src/admin/pages/posts/components/PhotoField.jsx:288
 msgid "This site is not on the public internet, so Google cannot open a photo stored here. An uploaded photo is added to your Google profile's Photos first, and the post uses it from there."
 msgstr ""
 
-#: src/admin/pages/posts/components/PhotoField.jsx:188
+#: src/admin/pages/posts/components/PhotoField.jsx:260
 msgid "This post has %d photo or video on Google. Changing or removing the photo here replaces it."
 msgid_plural "This post has %d photos and videos on Google. Changing or removing the photo here replaces all of them."
 msgstr[0] ""
 msgstr[1] ""
 
-#: src/admin/pages/posts/components/PostFilters.jsx:6
+#: src/admin/pages/posts/components/PostFailedNote.jsx:38
+msgid "Google rejected this post after checking it."
+msgstr ""
+
+#: src/admin/pages/posts/components/PostFailedNote.jsx:42
+msgid "Google did not take this post. It is saved here, so you can try again."
+msgstr ""
+
+#: src/admin/pages/posts/components/PostFailedNote.jsx:60
+msgid "Trying…"
+msgstr ""
+
+#: src/admin/pages/posts/components/PostFailedNote.jsx:61
+msgid "Retry"
+msgstr ""
+
+#: src/admin/pages/posts/components/PostFilters.jsx:7 src/admin/pages/reviews/components/TemplatesCard.jsx:83
 msgid "All"
 msgstr ""
 
-#: src/admin/pages/posts/components/PostFilters.jsx:7
+#: src/admin/pages/posts/components/PostFilters.jsx:8
 msgid "Updates"
 msgstr ""
 
-#: src/admin/pages/posts/components/PostFilters.jsx:8
+#: src/admin/pages/posts/components/PostFilters.jsx:9
 msgid "Events"
 msgstr ""
 
-#: src/admin/pages/posts/components/PostFilters.jsx:9
+#: src/admin/pages/posts/components/PostFilters.jsx:10
 msgid "Offers"
 msgstr ""
 
-#: src/admin/pages/posts/components/PostFilters.jsx:16 src/admin/pages/schema/components/services/editor/BasicsSection.jsx:157
+#: src/admin/pages/posts/components/PostFilters.jsx:17 src/admin/pages/schema/components/services/editor/BasicsSection.jsx:157
 msgid "Status"
 msgstr ""
 
-#: src/admin/pages/posts/components/PostFilters.jsx:18
+#: src/admin/pages/posts/components/PostFilters.jsx:19
 msgid "All statuses"
 msgstr ""
 
-#: src/admin/pages/posts/components/PostFilters.jsx:19 src/admin/pages/posts/lib/posts.js:44 src/admin/pages/reviews/components/ReviewFilters.jsx:92 src/admin/pages/schema/lib/locations.js:12 src/admin/pages/schema/lib/locations.js:13
+#: src/admin/pages/posts/components/PostFilters.jsx:20 src/admin/pages/posts/lib/posts.js:44 src/admin/pages/reviews/components/ReviewFilters.jsx:92 src/admin/pages/schema/lib/locations.js:12 src/admin/pages/schema/lib/locations.js:13
 msgid "Live"
 msgstr ""
 
-#: src/admin/pages/posts/components/PostFilters.jsx:21 src/admin/pages/posts/lib/posts.js:47
+#: src/admin/pages/posts/components/PostFilters.jsx:22 src/admin/pages/posts/lib/posts.js:47
 msgid "Failed"
 msgstr ""
 
-#: src/admin/pages/posts/components/PostFilters.jsx:26
+#: src/admin/pages/posts/components/PostFilters.jsx:27
 msgid "Time"
 msgstr ""
 
-#: src/admin/pages/posts/components/PostFilters.jsx:28
+#: src/admin/pages/posts/components/PostFilters.jsx:29
 msgid "Any time"
 msgstr ""
 
-#: src/admin/pages/posts/components/PostFilters.jsx:29
+#: src/admin/pages/posts/components/PostFilters.jsx:30
 msgid "Last 7 days"
 msgstr ""
 
-#: src/admin/pages/posts/components/PostFilters.jsx:30
+#: src/admin/pages/posts/components/PostFilters.jsx:31
 msgid "Last 30 days"
 msgstr ""
 
-#: src/admin/pages/posts/components/PostFilters.jsx:31
+#: src/admin/pages/posts/components/PostFilters.jsx:32
 msgid "Last 90 days"
 msgstr ""
 
-#: src/admin/pages/posts/components/PostFilters.jsx:36
+#: src/admin/pages/posts/components/PostFilters.jsx:37
 msgid "Source"
 msgstr ""
 
-#: src/admin/pages/posts/components/PostFilters.jsx:38
+#: src/admin/pages/posts/components/PostFilters.jsx:39
 msgid "All sources"
 msgstr ""
 
-#: src/admin/pages/posts/components/PostFilters.jsx:39
+#: src/admin/pages/posts/components/PostFilters.jsx:40
 msgid "Written by you"
 msgstr ""
 
-#: src/admin/pages/posts/components/PostFilters.jsx:40 src/admin/pages/posts/lib/posts.js:69
+#: src/admin/pages/posts/components/PostFilters.jsx:41 src/admin/pages/posts/lib/posts.js:69
 msgid "From a review"
 msgstr ""
 
-#: src/admin/pages/posts/components/PostFilters.jsx:45
+#: src/admin/pages/posts/components/PostFilters.jsx:46
 msgid "Order"
 msgstr ""
 
-#: src/admin/pages/posts/components/PostFilters.jsx:47
+#: src/admin/pages/posts/components/PostFilters.jsx:48
 msgid "Newest first"
 msgstr ""
 
-#: src/admin/pages/posts/components/PostFilters.jsx:48
+#: src/admin/pages/posts/components/PostFilters.jsx:49
 msgid "Oldest first"
+msgstr ""
+
+#: src/admin/pages/posts/components/PostList.jsx:43 src/admin/pages/posts/components/PostsSection.jsx:24
+msgid "No posts match these filters"
+msgstr ""
+
+#: src/admin/pages/posts/components/PostList.jsx:44 src/admin/pages/posts/components/PostsSection.jsx:25
+msgid "No posts yet"
+msgstr ""
+
+#: src/admin/pages/posts/components/PostList.jsx:48
+msgid "Try a wider date range, or clear the filters to see everything."
+msgstr ""
+
+#: src/admin/pages/posts/components/PostList.jsx:52
+msgid "Write your first post, or press Sync posts at the top to read the ones already on Google."
+msgstr ""
+
+#: src/admin/pages/posts/components/PostList.jsx:59
+msgid "Clear filters"
 msgstr ""
 
 #: src/admin/pages/posts/components/PostPreview.jsx:19
@@ -3039,194 +3113,156 @@ msgstr ""
 msgid "Start typing and your post will appear here."
 msgstr ""
 
-#: src/admin/pages/posts/components/PostRow.jsx:47
+#: src/admin/pages/posts/components/PostRow.jsx:31
 msgid "Untitled post"
 msgstr ""
 
-#: src/admin/pages/posts/components/PostRow.jsx:65
-msgid "The post was deleted from Google."
-msgstr ""
-
-#: src/admin/pages/posts/components/PostRow.jsx:66
-msgid "The post was deleted."
-msgstr ""
-
-#: src/admin/pages/posts/components/PostRow.jsx:77
+#: src/admin/pages/posts/components/PostRow.jsx:37
 msgid "%1$s: %2$s"
 msgstr ""
 
-#: src/admin/pages/posts/components/PostRow.jsx:127
+#: src/admin/pages/posts/components/PostRow.jsx:82
 msgid "A photo or video post with no text."
 msgstr ""
 
-#: src/admin/pages/posts/components/PostRow.jsx:128
+#: src/admin/pages/posts/components/PostRow.jsx:83
 msgid "No text yet."
 msgstr ""
 
-#: src/admin/pages/posts/components/PostRow.jsx:147 src/admin/pages/schema/components/locations/BranchSections.jsx:419 src/admin/pages/schema/components/locations/LocationList.jsx:355 src/admin/pages/schema/components/page/SchemaHeader.jsx:114 src/admin/pages/schema/components/shared/JsonPreview.jsx:208 src/admin/pages/schema/components/shared/JsonPreview.jsx:223
+#: src/admin/pages/posts/components/PostRow.jsx:102 src/admin/pages/schema/components/locations/BranchSections.jsx:419 src/admin/pages/schema/components/locations/LocationList.jsx:355 src/admin/pages/schema/components/page/PremiumTab.jsx:62 src/admin/pages/schema/components/page/SchemaHeader.jsx:145 src/admin/pages/schema/components/shared/JsonPreview.jsx:216
 msgid "(opens in a new tab)"
 msgstr ""
 
-#: src/admin/pages/posts/components/PostRow.jsx:160
-msgid "Google rejected this post after checking it."
+#: src/admin/pages/posts/components/PostRowActions.jsx:40
+msgid "The post was deleted from Google."
 msgstr ""
 
-#: src/admin/pages/posts/components/PostRow.jsx:164
-msgid "Google did not take this post. It is saved here, so you can try again."
+#: src/admin/pages/posts/components/PostRowActions.jsx:41
+msgid "The post was deleted."
 msgstr ""
 
-#: src/admin/pages/posts/components/PostRow.jsx:185
-msgid "Trying…"
-msgstr ""
-
-#: src/admin/pages/posts/components/PostRow.jsx:186
-msgid "Retry"
-msgstr ""
-
-#: src/admin/pages/posts/components/PostRow.jsx:201 src/admin/pages/setup/index.jsx:77
+#: src/admin/pages/posts/components/PostRowActions.jsx:56 src/admin/pages/setup/index.jsx:77
 msgid "Finish"
 msgstr ""
 
-#: src/admin/pages/posts/components/PostRow.jsx:202 src/admin/pages/profile/components/ServicesSection.jsx:182 src/admin/pages/reviews/components/TemplatesCard.jsx:114 src/admin/pages/schema/components/field/FieldHeader.jsx:63 src/admin/pages/schema/components/locations/LocationList.jsx:515
+#: src/admin/pages/posts/components/PostRowActions.jsx:57 src/admin/pages/profile/components/ServicesSection.jsx:180 src/admin/pages/schema/components/field/FieldHeader.jsx:63 src/admin/pages/schema/components/locations/LocationList.jsx:515
 msgid "Edit"
 msgstr ""
 
-#: src/admin/pages/posts/components/PostRow.jsx:215
+#: src/admin/pages/posts/components/PostRowActions.jsx:66
+msgid "Finish %s"
+msgstr ""
+
+#: src/admin/pages/posts/components/PostRowActions.jsx:68 src/admin/pages/profile/components/ServicesSection.jsx:175 src/admin/pages/reviews/components/TemplatesCard.jsx:153
+msgid "Edit %s"
+msgstr ""
+
+#: src/admin/pages/posts/components/PostRowActions.jsx:79
 msgid "Delete"
 msgstr ""
 
-#: src/admin/pages/posts/components/PostRow.jsx:221
+#: src/admin/pages/posts/components/PostRowActions.jsx:91
+msgid "Delete %s"
+msgstr ""
+
+#: src/admin/pages/posts/components/PostRowActions.jsx:99
 msgid "Delete this post?"
 msgstr ""
 
-#: src/admin/pages/posts/components/PostRow.jsx:225
+#: src/admin/pages/posts/components/PostRowActions.jsx:103
 msgid "It is removed from your Google profile, and nobody will see it there any more."
 msgstr ""
 
-#: src/admin/pages/posts/components/PostRow.jsx:229
+#: src/admin/pages/posts/components/PostRowActions.jsx:107
 msgid "It was never on Google, so this only deletes it here."
 msgstr ""
 
-#: src/admin/pages/posts/components/PostRow.jsx:237
+#: src/admin/pages/posts/components/PostRowActions.jsx:115
 msgid "Keep post"
 msgstr ""
 
-#: src/admin/pages/posts/components/PostRow.jsx:240
+#: src/admin/pages/posts/components/PostRowActions.jsx:118
 msgid "Delete post"
 msgstr ""
 
-#: src/admin/pages/posts/components/TopCards.jsx:41
-msgid "Share your blog on Google"
+#: src/admin/pages/posts/components/PostsHeader.jsx:41
+msgid "The posts on this location's Google listing, and new ones to publish. Only syncing, publishing, editing a live post and deleting one contact Google."
 msgstr ""
 
-#: src/admin/pages/posts/components/TopCards.jsx:45
-msgid "Turn your WordPress blog posts into Google Business Profile updates."
-msgstr ""
-
-#: src/admin/pages/posts/components/TopCards.jsx:66
-msgid "Sharing your blog is part of FoundHint Pro."
-msgstr ""
-
-#: src/admin/pages/posts/components/TopCards.jsx:73
-msgid "Share Website Blog"
-msgstr ""
-
-#: src/admin/pages/posts/components/TopCards.jsx:96
-msgid "Turn reviews into posts"
-msgstr ""
-
-#: src/admin/pages/posts/components/TopCards.jsx:99
-msgid "Share your customers' 5-star reviews as a post in one click."
-msgstr ""
-
-#: src/admin/pages/posts/components/TopCards.jsx:116
-msgid "5 out of 5 stars"
-msgstr ""
-
-#: src/admin/pages/posts/components/TopCards.jsx:144
-msgid "Make a post"
-msgstr ""
-
-#: src/admin/pages/posts/components/TopCards.jsx:151
-msgid "Your 5-star reviews with a comment appear here. Sync reviews on the Reviews screen to check for new ones."
-msgstr ""
-
-#: src/admin/pages/posts/components/TopCards.jsx:163
-msgid "See all 5-star reviews"
-msgstr ""
-
-#: src/admin/pages/posts/components/TopCards.jsx:54
-msgid "%d published post on your site"
-msgid_plural "%d published posts on your site"
-msgstr[0] ""
-msgstr[1] ""
-
-#: src/admin/pages/posts/index.jsx:151 src/admin/pages/reviews/index.jsx:228
-msgid "Syncing…"
-msgstr ""
-
-#: src/admin/pages/posts/index.jsx:152
-msgid "Sync posts"
-msgstr ""
-
-#: src/admin/pages/posts/index.jsx:165
-msgid "Posts"
-msgstr ""
-
-#: src/admin/pages/posts/index.jsx:169 src/admin/pages/reviews/index.jsx:242
-msgid "No Google locations yet"
-msgstr ""
-
-#: src/admin/pages/posts/index.jsx:170 src/admin/pages/reviews/index.jsx:258
-msgid "This location has no Google listing"
-msgstr ""
-
-#: src/admin/pages/posts/index.jsx:177
-msgid "Connect your Google account and read your profile first — posts go to the listings Google reports."
-msgstr ""
-
-#: src/admin/pages/posts/index.jsx:181
-msgid "Posts are published to a location's own Google listing. Link this location to one on the Google screen, or choose another location at the top of the page."
-msgstr ""
-
-#: src/admin/pages/posts/index.jsx:201 src/admin/pages/profile/components/info/DescriptionField.jsx:76
+#: src/admin/pages/posts/components/PostsHeader.jsx:51 src/admin/pages/profile/components/info/DescriptionField.jsx:76
 msgid "History"
 msgstr ""
 
-#: src/admin/pages/posts/index.jsx:206
-msgid "Scheduling posts from a CSV file is part of FoundHint Pro."
+#: src/admin/pages/posts/components/PostsHeader.jsx:56
+msgid "Scheduling posts from a CSV file is part of FoundHint Premium."
 msgstr ""
 
-#: src/admin/pages/posts/index.jsx:216
+#: src/admin/pages/posts/components/PostsHeader.jsx:66
 msgid "Schedule with a CSV file"
 msgstr ""
 
-#: src/admin/pages/posts/index.jsx:249
-msgid "Your posts"
+#: src/admin/pages/posts/components/PostsHeader.jsx:72
+msgid "Sync posts"
 msgstr ""
 
-#: src/admin/pages/posts/index.jsx:269
-msgid "No posts match these filters"
+#: src/admin/pages/posts/components/PostsHeader.jsx:73 src/admin/pages/reviews/components/ReviewsHeader.jsx:26
+msgid "Syncing…"
 msgstr ""
 
-#: src/admin/pages/posts/index.jsx:270
-msgid "No posts yet"
+#: src/admin/pages/posts/components/PostsHeader.jsx:74
+msgid "Reads the latest posts from Google. Nothing on Google is changed."
 msgstr ""
 
-#: src/admin/pages/posts/index.jsx:274
-msgid "Try a wider date range, or clear the filters to see everything."
+#: src/admin/pages/posts/components/PostsNotice.jsx:16
+msgid "Posts"
 msgstr ""
 
-#: src/admin/pages/posts/index.jsx:278
-msgid "Write your first post, or press Sync posts at the top to read the ones already on Google."
+#: src/admin/pages/posts/components/PostsNotice.jsx:20 src/admin/pages/reviews/index.jsx:57
+msgid "No Google locations yet"
 msgstr ""
 
-#: src/admin/pages/posts/index.jsx:289
-msgid "Clear filters"
+#: src/admin/pages/posts/components/PostsNotice.jsx:21 src/admin/pages/reviews/index.jsx:67
+msgid "This location has no Google listing"
 msgstr ""
 
-#: src/admin/pages/posts/index.jsx:315
+#: src/admin/pages/posts/components/PostsNotice.jsx:25
+msgid "Connect your Google account and read your profile first — posts go to the listings Google reports."
+msgstr ""
+
+#: src/admin/pages/posts/components/PostsNotice.jsx:29
+msgid "Posts are published to a location's own Google listing. Link this location to one on the Google screen, or choose another location at the top of the page."
+msgstr ""
+
+#: src/admin/pages/posts/components/PostsSection.jsx:30 src/admin/pages/posts/components/PostsSection.jsx:33
+msgid "All posts"
+msgstr ""
+
+#: src/admin/pages/posts/components/PostsSection.jsx:34
+msgid "Every post on this location's Google listing, and the drafts and failed posts kept here. Narrow the list by type, status, time or source."
+msgstr ""
+
+#: src/admin/pages/posts/components/PostsSection.jsx:63
 msgid "Post pages"
+msgstr ""
+
+#: src/admin/pages/posts/components/ReviewsCard.jsx:26
+msgid "Turn reviews into posts"
+msgstr ""
+
+#: src/admin/pages/posts/components/ReviewsCard.jsx:27
+msgid "Share your customers' 5-star reviews as a post in one click."
+msgstr ""
+
+#: src/admin/pages/posts/components/ReviewsCard.jsx:37
+msgid "See all 5-star reviews"
+msgstr ""
+
+#: src/admin/pages/posts/components/ReviewsCard.jsx:64
+msgid "Make a post"
+msgstr ""
+
+#: src/admin/pages/posts/components/ReviewsCard.jsx:71
+msgid "Your 5-star reviews with a comment appear here. Sync reviews on the Reviews screen to check for new ones."
 msgstr ""
 
 #: src/admin/pages/posts/lib/posts.js:11
@@ -3447,75 +3483,75 @@ msgstr ""
 msgid "Map of your location"
 msgstr ""
 
-#: src/admin/pages/profile/components/PhotosSection.jsx:35
+#: src/admin/pages/profile/components/PhotosSection.jsx:33
 msgid "What Google accepts:"
 msgstr ""
 
-#: src/admin/pages/profile/components/PhotosSection.jsx:37
+#: src/admin/pages/profile/components/PhotosSection.jsx:35
 msgid "JPG or PNG, up to 5 MB each. Your logo should be square. Your cover photo should be wide (16 by 9)."
 msgstr ""
 
-#: src/admin/pages/profile/components/PhotosSection.jsx:47 src/admin/pages/profile/components/photos/PendingPhotos.jsx:129 src/admin/pages/schema/components/locations/BranchSections.jsx:603
+#: src/admin/pages/profile/components/PhotosSection.jsx:45 src/admin/pages/profile/components/photos/PendingPhotos.jsx:129 src/admin/pages/schema/components/locations/BranchSections.jsx:603
 msgid "Logo"
 msgstr ""
 
-#: src/admin/pages/profile/components/PhotosSection.jsx:48
+#: src/admin/pages/profile/components/PhotosSection.jsx:46
 msgid "Square"
 msgstr ""
 
-#: src/admin/pages/profile/components/PhotosSection.jsx:49
+#: src/admin/pages/profile/components/PhotosSection.jsx:47
 msgid "Your logo"
 msgstr ""
 
-#: src/admin/pages/profile/components/PhotosSection.jsx:56
+#: src/admin/pages/profile/components/PhotosSection.jsx:55
 msgid "Cover photo"
 msgstr ""
 
-#: src/admin/pages/profile/components/PhotosSection.jsx:57
+#: src/admin/pages/profile/components/PhotosSection.jsx:56
 msgid "Wide"
 msgstr ""
 
-#: src/admin/pages/profile/components/PhotosSection.jsx:58
+#: src/admin/pages/profile/components/PhotosSection.jsx:57
 msgid "Your cover photo"
 msgstr ""
 
-#: src/admin/pages/profile/components/PhotosSection.jsx:71
+#: src/admin/pages/profile/components/PhotosSection.jsx:72
 msgid "Choose photos for your gallery"
 msgstr ""
 
-#: src/admin/pages/profile/components/PhotosSection.jsx:82
+#: src/admin/pages/profile/components/PhotosSection.jsx:83
 msgid "Add photos to your gallery"
 msgstr ""
 
-#: src/admin/pages/profile/components/PhotosSection.jsx:85
+#: src/admin/pages/profile/components/PhotosSection.jsx:86
 msgid "Pick several at once. You can check them before they go to Google."
 msgstr ""
 
-#: src/admin/pages/profile/components/PhotosSection.jsx:93
+#: src/admin/pages/profile/components/PhotosSection.jsx:94
 msgid "Working…"
 msgstr ""
 
-#: src/admin/pages/profile/components/PhotosSection.jsx:95
+#: src/admin/pages/profile/components/PhotosSection.jsx:96
 msgid "Add more photos"
 msgstr ""
 
-#: src/admin/pages/profile/components/PhotosSection.jsx:96
+#: src/admin/pages/profile/components/PhotosSection.jsx:97
 msgid "Choose photos"
 msgstr ""
 
-#: src/admin/pages/profile/components/PhotosSection.jsx:131
+#: src/admin/pages/profile/components/PhotosSection.jsx:132
 msgid "Your Google photos will appear here"
 msgstr ""
 
-#: src/admin/pages/profile/components/PhotosSection.jsx:140
+#: src/admin/pages/profile/components/PhotosSection.jsx:141
 msgid "Press Refresh from Google at the top of the page and FoundHint will load every photo on your listing, from you and from your customers."
 msgstr ""
 
-#: src/admin/pages/profile/components/PhotosSection.jsx:144
+#: src/admin/pages/profile/components/PhotosSection.jsx:145
 msgid "Connect your Google Business Profile and FoundHint will load every photo on your listing, from you and from your customers."
 msgstr ""
 
-#: src/admin/pages/profile/components/ProfileTabs.jsx:12 src/admin/pages/schema/components/page/TabBar.jsx:100
+#: src/admin/pages/profile/components/ProfileTabs.jsx:12 src/admin/pages/schema/components/page/TabBar.jsx:101
 msgid "Unsaved changes"
 msgstr ""
 
@@ -3619,27 +3655,23 @@ msgstr ""
 msgid "No description yet."
 msgstr ""
 
-#: src/admin/pages/profile/components/ServicesSection.jsx:177
-msgid "Edit %s"
-msgstr ""
-
-#: src/admin/pages/profile/components/ServicesSection.jsx:191 src/admin/pages/profile/components/address/ServiceAreaField.jsx:115 src/admin/pages/profile/components/info/ExtraCategoriesField.jsx:69 src/admin/pages/schema/components/services/editor/AreasSection.jsx:74 src/admin/pages/setup/components/ServicesStep.jsx:92
+#: src/admin/pages/profile/components/ServicesSection.jsx:189 src/admin/pages/profile/components/address/ServiceAreaField.jsx:115 src/admin/pages/profile/components/info/ExtraCategoriesField.jsx:69 src/admin/pages/schema/components/services/editor/AreasSection.jsx:74 src/admin/pages/setup/components/ServicesStep.jsx:92
 msgid "Remove %s"
 msgstr ""
 
-#: src/admin/pages/profile/components/ServicesSection.jsx:196 src/admin/pages/profile/components/hours/SpecialDayRow.jsx:41 src/admin/pages/schema/components/field/LogoPicker.jsx:69
+#: src/admin/pages/profile/components/ServicesSection.jsx:194 src/admin/pages/profile/components/hours/SpecialDayRow.jsx:41 src/admin/pages/schema/components/field/LogoPicker.jsx:69
 msgid "Remove"
 msgstr ""
 
-#: src/admin/pages/profile/components/ServicesSection.jsx:206
+#: src/admin/pages/profile/components/ServicesSection.jsx:204
 msgid "No services added yet"
 msgstr ""
 
-#: src/admin/pages/profile/components/ServicesSection.jsx:209
+#: src/admin/pages/profile/components/ServicesSection.jsx:207
 msgid "Press Add service to list what you offer. Use the words customers would search for."
 msgstr ""
 
-#: src/admin/pages/profile/components/ServicesSection.jsx:221
+#: src/admin/pages/profile/components/ServicesSection.jsx:219
 msgid "You have used all %d services on Free. Pro removes the limit."
 msgstr ""
 
@@ -3733,7 +3765,7 @@ msgstr ""
 msgid "Reads your attributes and photos from Google. Nothing on Google is changed."
 msgstr ""
 
-#: src/admin/pages/profile/components/header/TitleBar.jsx:94 src/admin/pages/schema/components/locations/LocationList.jsx:190 src/admin/pages/schema/components/locations/LocationList.jsx:366 src/admin/pages/schema/components/page/SchemaHeader.jsx:165
+#: src/admin/pages/profile/components/header/TitleBar.jsx:94 src/admin/pages/schema/components/locations/LocationList.jsx:190 src/admin/pages/schema/components/locations/LocationList.jsx:366 src/admin/pages/schema/components/page/SchemaHeader.jsx:197
 msgid "Refresh from Google"
 msgstr ""
 
@@ -3785,7 +3817,7 @@ msgstr ""
 msgid "This day"
 msgstr ""
 
-#: src/admin/pages/profile/components/hours/SpecialDayRow.jsx:24 src/admin/pages/reviews/index.jsx:66
+#: src/admin/pages/profile/components/hours/SpecialDayRow.jsx:24 src/admin/pages/reviews/lib/csv.js:27
 msgid "Date"
 msgstr ""
 
@@ -3967,20 +3999,36 @@ msgid_plural "%d photos ready to upload"
 msgstr[0] ""
 msgstr[1] ""
 
-#: src/admin/pages/profile/components/photos/PhotoSlot.jsx:75
+#: src/admin/pages/profile/components/photos/PhotoSlot.jsx:76
 msgid "Choose a file for your %s"
 msgstr ""
 
-#: src/admin/pages/profile/components/photos/PhotoSlot.jsx:98
+#: src/admin/pages/profile/components/photos/PhotoSlot.jsx:99
 msgid "or"
 msgstr ""
 
-#: src/admin/pages/profile/components/photos/PhotoSlot.jsx:100
+#: src/admin/pages/profile/components/photos/PhotoSlot.jsx:102
+msgid "choose from your media library"
+msgstr ""
+
+#: src/admin/pages/profile/components/photos/PhotoSlot.jsx:106
 msgid "browse files"
 msgstr ""
 
-#: src/admin/pages/profile/components/photos/PhotoSlot.jsx:112
+#: src/admin/pages/profile/components/photos/PhotoSlot.jsx:122
+msgid "Choose another %s"
+msgstr ""
+
+#: src/admin/pages/profile/components/photos/PhotoSlot.jsx:128
 msgid "Upload another"
+msgstr ""
+
+#: src/admin/pages/profile/components/photos/Picker.jsx:49
+msgid "Add to gallery"
+msgstr ""
+
+#: src/admin/pages/profile/components/photos/Picker.jsx:50
+msgid "Use this photo"
 msgstr ""
 
 #: src/admin/pages/profile/components/photos/lib.js:27
@@ -4155,7 +4203,7 @@ msgstr ""
 msgid "Check link"
 msgstr ""
 
-#: src/admin/pages/profile/components/social/LinkCard.jsx:18 src/admin/pages/schema/components/website/WebsiteTab.jsx:227
+#: src/admin/pages/profile/components/social/LinkCard.jsx:18 src/admin/pages/schema/components/website/WebsiteTab.jsx:270
 msgid "Not added"
 msgstr ""
 
@@ -4269,7 +4317,7 @@ msgstr ""
 msgid "Save Attributes"
 msgstr ""
 
-#: src/admin/pages/profile/tabs.jsx:172 src/admin/pages/reviews/components/ReviewToolbar.jsx:46
+#: src/admin/pages/profile/tabs.jsx:172
 msgid "%d selected"
 msgstr ""
 
@@ -4286,134 +4334,6 @@ msgid "%d day open"
 msgid_plural "%d days open"
 msgstr[0] ""
 msgstr[1] ""
-
-#: src/admin/pages/reviews/components/AutoReplyBanner.jsx:22 src/admin/pages/reviews/components/AutoReplyBanner.jsx:34 src/admin/pages/reviews/components/AutoReplySetup.jsx:101
-msgid "Auto-reply"
-msgstr ""
-
-#: src/admin/pages/reviews/components/AutoReplyBanner.jsx:39
-msgid "Choose a template or an AI reply for each star rating, then switch it on."
-msgstr ""
-
-#: src/admin/pages/reviews/components/AutoReplyBanner.jsx:52
-msgid "Auto-replies sent"
-msgstr ""
-
-#: src/admin/pages/reviews/components/AutoReplyBanner.jsx:60
-msgid "AI replies left"
-msgstr ""
-
-#: src/admin/pages/reviews/components/AutoReplyBanner.jsx:74
-msgid "Set up"
-msgstr ""
-
-#: src/admin/pages/reviews/components/AutoReplyBanner.jsx:78 src/admin/pages/schema/components/page/OffPanel.jsx:139 src/admin/pages/schema/components/settings/OutputSettings.jsx:173 src/admin/pages/schema/lib/location.js:52
-msgid "Off"
-msgstr ""
-
-#: src/admin/pages/reviews/components/AutoReplyBanner.jsx:83 src/admin/pages/reviews/components/AutoReplySetup.jsx:111
-msgid "Auto-reply (coming soon)"
-msgstr ""
-
-#: src/admin/pages/reviews/components/AutoReplySetup.jsx:11
-msgid "AI reply"
-msgstr ""
-
-#: src/admin/pages/reviews/components/AutoReplySetup.jsx:12 src/admin/pages/reviews/components/ReplyDialog.jsx:164
-msgid "Built-in reply"
-msgstr ""
-
-#: src/admin/pages/reviews/components/AutoReplySetup.jsx:13
-msgid "My templates"
-msgstr ""
-
-#: src/admin/pages/reviews/components/AutoReplySetup.jsx:14
-msgid "Don't reply"
-msgstr ""
-
-#: src/admin/pages/reviews/components/AutoReplySetup.jsx:74
-msgid "Set up auto-reply"
-msgstr ""
-
-#: src/admin/pages/reviews/components/AutoReplySetup.jsx:75
-msgid "A preview of the auto-reply settings, which are coming in FoundHint Pro."
-msgstr ""
-
-#: src/admin/pages/reviews/components/AutoReplySetup.jsx:84
-msgid "Auto-reply is coming in FoundHint Pro."
-msgstr ""
-
-#: src/admin/pages/reviews/components/AutoReplySetup.jsx:93 src/admin/pages/schema/components/page/UnsavedDialog.jsx:39
-msgid "Save"
-msgstr ""
-
-#: src/admin/pages/reviews/components/AutoReplySetup.jsx:104
-msgid "Off. Nothing is sent automatically."
-msgstr ""
-
-#: src/admin/pages/reviews/components/AutoReplySetup.jsx:120 src/admin/pages/reviews/components/AutoReplySetup.jsx:123
-msgid "Which reviews"
-msgstr ""
-
-#: src/admin/pages/reviews/components/AutoReplySetup.jsx:129
-msgid "New reviews only"
-msgstr ""
-
-#: src/admin/pages/reviews/components/AutoReplySetup.jsx:133
-msgid "New and unanswered"
-msgstr ""
-
-#: src/admin/pages/reviews/components/AutoReplySetup.jsx:139
-msgid "Older reviews are left as they are."
-msgstr ""
-
-#: src/admin/pages/reviews/components/AutoReplySetup.jsx:140
-msgid "Reviews still waiting on a reply are answered too."
-msgstr ""
-
-#: src/admin/pages/reviews/components/AutoReplySetup.jsx:149
-msgid "How to reply"
-msgstr ""
-
-#: src/admin/pages/reviews/components/AutoReplySetup.jsx:158 src/admin/pages/reviews/components/ReviewFilters.jsx:46 src/admin/pages/reviews/index.jsx:65
-msgid "Rating"
-msgstr ""
-
-#: src/admin/pages/reviews/components/AutoReplySetup.jsx:161 src/admin/pages/reviews/components/AutoReplySetup.jsx:185
-msgid "With a comment"
-msgstr ""
-
-#: src/admin/pages/reviews/components/AutoReplySetup.jsx:164 src/admin/pages/reviews/components/AutoReplySetup.jsx:185 src/admin/pages/reviews/components/TemplateDialog.jsx:128 src/admin/pages/reviews/components/TemplatesCard.jsx:107
-msgid "Stars only"
-msgstr ""
-
-#: src/admin/pages/reviews/components/AutoReplySetup.jsx:204
-msgid "We suggest replying to 1 and 2 star reviews yourself. Unhappy customers notice a personal reply."
-msgstr ""
-
-#: src/admin/pages/reviews/components/AutoReplySetup.jsx:214 src/admin/pages/reviews/components/AutoReplySetup.jsx:219
-msgid "AI writing style"
-msgstr ""
-
-#: src/admin/pages/reviews/components/AutoReplySetup.jsx:225
-msgid "FoundHint style"
-msgstr ""
-
-#: src/admin/pages/reviews/components/AutoReplySetup.jsx:229
-msgid "My own instructions"
-msgstr ""
-
-#: src/admin/pages/reviews/components/AutoReplySetup.jsx:235
-msgid "Writes about what each customer actually said, and changes style so replies never sound the same."
-msgstr ""
-
-#: src/admin/pages/reviews/components/AutoReplySetup.jsx:239
-msgid "Tell the AI how you like to reply — your tone, what to mention, what to avoid."
-msgstr ""
-
-#: src/admin/pages/reviews/components/AutoReplySetup.jsx:246
-msgid "If AI replies run out, use a template instead of pausing"
-msgstr ""
 
 #: src/admin/pages/reviews/components/Pagination.jsx:38
 msgid "Review pages"
@@ -4435,169 +4355,153 @@ msgstr ""
 msgid "Next"
 msgstr ""
 
-#: src/admin/pages/reviews/components/ProTemplatesCard.jsx:18 src/admin/pages/reviews/components/TemplatesCard.jsx:37
+#: src/admin/pages/reviews/components/ProTemplatesCard.jsx:20 src/admin/pages/reviews/components/TemplatesCard.jsx:43
 msgid "Reply templates"
 msgstr ""
 
-#: src/admin/pages/reviews/components/ProTemplatesCard.jsx:28
-msgid "FoundHint Pro %s is active."
-msgstr ""
-
 #: src/admin/pages/reviews/components/ProTemplatesCard.jsx:31
-msgid "Loading FoundHint Pro…"
+msgid "FoundHint Premium %s is active."
 msgstr ""
 
-#: src/admin/pages/reviews/components/ReplyDialog.jsx:56
+#: src/admin/pages/reviews/components/ProTemplatesCard.jsx:34
+msgid "Loading FoundHint Premium…"
+msgstr ""
+
+#: src/admin/pages/reviews/components/ReplyDialog.jsx:67
 msgid "Your reply was updated on Google."
 msgstr ""
 
-#: src/admin/pages/reviews/components/ReplyDialog.jsx:57
+#: src/admin/pages/reviews/components/ReplyDialog.jsx:68
 msgid "Your reply was posted on Google."
 msgstr ""
 
-#: src/admin/pages/reviews/components/ReplyDialog.jsx:71
+#: src/admin/pages/reviews/components/ReplyDialog.jsx:82
 msgid "Reply to %s"
 msgstr ""
 
-#: src/admin/pages/reviews/components/ReplyDialog.jsx:74
+#: src/admin/pages/reviews/components/ReplyDialog.jsx:85
 msgid "Reply to this review"
 msgstr ""
 
-#: src/admin/pages/reviews/components/ReplyDialog.jsx:76
+#: src/admin/pages/reviews/components/ReplyDialog.jsx:87
 msgid "Write a reply. It is posted on your Google profile when you press Publish reply."
 msgstr ""
 
-#: src/admin/pages/reviews/components/ReplyDialog.jsx:81
+#: src/admin/pages/reviews/components/ReplyDialog.jsx:93
 msgid "Publishing posts this reply on your Google profile."
 msgstr ""
 
-#: src/admin/pages/reviews/components/ReplyDialog.jsx:102
+#: src/admin/pages/reviews/components/ReplyDialog.jsx:114
 msgid "Publishing…"
 msgstr ""
 
-#: src/admin/pages/reviews/components/ReplyDialog.jsx:104
+#: src/admin/pages/reviews/components/ReplyDialog.jsx:116
 msgid "Update reply"
 msgstr ""
 
-#: src/admin/pages/reviews/components/ReplyDialog.jsx:105
+#: src/admin/pages/reviews/components/ReplyDialog.jsx:117
 msgid "Publish reply"
 msgstr ""
 
-#: src/admin/pages/reviews/components/ReplyDialog.jsx:114 src/admin/pages/reviews/components/ReviewCard.jsx:82 src/admin/pages/reviews/index.jsx:74
+#: src/admin/pages/reviews/components/ReplyDialog.jsx:126 src/admin/pages/reviews/components/ReviewCard.jsx:70 src/admin/pages/reviews/lib/csv.js:35
 msgid "Anonymous"
 msgstr ""
 
-#: src/admin/pages/reviews/components/ReplyDialog.jsx:121 src/admin/pages/reviews/components/ReviewCard.jsx:170
+#: src/admin/pages/reviews/components/ReplyDialog.jsx:138 src/admin/pages/reviews/components/ReviewCard.jsx:143
 msgid "Left a star rating without a comment."
 msgstr ""
 
-#: src/admin/pages/reviews/components/ReplyDialog.jsx:138
+#: src/admin/pages/reviews/components/ReplyDialog.jsx:155
 msgid "Quick templates"
 msgstr ""
 
-#: src/admin/pages/reviews/components/ReplyDialog.jsx:146
-msgid "Your own templates are part of FoundHint Pro."
+#: src/admin/pages/reviews/components/ReplyDialog.jsx:179
+msgid "Built-in reply"
 msgstr ""
 
-#: src/admin/pages/reviews/components/ReplyDialog.jsx:176 src/admin/pages/reviews/components/ReviewCard.jsx:180 src/admin/pages/reviews/index.jsx:69
+#: src/admin/pages/reviews/components/ReplyDialog.jsx:191 src/admin/pages/reviews/components/ReviewCard.jsx:153 src/admin/pages/reviews/lib/csv.js:30
 msgid "Your reply"
 msgstr ""
 
-#: src/admin/pages/reviews/components/ReplyDialog.jsx:186
+#: src/admin/pages/reviews/components/ReplyDialog.jsx:201
 msgid "%1$s / %2$s"
 msgstr ""
 
-#: src/admin/pages/reviews/components/ReplyDialog.jsx:203
+#: src/admin/pages/reviews/components/ReplyDialog.jsx:218
 msgid "Write a short, personal reply. Use their first name and mention something they said."
 msgstr ""
 
-#: src/admin/pages/reviews/components/ReplyDialog.jsx:229 src/admin/pages/reviews/components/ReviewCard.jsx:280
-msgid "AI suggestion"
-msgstr ""
-
-#: src/admin/pages/reviews/components/ReplyDialog.jsx:236
-msgid "AI replies are coming in FoundHint Pro. Nothing is sent until you press Publish."
-msgstr ""
-
-#: src/admin/pages/reviews/components/ReplyDialog.jsx:130
+#: src/admin/pages/reviews/components/ReplyDialog.jsx:147
 msgid "Quick templates for %d-star reviews"
 msgid_plural "Quick templates for %d-star reviews"
 msgstr[0] ""
 msgstr[1] ""
 
-#: src/admin/pages/reviews/components/ReviewCard.jsx:91
+#: src/admin/pages/reviews/components/ReviewCard.jsx:79
 msgid "Your reply was removed from Google."
 msgstr ""
 
-#: src/admin/pages/reviews/components/ReviewCard.jsx:102
+#: src/admin/pages/reviews/components/ReviewCard.jsx:90
 msgid "Review from %s"
 msgstr ""
 
-#: src/admin/pages/reviews/components/ReviewCard.jsx:116
-msgid "Select review from %s"
-msgstr ""
-
-#: src/admin/pages/reviews/components/ReviewCard.jsx:132 src/admin/pages/reviews/components/ReviewFilters.jsx:93
+#: src/admin/pages/reviews/components/ReviewCard.jsx:110 src/admin/pages/reviews/components/ReviewFilters.jsx:93
 msgid "Edited"
 msgstr ""
 
-#: src/admin/pages/reviews/components/ReviewCard.jsx:137 src/admin/pages/reviews/components/ReviewFilters.jsx:95
+#: src/admin/pages/reviews/components/ReviewCard.jsx:115 src/admin/pages/reviews/components/ReviewFilters.jsx:95
 msgid "Removed by reviewer"
 msgstr ""
 
-#: src/admin/pages/reviews/components/ReviewCard.jsx:148 src/admin/pages/reviews/components/ReviewFilters.jsx:74
+#: src/admin/pages/reviews/components/ReviewCard.jsx:126 src/admin/pages/reviews/components/ReviewFilters.jsx:74
 msgid "Replied"
 msgstr ""
 
-#: src/admin/pages/reviews/components/ReviewCard.jsx:158 src/admin/pages/reviews/components/ReviewFilters.jsx:77
+#: src/admin/pages/reviews/components/ReviewCard.jsx:130 src/admin/pages/reviews/components/ReviewFilters.jsx:77
 msgid "Not replied"
 msgstr ""
 
-#: src/admin/pages/reviews/components/ReviewCard.jsx:199
+#: src/admin/pages/reviews/components/ReviewCard.jsx:172
 msgid "Edit your reply to %s"
 msgstr ""
 
-#: src/admin/pages/reviews/components/ReviewCard.jsx:221
+#: src/admin/pages/reviews/components/ReviewCard.jsx:197
 msgid "Delete your reply to %s"
 msgstr ""
 
-#: src/admin/pages/reviews/components/ReviewCard.jsx:229
+#: src/admin/pages/reviews/components/ReviewCard.jsx:205
 msgid "Delete your reply?"
 msgstr ""
 
-#: src/admin/pages/reviews/components/ReviewCard.jsx:232
+#: src/admin/pages/reviews/components/ReviewCard.jsx:208
 msgid "It is removed from Google, so nobody will see it under this review any more. The review itself stays."
 msgstr ""
 
-#: src/admin/pages/reviews/components/ReviewCard.jsx:240
+#: src/admin/pages/reviews/components/ReviewCard.jsx:216
 msgid "Keep reply"
 msgstr ""
 
-#: src/admin/pages/reviews/components/ReviewCard.jsx:243
+#: src/admin/pages/reviews/components/ReviewCard.jsx:219
 msgid "Delete reply"
 msgstr ""
 
-#: src/admin/pages/reviews/components/ReviewCard.jsx:259
+#: src/admin/pages/reviews/components/ReviewCard.jsx:235
 msgid "The reviewer removed this review from Google, so it can no longer be replied to. It is not counted in your rating."
 msgstr ""
 
-#: src/admin/pages/reviews/components/ReviewCard.jsx:268 src/admin/pages/reviews/components/TemplateDialog.jsx:150
+#: src/admin/pages/reviews/components/ReviewCard.jsx:247 src/admin/pages/reviews/components/TemplateDialog.jsx:160
 msgid "Reply"
-msgstr ""
-
-#: src/admin/pages/reviews/components/ReviewCard.jsx:273
-msgid "AI replies are coming in FoundHint Pro."
-msgstr ""
-
-#: src/admin/pages/reviews/components/ReviewCard.jsx:282
-msgid "(coming soon)"
 msgstr ""
 
 #: src/admin/pages/reviews/components/ReviewFilters.jsx:41
 msgid "Filter reviews"
 msgstr ""
 
-#: src/admin/pages/reviews/components/ReviewFilters.jsx:54
+#: src/admin/pages/reviews/components/ReviewFilters.jsx:46 src/admin/pages/reviews/lib/csv.js:26
+msgid "Rating"
+msgstr ""
+
+#: src/admin/pages/reviews/components/ReviewFilters.jsx:54 src/admin/pages/reviews/components/TemplatesCard.jsx:66
 msgid "All ratings"
 msgstr ""
 
@@ -4625,11 +4529,11 @@ msgstr ""
 msgid "Reply status"
 msgstr ""
 
-#: src/admin/pages/reviews/components/ReviewFilters.jsx:72
+#: src/admin/pages/reviews/components/ReviewFilters.jsx:72 src/admin/pages/reviews/components/ReviewToolbar.jsx:46 src/admin/pages/reviews/components/ReviewToolbar.jsx:50
 msgid "All reviews"
 msgstr ""
 
-#: src/admin/pages/reviews/components/ReviewFilters.jsx:83 src/admin/pages/reviews/index.jsx:68
+#: src/admin/pages/reviews/components/ReviewFilters.jsx:83 src/admin/pages/reviews/lib/csv.js:29
 msgid "Review status"
 msgstr ""
 
@@ -4643,6 +4547,22 @@ msgstr ""
 
 #: src/admin/pages/reviews/components/ReviewFilters.jsx:113
 msgid "Name or words in a review"
+msgstr ""
+
+#: src/admin/pages/reviews/components/ReviewList.jsx:34 src/admin/pages/reviews/components/ReviewToolbar.jsx:23
+msgid "No reviews match these filters"
+msgstr ""
+
+#: src/admin/pages/reviews/components/ReviewList.jsx:35
+msgid "No reviews stored yet"
+msgstr ""
+
+#: src/admin/pages/reviews/components/ReviewList.jsx:39
+msgid "Try a different rating, status or search."
+msgstr ""
+
+#: src/admin/pages/reviews/components/ReviewList.jsx:43
+msgid "Press Sync reviews at the top to read the reviews on your Google profile."
 msgstr ""
 
 #: src/admin/pages/reviews/components/ReviewPhotos.jsx:33
@@ -4661,197 +4581,191 @@ msgstr ""
 msgid "Photo shared on Google by the reviewer."
 msgstr ""
 
-#: src/admin/pages/reviews/components/ReviewToolbar.jsx:37
-msgid "Select every review on this page"
-msgstr ""
-
-#: src/admin/pages/reviews/components/ReviewToolbar.jsx:64
+#: src/admin/pages/reviews/components/ReviewToolbar.jsx:15
 msgid "Showing %1$d to %2$d of %3$d"
 msgstr ""
 
-#: src/admin/pages/reviews/components/ReviewToolbar.jsx:70 src/admin/pages/reviews/index.jsx:308
-msgid "No reviews match these filters"
-msgstr ""
-
-#: src/admin/pages/reviews/components/ReviewToolbar.jsx:71
+#: src/admin/pages/reviews/components/ReviewToolbar.jsx:24
 msgid "No reviews yet"
 msgstr ""
 
-#: src/admin/pages/reviews/components/ReviewToolbar.jsx:82
+#: src/admin/pages/reviews/components/ReviewToolbar.jsx:51
+msgid "Narrow the list by rating, reply status or words in a review. Export CSV writes every review that matches."
+msgstr ""
+
+#: src/admin/pages/reviews/components/ReviewToolbar.jsx:67
 msgid "Exporting…"
 msgstr ""
 
-#: src/admin/pages/reviews/components/ReviewToolbar.jsx:84
-msgid "Export selected"
-msgstr ""
-
-#: src/admin/pages/reviews/components/ReviewToolbar.jsx:85
+#: src/admin/pages/reviews/components/ReviewToolbar.jsx:68
 msgid "Export CSV"
 msgstr ""
 
-#: src/admin/pages/reviews/components/ReviewToolbar.jsx:93
-msgid "Clear"
+#: src/admin/pages/reviews/components/ReviewsHeader.jsx:15
+msgid "What customers say about this location on Google. Read, filter and reply to reviews in one place. Only syncing and replying contact Google."
 msgstr ""
 
-#: src/admin/pages/reviews/components/ReviewToolbar.jsx:98
-msgid "Replying to many reviews at once comes with templates and AI replies."
+#: src/admin/pages/reviews/components/ReviewsHeader.jsx:25
+msgid "Sync reviews"
 msgstr ""
 
-#: src/admin/pages/reviews/components/ReviewToolbar.jsx:104
-msgid "Bulk actions"
+#: src/admin/pages/reviews/components/ReviewsHeader.jsx:27
+msgid "Reads the latest reviews from Google. Nothing on Google is changed."
 msgstr ""
 
-#: src/admin/pages/reviews/components/SoonTag.jsx:22 src/admin/pages/schema/lib/tabSummaries.js:19
-msgid "Pro"
+#: src/admin/pages/reviews/components/SoonTag.jsx:26 src/admin/pages/schema/components/page/PremiumTab.jsx:31 src/admin/pages/schema/lib/tabSummaries.js:18
+msgid "Premium"
 msgstr ""
 
-#: src/admin/pages/reviews/components/Stars.jsx:13
+#: src/admin/pages/reviews/components/Stars.jsx:17
 msgid "No rating"
 msgstr ""
 
-#: src/admin/pages/reviews/components/Stars.jsx:30
+#: src/admin/pages/reviews/components/Stars.jsx:39
 msgid "%d star"
 msgid_plural "%d stars"
 msgstr[0] ""
 msgstr[1] ""
 
-#: src/admin/pages/reviews/components/TemplateDialog.jsx:48
+#: src/admin/pages/reviews/components/TemplateDialog.jsx:57
 msgid "Edit template"
 msgstr ""
 
-#: src/admin/pages/reviews/components/TemplateDialog.jsx:49
+#: src/admin/pages/reviews/components/TemplateDialog.jsx:58
 msgid "New reply template"
 msgstr ""
 
-#: src/admin/pages/reviews/components/TemplateDialog.jsx:51
-msgid "Reply templates are part of FoundHint Pro."
+#: src/admin/pages/reviews/components/TemplateDialog.jsx:60
+msgid "Reply templates are part of FoundHint Premium."
 msgstr ""
 
-#: src/admin/pages/reviews/components/TemplateDialog.jsx:58
+#: src/admin/pages/reviews/components/TemplateDialog.jsx:68
 msgid "%1$d of %2$d used for %3$d-star reviews"
 msgstr ""
 
-#: src/admin/pages/reviews/components/TemplateDialog.jsx:71
-msgid "Saving templates is part of FoundHint Pro."
+#: src/admin/pages/reviews/components/TemplateDialog.jsx:81
+msgid "Saving templates is part of FoundHint Premium."
 msgstr ""
 
-#: src/admin/pages/reviews/components/TemplateDialog.jsx:77
+#: src/admin/pages/reviews/components/TemplateDialog.jsx:87
 msgid "Save template"
 msgstr ""
 
-#: src/admin/pages/reviews/components/TemplateDialog.jsx:84
-msgid "Saving your own templates comes with FoundHint Pro."
+#: src/admin/pages/reviews/components/TemplateDialog.jsx:94
+msgid "Saving your own templates comes with FoundHint Premium."
 msgstr ""
 
-#: src/admin/pages/reviews/components/TemplateDialog.jsx:93 src/admin/pages/reviews/components/TemplatesCard.jsx:51
+#: src/admin/pages/reviews/components/TemplateDialog.jsx:103 src/admin/pages/reviews/components/TemplatesCard.jsx:53
 msgid "Star rating"
 msgstr ""
 
-#: src/admin/pages/reviews/components/TemplateDialog.jsx:107
+#: src/admin/pages/reviews/components/TemplateDialog.jsx:117 src/admin/pages/reviews/components/TemplatesCard.jsx:69
 msgid "%d stars"
 msgstr ""
 
-#: src/admin/pages/reviews/components/TemplateDialog.jsx:116
+#: src/admin/pages/reviews/components/TemplateDialog.jsx:126
 msgid "Used for"
 msgstr ""
 
-#: src/admin/pages/reviews/components/TemplateDialog.jsx:125
+#: src/admin/pages/reviews/components/TemplateDialog.jsx:135
 msgid "Reviews with a comment"
 msgstr ""
 
-#: src/admin/pages/reviews/components/TemplateDialog.jsx:136 src/admin/pages/schema/components/locations/BranchSections.jsx:671
+#: src/admin/pages/reviews/components/TemplateDialog.jsx:138 src/admin/pages/reviews/components/TemplatesCard.jsx:142
+msgid "Stars only"
+msgstr ""
+
+#: src/admin/pages/reviews/components/TemplateDialog.jsx:146 src/admin/pages/schema/components/locations/BranchSections.jsx:671
 msgid "Name"
 msgstr ""
 
-#: src/admin/pages/reviews/components/TemplateDialog.jsx:143
+#: src/admin/pages/reviews/components/TemplateDialog.jsx:153
 msgid "e.g. Warm thank-you"
 msgstr ""
 
-#: src/admin/pages/reviews/components/TemplateDialog.jsx:165
-msgid "Insert"
+#: src/admin/pages/reviews/components/TemplateDialog.jsx:181
+msgid "Insert a detail"
 msgstr ""
 
-#: src/admin/pages/reviews/components/TemplatesCard.jsx:42
+#: src/admin/pages/reviews/components/TemplateDialog.jsx:184
+msgid "Added where the cursor is, and swapped for the real details when you reply."
+msgstr ""
+
+#: src/admin/pages/reviews/components/TemplatesCard.jsx:45
 msgid "Ready-made replies for each star rating."
 msgstr ""
 
-#: src/admin/pages/reviews/components/TemplatesCard.jsx:106
+#: src/admin/pages/reviews/components/TemplatesCard.jsx:141
 msgid "With comment"
 msgstr ""
 
-#: src/admin/pages/reviews/components/TemplatesCard.jsx:127
+#: src/admin/pages/reviews/components/TemplatesCard.jsx:193
 msgid "No templates for %d-star reviews yet."
 msgstr ""
 
-#: src/admin/pages/reviews/components/TemplatesCard.jsx:146
+#: src/admin/pages/reviews/components/TemplatesCard.jsx:212
 msgid "Add a template"
 msgstr ""
 
-#: src/admin/pages/reviews/components/TemplatesCard.jsx:151
-msgid "Importing templates is part of FoundHint Pro."
+#: src/admin/pages/reviews/components/TemplatesCard.jsx:217
+msgid "Importing templates is part of FoundHint Premium."
 msgstr ""
 
-#: src/admin/pages/reviews/components/TemplatesCard.jsx:158
+#: src/admin/pages/reviews/components/TemplatesCard.jsx:224
 msgid "Import from CSV"
 msgstr ""
 
-#: src/admin/pages/reviews/components/TemplatesCard.jsx:162
+#: src/admin/pages/reviews/components/TemplatesCard.jsx:228
 msgid "Templates belong to this location. Words in curly brackets are swapped for real details when you reply."
 msgstr ""
 
-#: src/admin/pages/reviews/index.jsx:64
-msgid "Reviewer"
-msgstr ""
+#: src/admin/pages/reviews/components/TemplatesCard.jsx:101
+msgid "All ratings have %d template."
+msgid_plural "All ratings have %d templates."
+msgstr[0] ""
+msgstr[1] ""
 
-#: src/admin/pages/reviews/index.jsx:67
-msgid "Review"
-msgstr ""
+#: src/admin/pages/reviews/components/TemplatesCard.jsx:111
+msgid "%1$d-star reviews have %2$d template."
+msgid_plural "%1$d-star reviews have %2$d templates."
+msgstr[0] ""
+msgstr[1] ""
 
-#: src/admin/pages/reviews/index.jsx:70
-msgid "Replied on"
-msgstr ""
+#: src/admin/pages/reviews/components/TemplatesCard.jsx:173
+msgid "For %d-star reviews"
+msgid_plural "For %d-star reviews"
+msgstr[0] ""
+msgstr[1] ""
 
-#: src/admin/pages/reviews/index.jsx:229
-msgid "Sync reviews"
-msgstr ""
-
-#: src/admin/pages/reviews/index.jsx:245
-msgid "Connect your Google account and read your profile first — reviews are read for the locations Google reports."
-msgstr ""
-
-#: src/admin/pages/reviews/index.jsx:261
-msgid "Reviews are read from a location's own Google listing. Link this location to one on the Google screen, or choose another location at the top of the page."
-msgstr ""
-
-#: src/admin/pages/reviews/index.jsx:312
-msgid "No reviews stored yet"
-msgstr ""
-
-#: src/admin/pages/reviews/index.jsx:316
-msgid "Try a different rating, status or search."
-msgstr ""
-
-#: src/admin/pages/reviews/index.jsx:320
-msgid "Press Sync reviews at the top to read the reviews on your Google profile."
-msgstr ""
-
-#: src/admin/pages/reviews/index.jsx:367
-msgid "Review tools"
-msgstr ""
-
-#: src/admin/pages/reviews/index.jsx:375
-msgid "Email alerts"
-msgstr ""
-
-#: src/admin/pages/reviews/index.jsx:383
-msgid "AI reply history"
-msgstr ""
-
-#: src/admin/pages/reviews/index.jsx:175
+#: src/admin/pages/reviews/hooks/useReviewActions.js:36
 msgid "Read %d review from Google."
 msgid_plural "Read %d reviews from Google."
 msgstr[0] ""
 msgstr[1] ""
+
+#: src/admin/pages/reviews/index.jsx:58
+msgid "Connect your Google account and read your profile first — reviews are read for the locations Google reports."
+msgstr ""
+
+#: src/admin/pages/reviews/index.jsx:71
+msgid "Reviews are read from a location's own Google listing. Link this location to one on the Google screen, or choose another location at the top of the page."
+msgstr ""
+
+#: src/admin/pages/reviews/index.jsx:118
+msgid "Review tools"
+msgstr ""
+
+#: src/admin/pages/reviews/lib/csv.js:25
+msgid "Reviewer"
+msgstr ""
+
+#: src/admin/pages/reviews/lib/csv.js:28
+msgid "Review"
+msgstr ""
+
+#: src/admin/pages/reviews/lib/csv.js:31
+msgid "Replied on"
+msgstr ""
 
 #: src/admin/pages/reviews/lib/replies.js:35
 msgid "Thank you so much, {{reviewer_name}}! We're really glad you had a great experience with us. We look forward to seeing you again. — {{location_name}}"
@@ -4973,11 +4887,11 @@ msgstr ""
 msgid "Some fields need attention."
 msgstr ""
 
-#: src/admin/pages/schema/components/business/BusinessTab.jsx:145 src/admin/pages/schema/components/page/TabBar.jsx:15
+#: src/admin/pages/schema/components/business/BusinessTab.jsx:145
 msgid "Organization schema"
 msgstr ""
 
-#: src/admin/pages/schema/components/business/BusinessTab.jsx:146 src/admin/pages/schema/components/page/TabBar.jsx:16
+#: src/admin/pages/schema/components/business/BusinessTab.jsx:146
 msgid "LocalBusiness schema"
 msgstr ""
 
@@ -5101,7 +5015,7 @@ msgstr ""
 msgid "Google needs: %s. Everything else is optional. Until then this is saved as a draft and nothing is printed."
 msgstr ""
 
-#: src/admin/pages/schema/components/business/SchemaKindPicker.jsx:8
+#: src/admin/pages/schema/components/business/SchemaKindPicker.jsx:8 src/admin/pages/schema/components/page/TabBar.jsx:16
 msgid "Organization"
 msgstr ""
 
@@ -5197,47 +5111,47 @@ msgstr ""
 msgid "Use Google's value"
 msgstr ""
 
-#: src/admin/pages/schema/components/field/FieldNotes.jsx:29
+#: src/admin/pages/schema/components/field/FieldNotes.jsx:28
 msgid "%1$d characters — aim for %2$d to %3$d."
 msgstr ""
 
-#: src/admin/pages/schema/components/field/FieldNotes.jsx:35
+#: src/admin/pages/schema/components/field/FieldNotes.jsx:34
 msgid "Say what you do and for whom."
 msgstr ""
 
-#: src/admin/pages/schema/components/field/FieldNotes.jsx:37
+#: src/admin/pages/schema/components/field/FieldNotes.jsx:36
 msgid "Search results cut it off; keep the first sentences strongest."
 msgstr ""
 
-#: src/admin/pages/schema/components/field/FieldNotes.jsx:47
+#: src/admin/pages/schema/components/field/FieldNotes.jsx:46
 msgid "“%1$s” appears %2$d times. Say it once and describe what you offer instead — repetition reads as keyword stuffing."
 msgstr ""
 
-#: src/admin/pages/schema/components/field/FieldNotes.jsx:69
+#: src/admin/pages/schema/components/field/FieldNotes.jsx:68
 msgid "Listed: %s."
 msgstr ""
 
-#: src/admin/pages/schema/components/field/FieldNotes.jsx:72
+#: src/admin/pages/schema/components/field/FieldNotes.jsx:71
 msgid "No profiles listed yet."
 msgstr ""
 
-#: src/admin/pages/schema/components/field/FieldNotes.jsx:76
+#: src/admin/pages/schema/components/field/FieldNotes.jsx:75
 msgid "Add any official profile you have — %s, and GitHub or WordPress.org for software. Each one helps Google match your business to its profiles."
 msgstr ""
 
-#: src/admin/pages/schema/components/field/FieldNotes.jsx:118
+#: src/admin/pages/schema/components/field/FieldNotes.jsx:117
 msgid "Your website and Google disagree. Google now says: %s"
 msgstr ""
 
-#: src/admin/pages/schema/components/field/FieldNotes.jsx:134
+#: src/admin/pages/schema/components/field/FieldNotes.jsx:133
 msgid "Printed as %s"
 msgstr ""
 
-#: src/admin/pages/schema/components/field/FieldNotes.jsx:140
+#: src/admin/pages/schema/components/field/FieldNotes.jsx:139
 msgid "Not printed: add the country code (such as +880), or set the business country, so it can be written in international form."
 msgstr ""
 
-#: src/admin/pages/schema/components/field/FieldNotes.jsx:153
+#: src/admin/pages/schema/components/field/FieldNotes.jsx:152
 msgid "Google needs this for a local business result."
 msgstr ""
 
@@ -5437,7 +5351,7 @@ msgstr ""
 msgid "Existing page"
 msgstr ""
 
-#: src/admin/pages/schema/components/locations/BranchSections.jsx:389 src/admin/pages/schema/components/services/editor/PageSection.jsx:136 src/admin/pages/schema/components/website/WebsiteTab.jsx:211
+#: src/admin/pages/schema/components/locations/BranchSections.jsx:389 src/admin/pages/schema/components/services/editor/PageSection.jsx:136 src/admin/pages/schema/components/website/WebsiteTab.jsx:254
 msgid "Choose a page"
 msgstr ""
 
@@ -5553,7 +5467,7 @@ msgstr ""
 msgid "Always from this location's Google profile, never from the brand."
 msgstr ""
 
-#: src/admin/pages/schema/components/locations/LocationList.jsx:105 src/admin/pages/schema/components/page/SchemaHeader.jsx:148
+#: src/admin/pages/schema/components/locations/LocationList.jsx:105 src/admin/pages/schema/components/page/SchemaHeader.jsx:180
 msgid "Synced from Google %s"
 msgstr ""
 
@@ -5573,7 +5487,7 @@ msgstr ""
 msgid "Run location setup"
 msgstr ""
 
-#: src/admin/pages/schema/components/locations/LocationList.jsx:189 src/admin/pages/schema/components/locations/LocationList.jsx:365 src/admin/pages/schema/components/page/SchemaHeader.jsx:164
+#: src/admin/pages/schema/components/locations/LocationList.jsx:189 src/admin/pages/schema/components/locations/LocationList.jsx:365 src/admin/pages/schema/components/page/SchemaHeader.jsx:196
 msgid "Refreshing…"
 msgstr ""
 
@@ -5901,7 +5815,7 @@ msgstr ""
 msgid "this branch"
 msgstr ""
 
-#: src/admin/pages/schema/components/locations/LocationTab.jsx:207 src/admin/pages/schema/components/locations/NoBranchChosen.jsx:42 src/admin/pages/schema/components/page/TabBar.jsx:17
+#: src/admin/pages/schema/components/locations/LocationTab.jsx:207 src/admin/pages/schema/components/locations/NoBranchChosen.jsx:42
 msgid "Location schema"
 msgstr ""
 
@@ -5941,11 +5855,11 @@ msgstr ""
 msgid "No pages chosen yet, so this branch prints nowhere. Pick its page, and your Contact page."
 msgstr ""
 
-#: src/admin/pages/schema/components/locations/SeparatePanel.jsx:41 src/admin/pages/schema/components/shared/JsonPreview.jsx:95
+#: src/admin/pages/schema/components/locations/SeparatePanel.jsx:41 src/admin/pages/schema/components/shared/JsonPreview.jsx:97
 msgid "Schema copied."
 msgstr ""
 
-#: src/admin/pages/schema/components/locations/SeparatePanel.jsx:44 src/admin/pages/schema/components/shared/JsonPreview.jsx:98
+#: src/admin/pages/schema/components/locations/SeparatePanel.jsx:44 src/admin/pages/schema/components/shared/JsonPreview.jsx:100
 msgid "Could not copy. Select the text instead."
 msgstr ""
 
@@ -5977,7 +5891,7 @@ msgstr ""
 msgid "Publish it on its own website"
 msgstr ""
 
-#: src/admin/pages/schema/components/locations/SeparatePanel.jsx:183 src/admin/pages/schema/components/shared/JsonPreview.jsx:197
+#: src/admin/pages/schema/components/locations/SeparatePanel.jsx:183 src/admin/pages/schema/components/shared/JsonPreview.jsx:205
 msgid "Copy schema"
 msgstr ""
 
@@ -6065,6 +5979,10 @@ msgstr ""
 msgid "It's described in 01 Organization, and your branches link to it as their parent. Change this in location setup."
 msgstr ""
 
+#: src/admin/pages/schema/components/page/OffPanel.jsx:139 src/admin/pages/schema/components/settings/OutputSettings.jsx:173 src/admin/pages/schema/lib/location.js:52
+msgid "Off"
+msgstr ""
+
 #: src/admin/pages/schema/components/page/OffPanel.jsx:146
 msgid "Nothing from this section is added to your site while it's off."
 msgstr ""
@@ -6081,6 +5999,22 @@ msgstr ""
 msgid "%s…"
 msgstr ""
 
+#: src/admin/pages/schema/components/page/PremiumTab.jsx:42
+msgid "Premium is installed; activate its licence to use it."
+msgstr ""
+
+#: src/admin/pages/schema/components/page/PremiumTab.jsx:46
+msgid "It's part of FoundHint Premium."
+msgstr ""
+
+#: src/admin/pages/schema/components/page/PremiumTab.jsx:51 src/admin/pages/schema/components/page/SchemaHeader.jsx:131 src/admin/pages/schema/components/shared/LockedPreview.jsx:92
+msgid "Activate licence"
+msgstr ""
+
+#: src/admin/pages/schema/components/page/PremiumTab.jsx:60
+msgid "Get Premium"
+msgstr ""
+
 #: src/admin/pages/schema/components/page/SchemaHeader.jsx:49
 msgid "FoundHint / Schema"
 msgstr ""
@@ -6089,51 +6023,59 @@ msgstr ""
 msgid "The structured data your website prints so search engines can read your business, locations and services. It is built from your Business Profile."
 msgstr ""
 
-#: src/admin/pages/schema/components/page/SchemaHeader.jsx:93
-msgid "The Schema Manager is part of FoundHint Pro."
+#: src/admin/pages/schema/components/page/SchemaHeader.jsx:104
+msgid "Activate your FoundHint Premium licence."
 msgstr ""
 
-#: src/admin/pages/schema/components/page/SchemaHeader.jsx:98
-msgid "Below is the markup your site prints today. Pro lets you edit it, add locations, services and your website's structure, and choose where each prints."
+#: src/admin/pages/schema/components/page/SchemaHeader.jsx:108
+msgid "The Schema Manager is part of FoundHint Premium."
 msgstr ""
 
-#: src/admin/pages/schema/components/page/SchemaHeader.jsx:112
-msgid "Upgrade to Pro"
+#: src/admin/pages/schema/components/page/SchemaHeader.jsx:114
+msgid "Premium is installed but its licence isn't active, so the Schema Manager is locked and your site prints the free markup. Activate it on the Plugins screen; everything you saved comes back as it was."
 msgstr ""
 
-#: src/admin/pages/schema/components/page/SchemaHeader.jsx:135
+#: src/admin/pages/schema/components/page/SchemaHeader.jsx:118
+msgid "Below is the markup your site prints today. Premium lets you edit it, add locations, services and your website's structure, and choose where each prints."
+msgstr ""
+
+#: src/admin/pages/schema/components/page/SchemaHeader.jsx:143
+msgid "Upgrade to Premium"
+msgstr ""
+
+#: src/admin/pages/schema/components/page/SchemaHeader.jsx:167
 msgid "Read your Business Profile from Google."
 msgstr ""
 
-#: src/admin/pages/schema/components/page/TabBar.jsx:18 src/admin/pages/schema/components/services/list/ListHeader.jsx:20 src/admin/pages/schema/components/services/list/ListHeader.jsx:23
-msgid "Service schema"
+#: src/admin/pages/schema/components/page/TabBar.jsx:17
+msgid "LocalBusiness"
 msgstr ""
 
-#: src/admin/pages/schema/components/page/TabBar.jsx:19 src/admin/pages/schema/components/website/WebsiteTab.jsx:132
+#: src/admin/pages/schema/components/page/TabBar.jsx:20 src/admin/pages/schema/components/website/WebsiteTab.jsx:175
 msgid "Website structure"
 msgstr ""
 
-#: src/admin/pages/schema/components/page/TabBar.jsx:53
+#: src/admin/pages/schema/components/page/TabBar.jsx:54
 msgid "Schema sections"
 msgstr ""
 
-#: src/admin/pages/schema/components/page/TabBar.jsx:103
+#: src/admin/pages/schema/components/page/TabBar.jsx:104
 msgid "Off · not printed"
 msgstr ""
 
-#: src/admin/pages/schema/components/page/TabBar.jsx:116 src/admin/pages/schema/components/services/list/ServiceRow.jsx:167
+#: src/admin/pages/schema/components/page/TabBar.jsx:125 src/admin/pages/schema/components/services/list/ServiceRow.jsx:162
 msgid "Publish %s"
 msgstr ""
 
-#: src/admin/pages/schema/components/page/TabPanel.jsx:18
+#: src/admin/pages/schema/components/page/TabPanel.jsx:19
 msgid "Describe each branch: its own address, phone, hours and page, linked to your main business."
 msgstr ""
 
-#: src/admin/pages/schema/components/page/TabPanel.jsx:23
+#: src/admin/pages/schema/components/page/TabPanel.jsx:24
 msgid "Describe what you offer, who provides it, where, and at what price — each on its own page."
 msgstr ""
 
-#: src/admin/pages/schema/components/page/TabPanel.jsx:28
+#: src/admin/pages/schema/components/page/TabPanel.jsx:29
 msgid "Tie your pages together: your website's name, each page, About and Contact, and breadcrumbs."
 msgstr ""
 
@@ -6147,6 +6089,10 @@ msgstr ""
 
 #: src/admin/pages/schema/components/page/UnsavedDialog.jsx:33
 msgid "Stay"
+msgstr ""
+
+#: src/admin/pages/schema/components/page/UnsavedDialog.jsx:39
+msgid "Save"
 msgstr ""
 
 #: src/admin/pages/schema/components/services/editor/AreasSection.jsx:47
@@ -6473,6 +6419,10 @@ msgstr ""
 msgid "No services yet. Add the first one."
 msgstr ""
 
+#: src/admin/pages/schema/components/services/list/ListHeader.jsx:20 src/admin/pages/schema/components/services/list/ListHeader.jsx:23
+msgid "Service schema"
+msgstr ""
+
 #: src/admin/pages/schema/components/services/list/ListHeader.jsx:24
 msgid "Each service you offer, linked to the business or branch that provides it. It never creates a second business."
 msgstr ""
@@ -6489,7 +6439,7 @@ msgstr ""
 msgid "Services offered"
 msgstr ""
 
-#: src/admin/pages/schema/components/services/list/ListSummary.jsx:20
+#: src/admin/pages/schema/components/services/list/ListSummary.jsx:18
 msgid "%1$d active · %2$d inactive"
 msgstr ""
 
@@ -6497,7 +6447,7 @@ msgstr ""
 msgid "%s is published."
 msgstr ""
 
-#: src/admin/pages/schema/components/services/list/ServiceList.jsx:69
+#: src/admin/pages/schema/components/services/list/ServiceList.jsx:69 src/admin/pages/schema/components/website/WebsiteTab.jsx:159
 msgid "%s is off your site."
 msgstr ""
 
@@ -6509,11 +6459,11 @@ msgstr ""
 msgid "Move %s down"
 msgstr ""
 
-#: src/admin/pages/schema/components/services/list/ServiceRow.jsx:158
+#: src/admin/pages/schema/components/services/list/ServiceRow.jsx:153
 msgid "Active"
 msgstr ""
 
-#: src/admin/pages/schema/components/services/list/ServiceRow.jsx:159
+#: src/admin/pages/schema/components/services/list/ServiceRow.jsx:154
 msgid "Inactive"
 msgstr ""
 
@@ -6745,7 +6695,7 @@ msgstr ""
 msgid "No local business markup is published from this site."
 msgstr ""
 
-#: src/admin/pages/schema/components/settings/SettingsTab.jsx:75 src/admin/pages/schema/lib/tabSummaries.js:65
+#: src/admin/pages/schema/components/settings/SettingsTab.jsx:75 src/admin/pages/schema/lib/tabSummaries.js:62
 msgid "Who publishes it"
 msgstr ""
 
@@ -6773,40 +6723,56 @@ msgstr ""
 msgid "— may publish local business markup, depending on how it is set up. Check your page source if you are not sure."
 msgstr ""
 
-#: src/admin/pages/schema/components/shared/JsonPreview.jsx:105 src/admin/pages/schema/components/shared/JsonPreview.jsx:120
+#: src/admin/pages/schema/components/shared/JsonPreview.jsx:113 src/admin/pages/schema/components/shared/JsonPreview.jsx:128 src/admin/pages/schema/components/shared/LockedPreview.jsx:42 src/admin/pages/schema/components/shared/LockedPreview.jsx:50
 msgid "JSON-LD preview"
 msgstr ""
 
-#: src/admin/pages/schema/components/shared/JsonPreview.jsx:129
+#: src/admin/pages/schema/components/shared/JsonPreview.jsx:137
 msgid "properties"
 msgstr ""
 
-#: src/admin/pages/schema/components/shared/JsonPreview.jsx:164
+#: src/admin/pages/schema/components/shared/JsonPreview.jsx:172
 msgid "Building the preview…"
 msgstr ""
 
-#: src/admin/pages/schema/components/shared/JsonPreview.jsx:165
+#: src/admin/pages/schema/components/shared/JsonPreview.jsx:173
 msgid "Nothing is printed for this yet."
 msgstr ""
 
-#: src/admin/pages/schema/components/shared/JsonPreview.jsx:173
+#: src/admin/pages/schema/components/shared/JsonPreview.jsx:181
 msgid "Outputs on:"
 msgstr ""
 
-#: src/admin/pages/schema/components/shared/JsonPreview.jsx:206
+#: src/admin/pages/schema/components/shared/JsonPreview.jsx:214
 msgid "Test with Google"
 msgstr ""
 
-#: src/admin/pages/schema/components/shared/JsonPreview.jsx:221
+#: src/admin/pages/schema/components/shared/JsonPreview.jsx:229
 msgid "Check with Schema.org"
 msgstr ""
 
-#: src/admin/pages/schema/components/shared/JsonPreview.jsx:229
+#: src/admin/pages/schema/components/shared/JsonPreview.jsx:237
 msgid "Save first to test the live page."
 msgstr ""
 
-#: src/admin/pages/schema/components/shared/JsonPreview.jsx:232
+#: src/admin/pages/schema/components/shared/JsonPreview.jsx:240
 msgid "Google can't reach %s. Copy the schema and paste it into the test's Code tab instead."
+msgstr ""
+
+#: src/admin/pages/schema/components/shared/LockedPreview.jsx:71
+msgid "Schema preview is a Premium feature"
+msgstr ""
+
+#: src/admin/pages/schema/components/shared/LockedPreview.jsx:75
+msgid "FoundHint Premium is installed but its licence isn't active."
+msgstr ""
+
+#: src/admin/pages/schema/components/shared/LockedPreview.jsx:79
+msgid "See and edit the exact markup each schema adds to your site."
+msgstr ""
+
+#: src/admin/pages/schema/components/shared/LockedPreview.jsx:93
+msgid "Unlock with Premium"
 msgstr ""
 
 #: src/admin/pages/schema/components/shared/PlacementCards.jsx:37 src/admin/pages/schema/components/website/WebsiteTab.jsx:35
@@ -6850,7 +6816,7 @@ msgid "Saved and live on your site."
 msgstr ""
 
 #: src/admin/pages/schema/components/shared/SaveBar.jsx:21
-msgid "Saved. Your site keeps its current markup until FoundHint Pro's full schema output is switched on."
+msgid "Saved. Your site keeps its current markup until FoundHint Premium's full schema output is switched on."
 msgstr ""
 
 #: src/admin/pages/schema/components/shared/SaveBar.jsx:53
@@ -6913,32 +6879,44 @@ msgstr ""
 msgid "Some rows need attention."
 msgstr ""
 
-#: src/admin/pages/schema/components/website/WebsiteTab.jsx:133
+#: src/admin/pages/schema/components/website/WebsiteTab.jsx:154
+msgid "%s is added to your site."
+msgstr ""
+
+#: src/admin/pages/schema/components/website/WebsiteTab.jsx:176
 msgid "Tells Google what your site is, what each page is for and how pages connect."
 msgstr ""
 
-#: src/admin/pages/schema/components/website/WebsiteTab.jsx:162
+#: src/admin/pages/schema/components/website/WebsiteTab.jsx:205
 msgid "Its name: %s."
 msgstr ""
 
-#: src/admin/pages/schema/components/website/WebsiteTab.jsx:169
+#: src/admin/pages/schema/components/website/WebsiteTab.jsx:212
 msgid "Your SEO plugin publishes this type (Settings → Who publishes it), so FoundHint leaves it out."
 msgstr ""
 
-#: src/admin/pages/schema/components/website/WebsiteTab.jsx:177
+#: src/admin/pages/schema/components/website/WebsiteTab.jsx:220
 msgid "Found by its address. Save to confirm it."
 msgstr ""
 
-#: src/admin/pages/schema/components/website/WebsiteTab.jsx:187
+#: src/admin/pages/schema/components/website/WebsiteTab.jsx:230
 msgid "Added to"
 msgstr ""
 
-#: src/admin/pages/schema/components/website/WebsiteTab.jsx:201
+#: src/admin/pages/schema/components/website/WebsiteTab.jsx:244
 msgid "Page for %s"
 msgstr ""
 
-#: src/admin/pages/schema/components/website/WebsiteTab.jsx:244
+#: src/admin/pages/schema/components/website/WebsiteTab.jsx:281
 msgid "%s schema"
+msgstr ""
+
+#: src/admin/pages/schema/index.jsx:88
+msgid "%s is on and added to your site."
+msgstr ""
+
+#: src/admin/pages/schema/index.jsx:93
+msgid "%s is off. Nothing from it is added to your site."
 msgstr ""
 
 #: src/admin/pages/schema/lib/business.js:8 src/admin/pages/schema/lib/location.js:8
@@ -7149,15 +7127,11 @@ msgid_plural "%d Google profiles"
 msgstr[0] ""
 msgstr[1] ""
 
-#: src/admin/pages/schema/lib/locations.js:194 src/admin/pages/schema/lib/tabSummaries.js:78
+#: src/admin/pages/schema/lib/locations.js:194 src/admin/pages/schema/lib/tabSummaries.js:84
 msgid "%d branch"
 msgid_plural "%d branches"
 msgstr[0] ""
 msgstr[1] ""
-
-#: src/admin/pages/schema/lib/media.js:32
-msgid "Use this image"
-msgstr ""
 
 #: src/admin/pages/schema/lib/schema.js:7
 msgid "Branch name"
@@ -7309,35 +7283,35 @@ msgid_plural "%d areas"
 msgstr[0] ""
 msgstr[1] ""
 
-#: src/admin/pages/schema/lib/tabSummaries.js:20
+#: src/admin/pages/schema/lib/tabSummaries.js:19
 msgid "Coming in a later update"
 msgstr ""
 
-#: src/admin/pages/schema/lib/tabSummaries.js:42
+#: src/admin/pages/schema/lib/tabSummaries.js:39
 msgid "%1$d of %2$d added"
 msgstr ""
 
-#: src/admin/pages/schema/lib/tabSummaries.js:53
+#: src/admin/pages/schema/lib/tabSummaries.js:50
 msgid "Head office · described in 01"
 msgstr ""
 
-#: src/admin/pages/schema/lib/tabSummaries.js:62
+#: src/admin/pages/schema/lib/tabSummaries.js:59
 msgid "Added to site header"
 msgstr ""
 
-#: src/admin/pages/schema/lib/tabSummaries.js:63
+#: src/admin/pages/schema/lib/tabSummaries.js:60
 msgid "Header output off"
 msgstr ""
 
-#: src/admin/pages/schema/lib/tabSummaries.js:97
+#: src/admin/pages/schema/lib/tabSummaries.js:103
 msgid "%1$d active · %2$d to check"
 msgstr ""
 
-#: src/admin/pages/schema/lib/tabSummaries.js:103
+#: src/admin/pages/schema/lib/tabSummaries.js:109
 msgid "%d active"
 msgstr ""
 
-#: src/admin/pages/schema/lib/tabSummaries.js:82
+#: src/admin/pages/schema/lib/tabSummaries.js:88
 msgid "%d page"
 msgid_plural "%d pages"
 msgstr[0] ""
