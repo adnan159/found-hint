@@ -4,7 +4,7 @@ Tags: local seo, google business profile, local business schema, multi location,
 Requires at least: 6.4
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 1.2.0
+Stable tag: 1.2.1
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -402,6 +402,16 @@ No. Google is never contacted on visitor-facing pages, and no scripts or stylesh
 
 == Changelog ==
 
+= 1.2.1 =
+* New: Choose your logo, cover photo and gallery photos from the WordPress Media Library on the Business Profile's Photos tab. Dropping files on a photo still uploads them.
+* New: A failed post explains why it is not on Google, with Retry for a post Google did not take.
+* New: Link fields on posts can fill in your website address in one click.
+* Improvement: Redesigned Posts screen, with its actions in the header and your latest 5-star reviews ready to turn into thank-you posts.
+* Improvement: Redesigned Reviews screen and reply templates.
+* Improvement: Without FoundHint Premium, the Schema screen shows your details read-only, locks only the schema preview with an "Unlock with Premium" button, and marks Premium tabs with a badge.
+* Improvement: The remaining "FoundHint Pro" text on the Posts and Reviews screens now says FoundHint Premium.
+* Fix: Removing a photo that has not been sent to Google no longer deletes an image you picked from your Media Library.
+
 = 1.2.0 =
 * New: Redesigned Schema screen with Organization, LocalBusiness, Locations, Services, Website structure and Settings tabs, each with an on/off switch that saves at once.
 * New: Support for the FoundHint Premium Schema Manager: edit every schema type, manage branch locations and services, and choose where each one prints.
@@ -446,6 +456,9 @@ No. Google is never contacted on visitor-facing pages, and no scripts or stylesh
 * Google reviews for each location, with replies.
 
 == Upgrade Notice ==
+
+= 1.2.1 =
+Pick your Business Profile photos from the Media Library, redesigned Posts and Reviews screens, and a fix that keeps your Media Library images safe when a waiting photo is removed.
 
 = 1.2.0 =
 A redesigned Schema screen, support for the FoundHint Premium Schema Manager, and FoundHint comments around the schema in your page source.
