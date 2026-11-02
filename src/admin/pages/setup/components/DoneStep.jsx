@@ -42,10 +42,10 @@ export function DoneStep({ steps, onFinish, onBack }) {
                 <MinusIcon className="fhint:size-3" />
               )}
             </span>
-            <span className="fhint:text-[13px] fhint:font-bold">
+            <span className="fhint:text-sm fhint:font-bold">
               {LABELS[step.id] ? LABELS[step.id]() : step.id}
             </span>
-            <span className="fhint:ml-auto fhint:text-[12.5px] fhint:text-muted-strong">
+            <span className="fhint:ml-auto fhint:text-sm fhint:text-muted-strong">
               {step.done
                 ? __("Done", "foundhint-local-seo")
                 : __("Still to do", "foundhint-local-seo")}
@@ -54,7 +54,7 @@ export function DoneStep({ steps, onFinish, onBack }) {
         ))}
       </ul>
 
-      <p className="fhint:max-w-[62ch] fhint:text-[13.5px] fhint:text-muted-strong">
+      <p className="fhint:max-w-[62ch] fhint:text-sm fhint:text-muted-strong">
         {outstanding.length === 0
           ? __(
               "That is everything. You can change any of it at any time — the dashboard keeps track from here.",

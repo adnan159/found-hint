@@ -110,7 +110,7 @@ export function SocialSection({ model, onChange, errors, social }) {
 
       <div className="fhint:grid fhint:gap-2 fhint:border fhint:border-border fhint:bg-muted fhint:px-[15px] fhint:py-[13px]">
         <div className="fhint:flex fhint:flex-wrap fhint:items-center fhint:gap-3">
-          <span className="fhint:min-w-0 fhint:flex-1 fhint:text-[13px]">
+          <span className="fhint:min-w-0 fhint:flex-1 fhint:text-sm">
             <strong>
               {sprintf(
                 /* translators: %d: number of links. */

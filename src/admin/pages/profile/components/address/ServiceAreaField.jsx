@@ -70,7 +70,7 @@ export function ServiceAreaField({ value, onChange, errors, max = 20 }) {
         </label>
         <span
           aria-live="polite"
-          className="fhint:ml-auto fhint:text-[12.5px] fhint:font-bold fhint:text-muted-strong"
+          className="fhint:ml-auto fhint:text-sm fhint:font-bold fhint:text-muted-strong"
         >
           {sprintf(
             /* translators: 1: places added, 2: the most allowed. */
@@ -90,7 +90,7 @@ export function ServiceAreaField({ value, onChange, errors, max = 20 }) {
             <li
               key={`${place.place_id || "typed"}-${place.name}`}
               className={cn(
-                "fhint:inline-flex fhint:items-center fhint:gap-1.5 fhint:rounded-full fhint:border fhint:bg-muted fhint:py-1 fhint:pr-1 fhint:pl-2.5 fhint:text-[13px] fhint:font-bold",
+                "fhint:inline-flex fhint:items-center fhint:gap-1.5 fhint:rounded-full fhint:border fhint:bg-muted fhint:py-1 fhint:pr-1 fhint:pl-2.5 fhint:text-sm fhint:font-bold",
                 place.place_id
                   ? "fhint:border-border"
                   : "fhint:border-dashed fhint:border-muted-strong",

@@ -87,7 +87,7 @@ export function ServicesSection({ model, onChange, errors, services }) {
         <p
           className={cn(
             help,
-            "fhint:m-0 fhint:min-w-0 fhint:flex-1 fhint:text-[13px]",
+            "fhint:m-0 fhint:min-w-0 fhint:flex-1 fhint:text-sm",
           )}
         >
           {__(
@@ -124,7 +124,7 @@ export function ServicesSection({ model, onChange, errors, services }) {
               >
                 <div className="fhint:grid fhint:min-w-[200px] fhint:flex-1 fhint:gap-1">
                   <span className="fhint:flex fhint:flex-wrap fhint:items-center fhint:gap-2">
-                    <strong className="fhint:text-[13.5px]">{item.name}</strong>
+                    <strong className="fhint:text-sm">{item.name}</strong>
                     <span
                       className={cn(
                         tag,
@@ -148,7 +148,7 @@ export function ServicesSection({ model, onChange, errors, services }) {
                   </span>
                   <span
                     className={cn(
-                      "fhint:text-[12.5px] fhint:leading-[1.45]",
+                      "fhint:text-sm fhint:leading-[1.45]",
                       item.description
                         ? "fhint:text-foreground-soft"
                         : "fhint:text-muted-foreground",
@@ -164,9 +164,7 @@ export function ServicesSection({ model, onChange, errors, services }) {
                   ))}
                 </div>
                 {price ? (
-                  <span className="fhint:text-[13px] fhint:font-bold">
-                    {price}
-                  </span>
+                  <span className="fhint:text-sm fhint:font-bold">{price}</span>
                 ) : null}
                 <span className="fhint:flex fhint:gap-3">
                   <button

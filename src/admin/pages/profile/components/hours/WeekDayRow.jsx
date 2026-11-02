@@ -26,7 +26,7 @@ export function WeekDayRow({
 
   return (
     <div className={ROW}>
-      <span className="fhint:w-24 fhint:flex-none fhint:text-[13.5px] fhint:font-bold">
+      <span className="fhint:w-24 fhint:flex-none fhint:text-sm fhint:font-bold">
         {day.name}
       </span>
       {day.configured && day.open ? (
@@ -37,7 +37,7 @@ export function WeekDayRow({
           onChange={(next) => onChange(next)}
         />
       ) : (
-        <span className="fhint:flex fhint:min-w-0 fhint:flex-1 fhint:flex-wrap fhint:items-center fhint:gap-2 fhint:text-[13px] fhint:text-muted-foreground">
+        <span className="fhint:flex fhint:min-w-0 fhint:flex-1 fhint:flex-wrap fhint:items-center fhint:gap-2 fhint:text-sm fhint:text-muted-foreground">
           {day.configured
             ? __("Closed all day", "foundhint-local-seo")
             : __("Not set yet", "foundhint-local-seo")}

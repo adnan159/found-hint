@@ -43,19 +43,19 @@ function MappingRow({ location, googleLocations, onMap, onUnmap, isBusy }) {
     return (
       <div className="fhint:flex fhint:flex-wrap fhint:items-start fhint:gap-4 fhint:border fhint:border-border fhint:px-4 fhint:py-3.5">
         <div className="fhint:min-w-0 fhint:flex-1">
-          <div className="fhint:text-[13px] fhint:font-bold">
+          <div className="fhint:text-sm fhint:font-bold">
             {location.name || __("Untitled location", "foundhint-local-seo")}
           </div>
-          <div className="fhint:text-[12.5px] fhint:text-muted-strong">
+          <div className="fhint:text-sm fhint:text-muted-strong">
             {location.address}
           </div>
         </div>
         <div className="fhint:min-w-0 fhint:flex-1">
-          <div className="fhint:flex fhint:items-center fhint:gap-1.5 fhint:text-[13px] fhint:font-bold">
+          <div className="fhint:flex fhint:items-center fhint:gap-1.5 fhint:text-sm fhint:font-bold">
             <LinkIcon aria-hidden="true" className="fhint:size-3.5" />
             {location.mapped_title || location.mapped_to}
           </div>
-          <div className="fhint:text-[12.5px] fhint:text-muted-strong">
+          <div className="fhint:text-sm fhint:text-muted-strong">
             {location.mapped_address}
           </div>
         </div>
@@ -75,10 +75,10 @@ function MappingRow({ location, googleLocations, onMap, onUnmap, isBusy }) {
   return (
     <div className="fhint:flex fhint:flex-wrap fhint:items-start fhint:gap-4 fhint:border fhint:border-border fhint:px-4 fhint:py-3.5">
       <div className="fhint:min-w-0 fhint:flex-1">
-        <div className="fhint:text-[13px] fhint:font-bold">
+        <div className="fhint:text-sm fhint:font-bold">
           {location.name || __("Untitled location", "foundhint-local-seo")}
         </div>
-        <div className="fhint:text-[12.5px] fhint:text-muted-strong">
+        <div className="fhint:text-sm fhint:text-muted-strong">
           {location.address}
         </div>
       </div>
@@ -113,7 +113,7 @@ function MappingRow({ location, googleLocations, onMap, onUnmap, isBusy }) {
         </Select>
 
         {location.suggestions?.length ? (
-          <p className="fhint:text-[12.5px] fhint:text-muted-strong">
+          <p className="fhint:text-sm fhint:text-muted-strong">
             {sprintf(
               /* translators: %s: name of the closest matching Google profile. */
               __("Closest match: %s", "foundhint-local-seo"),

@@ -68,7 +68,7 @@ export function GoogleTypeField({
         id={`${id}-type-note`}
         role={invalid ? "alert" : undefined}
         className={cn(
-          "fhint:text-[13px]",
+          "fhint:text-sm",
           invalid && googleTypes.length ? errorText : "fhint:text-muted-strong",
           !invalid && googleTypes.length && "fhint:sr-only",
         )}

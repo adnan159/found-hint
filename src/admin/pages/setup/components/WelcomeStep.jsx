@@ -59,17 +59,17 @@ export function WelcomeStep({ onStart }) {
             <div className="fhint:mb-2 fhint:text-[11px] fhint:font-extrabold fhint:tracking-[0.14em] fhint:text-primary fhint:uppercase">
               {pillar.eyebrow}
             </div>
-            <div className="fhint:mb-1 fhint:text-[14.5px] fhint:font-extrabold">
+            <div className="fhint:mb-1 fhint:text-sm fhint:font-extrabold">
               {pillar.title}
             </div>
-            <div className="fhint:text-[13px] fhint:leading-relaxed fhint:text-muted-strong">
+            <div className="fhint:text-sm fhint:leading-relaxed fhint:text-muted-strong">
               {pillar.body}
             </div>
           </div>
         ))}
       </div>
 
-      <p className="fhint:text-[12.5px] fhint:text-muted-foreground">
+      <p className="fhint:text-sm fhint:text-muted-foreground">
         {__(
           "Takes about five minutes. You can change anything later.",
           "foundhint-local-seo",

@@ -179,7 +179,7 @@ export default function DashboardPage() {
         <SectionCard
           title={__("Setup progress", "foundhint-local-seo")}
           action={
-            <span className="fhint:text-[13px] fhint:text-muted-strong">
+            <span className="fhint:text-sm fhint:text-muted-strong">
               {sprintf(
                 /* translators: 1: number of completed steps, 2: total steps. */
                 __("%1$d of %2$d steps done", "foundhint-local-seo"),
@@ -225,8 +225,8 @@ export default function DashboardPage() {
                   <span
                     className={
                       step.done
-                        ? "fhint:text-[13px] fhint:font-medium fhint:text-muted-strong"
-                        : "fhint:text-[13px] fhint:font-bold"
+                        ? "fhint:text-sm fhint:font-medium fhint:text-muted-strong"
+                        : "fhint:text-sm fhint:font-bold"
                     }
                   >
                     {step.label}

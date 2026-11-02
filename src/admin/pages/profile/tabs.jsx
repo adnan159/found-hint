@@ -86,7 +86,7 @@ export function buildProfileTabs({
             google={google}
             limits={meta.limits}
           />
-          <p className="fhint:m-0 fhint:text-[12.5px] fhint:text-muted-strong">
+          <p className="fhint:m-0 fhint:text-sm fhint:text-muted-strong">
             {__(
               "Legal name, business type, email, logo, price range and founding date are used only in your website markup.",
               "foundhint-local-seo",

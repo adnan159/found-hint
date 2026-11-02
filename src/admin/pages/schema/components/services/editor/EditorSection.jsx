@@ -1,5 +1,5 @@
-import { useId } from "react";
 import Hint from "@/components/Hint";
+import { useId } from "react";
 
 /** The small grey number before each section's title: 01, 02… */
 export const sectionNumber =
@@ -19,7 +19,7 @@ export function EditorSection({ number, title, hint, children }) {
     >
       <div className="fhint:flex fhint:items-center fhint:gap-2.5">
         <span className={sectionNumber}>{number}</span>
-        <h3 id={id} className="fhint:m-0 fhint:text-[15px] fhint:font-bold">
+        <h3 id={id} className="fhint:m-0 fhint:text-sm fhint:font-bold">
           {title}
         </h3>
         {hint ? <Hint about={title} text={hint} /> : null}

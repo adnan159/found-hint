@@ -44,7 +44,7 @@ export function SubtypePicker({
       </div>
 
       {locked ? (
-        <div className="fhint:flex fhint:items-center fhint:gap-2.5 fhint:border fhint:border-border fhint:bg-muted fhint:px-3 fhint:py-[9px] fhint:text-[13.5px]">
+        <div className="fhint:flex fhint:items-center fhint:gap-2.5 fhint:border fhint:border-border fhint:bg-muted fhint:px-3 fhint:py-[9px] fhint:text-sm">
           <span className="fhint:min-w-0 fhint:flex-1">{typeLabel}</span>
           <code className="fhint:bg-notice fhint:px-1.5 fhint:py-px fhint:font-mono fhint:text-[11.5px] fhint:text-notice-foreground">
             {type}

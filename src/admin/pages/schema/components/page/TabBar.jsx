@@ -83,7 +83,7 @@ export function TabBar({
               </span>
               <strong
                 className={cn(
-                  "fhint:text-[14px]",
+                  "fhint:text-sm",
                   off && "fhint:text-muted-strong",
                 )}
               >
@@ -91,7 +91,7 @@ export function TabBar({
               </strong>
               <span
                 className={cn(
-                  "fhint:text-[12.5px]",
+                  "fhint:text-sm",
                   "fhint:text-muted-strong",
                   unsaved && "fhint:font-bold",
                 )}

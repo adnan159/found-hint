@@ -9,7 +9,7 @@ import { SKIP_REASONS, fieldName } from "./labels";
 export function SkippedList({ skipped }) {
   return (
     <div className="fhint:grid fhint:gap-1.5">
-      <strong className="fhint:text-[13px]">
+      <strong className="fhint:text-sm">
         {__("Not being sent", "foundhint-local-seo")}
       </strong>
       <ul className="fhint:m-0 fhint:grid fhint:list-none fhint:gap-1 fhint:p-0">

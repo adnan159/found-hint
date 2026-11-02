@@ -32,7 +32,7 @@ const BASE =
 
 const SIZES = {
   // Hour pickers, filters: sized by their content, not their column.
-  sm: "fhint:px-[7px]! fhint:py-[5px]! fhint:text-[12.5px]",
+  sm: "fhint:px-[7px]! fhint:py-[5px]! fhint:text-sm",
   // The default field.
   md: "fhint:w-full fhint:px-3! fhint:py-2.5! fhint:text-sm",
   // A dialog with one job, read at arm's length.

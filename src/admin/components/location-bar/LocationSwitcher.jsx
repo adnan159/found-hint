@@ -103,7 +103,7 @@ export function LocationSwitcher({ entries, location, onSwitch, busy }) {
                     ) : null}
                   </span>
                   {entry.address ? (
-                    <span className="fhint:text-[12.5px] fhint:text-muted-strong">
+                    <span className="fhint:text-sm fhint:text-muted-strong">
                       {entry.address}
                     </span>
                   ) : null}

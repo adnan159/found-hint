@@ -139,7 +139,7 @@ export function OffPanel({
             {__("Off", "foundhint-local-seo")}
           </span>
         </h2>
-        <p className="fhint:m-0 fhint:text-[14px] fhint:leading-relaxed">
+        <p className="fhint:m-0 fhint:text-sm fhint:leading-relaxed">
           {copy.body()}
         </p>
         <p className={cn(muted, "fhint:m-0")}>

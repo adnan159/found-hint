@@ -48,9 +48,7 @@ export function PhotoSlot({
     <div className="fhint:grid fhint:content-start fhint:gap-3 fhint:rounded-[12px] fhint:border fhint:border-border fhint:bg-card fhint:p-4">
       <div className="fhint:flex fhint:flex-wrap fhint:items-center fhint:gap-2">
         <span className={cn(label, "fhint:text-sm")}>{title}</span>
-        <span className="fhint:text-[12.5px] fhint:text-muted-strong">
-          {shape}
-        </span>
+        <span className="fhint:text-sm fhint:text-muted-strong">{shape}</span>
         {status ? (
           <span className={cn(tag, status.tone, "fhint:ml-auto")}>
             {status.label}
@@ -91,7 +89,7 @@ export function PhotoSlot({
                 className="fhint:size-6 fhint:text-muted-strong"
                 strokeWidth={1.5}
               />
-              <span className="fhint:text-[13.5px] fhint:font-semibold fhint:text-foreground-soft">
+              <span className="fhint:text-sm fhint:font-semibold fhint:text-foreground-soft">
                 {placeholder}
               </span>
               <span className="fhint:text-[11.5px] fhint:text-muted-strong">

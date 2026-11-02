@@ -1,6 +1,7 @@
+import { useId } from "react";
 import { __ } from "@wordpress/i18n";
 import { cn } from "cn";
-import { focus, smallInput } from "@/pages/profile/styles";
+import { focus, input, label, tag, tagTones } from "@/pages/profile/styles";
 
 const TABS = [
   ["", () => __("All", "foundhint-local-seo"), "all"],
@@ -52,15 +53,24 @@ function selects() {
 }
 
 /**
- * Type tabs with their counts, then status, time, source and order.
+ * The type tabs with their counts — underlined in the accent like the
+ * reply templates' star tabs — then status, time, source and order as
+ * labelled fields, as the Reviews filters are.
+ *
+ * @param {Object}   props
+ * @param {Object}   props.filters  `{ type, status, days, source, sort }`.
+ * @param {Object}   [props.counts] Posts per type: `{ all, update, … }`.
+ * @param {Function} props.onChange Receives the changed filters.
  */
 export function PostFilters({ filters, counts, onChange }) {
+  const id = useId();
+
   return (
-    <div className="fhint:flex fhint:flex-wrap fhint:items-center fhint:gap-3 fhint:border-b fhint:border-b-border fhint:px-4 fhint:py-3">
+    <div className="fhint:grid fhint:gap-5">
       <div
         role="tablist"
         aria-label={__("Post type", "foundhint-local-seo")}
-        className="fhint:inline-flex fhint:gap-1 fhint:bg-muted fhint:p-1"
+        className="fhint:flex fhint:flex-wrap fhint:border-b fhint:border-b-border"
       >
         {TABS.map(([value, text, key]) => {
           const on = filters.type === value;
@@ -73,20 +83,19 @@ export function PostFilters({ filters, counts, onChange }) {
               aria-selected={on}
               onClick={() => onChange({ ...filters, type: value })}
               className={cn(
-                "fhint:inline-flex fhint:cursor-pointer fhint:items-center fhint:gap-2 fhint:border-0 fhint:px-3 fhint:py-1.5 fhint:text-[12.5px] fhint:font-extrabold",
+                "fhint:-mb-px fhint:inline-flex fhint:cursor-pointer fhint:items-center fhint:gap-2 fhint:border-0 fhint:border-b-2 fhint:bg-transparent fhint:px-3 fhint:pt-1 fhint:pb-2.5 fhint:text-sm fhint:leading-none fhint:font-extrabold fhint:transition-colors",
                 on
-                  ? "fhint:bg-card fhint:text-foreground fhint:shadow-sm"
-                  : "fhint:bg-transparent fhint:text-muted-strong",
+                  ? "fhint:border-b-primary fhint:text-foreground"
+                  : "fhint:border-b-transparent fhint:text-muted-strong fhint:hover:border-b-border fhint:hover:text-foreground",
                 focus,
               )}
             >
               {text()}
               <span
                 className={cn(
-                  "fhint:min-w-5 fhint:rounded-full fhint:px-1.5 fhint:text-[11px] fhint:leading-[18px]",
-                  on
-                    ? "fhint:bg-primary fhint:text-primary-foreground"
-                    : "fhint:bg-card fhint:text-muted-strong",
+                  tag,
+                  "fhint:rounded-full",
+                  on ? tagTones.accent : tagTones.quiet,
                 )}
               >
                 {counts?.[key] ?? 0}
@@ -96,23 +105,27 @@ export function PostFilters({ filters, counts, onChange }) {
         })}
       </div>
 
-      <div className="fhint:ml-auto fhint:flex fhint:flex-wrap fhint:gap-2">
+      <div className="fhint:grid fhint:grid-cols-1 fhint:gap-3 fhint:sm:grid-cols-2 fhint:xl:grid-cols-4">
         {selects().map(([key, name, options]) => (
-          <select
-            key={key}
-            aria-label={name}
-            value={String(filters[key])}
-            onChange={(event) =>
-              onChange({ ...filters, [key]: event.target.value })
-            }
-            className={cn(smallInput, "fhint:min-w-[120px] fhint:pr-7!")}
-          >
-            {options.map(([value, text]) => (
-              <option key={value} value={value}>
-                {text}
-              </option>
-            ))}
-          </select>
+          <div key={key} className="fhint:grid fhint:min-w-0 fhint:gap-1.5">
+            <label htmlFor={`${id}-${key}`} className={label}>
+              {name}
+            </label>
+            <select
+              id={`${id}-${key}`}
+              value={String(filters[key])}
+              onChange={(event) =>
+                onChange({ ...filters, [key]: event.target.value })
+              }
+              className={input}
+            >
+              {options.map(([value, text]) => (
+                <option key={value} value={value}>
+                  {text}
+                </option>
+              ))}
+            </select>
+          </div>
         ))}
       </div>
     </div>

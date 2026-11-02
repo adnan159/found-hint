@@ -62,7 +62,7 @@ const COLOUR = {
 };
 
 const action = cn(
-  "fhint:inline-flex fhint:items-center fhint:gap-2 fhint:px-3.5 fhint:py-2.5 fhint:text-[13.5px] fhint:font-bold fhint:no-underline",
+  "fhint:inline-flex fhint:items-center fhint:gap-2 fhint:px-3.5 fhint:py-2.5 fhint:text-sm fhint:font-bold fhint:no-underline",
   focus,
 );
 
@@ -116,7 +116,7 @@ export function JsonPreview({
             live ? "fhint:bg-[#3BC27A]" : "fhint:bg-muted-foreground",
           )}
         />
-        <strong className="fhint:text-[14px]">
+        <strong className="fhint:text-sm">
           {__("JSON-LD preview", "foundhint-local-seo")}
         </strong>
         {rootType ? (
@@ -159,7 +159,7 @@ export function JsonPreview({
             </code>
           </pre>
         ) : (
-          <p className="fhint:m-0 fhint:px-[18px] fhint:text-[13px] fhint:text-muted-foreground">
+          <p className="fhint:m-0 fhint:px-[18px] fhint:text-sm fhint:text-muted-foreground">
             {loading
               ? __("Building the preview…", "foundhint-local-seo")
               : __("Nothing is printed for this yet.", "foundhint-local-seo")}
@@ -214,7 +214,7 @@ export function JsonPreview({
           rel="noopener noreferrer"
           className={cn(
             action,
-            "fhint:col-span-full fhint:justify-center fhint:border fhint:border-input fhint:bg-card fhint:py-2 fhint:text-[12.5px] fhint:text-foreground!",
+            "fhint:col-span-full fhint:justify-center fhint:border fhint:border-input fhint:bg-card fhint:py-2 fhint:text-sm fhint:text-foreground!",
           )}
         >
           <ExternalLinkIcon aria-hidden="true" className="fhint:size-3.5" />

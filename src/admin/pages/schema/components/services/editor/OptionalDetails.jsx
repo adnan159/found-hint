@@ -1,9 +1,9 @@
-import { useState } from "react";
-import { __ } from "@wordpress/i18n";
-import { ChevronDownIcon } from "lucide-react";
-import { cn } from "cn";
 import Hint from "@/components/Hint";
 import { focus } from "@/pages/profile/styles";
+import { __ } from "@wordpress/i18n";
+import { cn } from "cn";
+import { ChevronDownIcon } from "lucide-react";
+import { useState } from "react";
 import { currencyOptions, pricingSummary } from "../../../lib/service";
 import { label, muted } from "../../styles";
 import { sectionNumber } from "./EditorSection";

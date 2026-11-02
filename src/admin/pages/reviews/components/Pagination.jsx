@@ -38,7 +38,7 @@ export function Pagination({ page, pages, perPage, onPage, onPerPage, label }) {
       aria-label={label ?? __("Review pages", "foundhint-local-seo")}
       className="fhint:flex fhint:flex-wrap fhint:items-center fhint:gap-3"
     >
-      <span className="fhint:flex fhint:items-center fhint:gap-2 fhint:text-[12.5px]">
+      <span className="fhint:flex fhint:items-center fhint:gap-2 fhint:text-sm">
         <label htmlFor={id}>{__("Per page", "foundhint-local-seo")}</label>
         <select
           id={id}
@@ -89,7 +89,7 @@ export function Pagination({ page, pages, perPage, onPage, onPerPage, label }) {
                     n,
                   )}
                   className={cn(
-                    "fhint:grid fhint:h-[30px] fhint:min-w-[30px] fhint:cursor-pointer fhint:place-items-center fhint:border fhint:px-2 fhint:text-[12.5px] fhint:font-extrabold",
+                    "fhint:grid fhint:h-[30px] fhint:min-w-[30px] fhint:cursor-pointer fhint:place-items-center fhint:border fhint:px-2 fhint:text-sm fhint:font-extrabold",
                     n === page
                       ? "fhint:border-foreground fhint:bg-foreground fhint:text-background"
                       : "fhint:border-input fhint:bg-card fhint:text-foreground fhint:hover:bg-muted",

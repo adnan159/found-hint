@@ -1,7 +1,7 @@
 /**
  * Class strings shared by the profile's sections.
  *
- * Measured from the design: 13px bold labels, 12.5px help text, square
+ * 14px bold labels and help text (the body-text minimum), square
  * corners throughout. Kept here so seven sections read as one screen.
  *
  * The fields themselves come from `lib/fieldStyles` — the one definition of
@@ -15,24 +15,24 @@ import { focusRing, textInput } from "@/lib/fieldStyles";
 
 const FOCUS = focusRing;
 
-export const label = "fhint:text-[13px] fhint:font-bold";
+export const label = "fhint:text-sm fhint:font-bold";
 
 export const help =
-  "fhint:text-[12.5px] fhint:leading-normal fhint:text-muted-strong";
+  "fhint:text-sm fhint:leading-normal fhint:text-muted-strong";
 
 export const errorText =
-  "fhint:text-[12.5px] fhint:font-semibold fhint:text-destructive";
+  "fhint:text-sm fhint:font-semibold fhint:text-destructive";
 
 export const input = textInput();
 
 export const smallInput = textInput({ size: "sm" });
 
 // The bordered white button used for secondary actions inside a section.
-export const quietButton = `fhint:inline-flex fhint:cursor-pointer fhint:items-center fhint:gap-1.5 fhint:border fhint:border-input fhint:bg-card fhint:px-[11px] fhint:py-[7px] fhint:text-[12.5px] fhint:font-extrabold fhint:text-foreground fhint:no-underline fhint:disabled:cursor-not-allowed fhint:disabled:text-muted-foreground ${FOCUS}`;
+export const quietButton = `fhint:inline-flex fhint:cursor-pointer fhint:items-center fhint:gap-1.5 fhint:border fhint:border-input fhint:bg-card fhint:px-[11px] fhint:py-[7px] fhint:text-sm fhint:font-extrabold fhint:text-foreground fhint:no-underline fhint:disabled:cursor-not-allowed fhint:disabled:text-muted-foreground ${FOCUS}`;
 
-export const primaryButton = `fhint:inline-flex fhint:cursor-pointer fhint:items-center fhint:gap-1.5 fhint:border-0 fhint:bg-primary fhint:px-[13px] fhint:py-2 fhint:text-[12.5px] fhint:font-extrabold fhint:text-primary-foreground fhint:disabled:cursor-not-allowed fhint:disabled:bg-border fhint:disabled:text-muted-foreground ${FOCUS}`;
+export const primaryButton = `fhint:inline-flex fhint:cursor-pointer fhint:items-center fhint:gap-1.5 fhint:border-0 fhint:bg-primary fhint:px-[13px] fhint:py-2 fhint:text-sm fhint:font-extrabold fhint:text-primary-foreground fhint:disabled:cursor-not-allowed fhint:disabled:bg-border fhint:disabled:text-muted-foreground ${FOCUS}`;
 
-export const linkButton = `fhint:cursor-pointer fhint:border-0 fhint:bg-transparent fhint:p-0 fhint:text-[12.5px] fhint:font-extrabold fhint:text-foreground fhint:underline ${FOCUS}`;
+export const linkButton = `fhint:cursor-pointer fhint:border-0 fhint:bg-transparent fhint:p-0 fhint:text-sm fhint:font-extrabold fhint:text-foreground fhint:underline ${FOCUS}`;
 
 // The small uppercase tag beside a title or a name.
 export const tag =
