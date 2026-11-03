@@ -1,36 +1,18 @@
+import { useEffect, useRef } from "react";
 import { __, sprintf } from "@wordpress/i18n";
 import { cn } from "cn";
 import { SparklesIcon } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
 import { focus } from "@/pages/profile/styles";
+import { SWITCHED, TABS } from "../../lib/tabs";
+
+export { TABS, SWITCHED };
 
 /**
- * The schema tabs, each with its number, title and a live one-line summary.
- * The chosen one: an accent rule along its bottom edge.
+ * The schema tabs, each with its number, title, a live one-line summary and
+ * what it describes. The chosen one: an accent rule along its bottom.
+ * The tab list lives in `lib/tabs`.
  *
- * Organization (the brand) and LocalBusiness (the place) are separate tabs.
- * Each schema tab has a switch: on prints its schema; off keeps every
- * detail and prints nothing. Settings has none.
- */
-export const TABS = [
-  ["organization", () => __("Organization", "foundhint-local-seo")],
-  ["localbusiness", () => __("LocalBusiness", "foundhint-local-seo")],
-  ["locations", () => __("Locations", "foundhint-local-seo")],
-  ["services", () => __("Services", "foundhint-local-seo")],
-  ["website", () => __("Website structure", "foundhint-local-seo")],
-  ["settings", () => __("Settings", "foundhint-local-seo")],
-];
-
-/** Tabs with an on/off switch. */
-export const SWITCHED = [
-  "organization",
-  "localbusiness",
-  "locations",
-  "services",
-  "website",
-];
-
-/**
  * @param {Object}   props
  * @param {string}   props.current   The open tab.
  * @param {Object}   props.summaries Summary text by tab.
@@ -49,24 +31,43 @@ export function TabBar({
   onPick,
   onToggle,
 }) {
+  const bar = useRef(null);
+
+  // Keep the open tab in sight when the row scrolls.
+  useEffect(() => {
+    bar.current
+      ?.querySelector("[data-current]")
+      ?.scrollIntoView({ block: "nearest", inline: "nearest" });
+  }, [current]);
+
   return (
     <nav
       aria-label={__("Schema sections", "foundhint-local-seo")}
-      className="fhint:grid fhint:grid-cols-[repeat(auto-fit,minmax(min(100%,170px),1fr))] fhint:border fhint:border-border fhint:bg-card"
+      ref={bar}
+      // One row, always: on a narrow screen the row scrolls sideways
+      // instead of wrapping. A 1px gap over the border colour draws the
+      // dividers.
+      className="fhint:grid fhint:snap-x fhint:auto-cols-[minmax(190px,1fr)] fhint:grid-flow-col fhint:gap-px fhint:overflow-x-auto fhint:overscroll-x-contain fhint:border fhint:border-border fhint:bg-border"
     >
-      {TABS.map(([key, title], index) => {
+      {TABS.map(([key, title, description], index) => {
         const on = key === current;
         const unsaved = dirty && on;
         const switched = SWITCHED.includes(key);
         const off = switched && enabled[key] === false;
+        const premium = summaries.premium?.[key];
 
         return (
           <div
             key={key}
+            data-current={on || undefined}
             className={cn(
-              "fhint:relative fhint:flex fhint:min-w-0 fhint:border-r fhint:border-r-border fhint:bg-card",
-              // The chosen tab: an accent rule along its bottom edge.
-              on && "fhint:shadow-[inset_0_-3px_0_var(--primary)]",
+              "fhint:relative fhint:flex fhint:min-w-0 fhint:snap-start fhint:transition-colors",
+              // Every tab is white; the chosen one has an accent rule along
+              // its bottom.
+              "fhint:bg-card",
+              on
+                ? "fhint:shadow-[inset_0_-3px_0_var(--primary)]"
+                : "fhint:hover:bg-muted/50",
             )}
           >
             <button
@@ -74,48 +75,58 @@ export function TabBar({
               aria-current={on ? "page" : undefined}
               onClick={() => onPick(key)}
               className={cn(
-                "fhint:grid fhint:min-w-0 fhint:flex-1 fhint:cursor-pointer fhint:gap-0.5 fhint:border-0 fhint:bg-transparent fhint:py-[13px] fhint:pl-4 fhint:text-left fhint:text-foreground",
-                switched ? "fhint:pr-14" : "fhint:pr-4",
+                "fhint:grid fhint:min-w-0 fhint:flex-1 fhint:cursor-pointer fhint:content-start fhint:gap-1 fhint:border-0 fhint:bg-transparent fhint:pt-4 fhint:pb-3.5 fhint:pl-4 fhint:text-left fhint:text-foreground",
+                switched && !premium ? "fhint:pr-14" : "fhint:pr-3",
                 focus,
               )}
             >
-              <span className="fhint:text-[11.5px] fhint:font-bold fhint:tracking-[0.06em] fhint:text-muted-foreground">
-                {`0${index + 1}`}
-              </span>
-              <strong
-                className={cn(
-                  "fhint:text-sm",
-                  off && "fhint:text-muted-strong",
-                )}
-              >
-                {title()}
-              </strong>
-              <span
-                className={cn(
-                  "fhint:text-sm",
-                  "fhint:text-muted-strong",
-                  unsaved && "fhint:font-bold",
-                )}
-              >
-                {unsaved ? (
-                  __("Unsaved changes", "foundhint-local-seo")
-                ) : off ? (
-                  (summaries.offText?.[key] ??
-                  __("Off · not printed", "foundhint-local-seo"))
-                ) : summaries.premium?.[key] ? (
-                  // A Premium tab without Premium: the brand's badge.
-                  <span className="fhint:inline-flex fhint:items-center fhint:gap-1 fhint:rounded-full fhint:bg-[#FFF1EB] fhint:px-2 fhint:py-0.5 fhint:text-[11.5px] fhint:font-bold fhint:text-[#D8521F]">
+              {/* "01 Organization", and a Premium tab's badge at the right. */}
+              <span className="fhint:flex fhint:min-w-0 fhint:items-center fhint:gap-2">
+                <span
+                  className={cn(
+                    "fhint:text-sm fhint:leading-5 fhint:font-bold fhint:tabular-nums",
+                    on ? "fhint:text-primary" : "fhint:text-muted-foreground",
+                  )}
+                >
+                  {`0${index + 1}`}
+                </span>
+                <strong
+                  className={cn(
+                    "fhint:min-w-0 fhint:truncate fhint:text-sm fhint:leading-5",
+                    off && "fhint:text-muted-strong",
+                  )}
+                >
+                  {title()}
+                </strong>
+                {premium ? (
+                  <span className="fhint:ml-auto fhint:inline-flex fhint:shrink-0 fhint:items-center fhint:gap-1 fhint:rounded-full fhint:border fhint:border-[#F5C2AD] fhint:bg-card fhint:px-2 fhint:py-0.5 fhint:text-[11px] fhint:font-bold fhint:text-[#B8441A]">
                     <SparklesIcon aria-hidden="true" className="fhint:size-3" />
                     {summaries[key]}
                   </span>
-                ) : (
-                  summaries[key]
-                )}
+                ) : null}
+              </span>
+              {premium ? null : (
+                <span
+                  className={cn(
+                    "fhint:text-[13px] fhint:text-muted-strong",
+                    unsaved && "fhint:font-bold fhint:text-foreground",
+                  )}
+                >
+                  {unsaved
+                    ? __("Unsaved changes", "foundhint-local-seo")
+                    : off
+                      ? (summaries.offText?.[key] ??
+                        __("Off · not printed", "foundhint-local-seo"))
+                      : summaries[key]}
+                </span>
+              )}
+              <span className="fhint:mt-1 fhint:border-t fhint:border-t-border fhint:pt-2 fhint:text-[12.5px] fhint:leading-snug fhint:text-muted-foreground">
+                {description()}
               </span>
             </button>
 
-            {switched && enabled[key] !== undefined ? (
-              <span className="fhint:absolute fhint:top-3 fhint:right-3">
+            {switched && !premium && enabled[key] !== undefined ? (
+              <span className="fhint:absolute fhint:top-3.5 fhint:right-3">
                 <Switch
                   checked={!off}
                   disabled={locked}

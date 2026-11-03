@@ -31,6 +31,11 @@ import PanelHeading from "../shared/PanelHeading";
 
 const TITLE_ID = "fhint-schema-location-title";
 
+// No outer panel: the branch's head and sections, each field group, More
+// options and the save bar are cards of their own. A card's last row drops
+// its divider, which the card's own edge now draws.
+const CARD = cn(panel, "fhint:*:last:border-b-0");
+
 /**
  * Where a branch's schema prints (design: "Outputs on"): its page, or why
  * it prints nowhere yet.
@@ -199,28 +204,27 @@ export function LocationTab({
     <div className="fhint:flex fhint:flex-wrap fhint:items-start fhint:gap-4">
       <section
         aria-labelledby={TITLE_ID}
-        className={cn(panel, "fhint:min-w-0 fhint:flex-[1_1_580px]")}
+        className="fhint:grid fhint:min-w-0 fhint:flex-[1_1_580px] fhint:gap-4"
       >
         {locked ? (
           <PanelHeading
             id={TITLE_ID}
             title={__("Location schema", "foundhint-local-seo")}
-            description={__(
-              "Each branch: its own address, phone, hours and page, linked to your business.",
-              "foundhint-local-seo",
-            )}
             counter={state.counter}
+            srOnly
           />
         ) : (
-          <BranchSections
-            state={{ ...state, id: branchId }}
-            row={roster?.rows?.find((item) => item.id === branchId)}
-            draft={draft}
-            set={set}
-            locked={locked}
-            onBack={onAllLocations}
-            usedBy={usedBy(roster, branchId)}
-          />
+          <div className={CARD}>
+            <BranchSections
+              state={{ ...state, id: branchId }}
+              row={roster?.rows?.find((item) => item.id === branchId)}
+              draft={draft}
+              set={set}
+              locked={locked}
+              onBack={onAllLocations}
+              usedBy={usedBy(roster, branchId)}
+            />
+          </div>
         )}
 
         <LocationFields
@@ -234,10 +238,7 @@ export function LocationTab({
         {/* What the design leaves out, kept: switching the branch's output,
             the branch buttons, its sister branches, and pages of its own
             beyond its location page. */}
-        <details
-          open={locked || undefined}
-          className="fhint:group fhint:border-t fhint:border-t-[#e6e3e3]"
-        >
+        <details open={locked || undefined} className={cn(CARD, "fhint:group")}>
           <summary className="fhint:flex fhint:cursor-pointer fhint:items-center fhint:gap-2 fhint:px-5 fhint:py-3.5 fhint:text-[13px] fhint:font-bold fhint:text-[#201e1d] fhint:marker:content-none">
             <ChevronRightIcon
               aria-hidden="true"
@@ -269,7 +270,7 @@ export function LocationTab({
             />
           </div>
 
-          <div className="fhint:grid fhint:grid-cols-[repeat(auto-fill,minmax(min(100%,230px),1fr))] fhint:gap-4 fhint:border-b fhint:border-b-border fhint:px-5 fhint:py-3.5">
+          <div className="fhint:grid fhint:grid-cols-[repeat(auto-fill,minmax(min(100%,230px),1fr))] fhint:gap-x-4 fhint:gap-y-5 fhint:border-b fhint:border-b-border fhint:px-5 fhint:py-3.5">
             <BranchGroupFields parent={parent} sisters={state.sisters} />
           </div>
 
@@ -298,20 +299,22 @@ export function LocationTab({
         {saveState.error && !Object.keys(errors).length ? (
           <p
             role="alert"
-            className="fhint:mx-5 fhint:mb-3 fhint:text-sm fhint:text-destructive"
+            className="fhint:m-0 fhint:text-sm fhint:text-destructive"
           >
             {errorMessage(saveState.error)}
           </p>
         ) : null}
 
         {locked ? null : (
-          <SaveBar
-            dirty={dirty}
-            saving={saveState.isLoading}
-            status={missing.length ? "draft" : state.status}
-            live={live}
-            onSave={onSave}
-          />
+          <div className={cn(panel, "fhint:*:border-t-0")}>
+            <SaveBar
+              dirty={dirty}
+              saving={saveState.isLoading}
+              status={missing.length ? "draft" : state.status}
+              live={live}
+              onSave={onSave}
+            />
+          </div>
         )}
       </section>
 

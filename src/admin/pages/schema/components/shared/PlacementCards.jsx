@@ -2,7 +2,7 @@ import { useState } from "react";
 import { __, sprintf } from "@wordpress/i18n";
 import { cn } from "cn";
 import { useGetSchemaPagesQuery } from "@/store/api/schemaManagerApi";
-import { card, chip, input, muted } from "../styles";
+import { card, chip, input, muted, sectionTitle } from "../styles";
 
 /**
  * "Add … schema to": Every page / Home page only / Pages I choose, with
@@ -56,8 +56,13 @@ export function PlacementCards({
   ];
 
   return (
-    <fieldset className="fhint:m-0 fhint:grid fhint:gap-3 fhint:border-0 fhint:border-t fhint:border-t-border fhint:px-5 fhint:py-[18px]">
-      <legend className="fhint:float-left fhint:mb-1 fhint:w-full fhint:p-0 fhint:text-[15px] fhint:font-bold">
+    <fieldset className="fhint:m-0 fhint:grid fhint:gap-3 fhint:border-0 fhint:border-t fhint:border-t-border fhint:p-5">
+      <legend
+        className={cn(
+          sectionTitle,
+          "fhint:float-left fhint:mb-1 fhint:w-full fhint:p-0",
+        )}
+      >
         {title}
       </legend>
       <div className="fhint:grid fhint:grid-cols-[repeat(auto-fit,minmax(min(100%,190px),1fr))] fhint:gap-2">
