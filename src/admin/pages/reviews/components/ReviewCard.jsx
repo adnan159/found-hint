@@ -26,6 +26,7 @@ import { useDeleteReviewReplyMutation } from "@/store/api/reviewsApi";
 import { formatDate, initialsOf } from "../lib/replies";
 import ReviewPhotos from "./ReviewPhotos";
 import Stars from "./Stars";
+import AutoLabel from "./autoreply/AutoLabel";
 
 /**
  * The reviewer's photo from Google, or their initials when there is none
@@ -63,7 +64,7 @@ function Avatar({ review }) {
  * One review: who left it, the stars and the date, where it stands, what
  * they wrote, and the owner's reply with the ways to change it.
  */
-export function ReviewCard({ review, onReply }) {
+export function ReviewCard({ review, onReply, auto = false }) {
   const [remove, { isLoading: removing }] = useDeleteReviewReplyMutation();
   const name =
     review.is_anonymous || !review.reviewer_name
@@ -157,6 +158,7 @@ export function ReviewCard({ review, onReply }) {
                   {formatDate(review.replied_at)}
                 </span>
               ) : null}
+              {auto ? <AutoLabel /> : null}
               {removed ? null : (
                 <span className="fhint:ml-auto fhint:flex fhint:gap-1.5">
                   <button

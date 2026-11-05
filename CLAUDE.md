@@ -24,6 +24,10 @@ Free/Premium split and every checklist are in
 [`docs/SCHEMA-PLAN.md`](docs/SCHEMA-PLAN.md); open items are unticked there.
 See `docs/PROGRESS.md` for exactly what is done and how it was verified.
 
+**Review auto-reply (built; Premium, no AI yet):** how a reply is chosen,
+sent and recorded, and where each part lives —
+[`docs/AUTO-REPLY.md`](docs/AUTO-REPLY.md).
+
 The sibling `local-seo` plugin in this same directory is the reference for
 the *product*: its `docs/DATABASE.md`, `API.md` and `FEATURES.md` describe
 the model and the features this plugin grows into. Take the requirements

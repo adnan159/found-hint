@@ -114,11 +114,16 @@ export function fillPlaceholders(text, review, context = {}) {
     review_text: String(review.comment ?? ""),
   };
 
-  return String(text)
+  // An empty value leaves stray punctuation: "stars, !" or ", we're".
+  const filled = String(text)
     .replace(/\{\{(\w+)\}\}/g, (_, key) => values[key] ?? "")
     .replace(/\s+([,.!?])/g, "$1")
+    .replace(/,(\s*[.!?])/g, "$1")
+    .replace(/^[\s,]+/, "")
     .replace(/ {2,}/g, " ")
     .trim();
+
+  return filled.charAt(0).toUpperCase() + filled.slice(1);
 }
 
 /**

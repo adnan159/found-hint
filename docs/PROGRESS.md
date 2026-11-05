@@ -2882,3 +2882,79 @@ posts scheduled before the licence lapsed (while the screen said they wait
 for Premium). `Scheduler::run()` now returns early without a licence; posts
 stay scheduled and go out once it is back. Premium database 66 (+3); with
 the guard removed the new checks fail. PHPCS clean.
+
+## Step 82 — Review reply templates work with Premium
+
+Before: without Premium the Reviews screen drew the full templates card
+from sample data (a preview that could not save); with Premium it showed a
+placeholder ("FoundHint Premium X is active"), and Premium had no template
+code. Now Premium stores and serves them, and the same card works for real.
+
+**Premium:** table `fhintpremium_review_templates` (DB 1.1.0); rules in
+`App\Review\Templates` (rating 1–5, kind comment|stars, name ≤ 100, reply ≤
+4096, ≤ 20 per rating and kind, per-field `review_template.*` codes); routes
+`GET/POST reviews/templates`, `PUT/DELETE reviews/templates/{id}`, licence
+required. Templates are shared by every location (owner's choice). The table
+goes on uninstall only with "Delete data on uninstall" on.
+
+**Free:** `hooks/useTemplates` gives the card and the reply dialog the
+owner's templates with Premium, or the samples without. The card (split per
+the 150-line rule into `templates/RatingTabs`, `TemplateItem`,
+`TemplateCount`, `CardActions`, `TemplateFields`, `InsertDetail`,
+`DialogFooter`) adds, edits and deletes (delete asks once); the server's
+messages show under each field; the reply dialog's quick templates are the
+owner's. `ProTemplatesCard` is removed. The help line now says templates are
+shared by all locations. Import from CSV stays disabled ("coming soon").
+
+**Verified:** Premium database `templates.php` 31 (dbDelta idempotent, every
+rule, the limit and the other kind's own 20, moving into a full rating,
+404s, routes with and without a licence, uninstall keeping or dropping the
+table), mutation-tested (limit off by one, kind unchecked, no text maximum,
+moving into a full rating, uninstall ignoring the setting, order). Browser
+with Premium: empty save showed "Give the template a name." / "Write the
+reply."; a template saved, filled the reply dialog ("Hi shahjalal, thank you
+for visiting us!" — not sent), was renamed and deleted (list back to empty);
+without Premium the sample preview, Save disabled, no Delete.
+
+## Step 83 — Review auto-reply (without AI)
+
+From the FHReviews design (`Product roadmap priorities – FHReviews.html`),
+everything except the AI parts, which come later.
+
+**Premium:** `AutoReplier` (WP-Cron every 10 minutes while on: sync reviews,
+answer the due ones through the free `ReviewReply::save()`), `AutoReplySettings`
+(on, scope new|all, rules per rating × comment|stars = template|builtin|off),
+`ReplyText` (built-in replies + placeholders, mirroring `lib/replies.js`),
+`AutoReplyLog` + table `fhintpremium_auto_replies` (one row per review; sent
+count; retries up to 3), route `GET/PUT reviews/auto-reply`, feature
+`reviews.auto_reply`. DB 1.2.0; deactivation clears the event; uninstall
+removes the option (and the table with "Delete data on uninstall").
+
+**Free:** the band on Reviews (Active/Paused, sent count, Set up, a switch
+that saves at once; without Premium a Premium pill and Unlock/Activate), the
+"Set up auto-reply" dialog (switch, Which reviews, the How to reply grid with
+My templates / Built-in reply / Don't reply, "N templates take turns", "No
+templates yet. Add one" opening the template editor and coming back with the
+draft kept, the 1–2 star advice, "N of 10 review kinds get a reply"), and
+"Sent by auto-reply" on replies it wrote. Left out: AI reply, AI writing
+style, AI credits.
+
+**Bug fixed on the way (both sides):** filling a reply for an anonymous
+reviewer left "Thanks for the 4 stars,!" and ", we're sorry…"; a comma
+before `!.?` and a leading comma are now removed, and the first letter
+capitalised.
+
+**Verified:** Premium `autoreply.php` 48 (defaults, every validation, `since`
+on switch-on, first names and empty placeholders, due reviews by scope /
+rule / rating / removed / replied / limit / order, template rotation, a run
+putting both replies to Google with the right text, nothing twice, failure
+logged and retried to the limit, off and no-licence send nothing, schedule
+follows the switch, route and uninstall), mutation-tested (scope ignored,
+retry forever, answering twice, no rotation, no licence check, newest
+first, template rule unchecked, `since` not set). Browser (real admin): the
+band, the dialog, Add one → template saved → back with the rule kept, Save
+while off, the switch on and straight off (no event left, nothing sent),
+the label (temporary log row, removed). Test data removed; auto-reply left
+off.
+
+How it works, end to end: `docs/AUTO-REPLY.md`.

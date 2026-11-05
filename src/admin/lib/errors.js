@@ -205,6 +205,27 @@ const MESSAGES = {
     __("Choose a business type from the list.", "foundhint-local-seo"),
   "schema.location.page.not_found": () =>
     __("That page no longer exists. Choose another.", "foundhint-local-seo"),
+  "auto_reply.scope.invalid": () =>
+    __("Choose which reviews to reply to.", "foundhint-local-seo"),
+  "auto_reply.rule.invalid": () =>
+    __("Choose how to reply to these reviews.", "foundhint-local-seo"),
+  "auto_reply.rule.no_templates": () =>
+    __(
+      "No templates for this rating yet. Add one, or pick another option.",
+      "foundhint-local-seo",
+    ),
+  "review_template.rating.invalid": () =>
+    __("Choose a rating from 1 to 5 stars.", "foundhint-local-seo"),
+  "review_template.kind.invalid": () =>
+    __("Choose reviews with a comment, or stars only.", "foundhint-local-seo"),
+  "review_template.name.required": () =>
+    __("Give the template a name.", "foundhint-local-seo"),
+  "review_template.name.too_long": () =>
+    __("Keep the name to 100 characters.", "foundhint-local-seo"),
+  "review_template.text.required": () =>
+    __("Write the reply.", "foundhint-local-seo"),
+  "review_template.text.too_long": () =>
+    __("Google takes replies of up to 4096 characters.", "foundhint-local-seo"),
   "schema.location.page.no_name": () =>
     __(
       "Give this branch a name first; the page is named after it.",
@@ -694,6 +715,13 @@ export function errorMessage(error) {
         "Your account can't publish pages, so FoundHint can't create one. Use an existing page instead.",
         "foundhint-local-seo",
       ),
+    fhintpremium_template_limit: () =>
+      __(
+        "A star rating holds up to 20 templates for each kind of review. Delete one to add another.",
+        "foundhint-local-seo",
+      ),
+    fhintpremium_template_not_found: () =>
+      __("That template no longer exists.", "foundhint-local-seo"),
     fhintpremium_page_not_created: () =>
       __(
         "The page couldn't be created. Try again, or use an existing page.",

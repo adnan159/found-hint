@@ -1,9 +1,7 @@
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { __ } from "@wordpress/i18n";
 import RequestError from "@/components/RequestError";
 import ListFooter from "@/components/ListFooter";
-import ProFeature from "@/components/ProFeature";
-import ProTemplatesCard from "./components/ProTemplatesCard";
 import ReplyDialog from "./components/ReplyDialog";
 import ReviewFilters from "./components/ReviewFilters";
 import ReviewList from "./components/ReviewList";
@@ -13,7 +11,9 @@ import ReviewToolbar, { showingText } from "./components/ReviewToolbar";
 import TemplatesCard from "./components/TemplatesCard";
 import useReviewActions from "./hooks/useReviewActions";
 import useReviewList from "./hooks/useReviewList";
-import { sampleTemplates } from "./lib/templates";
+import useTemplates from "./hooks/useTemplates";
+import useAutoReply from "./hooks/useAutoReply";
+import AutoReplySection from "./components/autoreply/AutoReplySection";
 
 /**
  * Google reviews for the location chosen in the bar at the top.
@@ -35,7 +35,9 @@ export default function Reviews() {
     query: list.query,
   });
   const [replying, setReplying] = useState(null);
-  const templates = useMemo(() => sampleTemplates(), []);
+  // Premium's own templates, or the sample set as a preview.
+  const templates = useTemplates();
+  const autoReply = useAutoReply();
 
   const replyContext = {
     locationName: list.listing?.title ?? list.current?.name ?? "",
@@ -76,6 +78,10 @@ export default function Reviews() {
       ) : null}
 
       {list.listing ? (
+        <AutoReplySection autoReply={autoReply} templates={templates} />
+      ) : null}
+
+      {list.listing ? (
         <div className="fhint:grid fhint:items-start fhint:gap-5 fhint:lg:grid-cols-[minmax(0,1fr)_320px] fhint:xl:grid-cols-[minmax(0,1fr)_350px]">
           <div className="fhint:grid fhint:min-w-0 fhint:gap-5">
             <ReviewToolbar
@@ -99,6 +105,7 @@ export default function Reviews() {
                 isFetching={list.isFetching}
                 filtered={list.filtered}
                 onReply={setReplying}
+                autoReplied={autoReply.replied}
               />
 
               {list.total ? (
@@ -118,12 +125,7 @@ export default function Reviews() {
             aria-label={__("Review tools", "foundhint-local-seo")}
             className="fhint:grid fhint:gap-5"
           >
-            <ProFeature
-              feature="reviews.templates"
-              fallback={<TemplatesCard />}
-            >
-              <ProTemplatesCard />
-            </ProFeature>
+            <TemplatesCard {...templates} />
           </aside>
         </div>
       ) : null}
@@ -132,7 +134,7 @@ export default function Reviews() {
         <ReplyDialog
           review={replying}
           context={replyContext}
-          templates={templates}
+          templates={templates.templates}
           onClose={() => setReplying(null)}
         />
       ) : null}
