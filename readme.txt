@@ -4,7 +4,7 @@ Tags: local seo, google business profile, local business schema, multi location,
 Requires at least: 6.4
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 1.2.1
+Stable tag: 1.2.2
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -32,11 +32,13 @@ Most WordPress local SEO plugins either lock multiple locations behind a paid ad
 * **Local SEO audit**, find what's missing, sorted by severity and explained in plain words.
 * **Review management**, read, filter and reply to Google reviews without leaving WordPress.
 * **Google Business Profile posts**, publish Update, Event and Offer posts to each location, with a live Google preview.
+* **Post scheduling**, choose the date and time a post goes out *(Premium)*.
+* **Share your blog on Google**, turn a published blog post into a Google post from the post list or the block editor *(Premium)*.
 * **Local SEO dashboard**, your health score, what to fix and your Google connection at a glance.
 * **Advanced schema**, Organization, every branch, services, WebSite, WebPage, About, Contact and Breadcrumb schema *(Premium)*.
 * **Location landing pages**, a page for each branch with its address, hours and map *(Premium)*.
 
-**Coming soon:** review auto-reply, post scheduling and a post calendar, local citations, a local ranking grid with competitor history, service landing pages, an advanced audit and Business Profile performance analytics.
+**Coming soon:** review auto-reply, a post calendar, local citations, a local ranking grid with competitor history, service landing pages, an advanced audit and Business Profile performance analytics.
 
 ### A WordPress Local SEO Plugin That’s Free Where It Counts
 
@@ -201,11 +203,12 @@ Publish posts to your Google Business Profile from WordPress, for each location:
 * **Update, Event and Offer posts**, with title, dates, coupon code and terms for offers
 * **Buttons** such as Book, Order online, Call now or Learn more
 * **Live preview** of how the post looks on Google, updated as you type
-* **Photos** uploaded, or picked from your Google gallery or review photos
+* **Photos** from your WordPress Media Library, dropped in, or picked from your Google gallery
 * **Drafts**, plus editing and deleting live posts
 * **Sync posts** already on your Google profile
-* **Review to post**: turn a 5-star review into a thank-you post in one click
-* **Filters and history** by type, status and source
+* **Filters and history** by type, status and source; the newest post is always on top
+* **Scheduling** *(Premium)*: pick a date and time in your site's time zone; change, publish now or cancel until then
+* **Share your blog on Google** *(Premium)*: switch it on, then use "GBP Posting" under a published post in Posts → All Posts, or the GBP Posting button in the block editor, to share it with a "Learn more" link to the article
 
 ### Local Landing Pages for WordPress
 
@@ -379,7 +382,7 @@ Yes. FoundHint runs alongside WooCommerce, so stores with physical locations can
 
 = What does FoundHint Premium add? =
 
-The Schema Manager: Organization, LocalBusiness, branch, service and website structure schema, each with its own switch and a live preview, plus location pages created from your saved data. Reply templates for reviews are included too. Premium is a separate add-on that needs this free plugin. See [pricing](https://foundhint.com/pricing/).
+The Schema Manager: Organization, LocalBusiness, branch, service and website structure schema, each with its own switch and a live preview, plus location pages created from your saved data. Post scheduling, sharing your blog posts on Google, and reply templates for reviews are included too. Premium is a separate add-on that needs this free plugin. See [pricing](https://foundhint.com/pricing/).
 
 = How can I see the schema FoundHint adds to my pages? =
 
@@ -401,6 +404,14 @@ No. Google is never contacted on visitor-facing pages, and no scripts or stylesh
 8. Google Business Profile posts with a live Google preview.
 
 == Changelog ==
+
+= 1.2.2 =
+* New: Schedule posts for a date and time, in your site's time zone, with FoundHint Premium. Scheduled posts show when they go live, and can be changed, published now or cancelled back to a draft.
+* New: Share your blog on Google with FoundHint Premium. Turn it on from the Posts screen, then choose "GBP Posting" under a published post in Posts → All Posts, or the GBP Posting button in the block editor's top bar, to open a new post that links to the article.
+* New: "Choose photo" on a post opens the WordPress Media Library, on the Posts screen and in the block editor. Dropping a file still uploads it.
+* Improvement: The newest post is now always at the top of the posts list, scheduled or not.
+* Improvement: A scheduled post can't be edited or deleted while it is being sent.
+* Removed: The "Turn reviews into posts" card, the "Schedule with a CSV file" button and the "Customer photos" picker on the Posts screen.
 
 = 1.2.1 =
 * New: Choose your logo, cover photo and gallery photos from the WordPress Media Library on the Business Profile's Photos tab. Dropping files on a photo still uploads them.
@@ -456,6 +467,9 @@ No. Google is never contacted on visitor-facing pages, and no scripts or stylesh
 * Google reviews for each location, with replies.
 
 == Upgrade Notice ==
+
+= 1.2.2 =
+Post scheduling and sharing your blog on Google (with FoundHint Premium), and choosing post photos from the Media Library.
 
 = 1.2.1 =
 Pick your Business Profile photos from the Media Library, redesigned Posts and Reviews screens, and a fix that keeps your Media Library images safe when a waiting photo is removed.

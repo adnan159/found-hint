@@ -4,7 +4,7 @@
 step finishes: what shipped, and how it was verified — the evidence, not the
 intent. Name any bug the verification caught.
 
-Last updated: step 91. The data layer, its REST API and the admin screens
+Last updated: step 92. The data layer, its REST API and the admin screens
 for everything it covers exist. The Schema Manager is built in FoundHint
 Premium and matches the design (`FoundHint Schema (1).html`): six tabs —
 01 Organization, 02 LocalBusiness, 03 Locations (list, setup, branch
@@ -2858,3 +2858,27 @@ only), and the warning's mention of it. Server: `PostMedia::choices()` —
 reviews. Reviews keep their own photos on the Reviews screen. Database
 757 (+1: only the gallery is offered), smoke suites, PHPCS, ESLint, both
 builds clean.
+
+## Step 92 — Checked: FoundHint without Premium, and Premium unlicensed
+
+Run on the dev site's real database without changing it: WordPress loaded
+with Premium filtered out of `active_plugins` (or its licence filtered off)
+for that one process.
+
+**Premium not active** — all fine: FoundHint loads; the admin module wires;
+no "GBP Posting" link under blog posts; the editor bundle is not loaded;
+the app gets no `pro` data (PRO tags, Schedule and the blog switch
+disabled — checked in the browser earlier); no `fhint-premium` routes;
+`/posts` and `/posts/state` answer 200; unscheduling still works; source
+`blog` refused; nothing listens to a leftover sender event. The home page
+renders with the free schema markup. (The one PHP warning on every request,
+`WP_DEBUG_LOG already defined`, is the container's `WORDPRESS_CONFIG_EXTRA`
+repeating `wp-config.php` — not FoundHint.)
+
+**Premium active, licence inactive** — one bug, fixed: every route answered
+`403 fhintpremium_license_required`, features were empty and blog sharing
+stayed off even with its switch on — but the five-minute sender still sent
+posts scheduled before the licence lapsed (while the screen said they wait
+for Premium). `Scheduler::run()` now returns early without a licence; posts
+stay scheduled and go out once it is back. Premium database 66 (+3); with
+the guard removed the new checks fail. PHPCS clean.
