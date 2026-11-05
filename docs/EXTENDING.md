@@ -44,9 +44,8 @@ listed here — not a general registry.
 |---|---|---|---|
 | `reviews.templates` | Reviews sidebar | `TemplatesCard` (upsell, sample templates) | `ProTemplatesCard` (placeholder: reads `GET fhint-premium/v1/status`) |
 | `posts.ai` | Posts: "Write with AI" (header button and composer tab), "Make with AI" photo | disabled, `PRO` tag | — |
-| `posts.schedule` | Posts composer: "Schedule" under When to publish; `scheduled` status | disabled, `PRO` tag | — |
-| `posts.csv` | Posts: "Schedule with a CSV file" | disabled, `PRO` tag | — |
-| `posts.blog` | Posts: "Share your blog on Google" card | disabled, `PRO` tag | — |
+| `posts.schedule` | Posts composer: "Schedule" under When to publish, the "Publish on" picker | disabled, `PRO` tag; a post already scheduled shows its time read-only and "Needs FoundHint Premium to send", and can still be published now, changed or cancelled (free `POST /posts/{id}/unschedule`) | The picker; saving calls `POST fhint-premium/v1/posts/{id}/schedule` `{ scheduled_at }` (site wall time). Shipped in Premium: the route, a 5-minute WP-Cron sweep (`fhintpremium_send_due_posts`) that claims each due post (`sending`) and sends it once (see `docs/POSTS-SCHEDULE-PLAN.md`) |
+| `posts.blog` | Posts: "Share your blog on Google" card — a switch; a "GBP Posting" link after View under each published blog post (Posts → All Posts) that opens the composer on `#/posts?share=<id>`, and a "GBP Posting" button in the block editor's top bar that opens the same composer in a popup there (`src/editor`) | switch off and disabled, `PRO` tag; no link | Shipped: `fhint-premium/v1/posts/blog-sharing` (GET/PUT `{ enabled }`, stored in the free setting `posts.blog_sharing`), `posts/blog/{id}` (the blog post as a draft); answers `fhint_blog_sharing_enabled`; adds source `blog` |
 
 The posts table already has what Pro's posts need: `status` `scheduled`,
 `scheduled_at`, and `source` (`ai`, `csv`, `blog` — allowed on a request

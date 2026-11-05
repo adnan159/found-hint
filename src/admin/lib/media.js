@@ -1,6 +1,22 @@
 import { __ } from "@wordpress/i18n";
 
 /**
+ * Whether a Media Library window is open, for a dialog underneath it: that
+ * dialog must not close on the library's clicks or its Esc, nor pull focus
+ * back from it. Changes are announced with the `fhint:media` window event.
+ */
+let openFrames = 0;
+
+export function isMediaOpen() {
+  return openFrames > 0;
+}
+
+function announce(change) {
+  openFrames = Math.max(0, openFrames + change);
+  window.dispatchEvent(new CustomEvent("fhint:media"));
+}
+
+/**
  * Whether WordPress's Media Library picker is on the page
  * (`Admin\Enqueue` calls `wp_enqueue_media()` on our screen).
  *
@@ -36,6 +52,7 @@ export function chooseImages({ title, button, multiple = false, types }) {
     });
     let chosen = false;
 
+    frame.on("open", () => announce(1));
     frame.on("select", () => {
       chosen = true;
       resolve(
@@ -54,6 +71,8 @@ export function chooseImages({ title, button, multiple = false, types }) {
     frame.on("close", () => {
       // "select" fires before "close"; a plain close chose nothing.
       window.setTimeout(() => !chosen && resolve([]), 0);
+      // Later than the Esc that closed it, which the dialog below also hears.
+      window.setTimeout(() => announce(-1), 150);
     });
     frame.open();
   });

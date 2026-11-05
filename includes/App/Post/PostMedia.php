@@ -13,7 +13,6 @@ use FHINT\App\Google\GoogleLocationRepository;
 use FHINT\App\Media\MediaRepository;
 use FHINT\App\Media\MediaSync;
 use FHINT\App\Media\MediaUpload;
-use FHINT\App\Review\ReviewRepository;
 use WP_Error;
 
 defined( 'ABSPATH' ) || exit;
@@ -30,8 +29,8 @@ defined( 'ABSPATH' ) || exit;
  * screen says so before the owner uploads (`uploads_reachable` in the
  * posts state).
  *
- * Photos already on Google — the listing's gallery and customers' review
- * photos — are on Google's own servers and always work.
+ * Photos already on the listing's Google gallery are on Google's own
+ * servers and always work.
  */
 class PostMedia {
 
@@ -115,6 +114,67 @@ class PostMedia {
 		}
 
 		return self::via_gallery( (int) $attachment_id, (string) $size['mime'], $listing );
+	}
+
+	/**
+	 * Use a photo already in the Media Library for a post.
+	 *
+	 * Nothing is uploaded again. Checked against Google's limits from the
+	 * file itself, like an upload; then used by its link when Google can
+	 * reach this site, or put on the listing's gallery when it cannot.
+	 *
+	 * @param int    $attachment_id Media-library id.
+	 * @param string $location_name The listing the post is for.
+	 * @return array|\FHINT\App\Core\ValidationResult|WP_Error `{ attachment_id, url, reachable, via_gallery }`.
+	 */
+	public static function from_library( $attachment_id, $location_name = '' ) {
+		$listing = GoogleLocationRepository::find_by_location_name( (string) $location_name );
+
+		if ( ! $listing ) {
+			return new WP_Error(
+				'fhint_no_google_location',
+				__( 'That location has no Google listing. Read your Google profile first.', 'foundhint-local-seo' ),
+				array( 'status' => 404 )
+			);
+		}
+
+		$attachment_id = (int) $attachment_id;
+		$path          = $attachment_id && 'attachment' === get_post_type( $attachment_id ) ? (string) get_attached_file( $attachment_id ) : '';
+
+		if ( '' === $path || ! is_readable( $path ) ) {
+			return new WP_Error(
+				'fhint_media_not_found',
+				__( 'That image is no longer in your media library.', 'foundhint-local-seo' ),
+				array( 'status' => 404 )
+			);
+		}
+
+		$size       = getimagesize( $path );
+		$validation = MediaUpload::validate(
+			array(
+				'mime_type' => is_array( $size ) && ! empty( $size['mime'] ) ? (string) $size['mime'] : '',
+				'file_size' => (int) filesize( $path ),
+				'width'     => is_array( $size ) ? (int) $size[0] : 0,
+				'height'    => is_array( $size ) ? (int) $size[1] : 0,
+			)
+		);
+
+		if ( ! $validation->is_valid() ) {
+			return $validation;
+		}
+
+		$url = (string) wp_get_attachment_url( $attachment_id );
+
+		if ( self::is_reachable( $url ) ) {
+			return array(
+				'attachment_id' => $attachment_id,
+				'url'           => $url,
+				'reachable'     => true,
+				'via_gallery'   => false,
+			);
+		}
+
+		return self::via_gallery( $attachment_id, (string) $size['mime'], $listing );
 	}
 
 	/**
@@ -224,7 +284,7 @@ class PostMedia {
 	 * Photos already on Google that a post can use, for one location.
 	 *
 	 * @param string $location_name Google location resource name.
-	 * @return array{gallery: array[], customer: array[]}
+	 * @return array{gallery: array[]}
 	 */
 	public static function choices( $location_name ) {
 		$listing = GoogleLocationRepository::find_by_location_name( (string) $location_name );
@@ -241,24 +301,7 @@ class PostMedia {
 			}
 		}
 
-		$customer = array();
-
-		if ( $listing ) {
-			foreach ( ReviewRepository::all( array( 'location_name' => $listing['location_name'] ) ) as $review ) {
-				foreach ( $review['photos'] as $photo ) {
-					$customer[] = array(
-						'url'   => $photo['full'],
-						'thumb' => $photo['thumb'],
-						'label' => $review['is_anonymous'] ? '' : (string) $review['reviewer_name'],
-					);
-				}
-			}
-		}
-
-		return array(
-			'gallery'  => $gallery,
-			'customer' => $customer,
-		);
+		return array( 'gallery' => $gallery );
 	}
 
 	/**

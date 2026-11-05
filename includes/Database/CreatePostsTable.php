@@ -27,7 +27,8 @@ defined( 'ABSPATH' ) || exit;
  *     draft ──publish──▶ live | processing | rejected
  *       │                  ▲
  *       └──publish fails──▶ failed ──retry──┘
- *     scheduled (set by FoundHint Pro only) ──▶ live | failed
+ *     draft ◀──unschedule── scheduled (set by FoundHint Premium only)
+ *                              └──due──▶ sending ──▶ live | failed
  *
  * - `draft`      saved here, never sent.
  * - `live`       on the listing (Google's LIVE).
@@ -37,7 +38,11 @@ defined( 'ABSPATH' ) || exit;
  * - `failed`     the last attempt to send it was refused before Google kept
  *                it; `error` holds the message. Nothing is on Google unless
  *                `google_name` is set (an edit to a live post that failed).
- * - `scheduled`  waiting for `scheduled_at`. The free plugin never sets it.
+ * - `scheduled`  waiting for `scheduled_at`. The free plugin never sets it;
+ *                it edits, publishes or unschedules (→ draft) one.
+ * - `sending`    claimed by Premium's sender for one send — seconds. Nothing
+ *                may change it meanwhile (409 `fhint_post_sending`). One
+ *                left longer than 15 minutes is marked failed, never resent.
  *
  * Event and offer dates are the business's own wall-clock time, as Google
  * holds them (a date and a time of day, no zone) — **not UTC**, unlike every

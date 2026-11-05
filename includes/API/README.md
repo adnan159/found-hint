@@ -1224,14 +1224,14 @@ A post:
   "id": 7, "location_name": "locations/1", "location_title": "Northside Dental",
   "google_name": "accounts/1/locations/1/localPosts/p1",
   "topic_type": "update|event|offer",
-  "status": "draft|live|processing|rejected|failed|scheduled",
+  "status": "draft|live|processing|rejected|failed|scheduled|sending",
   "source": "manual|review", "source_ref": "",
   "title": "", "summary": "", "cta_type": "", "cta_url": "",
   "starts_at": null, "ends_at": null,
   "coupon_code": "", "redeem_url": "", "terms": "",
   "media_url": "", "attachment_id": 0, "media_count": 0, "media_reachable": true,
   "search_url": "", "error": "", "on_google": true,
-  "scheduled_at": null, "published_at": "2026-10-20 09:00:00",
+  "scheduled_at": null, "scheduled_local": "", "published_at": "2026-10-20 09:00:00",
   "synced_at": "…", "created_at": "…", "updated_at": "…"
 }
 ```
@@ -1245,6 +1245,9 @@ A post:
   written on Google can carry several; this site keeps a link to the first.
 - `media_reachable`: whether Google could fetch `media_url` — false for a
   photo on a local or private site. Google takes a post's photo only by link.
+- `scheduled_at` is UTC; `scheduled_local` is the same moment as wall time in
+  the site's time zone, shaped for a `datetime-local` input
+  (`2026-11-06T09:00`), '' when there is none.
 
 ### `GET /posts`
 
@@ -1252,7 +1255,7 @@ A post:
 |---|---|---|
 | `location_name` | resource name | |
 | `type` | `''` `update` `event` `offer` | |
-| `status` | `''` `live` (incl. processing) `draft` `scheduled` `failed` (incl. rejected) | |
+| `status` | `''` `live` (incl. processing) `draft` `scheduled` (incl. sending) `failed` (incl. rejected) | |
 | `source` | a source key, or `''` | unknown keys are ignored |
 | `days` | `0` `7` `30` `90` | published (or, never published, last edited) within |
 | `sort` | `new` `old` | |
@@ -1262,20 +1265,26 @@ A post:
 `meta.total` counts every match; `meta.counts` is `{ all, update, event,
 offer }` under every filter but `type` — the numbers on the type tabs.
 
+Order: `new` puts the post added most recently on top, whatever its
+status — by when it was published, else when it was last saved (a scheduled
+post: when it was scheduled), not by when it is due. `old` is the exact
+reverse.
+
 ### `GET /posts/state?location_name=`
 
 `{ locations: [{ location_name, title, location_id }], synced_at, website,
-reviews: [{ review_id, comment, reviewer_name, reviewed_at }], blog_posts,
-uploads_reachable }`
+blog_posts, uploads_reachable, timezone }`
 — `website` for "Use my website address" (the listing's, else the site's);
-`reviews` the latest two 5-star reviews with words; `blog_posts` the count
+`blog_posts` the count
 of published WordPress posts; `uploads_reachable` whether Google can fetch
-a file from this site's uploads (when not, uploads go via the gallery).
+a file from this site's uploads (when not, uploads go via the gallery);
+`timezone` the site's time zone (`wp_timezone_string()`), in which a
+scheduled time is entered and shown.
 
 ### `GET /posts/photos?location_name=`
 
-`{ gallery: [{ url }], customer: [{ url, thumb, label }] }` — photos already
-on Google: the listing's synced photos, and customers' review photos.
+`{ gallery: [{ url }] }` — photos already on Google: the listing's synced
+photos ("Your gallery").
 
 ### `POST /posts/media`
 
@@ -1289,6 +1298,16 @@ network, a `.test`/`.local` name), the photo is first added to the listing's
 Google gallery — sent as bytes, like any listing photo — and `url` is
 Google's link to it (`via_gallery: true`). The photo then also shows in the
 profile's Photos, and in the Photos tab here.
+
+### `POST /posts/media/library`
+
+`{ attachment_id, location_name }`; needs Google connected. A photo already
+in the Media Library ("Choose photo" opens it): checked against the same
+limits as an upload (`media.*` codes) from the file itself, never copied in
+the library again. Answers `{ attachment_id, url, reachable, via_gallery }`
+like `POST /posts/media` — its own link when Google can reach this site,
+else Google's link once it is on the listing's gallery.
+`404 fhint_media_not_found` for an attachment that is gone.
 
 ### `POST /posts/sync`
 
@@ -1312,8 +1331,10 @@ editing that row instead of creating another.
 
 ### `PUT /posts/{id}`
 
-Same fields (`source`/`source_ref` are fixed once written). A draft or
-failed post is saved, and sent when `publish` is true. **A post on Google
+Same fields (`source`/`source_ref` are fixed once written). A draft, failed
+or scheduled post is saved, and sent when `publish` is true. **A scheduled
+post is checked with the publishing rules on every save** — it is sent by
+itself later, so it must stay ready to send — and keeps its status and time. **A post on Google
 can only be changed by publishing** (`409 fhint_post_live` otherwise), its
 type is locked (`post.type.locked`), and the row changes only once Google
 has taken the edit. The PATCH names `media` only when the photo changed.
@@ -1322,6 +1343,14 @@ has taken the edit. The PATCH names `media` only when the photo changed.
 
 Send a draft or retry a failed post. `409 fhint_post_already_live` for a
 post on Google.
+
+### `POST /posts/{id}/unschedule`
+
+Take a scheduled post off the schedule: it becomes a draft and
+`scheduled_at` is cleared. Free, and needs only the capability — nothing is
+sent — so a post queued while Premium was active can always be taken back.
+`409 fhint_post_not_scheduled` for any other status, `404
+fhint_post_not_found`.
 
 ### `DELETE /posts/{id}`
 
@@ -1337,11 +1366,23 @@ On Google: deleted there first (a 404 counts as done). Otherwise only here.
 `post.cta_url.required|invalid` `post.redeem_url.invalid`
 `post.coupon_code.too_long` (58) `post.terms.too_long` (5,000)
 `post.media_url.invalid`. Other codes: `fhint_post_not_found` (404),
-`fhint_no_google_location` (404).
+`fhint_no_google_location` (404), `fhint_post_sending` (409 — Premium's
+sender has claimed the post for a send that takes seconds; edit, publish,
+unschedule and delete all wait for it).
 
-**Pro:** `fhint_post_sources` widens the sources a request may set
-(`ai`, `csv`, `blog`); `scheduled` / `scheduled_at` exist for Pro's
-scheduler and are never set by the free plugin.
+**Premium:** `fhint_post_sources` widens the sources a request may set
+(`ai`, `csv`, `blog`). Blog sharing: `fhint_blog_sharing_enabled` (Premium
+answers it) decides whether `Admin\BlogSharing` adds "GBP Posting" under
+published blog posts; the link opens `#/posts?share=<post id>`, and the
+composer is filled from Premium's `GET fhint-premium/v1/posts/blog/{id}`
+(`{ id, title, url, image_url, attachment_id, image_reachable }` — the
+button links to the article; the description starts blank)
+(`404 fhintpremium_blog_post_not_found` for anything but a published post). `scheduled` / `scheduled_at` are set only by
+Premium's `POST fhint-premium/v1/posts/{id}/schedule` `{ scheduled_at }`
+(site wall time, `YYYY-MM-DDTHH:MM`), whose codes the admin already maps:
+`post.scheduled_at.required|invalid|too_soon|too_far|after_event`. The free
+plugin lists, edits, publishes and unschedules them. See
+`docs/POSTS-SCHEDULE-PLAN.md`.
 
 ## How the score works
 

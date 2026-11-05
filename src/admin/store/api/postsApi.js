@@ -73,6 +73,17 @@ export const postsApi = baseApi.injectEndpoints({
       transformResponse: (response) => response?.data ?? null,
     }),
 
+    // A photo already in the Media Library: answered like an upload — its
+    // link, or Google's link once it is on the listing's gallery.
+    postPhotoFromLibrary: builder.mutation({
+      query: ({ attachmentId, locationName }) => ({
+        url: "/posts/media/library",
+        method: "POST",
+        body: { attachment_id: attachmentId, location_name: locationName },
+      }),
+      transformResponse: (response) => response?.data ?? null,
+    }),
+
     syncPosts: builder.mutation({
       query: ({ locationName }) => ({
         url: "/posts/sync",
@@ -114,6 +125,17 @@ export const postsApi = baseApi.injectEndpoints({
       invalidatesTags: ["Posts"],
     }),
 
+    // Takes a scheduled post off the schedule: it becomes a draft. Free, so
+    // a post queued while Premium was active can always be taken back.
+    unschedulePost: builder.mutation({
+      query: ({ id }) => ({
+        url: `/posts/${Number(id)}/unschedule`,
+        method: "POST",
+      }),
+      transformResponse: (response) => response?.data ?? null,
+      invalidatesTags: ["Posts"],
+    }),
+
     deletePost: builder.mutation({
       query: ({ id }) => ({
         url: `/posts/${Number(id)}`,
@@ -129,9 +151,11 @@ export const {
   useGetPostStateQuery,
   useGetPostPhotosQuery,
   useUploadPostPhotoMutation,
+  usePostPhotoFromLibraryMutation,
   useSyncPostsMutation,
   useCreatePostMutation,
   useUpdatePostMutation,
   usePublishPostMutation,
+  useUnschedulePostMutation,
   useDeletePostMutation,
 } = postsApi;

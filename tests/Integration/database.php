@@ -1686,6 +1686,46 @@ if ( $fhint_admin ) {
 
 remove_filter( 'pre_http_request', $fhint_fake_reply, 10 );
 
+// -- The admin module wires every admin class --------------------------------
+
+// Admin::init() runs only on admin pages, so a class it names wrongly
+// crashes every admin page yet nothing else in this suite. Run it here.
+FHINT\Admin::init();
+check( false !== has_filter( 'post_row_actions', array( 'FHINT\\Admin\\BlogSharing', 'row_actions' ) ), 'admin: the GBP Posting link is wired' );
+check( false !== has_action( 'enqueue_block_editor_assets', array( 'FHINT\\Admin\\EditorAssets', 'enqueue' ) ), 'admin: the editor button is wired' );
+
+// When the editor bundle loads: a blog post, in the block editor, for a
+// manager, with blog sharing on (Premium answers the filter; forced here).
+require_once ABSPATH . 'wp-admin/includes/class-wp-screen.php';
+require_once ABSPATH . 'wp-admin/includes/screen.php';
+$fhint_editor_user = get_users( array( 'role' => 'administrator', 'number' => 1, 'fields' => 'ID' ) );
+wp_set_current_user( (int) ( $fhint_editor_user[0] ?? 0 ) );
+$fhint_sharing = static function () {
+	return true;
+};
+add_filter( 'fhint_blog_sharing_enabled', $fhint_sharing, 99 );
+$fhint_screen = WP_Screen::get( 'post' );
+$fhint_screen->is_block_editor( true );
+set_current_screen( $fhint_screen );
+check( FHINT\Admin\EditorAssets::applies(), 'editor: the button loads for a blog post with sharing on' );
+$fhint_screen->is_block_editor( false );
+check( ! FHINT\Admin\EditorAssets::applies(), 'editor: not in the classic editor' );
+$fhint_screen->is_block_editor( true );
+$fhint_page = WP_Screen::get( 'page' );
+$fhint_page->is_block_editor( true );
+set_current_screen( $fhint_page );
+check( ! FHINT\Admin\EditorAssets::applies(), 'editor: not for a page' );
+set_current_screen( $fhint_screen );
+remove_filter( 'fhint_blog_sharing_enabled', $fhint_sharing, 99 );
+add_filter( 'fhint_blog_sharing_enabled', '__return_false', 99 );
+check( ! FHINT\Admin\EditorAssets::applies(), 'editor: not while sharing is off' );
+remove_filter( 'fhint_blog_sharing_enabled', '__return_false', 99 );
+wp_set_current_user( 0 );
+add_filter( 'fhint_blog_sharing_enabled', $fhint_sharing, 99 );
+check( ! FHINT\Admin\EditorAssets::applies(), 'editor: not for someone who cannot manage FoundHint' );
+remove_filter( 'fhint_blog_sharing_enabled', $fhint_sharing, 99 );
+$GLOBALS['current_screen'] = null;
+
 // -- Posts, with Google answered in-process ----------------------------------
 //
 // A post is public the moment Google takes it. A new post is kept whatever
@@ -1854,6 +1894,50 @@ $fhint_ordered = PostRepository::all( array( 'location_name' => 'locations/1', '
 check_same( $fhint_live['id'], $fhint_ordered[0]['id'], 'posts: oldest first starts with the earliest published' );
 check_same( 2, count( PostRepository::all( array( 'per_page' => 2 ) ) ), 'posts: paging limits the page' );
 
+// Scheduled posts (Premium sets the status; the free plugin lists, edits and
+// cancels them). They sit after everything posted, soonest first.
+$fhint_scheduled_row = static function ( $due ) {
+	return PostRepository::create(
+		array(
+			'location_name' => 'locations/1',
+			'account_name'  => 'accounts/1',
+			'topic_type'    => 'update',
+			'summary'       => 'Due ' . $due,
+			'source'        => 'manual',
+			'status'        => 'scheduled',
+			'scheduled_at'  => $due,
+		)
+	);
+};
+$fhint_due_late = $fhint_scheduled_row( '2099-02-01 09:00:00' );
+$fhint_due_soon = $fhint_scheduled_row( '2099-01-01 09:00:00' );
+// Added after everything above, so — newest first — they lead the list,
+// the last one added on top, whenever each is due.
+$fhint_ordered = array_column( PostRepository::all( array( 'location_name' => 'locations/1' ) ), 'id' );
+check_same( array( $fhint_due_soon['id'], $fhint_due_late['id'] ), array_slice( $fhint_ordered, 0, 2 ), 'posts: newest first puts the last post added on top, scheduled or not' );
+$fhint_ordered = array_column( PostRepository::all( array( 'location_name' => 'locations/1', 'sort' => 'old' ) ), 'id' );
+check_same( array( $fhint_due_late['id'], $fhint_due_soon['id'] ), array_slice( $fhint_ordered, -2 ), 'posts: oldest first is the exact reverse' );
+check_same( 2, PostRepository::count( array( 'location_name' => 'locations/1', 'status' => 'scheduled' ) ), 'posts: the scheduled filter finds them' );
+
+$fhint_post_calls = array();
+$fhint_result     = FHINT\App\Post\Posts::update( $fhint_due_soon['id'], array( 'summary' => '' ), false );
+check( $fhint_result instanceof FHINT\App\Core\ValidationResult, 'posts: a scheduled post is held to the publishing rules on every save' );
+$fhint_result = FHINT\App\Post\Posts::update( $fhint_due_soon['id'], array( 'summary' => 'Changed while queued' ), false );
+check( is_array( $fhint_result ) && 'scheduled' === $fhint_result['status'], 'posts: editing a scheduled post keeps it scheduled' );
+check_same( '2099-01-01 09:00:00', $fhint_result['scheduled_at'], 'posts: and keeps its time' );
+check_same( array(), $fhint_post_calls, 'posts: without asking Google' );
+check( 1 === preg_match( '/^2099-01-0[12]T\d\d:\d\d$/', $fhint_result['scheduled_local'] ), 'posts: its time is also given as site wall time, in the picker\'s shape' );
+
+$fhint_result = FHINT\App\Post\Posts::unschedule( $fhint_due_soon['id'] );
+check( is_array( $fhint_result ) && 'draft' === $fhint_result['status'], 'posts: cancelling a schedule makes the post a draft' );
+check_same( null, PostRepository::find( $fhint_due_soon['id'] )['scheduled_at'], 'posts: and forgets the time' );
+$fhint_result = FHINT\App\Post\Posts::unschedule( $fhint_due_soon['id'] );
+check( is_wp_error( $fhint_result ) && 409 === $fhint_result->get_error_data()['status'], 'posts: a post that is not scheduled cannot be cancelled' );
+$fhint_result = FHINT\App\Post\Posts::unschedule( 999999 );
+check( is_wp_error( $fhint_result ) && 404 === $fhint_result->get_error_data()['status'], 'posts: nor can one that does not exist' );
+PostRepository::delete( $fhint_due_soon['id'] );
+PostRepository::delete( $fhint_due_late['id'] );
+
 // A sync: Google's copy wins, but what only this site knows is kept, and a
 // post gone from Google is forgotten — drafts are never touched.
 $fhint_post_answer = array(
@@ -1972,8 +2056,36 @@ check_same(
 );
 check( (int) $fhint_result['attachment_id'] > 0, 'posts: the file is kept in the media library too' );
 
+// The same photo chosen from the Media Library: nothing is uploaded to the
+// library again, and on this unreachable site it goes on Google's gallery.
+$fhint_attachment   = (int) $fhint_result['attachment_id'];
+$fhint_media_calls  = array();
+$fhint_attachments  = (int) wp_count_posts( 'attachment' )->inherit;
+$fhint_result       = FHINT\App\Post\PostMedia::from_library( $fhint_attachment, 'locations/1' );
+check( is_array( $fhint_result ) && ! empty( $fhint_result['via_gallery'] ), 'posts: a Media Library photo goes via the Google gallery too' );
+check_same( 'https://lh3.googleusercontent.com/grass-cs/post-photo=s0', $fhint_result['url'] ?? '', "posts: and the post gets Google's lasting link" );
+check_same( $fhint_attachment, $fhint_result['attachment_id'] ?? 0, 'posts: keeping the library photo it came from' );
+check_same( $fhint_attachments, (int) wp_count_posts( 'attachment' )->inherit, 'posts: without adding a copy to the library' );
+check_same( 'POST /v4/accounts/1/locations/1/media:startUpload', $fhint_media_calls[0] ?? '', "posts: sent to Google's gallery as bytes" );
+$fhint_result = FHINT\App\Post\PostMedia::from_library( 999999, 'locations/1' );
+check( is_wp_error( $fhint_result ) && 'fhint_media_not_found' === $fhint_result->get_error_code(), 'posts: an image no longer in the library: 404' );
+$fhint_result = FHINT\App\Post\PostMedia::from_library( $fhint_attachment, 'locations/unknown' );
+check( is_wp_error( $fhint_result ) && 'fhint_no_google_location' === $fhint_result->get_error_code(), 'posts: a listing this site never read is refused' );
+$fhint_small     = wp_tempnam( 'tiny.jpg' );
+$fhint_small_img = imagecreatetruecolor( 40, 40 );
+imagejpeg( $fhint_small_img, $fhint_small, 90 );
+imagedestroy( $fhint_small_img );
+$fhint_small_id = media_handle_sideload( array( 'name' => 'tiny.jpg', 'tmp_name' => $fhint_small ), 0 );
+$fhint_media_calls = array();
+check( FHINT\App\Post\PostMedia::from_library( (int) $fhint_small_id, 'locations/1' ) instanceof FHINT\App\Core\ValidationResult, "posts: a library photo too small for Google is refused with Google's limits" );
+check_same( array(), $fhint_media_calls, 'posts: before anything is sent' );
+wp_delete_attachment( (int) $fhint_small_id, true );
+
+// Photos already on Google a post can use: the listing's gallery only —
+// customers' review photos are not offered.
+check_same( array( 'gallery' ), array_keys( FHINT\App\Post\PostMedia::choices( 'locations/1' ) ), 'posts: only the gallery is offered, not customer photos' );
+
 // This suite never leaves anything behind in the developer's site.
-$fhint_attachment = (int) $fhint_result['attachment_id'];
 wp_delete_attachment( $fhint_attachment, true );
 check( null === get_post( $fhint_attachment ), 'posts: the test photo is removed again' );
 
