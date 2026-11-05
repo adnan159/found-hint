@@ -5,9 +5,9 @@ import Composer from "./components/Composer";
 import PostsHeader from "./components/PostsHeader";
 import PostsNotice from "./components/PostsNotice";
 import PostsSection from "./components/PostsSection";
-import ReviewsCard from "./components/ReviewsCard";
+import useBlogShare from "./hooks/useBlogShare";
 import usePostList, { NO_FILTERS } from "./hooks/usePostList";
-import { blankPost, reviewPost } from "./lib/posts";
+import { blankPost } from "./lib/posts";
 
 /**
  * Posts & Scheduling: the posts on the Google listing of the location in
@@ -16,8 +16,9 @@ import { blankPost, reviewPost } from "./lib/posts";
  * Everything here reads stored rows. "Sync posts", publishing, editing a
  * live post and deleting one are the only things that contact Google.
  *
- * Scheduling, CSV scheduling and sharing the website blog are FoundHint
- * Pro: drawn so they can be found, marked Pro, and inert.
+ * Scheduling (`posts.schedule`) and sharing the website
+ * blog are FoundHint Premium: drawn so they can be found, marked Pro, and
+ * inert until Premium serves them. Cancelling a schedule is free.
  *
  * The list, its paging and Sync live in `usePostList`; this component only
  * lays the screen out.
@@ -25,6 +26,8 @@ import { blankPost, reviewPost } from "./lib/posts";
 export default function Posts() {
   const list = usePostList();
   const [composing, setComposing] = useState(null);
+
+  useBlogShare({ ready: Boolean(list.listing), onCompose: setComposing });
 
   return (
     <>
@@ -48,10 +51,6 @@ export default function Posts() {
       {list.listing ? (
         <div className="fhint:grid fhint:gap-5">
           <BlogCard blogPosts={list.state?.blog_posts ?? 0} />
-          <ReviewsCard
-            reviews={list.state?.reviews ?? []}
-            onMakePost={(review) => setComposing(reviewPost(review))}
-          />
           <PostsSection list={list} onEdit={setComposing} />
         </div>
       ) : null}
@@ -63,6 +62,7 @@ export default function Posts() {
           businessName={list.listing?.title ?? ""}
           website={list.state?.website ?? ""}
           uploadsReachable={list.state?.uploads_reachable ?? true}
+          timezone={list.state?.timezone ?? ""}
           onClose={() => setComposing(null)}
         />
       ) : null}

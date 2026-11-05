@@ -121,7 +121,7 @@ class Enqueue {
 	 *
 	 * @return array
 	 */
-	private static function bootstrap_data() {
+	public static function bootstrap_data() {
 		$data = array(
 			'rest_url'   => rest_url( \FHINT\API::NAMESPACE_NAME . '/' . \FHINT\API::VERSION ),
 			'rest_nonce' => wp_create_nonce( 'wp_rest' ),

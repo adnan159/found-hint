@@ -33,7 +33,7 @@ from there; the structure is defined here.
 
 ```bash
 npm run dev              # Vite dev server for the admin React SPA (vite.admin.config.js)
-npm run build            # Production build of the admin SPA → assets/build/admin
+npm run build            # Production build of the admin SPA → assets/build/admin, then the editor bundle → assets/build/editor
 npm run lint              # eslint over src/
 npm run plugin:prepare    # build + copy everything (minus buildExclude globs in package.json) into ./build
 npm run plugin:publish    # plugin:prepare + zip ./build into found-hint.zip
@@ -139,6 +139,7 @@ includes/
 ├── functions.php           global non-class helpers only
 └── hooks.php               global hook wiring only
 src/admin/                  Vite-built React SPA (see below)
+src/editor/                 GBP Posting button + popup in the block editor (vite.editor.config.js)
 assets/build/               Vite output, gitignored — never hand-edit
 assets/static/              hand-written, directly-enqueued, no build step
 libs/assets.php             vite-for-wp integration (FHINT\Libs\Assets)
@@ -266,7 +267,13 @@ route in `routes.jsx` and an entry in the sidebar; do not add
   source.
 - **Assets load on our screen only.** `Enqueue` gates on the exact hook
   suffix `toplevel_page_fhint`. Verify by loading an unrelated admin page
-  and grepping the HTML for `fhint-admin`.
+  and grepping the HTML for `fhint-admin`. The one other bundle is
+  `src/editor` (`Admin\EditorAssets`): the block editor for a blog post,
+  while blog sharing is on. It must never import `src/admin/index.css` —
+  that resets every element on the page. Shared look lives in
+  `src/admin/styles/theme.css` (FoundHint-only selectors); the editor gets
+  Tailwind's reset inside `@scope` (`src/editor/preflight-scoped.css`,
+  regenerate it after a Tailwind upgrade).
 - **Field errors come from the server.** REST returns machine codes; the
   client maps them to translated strings.
 - **Every string through `__()`** with the `found-hint` text domain.

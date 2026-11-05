@@ -1,9 +1,8 @@
 import { __ } from "@wordpress/i18n";
 import { cn } from "cn";
-import { FileSpreadsheetIcon, HistoryIcon, PlusIcon } from "lucide-react";
+import { HistoryIcon, PlusIcon } from "lucide-react";
 import ScreenTitleBar, { SyncButton } from "@/components/ScreenTitleBar";
 import { pillButton } from "@/components/location-bar/styles";
-import SoonTag from "@/pages/reviews/components/SoonTag";
 
 // The main action, as the Business Profile's "Send to Google": a filled pill.
 const primaryPill = cn(
@@ -13,8 +12,7 @@ const primaryPill = cn(
 
 /**
  * The Posts & Scheduling title row: the shared screen title bar, with the
- * screen's actions on the right — History, CSV scheduling (FoundHint Pro:
- * drawn so it can be found, marked Pro, and inert), Sync posts and New post.
+ * screen's actions on the right — History, Sync posts and New post.
  *
  * The actions need a Google listing for the location; until one is chosen
  * (`hasListing` false) the row shows the title alone.
@@ -49,22 +47,6 @@ export function PostsHeader({
             <button type="button" onClick={onHistory} className={pillButton}>
               <HistoryIcon aria-hidden="true" className="fhint:size-3.5" />
               {__("History", "foundhint-local-seo")}
-            </button>
-            <button
-              type="button"
-              disabled
-              title={__(
-                "Scheduling posts from a CSV file is part of FoundHint Premium.",
-                "foundhint-local-seo",
-              )}
-              className={pillButton}
-            >
-              <FileSpreadsheetIcon
-                aria-hidden="true"
-                className="fhint:size-3.5"
-              />
-              {__("Schedule with a CSV file", "foundhint-local-seo")}
-              <SoonTag kind="pro" />
             </button>
             <SyncButton
               onClick={onSync}

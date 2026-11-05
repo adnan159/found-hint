@@ -81,10 +81,15 @@ class PostRepository {
 			$params[]  = $offset;
 		}
 
+		// Newest first: the post added (published, or last saved — a scheduled
+		// one when it was scheduled) most recently leads, whatever its status.
+		// Oldest first is the exact reverse.
+		$ordering = "COALESCE( published_at, updated_at ) {$order}, id {$order}";
+
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 		$rows = $wpdb->get_results(
 			// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-			$wpdb->prepare( "SELECT * FROM {$table} {$where} ORDER BY COALESCE( published_at, updated_at ) {$order}, id {$order}{$limit_sql}", $params ),
+			$wpdb->prepare( "SELECT * FROM {$table} {$where} ORDER BY {$ordering}{$limit_sql}", $params ),
 			ARRAY_A
 		);
 
@@ -161,7 +166,8 @@ class PostRepository {
 	 * - `location_name`: one Google location, or '' for all.
 	 * - `topic_type`: update | event | offer, or '' for any.
 	 * - `status`: live (Google's LIVE or still processing), draft,
-	 *   scheduled, failed (failed or rejected by Google), or '' for any.
+	 *   scheduled (incl. sending), failed (failed or rejected by Google), or
+	 *   '' for any.
 	 * - `source`: manual | review | … , or '' for any.
 	 * - `days`: only posts published — or, for one never published, last
 	 *   edited — in the last N days. 0 for any time.
@@ -190,8 +196,11 @@ class PostRepository {
 			case 'failed':
 				$where .= " AND status IN ( 'failed', 'rejected' )";
 				break;
-			case 'draft':
 			case 'scheduled':
+				// A post mid-send is still the schedule's, for the seconds it takes.
+				$where .= " AND status IN ( 'scheduled', 'sending' )";
+				break;
+			case 'draft':
 				$where   .= ' AND status = %s';
 				$params[] = (string) $args['status'];
 				break;

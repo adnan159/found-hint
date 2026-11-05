@@ -382,6 +382,23 @@ const MESSAGES = {
       "That photo is not a web address Google can open.",
       "foundhint-local-seo",
     ),
+  // Scheduling (FoundHint Premium checks the time).
+  "post.scheduled_at.required": () =>
+    __("Choose when to send it.", "foundhint-local-seo"),
+  "post.scheduled_at.invalid": () =>
+    __("Enter a date and a time.", "foundhint-local-seo"),
+  "post.scheduled_at.too_soon": () =>
+    __(
+      "Pick a time at least 5 minutes from now, or choose Now instead.",
+      "foundhint-local-seo",
+    ),
+  "post.scheduled_at.too_far": () =>
+    __("Pick a time within the next year.", "foundhint-local-seo"),
+  "post.scheduled_at.after_event": () =>
+    __(
+      "Send it before the event ends, or nobody will see it in time.",
+      "foundhint-local-seo",
+    ),
   "review.reply.required": () =>
     __("Write a reply before posting it.", "foundhint-local-seo"),
   "review.reply.too_long": () =>
@@ -683,10 +700,7 @@ export function errorMessage(error) {
         "foundhint-local-seo",
       ),
     fhintpremium_google_required: () =>
-      __(
-        "Connect your Google Business Profile to set up schema.",
-        "foundhint-local-seo",
-      ),
+      __("Connect your Google Business Profile first.", "foundhint-local-seo"),
     fhint_post_not_found: () =>
       __(
         "That post no longer exists. Sync posts to see the latest.",
@@ -699,6 +713,23 @@ export function errorMessage(error) {
       ),
     fhint_post_already_live: () =>
       __("This post is already on Google.", "foundhint-local-seo"),
+    fhint_post_not_scheduled: () =>
+      __("This post is not scheduled any more.", "foundhint-local-seo"),
+    fhint_post_sending: () =>
+      __(
+        "This post is being sent to Google right now. Try again in a minute.",
+        "foundhint-local-seo",
+      ),
+    fhintpremium_blog_post_not_found: () =>
+      __(
+        "That blog post is not published, or no longer exists.",
+        "foundhint-local-seo",
+      ),
+    fhintpremium_post_not_schedulable: () =>
+      __(
+        "Only a draft or a post that is not on Google yet can be scheduled.",
+        "foundhint-local-seo",
+      ),
     fhint_review_not_found: () =>
       __(
         "That review is no longer stored here. Read your reviews from Google again.",

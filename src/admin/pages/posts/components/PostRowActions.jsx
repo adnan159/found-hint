@@ -16,9 +16,12 @@ import {
 import { errorMessage } from "@/lib/errors";
 import { iconButton } from "@/pages/reviews/styles";
 import { useDeletePostMutation } from "@/store/api/postsApi";
+import ScheduledActions from "./ScheduledActions";
 
 /**
- * Edit (or Finish, for a draft or a failed post) and Delete, beside a post,
+ * Edit (Finish for a draft or a failed post, Change for a scheduled one)
+ * and Delete, beside a post — after Publish now and Cancel schedule on a
+ * scheduled post —
  * as the pencil and bin icon buttons a review's reply has.
  * Delete asks first, and says whether it removes the post from Google or
  * only from here.
@@ -31,6 +34,12 @@ import { useDeletePostMutation } from "@/store/api/postsApi";
 export function PostRowActions({ post, name, onEdit }) {
   const [remove, { isLoading: removing }] = useDeletePostMutation();
   const finish = post.status === "draft" || post.status === "failed";
+  const scheduled = post.status === "scheduled";
+  const verb = scheduled
+    ? __("Change", "foundhint-local-seo")
+    : finish
+      ? __("Finish", "foundhint-local-seo")
+      : __("Edit", "foundhint-local-seo");
 
   const onDelete = async () => {
     try {
@@ -47,25 +56,25 @@ export function PostRowActions({ post, name, onEdit }) {
 
   return (
     <div className="fhint:flex fhint:flex-none fhint:items-start fhint:gap-1.5">
+      {scheduled ? <ScheduledActions post={post} name={name} /> : null}
       <button
         type="button"
         onClick={onEdit}
         disabled={removing}
-        title={
-          finish
-            ? __("Finish", "foundhint-local-seo")
-            : __("Edit", "foundhint-local-seo")
-        }
+        title={verb}
         className={iconButton}
       >
         <PencilIcon aria-hidden="true" className="fhint:size-3.5" />
         <span className="fhint:sr-only">
           {sprintf(
-            finish
+            scheduled
               ? /* translators: %s: the post's title or opening words. */
-                __("Finish %s", "foundhint-local-seo")
-              : /* translators: %s: the post's title or opening words. */
-                __("Edit %s", "foundhint-local-seo"),
+                __("Change %s", "foundhint-local-seo")
+              : finish
+                ? /* translators: %s: the post's title or opening words. */
+                  __("Finish %s", "foundhint-local-seo")
+                : /* translators: %s: the post's title or opening words. */
+                  __("Edit %s", "foundhint-local-seo"),
             name,
           )}
         </span>

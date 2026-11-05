@@ -37,6 +37,12 @@ class Settings {
 			'logs'    => array(
 				'retention_days' => 30,
 			),
+			'posts'   => array(
+				// "Share your blog on Google" (FoundHint Premium, `posts.blog`):
+				// on adds a "GBP Posting" link under each published blog post
+				// in Posts → All Posts. Written only by Premium.
+				'blog_sharing' => false,
+			),
 			'schema'  => array(
 				// auto | plugin | seo_plugin | disabled — who publishes the
 				// local business markup when an SEO plugin is also present.

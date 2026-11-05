@@ -4,7 +4,7 @@
 step finishes: what shipped, and how it was verified — the evidence, not the
 intent. Name any bug the verification caught.
 
-Last updated: step 75. The data layer, its REST API and the admin screens
+Last updated: step 91. The data layer, its REST API and the admin screens
 for everything it covers exist. The Schema Manager is built in FoundHint
 Premium and matches the design (`FoundHint Schema (1).html`): six tabs —
 01 Organization, 02 LocalBusiness, 03 Locations (list, setup, branch
@@ -2562,3 +2562,299 @@ Services and Website structure carry the pill with Premium hidden.
 LocalBusiness now carries the Premium pill too: without Premium its summary
 is "Premium" rather than the free markup's type (`tabSummaries()` no longer
 takes `free`).
+
+## Step 82 — Scheduling posts: the free side (Phase 1)
+
+Plan: `docs/POSTS-SCHEDULE-PLAN.md`, from the "FoundHint Posts" design.
+Scheduling is Premium (`posts.schedule`); this step is everything the free
+plugin owns. Premium's schedule route and its sender are still open there.
+
+**Server:**
+- `PUT /posts/{id}` on a `scheduled` post checks the publishing rules on
+  every save (it is sent by itself later) and keeps its status and time.
+- New free `POST /posts/{id}/unschedule`: scheduled → draft, time cleared;
+  `409 fhint_post_not_scheduled` otherwise. Needs only the capability.
+- Every post carries `scheduled_local` (site wall time, datetime-local
+  shape); `GET /posts/state` carries `timezone`.
+- List order in SQL, the design's rule: newest first puts what was posted
+  first and the scheduled posts after it, soonest due first; oldest first
+  is the exact reverse.
+
+**Screen:** `Composer.jsx` (696 lines) split into `components/composer/*`,
+`hooks/useComposer.js` and `lib/composer.js`, every file ≤ 150 lines.
+When to publish → Schedule shows "Publish on" with the site's time zone;
+saving is the free save and then Premium's `schedule` call; a refused time
+shows at the picker and the post stays a draft (new) or keeps its earlier
+time (already scheduled). Choosing Draft on a scheduled post unschedules it.
+Rows: "Goes live in 3d · date", **Publish now**, **Cancel schedule**,
+**Change**; *Scheduled* in the status filter. Without Premium the option
+keeps its `PRO` tag; a post already queued says "Needs FoundHint Premium to
+send", shows its time read-only, and can still be published, changed or
+cancelled.
+
+**Verified:** database suite 741 (13 new: order both ways, strict save,
+time kept, unschedule and its 409/404), each rule mutation-checked (strict
+check removed → 1 fail; unschedule left scheduled → 2; old order → 3); REST
+routes smoke 685 (route registered, capability-only guard); every smoke
+suite, `composer lint` and `npm run lint` clean. Real bundle in the browser
+against a stateful mock with Premium on and off: reschedule, too-soon time
+(error at the picker — this caught a wrong "saved as a draft" note for a
+post that was already scheduled; fixed), new scheduled post (create +
+schedule), cancel, publish now, scheduled → draft (PUT + unschedule),
+Premium off (disabled option, read-only time, save sends only PUT, toast no
+longer promises a send). Not yet run against Premium itself — its route
+does not exist yet.
+
+## Step 83 — Scheduling posts: Premium's route and sender
+
+The Schedule option was locked on the dev site because Premium did not yet
+serve `posts.schedule`. Built in `found-hint-premium`:
+
+- `App/Post/ScheduleRules` — the time rules, pure: site wall time
+  (`wp_timezone()`) → UTC; required, real date (no "Feb 31" rollover), ≥ 5
+  minutes ahead, ≤ a year, before an event ends.
+- `App/Post/Scheduler` — `schedule()` (draft, failed or scheduled only;
+  Publish's rules plus the time rules; then one cron event at the post's
+  own time) and `run()`, the sender: a five-minute WP-Cron sweep, kept
+  scheduled on every load and cleared on deactivation, 10 posts a run.
+- `App/Post/Queue` — the only queries Premium runs on the free posts
+  table: due posts, the claim (`scheduled` → `sending` in one conditional
+  UPDATE, so two overlapping sweeps never send a post twice), and posts
+  stuck `sending` 15 minutes → failed with a reason, never resent.
+- `API/PostSchedule` — `POST fhint-premium/v1/posts/{id}/schedule`
+  `{ scheduled_at }`; needs the licence, the capability and Google.
+- `posts.schedule` added to `Features::active()`.
+
+Free plugin: new short-lived status `sending` — documented in
+`CreatePostsTable`, listed under *Scheduled*, labelled "Sending" with "Being
+sent to Google now"; edit, publish, unschedule and delete answer `409
+fhint_post_sending` while it lasts. New messages for
+`fhint_post_not_scheduled`, `fhint_post_sending`,
+`fhintpremium_post_not_schedulable`; `fhintpremium_google_required` now
+reads "Connect your Google Business Profile first." (it is shared by schema
+and posts).
+
+**Verified:** Premium smoke 17 (time rules, incl. summer time; the "a year"
+bound was first written as wall time and failed across the DST change —
+the test was wrong, now computed from the timestamp), Premium database 42
+on its own tables with Google answered in-process. Mutation-checked: claim
+without its status check (first passed — MySQL reports 0 changed rows for
+an unchanged row, so a second claim on the same row proved nothing; a
+"cancelled before the sweep" case was added and now catches it), stuck
+posts returned to the queue, scheduling without Publish's rules, the free
+mid-send guard, no lead time — each fails its tests. Free database 741,
+every free smoke suite, Premium schema suites (253 + 286), both PHPCS and
+ESLint clean, build clean. On the dev site: the route is registered,
+`posts.schedule` is listed, the sweep is queued. Not verified: a real
+scheduled send to Google (it would post on the live listing), and the
+screen while logged in.
+
+## Step 84 — Newest post on top, scheduled ones included
+
+Changed on request: the design grouped scheduled posts after the posted
+ones (soonest due first); the list now puts the last post added on top,
+whatever its status — ordered by when it was published, else last saved
+(a scheduled post: when it was scheduled). `PostRepository::all()` is back
+to `COALESCE( published_at, updated_at )`, id as the tie-break; `old` is
+the exact reverse. Database suite 740, the ordering test rewritten and
+mutation-checked: grouping scheduled posts last fails it, and so does
+ordering by id alone.
+
+## Step 85 — "Turn reviews into posts" removed
+
+Removed on request from the Posts screen: the card (`ReviewsCard.jsx`),
+its `reviewPost()` helper, and `reviews` from `GET /posts/state` (with
+`Posts::shareable_reviews()`, so the state no longer queries reviews).
+Posts already written from a review keep their `review` source and its
+"From a review" tag; `review` stays an allowed source. ESLint, PHPCS and
+the build are clean; posts smoke 86, REST routes 685, database 740.
+
+## Step 86 — "Schedule with a CSV file" removed
+
+Removed on request: the disabled, Premium-tagged button in the Posts header
+(`PostsHeader.jsx`) and the `posts.csv` row in `docs/EXTENDING.md`. CSV
+scheduling (Phase 2 of `docs/POSTS-SCHEDULE-PLAN.md`) is on hold. The
+`csv` source and its "From CSV" tag stay, for any post that carries it.
+ESLint and the build are clean.
+
+## Step 87 — Share your blog on Google (Premium, `posts.blog`)
+
+Requested: the card's "Share Website Blog" button becomes a switch; when on,
+a "GBP Posting" link after View under each blog post opens a new post on
+the FoundHint Posts screen, published like any other. Kept Premium-only
+(owner's call).
+
+**Free:** setting `posts.blog_sharing` (default off, written only by
+Premium). `Admin\BlogSharing` adds "GBP Posting" after View in Posts → All
+Posts — published `post`s only, for users who can manage FoundHint, and only
+when `fhint_blog_sharing_enabled` (new filter, Premium answers it) is true;
+it links to `admin.php?page=fhint#/posts?share=<id>`. `BlogCard` is a
+`Switch` (PRO tag and disabled without Premium). `useBlogShare` waits for
+the location's listing, opens the composer on `blogPost()` (title + excerpt
+as the text, "Learn more" to the article, the featured image when Google
+can fetch it, source `blog`), then drops `share` from the URL so a reload
+does not reopen it.
+
+**Premium:** `App/Post/BlogSharing` (`is_on()` = licence + switch, `set()`,
+`blog_post()`, `summary()` cut to 1,500 characters, adds source `blog`),
+`API/PostBlog` (`GET|PUT posts/blog-sharing`, `GET posts/blog/{id}`),
+`posts.blog` in `Features::active()`.
+
+**Verified:** Premium smoke 21 (summary), Premium database 62 (+20: the
+draft shape, drafts and pages refused, switch off → no link, link right
+after View and to the right URL, not for drafts/pages/logged-out, both
+routes, a post saved with source `blog`; the test blog posts and the site's
+settings are removed/restored), mutation-checked — the "after View" test
+first passed with that rule broken (View was last in the test row); View now
+sits mid-row and the mutation fails it. In the browser against the mock:
+switch on/off, the share link opens a filled composer and publishing sends
+`source=blog`; **caught a bug** — a link to a missing blog post reopened the
+previous one, because RTK Query keeps the last answer while loading the
+next; fixed with `currentData` and an id check. Premium off: switch disabled
+with its tag, the link shows a Premium message and opens nothing. Free
+database 740, all smoke suites, both PHPCS, ESLint, build clean. Not
+checked: the real All Posts screen while logged in.
+
+## Step 88 — Fix: every admin page crashed after step 87
+
+`Admin::init()` called `BlogSharing::init()` without importing
+`FHINT\Admin\BlogSharing`, so PHP looked for `FHINT\BlogSharing` and every
+wp-admin request died ("Class "FHINT\BlogSharing" not found"). Step 87's
+tests called `Admin\BlogSharing` directly and never ran `Admin::init()`,
+which only runs on admin pages. Fixed with the `use` line; the database
+suite now runs `FHINT\Admin::init()` and checks the link is wired (741).
+With the import removed it dies with exit 255 and no summary line — the
+fatal goes to the WordPress debug log, not the console.
+
+## Step 89 — GBP Posting in the block editor
+
+Requested: the GBP Posting button in the post editor's top bar (beside
+its other pinned icons), opening the composer as a popup right there.
+
+**How:** the editor has no public API for a bare header button; a plugin
+sidebar (`wp.editor.PluginSidebar`) is what pins an icon there. So
+`src/editor/toolbar.js` registers one, and when it opens it puts back the
+sidebar that was open (or closes it) and opens FoundHint's popup for the
+current post — one click. The popup is the Posts `Composer` in this
+bundle's own React tree (`.fhint-ui` host on `<body>`), with its own
+store, toasts and theme. `useEditorShare` walks: Premium → Google listings
+(asks which one when there are several; the editor has no location bar)
+→ the blog post (Premium's `posts/blog/{id}`; an unpublished post is
+explained, not shared) → the composer, filled as from the list link.
+
+**Separate bundle:** `vite.editor.config.js` → `assets/build/editor`
+(`npm run build` builds both). `Admin\EditorAssets` enqueues it on
+`enqueue_block_editor_assets` only for a `post` in the block editor, for a
+FoundHint manager, while `BlogSharing::enabled()`; it localises the same
+`window.FHINT` (`Enqueue::bootstrap_data()` is now public). The admin's CSS
+was split: `src/admin/styles/theme.css` holds tokens and FoundHint-only
+rules for both bundles; `index.css` keeps the page-wide preflight and base
+rules — its build output is byte-identical to before. The editor gets
+Tailwind's preflight (4.x) wrapped in `@scope (.fhint-ui, [data-slot=
+"dialog-portal"], [data-slot="alert-dialog-portal"], [data-sonner-toaster])`.
+ESLint skips the Tailwind entry stylesheets.
+
+**Verified:** database 747 (+6: hooked; loads for a blog post in the block
+editor with sharing on; not in the classic editor, not for a page, not
+with sharing off, not for a non-manager), each condition mutation-checked.
+Built editor CSS: the reset only inside `@scope`; outside it only
+Tailwind's `--tw-*` variable defaults. Real editor bundle in a browser
+page with a stand-in for `wp.*` and WordPress-styled elements: their
+margins, font size, padding and border unchanged before, during and after
+the popup; the toolbar click opens the filled composer and publishing
+sends `source=blog`. **Caught a bug:** the sidebar open before the first
+click was not put back (it was only recorded on a store change); now
+recorded at registration. Not checked: the real WordPress editor (needs a
+login) — the store names `core/interface` and `getActiveComplementaryArea`
+are WordPress's, scope `core` (and `core/edit-post` before 6.6).
+
+## Step 89 — GBP Posting in the block editor
+
+Requested: the GBP Posting button in the post editor's top bar (beside
+its other pinned icons), opening the composer as a popup right there.
+
+**How:** the editor has no public API for a bare header button; a plugin
+sidebar (`wp.editor.PluginSidebar`) is what pins an icon there. So
+`src/editor/toolbar.js` registers one, and when it opens it puts back the
+sidebar that was open (or closes it) and opens FoundHint's popup for the
+current post — one click. The popup is the Posts `Composer` in this
+bundle's own React tree (`.fhint-ui` host on `<body>`), with its own
+store, toasts and theme. `useEditorShare` walks: Premium → Google listings
+(asks which one when there are several; the editor has no location bar)
+→ the blog post (Premium's `posts/blog/{id}`; an unpublished post is
+explained, not shared) → the composer, filled as from the list link.
+
+**Separate bundle:** `vite.editor.config.js` → `assets/build/editor`
+(`npm run build` builds both). `Admin\EditorAssets` enqueues it on
+`enqueue_block_editor_assets` only for a `post` in the block editor, for a
+FoundHint manager, while `BlogSharing::enabled()`; it localises the same
+`window.FHINT` (`Enqueue::bootstrap_data()` is now public). The admin's CSS
+was split: `src/admin/styles/theme.css` holds tokens and FoundHint-only
+rules for both bundles; `index.css` keeps the page-wide preflight and base
+rules — its build output is byte-identical to before. The editor gets
+Tailwind's preflight (4.x) wrapped in `@scope (.fhint-ui, [data-slot=
+"dialog-portal"], [data-slot="alert-dialog-portal"], [data-sonner-toaster])`.
+ESLint skips the Tailwind entry stylesheets.
+
+**Verified:** database 747 (+6: hooked; loads for a blog post in the block
+editor with sharing on; not in the classic editor, not for a page, not
+with sharing off, not for a non-manager), each condition mutation-checked.
+Built editor CSS: the reset only inside `@scope`; outside it only
+Tailwind's `--tw-*` variable defaults. Real editor bundle in a browser
+page with a stand-in for `wp.*` and WordPress-styled elements: their
+margins, font size, padding and border unchanged before, during and after
+the popup; the toolbar click opens the filled composer and publishing
+sends `source=blog`. **Caught a bug:** the sidebar open before the first
+click was not put back (it was only recorded on a store change); now
+recorded at registration. Not checked: the real WordPress editor (needs a
+login) — the store names `core/interface` and `getActiveComplementaryArea`
+are WordPress's, scope `core` (and `core/edit-post` before 6.6).
+
+## Step 90 — GBP Posting: icon, link, Media Library, blank description
+
+Requested: the toolbar icon as a page with a "+" badge in the brand colour;
+the button link the published post's URL by default; "Choose photo" opening
+the Media Library on the Posts screen and in the editor; the description
+blank.
+
+- **Icon:** `src/editor/toolbar.js` draws a page with a folded corner,
+  lines and a "+" badge, stroked `#FF6B35`.
+- **Link:** already the article's permalink (`cta_url`, "Learn more");
+  now covered by a Premium database test.
+- **Description:** starts blank. Premium's `posts/blog/{id}` no longer
+  builds text (`summary()` and the excerpt removed; test says so).
+- **Media Library:** the photo field passes `onAttachments` to the shared
+  `Picker`, so "Choose photo" opens `wp.media` (files can still be
+  dropped). New `PostMedia::from_library()` + `POST /posts/media/library`:
+  Google's limits checked from the file, no copy in the library, own link
+  when reachable else via the listing's gallery. `EditorAssets` also calls
+  `wp_enqueue_media()`. While the library is open the composer stops being
+  modal and ignores close requests (`lib/media.js` announces it,
+  `hooks/useMediaOpen`), so clicking in the library or pressing its Esc no
+  longer closes the post.
+- **Split:** `PhotoField.jsx` (was 316 lines) → `photo/GooglePhotoPicker`,
+  `photo/PhotoChooser`, `photo/PhotoNotes`, `hooks/usePhotoChoice`; the
+  composer's photo handler moved into `useComposer` (Composer 141 lines).
+
+**Verified:** database 756 (+9: library photo via the gallery with Google's
+lasting link, same attachment, no library copy, missing/unknown refused, a
+too-small photo refused before anything is sent), REST routes 695; the
+size check and the reachable branch each mutation-checked. Premium 17 +
+63. In the browser with a stand-in `wp.media` window (above the dialog,
+with a search box, Esc to close), on both the Posts screen and the editor:
+the library opens, its search keeps focus, clicking in it leaves the post
+open, Select sends `POST /posts/media/library` once and shows Google's
+link; Esc closes only the library, a second Esc the post. Icon rendered
+from the toolbar code on light and dark. All smoke suites, both PHPCS,
+ESLint and both builds clean. Not checked: the real `wp.media` and editor.
+
+## Step 91 — "Customer photos" removed from post photos
+
+Removed on request, on the Posts screen and the editor popup alike (one
+shared photo field): the "Customer photos" pill (`photo/PhotoChooser`), the
+customer branch of the picker (now `GooglePhotoPicker` shows "Your gallery"
+only), and the warning's mention of it. Server: `PostMedia::choices()` —
+`GET /posts/photos` — returns `{ gallery }` only and no longer reads
+reviews. Reviews keep their own photos on the Reviews screen. Database
+757 (+1: only the gallery is offered), smoke suites, PHPCS, ESLint, both
+builds clean.
