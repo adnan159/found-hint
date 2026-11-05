@@ -157,6 +157,32 @@ class Posts extends AbstractController {
 
 		register_rest_route(
 			$this->namespace,
+			'/posts/media/library',
+			array(
+				array(
+					'methods'             => WP_REST_Server::CREATABLE,
+					'callback'            => array( $this, 'library_media' ),
+					// Like an upload: on a site Google cannot reach, the photo
+					// goes on the listing.
+					'permission_callback' => array( $this, 'google_write_check' ),
+					'args'                => $this->args(
+						array_merge(
+							$location,
+							array(
+								'attachment_id' => array(
+									'type'              => 'integer',
+									'required'          => true,
+									'sanitize_callback' => 'absint',
+								),
+							)
+						)
+					),
+				),
+			)
+		);
+
+		register_rest_route(
+			$this->namespace,
 			'/posts/sync',
 			array(
 				array(
@@ -194,6 +220,18 @@ class Posts extends AbstractController {
 					'methods'             => WP_REST_Server::CREATABLE,
 					'callback'            => array( $this, 'publish_item' ),
 					'permission_callback' => array( $this, 'google_write_check' ),
+				),
+			)
+		);
+
+		register_rest_route(
+			$this->namespace,
+			'/posts/(?P<id>\d+)/unschedule',
+			array(
+				array(
+					'methods'             => WP_REST_Server::CREATABLE,
+					'callback'            => array( $this, 'unschedule_item' ),
+					'permission_callback' => array( $this, 'permissions_check' ),
 				),
 			)
 		);
@@ -304,6 +342,22 @@ class Posts extends AbstractController {
 	}
 
 	/**
+	 * Use a photo already in the media library for a post.
+	 *
+	 * @param \WP_REST_Request $request Request.
+	 * @return \WP_REST_Response|\WP_Error
+	 */
+	public function library_media( $request ) {
+		$result = PostMedia::from_library( (int) $request->get_param( 'attachment_id' ), (string) $request->get_param( 'location_name' ) );
+
+		if ( $result instanceof ValidationResult ) {
+			return $this->validation_error( $result );
+		}
+
+		return is_wp_error( $result ) ? $result : $this->envelope( $result );
+	}
+
+	/**
 	 * Add a photo to the media library for a post.
 	 *
 	 * @param \WP_REST_Request $request Request.
@@ -366,6 +420,16 @@ class Posts extends AbstractController {
 	 */
 	public function publish_item( $request ) {
 		return $this->answer( PostService::publish( (int) $request['id'] ) );
+	}
+
+	/**
+	 * Take a scheduled post off the schedule; it becomes a draft.
+	 *
+	 * @param \WP_REST_Request $request Request.
+	 * @return \WP_REST_Response|\WP_Error
+	 */
+	public function unschedule_item( $request ) {
+		return $this->answer( PostService::unschedule( (int) $request['id'] ) );
 	}
 
 	/**

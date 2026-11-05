@@ -79,7 +79,7 @@ export function Section({
           <span
             aria-live="polite"
             className={cn(
-              "fhint:min-w-0 fhint:flex-1 fhint:text-[13px] fhint:font-bold",
+              "fhint:min-w-0 fhint:flex-1 fhint:text-sm fhint:font-bold",
               status?.tone,
             )}
           >
@@ -92,7 +92,7 @@ export function Section({
               disabled={disabled}
               className={cn(
                 quietButton,
-                "fhint:px-4 fhint:py-[9px] fhint:text-[13px]",
+                "fhint:px-4 fhint:py-[9px] fhint:text-sm",
               )}
             >
               {__("Discard", "foundhint-local-seo")}
@@ -104,7 +104,7 @@ export function Section({
             disabled={disabled || isSaving || !hasUnsavedChanges}
             className={cn(
               primaryButton,
-              "fhint:px-4 fhint:py-[9px] fhint:text-[13px]",
+              "fhint:px-4 fhint:py-[9px] fhint:text-sm",
             )}
           >
             {saveLabel}

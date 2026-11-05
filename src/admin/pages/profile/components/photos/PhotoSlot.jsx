@@ -4,6 +4,7 @@ import { cn } from "cn";
 import { label, quietButton, tag, tagTones } from "../../styles";
 import { STATES, thumb } from "./lib";
 import Picker from "./Picker";
+import { hasMediaLibrary } from "@/lib/media";
 
 /**
  * One of the listing's two named photos — the logo or the cover — as a
@@ -23,6 +24,7 @@ export function PhotoSlot({
   wide,
   disabled,
   onFiles,
+  onAttachments,
 }) {
   const shown = waiting ?? photo;
   const status = waiting
@@ -41,16 +43,14 @@ export function PhotoSlot({
     wide ? "fhint:h-[150px] fhint:w-full" : "fhint:size-[130px]",
     shown?.url
       ? "fhint:border-border fhint:bg-card"
-      : "fhint:border-dashed fhint:border-[#b9b3b1] fhint:bg-[#efe9e7] fhint:hover:bg-[#e8e1de]",
+      : "fhint:border-dashed fhint:border-input fhint:bg-muted fhint:hover:bg-accent",
   );
 
   return (
     <div className="fhint:grid fhint:content-start fhint:gap-3 fhint:rounded-[12px] fhint:border fhint:border-border fhint:bg-card fhint:p-4">
       <div className="fhint:flex fhint:flex-wrap fhint:items-center fhint:gap-2">
         <span className={cn(label, "fhint:text-sm")}>{title}</span>
-        <span className="fhint:text-[12.5px] fhint:text-muted-strong">
-          {shape}
-        </span>
+        <span className="fhint:text-sm fhint:text-muted-strong">{shape}</span>
         {status ? (
           <span className={cn(tag, status.tone, "fhint:ml-auto")}>
             {status.label}
@@ -61,13 +61,14 @@ export function PhotoSlot({
       <div
         className={cn(
           "fhint:grid fhint:place-items-center fhint:rounded-[10px]",
-          wide ? "" : "fhint:bg-[#f6f1ef] fhint:py-[10px]",
+          wide ? "" : "fhint:bg-muted fhint:py-[10px]",
         )}
       >
         <Picker
           droppable
           disabled={disabled}
           onFiles={onFiles}
+          onAttachments={onAttachments}
           className={zone}
           draggingClassName="fhint:border-primary fhint:bg-primary/10"
           label={sprintf(
@@ -91,13 +92,18 @@ export function PhotoSlot({
                 className="fhint:size-6 fhint:text-muted-strong"
                 strokeWidth={1.5}
               />
-              <span className="fhint:text-[13.5px] fhint:font-semibold fhint:text-foreground-soft">
+              <span className="fhint:text-sm fhint:font-semibold fhint:text-foreground-soft">
                 {placeholder}
               </span>
               <span className="fhint:text-[11.5px] fhint:text-muted-strong">
                 {__("or", "foundhint-local-seo")}{" "}
                 <span className="fhint:underline">
-                  {__("browse files", "foundhint-local-seo")}
+                  {onAttachments && hasMediaLibrary()
+                    ? __(
+                        "choose from your media library",
+                        "foundhint-local-seo",
+                      )
+                    : __("browse files", "foundhint-local-seo")}
                 </span>
               </span>
             </span>
@@ -107,7 +113,17 @@ export function PhotoSlot({
 
       {shown ? (
         <span>
-          <Picker disabled={disabled} onFiles={onFiles} className={quietButton}>
+          <Picker
+            disabled={disabled}
+            onFiles={onFiles}
+            onAttachments={onAttachments}
+            label={sprintf(
+              /* translators: %s: "Logo" or "Cover photo". */
+              __("Choose another %s", "foundhint-local-seo"),
+              title.toLowerCase(),
+            )}
+            className={quietButton}
+          >
             <UploadIcon aria-hidden="true" className="fhint:size-3.5" />
             {__("Upload another", "foundhint-local-seo")}
           </Picker>

@@ -37,10 +37,60 @@ class Settings {
 			'logs'    => array(
 				'retention_days' => 30,
 			),
+			'posts'   => array(
+				// "Share your blog on Google" (FoundHint Premium, `posts.blog`):
+				// on adds a "GBP Posting" link under each published blog post
+				// in Posts → All Posts. Written only by Premium.
+				'blog_sharing' => false,
+			),
 			'schema'  => array(
 				// auto | plugin | seo_plugin | disabled — who publishes the
 				// local business markup when an SEO plugin is also present.
-				'mode' => 'auto',
+				'mode'        => 'auto',
+
+				// The Schema Manager (FoundHint Pro; docs/SCHEMA-PLAN.md).
+				// Read only while Pro serves the manager; the free markup
+				// ignores them. Pro sanitises every value before saving.
+				'enabled'     => true,
+				// Each schema tab's switch (the website's is website.enabled).
+				// Off keeps the details and prints nothing. Every tab starts
+				// off: nothing is published until the owner switches it on.
+				'tabs'        => array(
+					'organization'  => false,
+					'localbusiness' => false,
+					'locations'     => false,
+					'services'      => false,
+				),
+				// head | footer — inside <head>, or just before </body>.
+				'placement'   => 'head',
+				'website'     => array(
+					'enabled'        => false,
+					// Blank: the business name from Google.
+					'name'           => '',
+					'alternate_name' => '',
+				),
+				'webpage'     => array(
+					'enabled' => false,
+				),
+				'about'       => array(
+					'enabled' => false,
+					'post_id' => 0,
+				),
+				'contact'     => array(
+					'enabled' => false,
+					'post_id' => 0,
+				),
+				'breadcrumbs' => array(
+					'enabled' => false,
+				),
+				// Who prints each type when an SEO plugin prints it too:
+				// 'fhint' or the other plugin's key (Ownership::detected()).
+				'owners'      => array(
+					'LocalBusiness'  => 'fhint',
+					'WebSite'        => 'fhint',
+					'WebPage'        => 'fhint',
+					'BreadcrumbList' => 'fhint',
+				),
 			),
 		);
 	}

@@ -63,7 +63,7 @@ export function PublishDialog({ locationId = 0, onClose, onSent }) {
 
         <div aria-live="polite" className="fhint:grid fhint:gap-4">
           {planState.isLoading || planState.isUninitialized ? (
-            <p className="fhint:m-0 fhint:flex fhint:items-center fhint:gap-2 fhint:text-[13px]">
+            <p className="fhint:m-0 fhint:flex fhint:items-center fhint:gap-2 fhint:text-sm">
               <Spinner />
               {__("Checking what Google has…", "foundhint-local-seo")}
             </p>
@@ -76,7 +76,7 @@ export function PublishDialog({ locationId = 0, onClose, onSent }) {
           ) : null}
 
           {planState.isSuccess && !steps.length ? (
-            <p className="fhint:m-0 fhint:text-[13px] fhint:font-semibold">
+            <p className="fhint:m-0 fhint:text-sm fhint:font-semibold">
               {__(
                 "Google already has everything saved here. There is nothing to send.",
                 "foundhint-local-seo",
@@ -103,7 +103,7 @@ export function PublishDialog({ locationId = 0, onClose, onSent }) {
           ) : null}
 
           {finished ? (
-            <p className="fhint:m-0 fhint:text-[13px] fhint:font-bold fhint:text-success">
+            <p className="fhint:m-0 fhint:text-sm fhint:font-bold fhint:text-success">
               {__(
                 "Sent to Google. It can take a few minutes to show on your listing.",
                 "foundhint-local-seo",

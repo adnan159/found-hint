@@ -4,8 +4,16 @@
 step finishes: what shipped, and how it was verified — the evidence, not the
 intent. Name any bug the verification caught.
 
-Last updated: step 3. The data layer, its REST API and the admin screens
-for everything it covers exist. The audit engine and schema output do not.
+Last updated: step 92. The data layer, its REST API and the admin screens
+for everything it covers exist. The Schema Manager is built in FoundHint
+Premium and matches the design (`FoundHint Schema (1).html`): six tabs —
+01 Organization, 02 LocalBusiness, 03 Locations (list, setup, branch
+editor, separate businesses, "Create location page"), 04 Services, 05
+Website structure, 06 Settings — and Premium prints the site's schema
+itself, one `@graph` per page. Premium builds its own release zip with
+`npm run plugin:publish`. What is still open is the unticked items in
+`docs/SCHEMA-PLAN.md`: the WP-Cron live check, SoftwareApplication (Q4),
+Step 6's QA and release checks, and the last "Pro" → "Premium" copy.
 
 ## Step 0 · Scaffold — done
 
@@ -1928,3 +1936,949 @@ lasting link. Publishing with a still-temporary link is refused up front
 (`post.media_url.processing`). The failed post was re-sent with the lasting
 link and is live on the "FoundHint" listing. Smoke + database tests,
 mutation-checked.
+
+## Step 61 — Schema Manager: groundwork and Business schema (Steps 0–1)
+
+Following docs/SCHEMA-PLAN.md. Pro builds, Free draws.
+
+**Free** (DB 0.19.0):
+- Tables `fhint_schema_entities`, `…_service_providers`, `…_service_areas`,
+  `…_page_index` (created and dropped here, written only by Pro); `schema.*`
+  settings defaults.
+- `Frontend\Schema`: `fhint_schema_document` (a document from Pro replaces
+  the free markup; feeds/embeds never print) and `fhint_schema_placement`
+  (head or footer). The tag now carries `id="fhint-schema"`.
+- `Graph::opening_hours()`, `address_node()`, `same_as()` public so Pro
+  reuses them rather than copying the rules.
+- "Veterinarian" (not a schema.org type) → `VeterinaryCare`, with a guarded
+  migration of stored values.
+- The Schema screen rebuilt to the design: header (sync time, Refresh from
+  Google), five-tab bar with live summaries and an unsaved-changes prompt;
+  tab 01 complete — Organization / LocalBusiness cards, searchable subtype
+  (shadcn Combobox, added with the CLI), eligibility box, fields with
+  requirement badges, From Google / Edited here, Edit / Use Google's value,
+  `gbp.* · property` captions and disagreement notes, storefront vs service
+  area, images from the listing, hours read-only, type details, placement
+  cards with page chips, save bar, and the server-built JSON-LD preview
+  (Copy schema, Test with Google, Check with Schema.org, the Code-tab tip
+  for a site Google cannot reach). Tabs 02–04 say "Coming in a later
+  update"; 05 keeps the working "Who publishes it" control.
+- Without Pro the same screen is locked: read-only, an upgrade prompt
+  (`upgrade_url`, filter `fhint_upgrade_url`), and the markup the free
+  plugin really prints.
+
+**Pro** (`FHINTPRO\App\Schema`): `Types` + `data/schema-types.json` (57
+curated types, parents, Google matches, extras, service categories),
+`IdFactory`, `EntityRepository`, `Document` (prune, dedupe by @id, drop
+dangling references, property count), `BusinessFields` (provenance),
+`Pieces\Business` (days with equal hours grouped, special hours for the
+next 90 days, type extras), `BusinessSchema` (state, draft rules, save,
+preview), `Validator`, `Pages`, `SchemaState`, `Renderer` (gated on
+`schema.output`, not yet listed). REST `fhint-pro/v1/schema/{state,types,
+pages,business,preview}`; saves need Google connected. Feature key
+`schema.business`.
+
+Verified: Pro smoke `schema.php` (121) and database `Integration/schema.php`
+(36, own tables, restores the Google connection) — both mutation-tested;
+free smoke and database suites (721) pass; real routes on the dev site
+(type matched from "Software company", 11 of 18 fields from Google); the
+real bundle against captured responses with Pro on (edit, preview, save,
+refusal, reset, Organization, subtype by keyboard with its details at once,
+placement chips and the home warning, unsaved-changes prompt) and off
+(locked, no inputs, upgrade link, free markup).
+
+## Step 62 — Premium rename; Schema Manager Step 2 (Location schema)
+
+**Rename.** The add-on is **FoundHint Premium**: folder and main file
+`found-hint-premium`, text domain `found-hint-premium`, namespace
+`FHINTPREMIUM\`, constants `FHINTPREMIUM_`, options/hooks `fhintpremium_`,
+REST `fhint-premium/v1`. The free app's bootstrap key stays `pro`
+(`window.FHINT.pro`). The free plugin's user-facing "Pro" labels are still
+to be renamed.
+
+**Location schema** (docs/SCHEMA-PLAN.md Step 2). Branches are every
+location but the main one (the main one is the business); one location →
+the tab says Business schema describes it.
+- Premium: `LocationFields` (provenance per branch: name, store code →
+  branchCode, address incl. region, coordinates, map link from the CID,
+  the branch's own phone and email, page URL = linked page else website,
+  hours read-only), `Pieces\Location` (typed like the business — or its
+  own category for a location trading under its own name — inherited logo,
+  photos, price range; parentOrganization unless "not part of a group";
+  unknown hours never published), `LocationSchema` (branches list, state,
+  save with on/off and drafts, permanently closed never prints, default
+  placement = its page + Contact, warnings `every_page_multi`, `no_pages`,
+  `permanently_closed`). `IdFactory::location()` never builds an @id on
+  another site's host. REST `schema/locations`, `schema/locations/{id}`,
+  preview `entity: location`. Feature key `schema.locations`.
+- Free: the Location tab — branch pills ("On n pages" / "Off"), on/off
+  switch, fields (Branch / Address / Contact / Hours) with the shared
+  field rows, Part of, sister branches, placement with its warnings, save
+  bar, preview; locked view from each branch's free markup ("On every
+  page"). `BusinessFields::resolve()` and `Validator::field()` now take the
+  tab's definitions/scope.
+
+Verified: Premium smoke 131 and database 59 (mutation-tested: parent
+default, switch-off, multi-branch warning, permanently closed, foreign-host
+id, parent link); real routes on the dev site (pet shop as PetStore, its
+own store code, not part of the group); the real bundle with Premium on
+(email, parent, switch off, save payload, refused email, plural summary)
+and off (locked, no inputs, free markup).
+
+
+## Step 63 — The Schema screen follows the selected location
+
+The location switcher at the top of every page now drives the Schema
+screen, as it does Reviews and the Business profile: a branch chosen there
+opens the Location tab on that branch; the main location opens the
+Business tab (Settings and later site-wide tabs stay put). Branch pills
+switch the top bar too, and with the main location selected the Location
+tab explains it and lists the branches. Refresh from Google refreshes the
+location on screen (the branch on the Location tab, else the main one).
+A switch with unsaved changes — from the bar or a pill — goes through the
+Save / Discard / Stay prompt (a guard on the shared selection).
+Verified on the real bundle: bar → Location tab + `location_id: 2` refresh,
+bar → Business tab, prompt keeps the branch until Discard, pill → bar.
+
+## Step 64 — Schema Manager Step 3: Service schema
+
+The Service tab: a list per location (the main location's services, or a
+branch's own list — the top bar decides) and an editor for one service.
+
+**Shipped (Premium):** `Pieces\Service` (`provider` → the business or
+branch `@id`s; a named Person `worksFor` the provider, a partner company
+joins the providers; `areaServed` typed places; `offers` as a fixed price,
+a starting price or a range; `@id` `{page}#service-{slug}`, never another
+site's address); `ServiceSchema` (list, editor state, create, save, the
+list switch, delete, reorder, preview, page checks); `ServiceRelations`
+(providers and areas tables, written as whole lists); routes
+`schema/services`, `schema/services/blank`, `schema/services/{id}`
+(GET/PUT/PATCH/DELETE), `schema/services/order`; `schema.services` feature;
+tab summary "N active · M to check". Services stay on the free plugin's
+records (name, description, price, currency, page URL, on/off — shared with
+the Profile screen and Google); only schema's own details go to the schema
+tables.
+**Shipped (free):** `ServiceRepository` deleting a service — or a branch's
+list — also clears its schema settings, providers and areas; the Service
+tab (list with badges, checks on demand, a switch that saves at once, drag
+and up/down reordering; editor sections 01–05 and placement); the editor
+scrolls into view and focuses the name when opened from the list.
+
+**Verified:** Premium smoke 159 and database 103, every rule
+mutation-tested (two survivors explained: "No price" already blanks the
+price, Premium has no service limit). In the browser, against the real dev
+site: add a service (a refused backwards range first), the preview's
+`PriceSpecification`, the switch (one PATCH), remove (its schema rows gone
+from the database), a branch's empty list and its defaults (the branch as
+provider, pet-store categories).
+
+**Bugs caught:** service and location `@id`s built from `?page_id=` links
+lost the query, so on a site without pretty permalinks every page looked
+like the home page — `IdFactory::page()` now keeps the arguments that name
+a page. A just-added service briefly showed another one until the list
+refreshed. "Add a service" opened the editor out of sight below a long
+list.
+
+## Step 65 — Organization schema QA fixes (D1–D8)
+
+The QA report on the Organization output (1 critical, 4 high defects) —
+all eight fixed in the Business tab (`docs/SCHEMA-PLAN.md`, "QA fixes").
+
+**Shipped (Premium):** `Media` (avatar filter, self-hosted check, Google
+photo import with an allow-list and dedupe by source, default logo, image
+sizes); `Phone` (international form from the country's calling code and
+trunk prefix; save check; "Printed as" note); `Pieces\WebSite`; the logo as
+an `ImageObject` at `#logo`, `image` falling back to it; ten new business
+fields (identity and contact point) with their validation; an
+Organization's optional address and areas; profile links tidied and
+deduplicated; `POST schema/media/import`; the business preview as a
+`@graph` with the website; nested `@id`s resolvable in documents.
+**Shipped (free):** Media Library logo and photo pickers (with "+ Add" for
+Google photos), the new field groups and controls, an Organization's field
+set (no hours, price, coordinates or map), phone, description and
+profile-link guidance under their fields, messages for every new code.
+
+**Verified:** Premium smoke 244 and database 124, mutation-tested (the
+one survivor is a deliberate second safeguard: avatars are also caught by
+the self-hosted rule). On real data: 7 Google photos → 6 offered (one
+avatar); an import saved a 1600×899 JPEG and a second import reused it; a
+foreign URL was refused; the phone `01518-984873` prints as
+`+880-1518-984873` (the branch as `+880-1335-521022`); the preview links
+`WebSite.publisher` to the business; the description guidance flags the
+report's own case (320 characters, "local seo" ×3). Browser: pickers,
+import, preview, new groups. Choosing inside the Media Library window was
+simulated — the browser pane is not logged in to WordPress.
+
+**Bugs caught:** a reference to the nested logo was dropped by the
+document finaliser; branches would have printed the new logo object as the
+text "Array"; repeated topics kept the last spelling instead of the first;
+an Organization's address fields still said "Required by Google for a
+storefront".
+
+**Still open:** the SoftwareApplication node (a decision), live output
+(Step 5), duplicate detection with SEO plugins, and the report's manual
+tests.
+
+## Step 66 — Organization and LocalBusiness as two tabs; tab switches
+
+The Business tab became two schema tabs — Organization (the brand) and
+LocalBusiness (the place) — each with its own fields and saved settings,
+and every schema tab gained an on/off switch in the tab bar.
+
+**Shipped (Premium):** `BusinessSchema` takes a kind (default
+LocalBusiness, so branches, services and the tab state are unchanged); the
+organization settings row and a one-time move of an old Organization row;
+`Tabs`; `PUT schema/tabs`; `?kind=` on `schema/business`; preview
+`entity: organization`; `parentOrganization` on the place when the brand is
+on; the website's publisher follows the switches; the tab state reports
+them.
+**Shipped (free):** `schema.tabs.*` settings; six tabs with switches ("Off ·
+not printed"); the off notice; the Business tab fixed to its kind (no kind
+picker); the Organization without photos; LocalBusiness the default tab.
+
+**Verified:** Premium smoke 246 and database 145, mutation-tested
+(survivors explained: equivalent defaults and a redundant assignment).
+Browser on the real site: six tabs, the Organization off by default with
+its notice and no photos field, switching it on links the LocalBusiness
+preview (`parentOrganization`, website `publisher` → `#organization`), no
+console errors.
+
+**Bug caught:** the off notice's wrapper let the page scroll sideways (the
+grid stretched to the preview's longest line).
+
+**Then:** a switched-off tab shows only an off panel in place of its form
+(icon, "… schema is off" with an Off tag, what turning it on does, "Turn on
+… schema"); its heading takes focus. Switching off the open tab with
+unsaved changes goes through Save / Discard / Stay. Verified in the
+browser: the panel alone, Turn on brings the form back, an unsaved edit
+then Off prompts, Discard switches off and saves nothing.
+
+## Step 67 — Design update A: choose your main business
+
+From the new design (`FoundHint Schema (1).html`): with more than one
+Google profile, the Main business tab first asks which one is the main
+business — the one that represents the brand on this website — or takes a
+head office that is not on Google, typed by hand.
+
+**Shipped (Premium):** `MainBusiness` (the choice in `extras.main`;
+candidates with area, rating and a "suggested" mark; choosing a location
+makes it the primary location; a manual head office); `BusinessFields::manual()`
+(the head office's values — nothing from a listing it is not); every
+location a branch under a manual head office; `GET/PUT schema/main`; the
+tab state carries `main`. The database suite now starts from default
+settings (settings live in the real options table).
+**Shipped (free):** `MainBusinessPicker` in place of the Main business form
+while a choice is needed; messages for its codes.
+
+**Verified:** Premium smoke 251, database 164, mutation-tested (both
+survivors of the first run closed by new tests). Browser on the real site:
+two profiles with ratings, the manual option's Continue disabled until a
+name is typed, choosing FoundHint opens the form with "FoundHint is your
+main business. Its fields are below." State restored afterwards (asking,
+LocalBusiness off).
+
+**Bug caught:** the database suite read the site's real tab switches, so
+it failed whenever the developer had switched a tab off.
+
+## Step 68 — Design update B: the Locations tab
+
+The Locations tab now opens on a list of every Google profile — main
+business, branches, separate businesses — with each one's page, output
+status and issues; branches open in an editor with the design's four
+sections; location setup assigns everything in three steps.
+
+**Shipped (Premium):** `LocationRoles` (roles, the list, issues, found
+profiles, setup, a separate business's own schema); `LocationSchema` — only
+branches are branches, a branch's own type, the Organization as a parent
+(only while it is on), inheritance switches, `set_page()`, the editor's
+extra state; `MainBusiness` keeps whether customers visit; six routes.
+**Shipped (free):** `LocationList`, `LocationSetup`, `SeparatePanel`,
+`BranchSections`, `lib/locations`; "Part of" moved into 03 Parent business
+(with the Organization added, "Not part of a group" kept); "All locations"
+stays on the tab; `LocationRepository` writes a location's page.
+
+**Verified:** Premium smoke 251, database 204, mutation-tested (one
+survivor, equivalent: removed profiles are never added to the visible
+rows). Free domain 142, database 721. Browser on the real site: the list
+(FoundHint main and live; the Pet Shop a branch needing a page, flagged
+for its other domain, found with a "separate" suggestion), the editor's
+sections, the parent change reaching the preview, the unsaved prompt on
+All locations, the wizard's three steps (cancelled). Nothing saved; the
+developer's switches restored.
+
+## Step 69 — Design update C: Settings, website structure, and live output
+
+FoundHint Premium now prints the site's schema itself (Step 5): each page
+gets its own graph — the Organization and LocalBusiness on their pages,
+each live branch on its page, each service on its page, the website on the
+home page, the page itself and its breadcrumb trail — in one script tag,
+in the head or the footer. Tab 05 Website structure and the Settings
+sections from the new design control it.
+
+**Shipped (Premium):** `Output` (cached entities with their placement,
+per-page nodes, page types), `Pieces\WebPage` (WebPage / AboutPage /
+ContactPage, BreadcrumbList), `SiteSettings` (website rows, output switch
+and position, page map, SEO plugins), `LiveCheck`, `Renderer` live with a
+placement filter; routes `schema/website`, `schema/settings`,
+`schema/page-map`, `schema/live-check`; tab summaries for 05 and 06;
+features `schema.website`, `schema.settings`, `schema.output`.
+**Shipped (free):** `WebsiteTab`, `OutputSettings` (above "Who publishes
+it"), messages.
+
+**Verified:** Premium smoke 273, database 224, mutation-tested (one
+survivor: the home page's trail is also dropped for being one step long).
+The live home page now prints Organization, ProfessionalService, WebSite
+and WebPage from Premium. Browser: tab 05's rows, Settings' sections, the
+page map with the real pages, Check my site.
+
+**Bugs caught:** the main-business question would have stopped the
+LocalBusiness printing until answered (it gates the screen only now); page
+paths lost `?p=` on a site without pretty permalinks; the database suite
+could leave a cache built from its test tables for the real site (it now
+restores the cache version and flushes). On this Docker setup the server
+cannot reach its own `localhost:8100`, so Check my site reports it could
+not reach the site; the comparison itself was verified on the real home
+page's HTML.
+
+## Step 70 — Design update D: "Outputs on"
+
+The branch editor's preview ends with the line from the design: "Outputs
+on: /its-page/", or why it prints nowhere yet ("no page yet. Assign one to
+publish.", not published yet, a shared page). `JsonPreview` takes it as
+`outputsOn`.
+
+**Bug caught:** a branch's `image` listed the brand's photos; the design
+says a branch's images always come from its own Google profile. Branches
+now print only their own photos imported into the Media Library, and the
+editor lists Images among what is never inherited. Premium database 226
+(the new check fails with the old behaviour); browser: the line and the
+preview without the brand's photos.
+
+This completes the design update (A–D).
+
+
+## Step 71 — Locations, Services and Settings matched to the design
+
+The screens now match `FoundHint Schema (1).html` in look and layout; no
+feature was removed.
+
+- **Locations list** (`LocationList`): the design's summary bar (icon,
+  counts, "Synced from Google … ago", Run location setup as a link,
+  Refresh from Google), the found-profiles banner, the six-column table
+  (rounded role, output and warning pills with dots; main row first with
+  "Main business — edit in tab 02"; light red background on blocked rows),
+  Edit / Change or Assign page / Open tab 02 / Open, the "…" menu and the
+  colour legend. The setup wizard, separate-business panel and the
+  one-location panel stay. `syncedAt` reaches the list through
+  `TabPanel` → `LocationTab`.
+- **Branch editor**: fields in three columns when the panel is wide
+  (name / phone / email, city / region / postcode, country / lat / long),
+  one column when narrow (a container query). Long field tags and Google
+  field paths wrap instead of spilling into the next column.
+- **Services**: with a service open, the list sits above its form and the
+  preview runs beside both (the editor's wrapper is `display: contents`,
+  so its form and preview are cells of the tab's grid). The list is never
+  remounted when switching services; on a narrow screen everything stacks.
+  Reordering, publish switches and everything else are unchanged.
+- **Settings**: status tags use the design's rounded pills.
+
+Lint, build and every smoke suite (free and Premium) pass. Docs: `SCHEMA-PLAN.md` §4 (shared pieces: pills, the two layouts, `JsonPreview`'s `outputsOn` and `className`) and its open items. Browser: list,
+editor, setup wizard and separate panel against the design at 1440px, the
+services layout at 1440px and phone width. The Pet Shop was made a branch
+to view the editor and set back to separate afterwards.
+
+## Step 72 — A separate business opens beside its schema
+
+"Open" on a separate business used to add its warning and schema under
+the table, full width. It now replaces the list like Edit does for a
+branch: `SeparatePanel` has the "All locations" breadcrumb, the Separate
+and "Not on this site" pills, its name and address, the warning, three
+steps to publish it on its own website, Copy schema and Treat as a branch
+anyway on the left, and the JSON preview on the right ("Outputs on: not
+this site"). Focus moves to its heading. Browser: open, back, the preview
+beside the panel at 1440px. The Pet Shop was set to separate for the
+check and returned to branch afterwards.
+
+## Step 73 — Create location page, and the head-office notice
+
+The last two Locations items from the design.
+
+**Create location page.** Branch editor section 01 now has the design's
+two cards: *Create location page* (Recommended, showing
+`/locations/{branch}/`) and *Use an existing page* (the page picker).
+Picking "Create" shows one confirm, "Create and publish page", because it
+publishes real content. Premium's new `LocationPage` then publishes a page
+under a "Locations" parent (the site's own `/locations/` page if it has
+one), with the branch's description, address, phone (tel: link), opening
+hours (days nobody set are left out) and a map (an embed when there is a
+map pin, plus a Google Maps link), and assigns it like a picked page. The
+page is the owner's to edit from then on; FoundHint never rewrites it.
+Pages it made carry `_fhintpremium_location_page`, so the card shows as
+chosen. Route: `POST schema/locations/{id}/page`. Errors:
+`schema.location.page.no_name`, `fhintpremium_cannot_publish_pages`,
+`fhintpremium_page_not_created`.
+
+**Head-office notice.** When location setup says customers don't visit the
+main business, tab 02 is off. Its panel now says "Your main business is a
+head office. It's described in 01 Organization, and your branches link to
+it as their parent. Change this in location setup." with *Open 01
+Organization* and *Change in location setup*, and the tab reads "Head
+office · described in 01" instead of "Off · not printed". The turn-on
+button stays.
+
+**Tests.** Premium smoke 286 (+10: escaping, the one-line address, tel
+link, two periods, closed / 24 hours, unset days left out, embed only with
+a pin, slug and its fallback); database 237 (+7: published, under
+Locations, its details, "created" true and then false for another page,
+the main business refused; cleans up the pages it made). Every new check
+was mutation-tested and fails against broken code. The free harness's
+`esc_html` stand-in now really escapes (all free suites still pass).
+Browser: created the Pet Shop's page from the editor (branch went Live,
+its PetStore schema printed on the page), then deleted it; the head-office
+panel and its links.
+
+## Step 74 — Services matched to the design
+
+**Look.** With a service open, the list and its editor are one card, as in
+the design: header, "Services offered" with its counts, the rows in their
+own bordered box, then the black "Editing" bar and the sections (orange
+numbers, 15px titles, 2px dark dividers). Rows use the design's rounded
+"From Google" / "N to check" pills, a green Active or grey Inactive, an
+orange edge and tint on the open service, and fade when inactive. Field
+tags are rounded pills; area chips have a dark border and the Add button is
+black. Nothing was removed: reordering (drag and arrows), the checks list,
+the featured-image choice and Remove service stay. New file:
+`components/services/pills.js`.
+
+**Selects were grey.** The shared field style greys anything matching CSS
+`:read-only`, which every `<select>` does; the Services editor now
+overrides it so its selects are white like the design's. (Other screens
+still use the shared style unchanged.)
+
+**Google photo as the image.** The Image select lists the list owner's
+synced Google photos by role ("Google photo: Cover 1", "Gallery 2" …;
+`options.photos` from `ServiceSchema::photo_choices()`). Saving copies the
+photo into the Media Library before anything is written (`with_photo()` →
+`Media::import`, which accepts only that profile's photos), so a failed
+download leaves no half-saved service. The service stores the local URL in
+`image_url` and the Google URL in `extras.image_source`; the schema prints
+the local copy only, and a preview never downloads.
+
+**No-areas warning.** `no_areas` ("No service areas yet. Add the places
+you actually serve.") joins the service warnings, shown with the others
+under 04 and counted in "N to check".
+
+**Tests.** Premium database 243 (+6: no_areas and clearing it, a Google
+photo must be an address, a photo not on the profile is refused with
+nothing saved, a preview never prints Google's address, photos offered);
+one existing check now expects `no_areas` too. Each was mutation-tested.
+Browser: the list and editor beside the design at 1440px; picked "Google
+photo: Gallery 1", saved — the schema's image became
+`/wp-content/uploads/…/data-center-management-photo.jpg` and the choice
+survived a reload; then set back to No image and the copied file deleted.
+
+## Step 75 — Settings checked against the design
+
+Compared tab 06 with the design's Settings at 1440px. Changed:
+
+- **Add to my site header**: the design's 34px icon box (orange on
+  #FFF1EB) and an ⓘ hint beside the title. The "Where in the page" select
+  is white — it was greyed by the shared field style's `:read-only` rule,
+  which every `<select>` matches.
+- **Works with your SEO plugin**: active plugins one per row; the
+  supported ones that aren't installed share one row, as in the design
+  ("Rank Math, All in One SEO, SEOPress — Supported. Not installed." ·
+  Ready). The Yoast fix box uses the design's colours and an orange
+  button.
+
+Kept on purpose: the header's one-line description, each page's path and
+"Your other N pages get: …" in What goes where (the design shows names
+only), Who publishes it, and What gets added showing the single
+`<script id="fhint-schema">` @graph that Premium really prints (the
+design draws one script per section).
+
+**Bug fixed**: tab 02's summary said "Head office · described in 01"
+whenever location setup recorded that customers don't visit, even with
+the LocalBusiness tab switched on and printing. It now shows only while
+the tab is off; switched on, it names the type as before.
+
+Browser: the header, select, plugin rows and tab 02's summary on the dev
+site. The Yoast box needs Yoast active, so only its styles changed.
+
+## Step 76 — Premium licensing with Freemius
+
+**Shipped (Premium):**
+- `freemius/wordpress-sdk` 2.13.5 as a Composer runtime dependency, and
+  `includes/freemius.php` with the dashboard's `fhp_fs()` initialisation
+  (product 43715), loaded with the plugin file. Two changes from the
+  dashboard snippet: the SDK path is Composer's, and the
+  `wp_org_gatekeeper` line is left out (Premium is premium-only; the free
+  plugin is its own WordPress.org plugin).
+- `App\Core\License`: `active()` (licence or trial, failing closed),
+  `state()` (`{ active, activate_url, account_url }`), `required()`.
+- Without a licence: no features (the app shows upsells), no schema output
+  (the site prints the free markup), and every route refuses with 403
+  `fhintpremium_license_required`. `GET status` still answers and reports
+  the licence. Saved data is kept.
+- The release zip now ships `composer.lock`, so it installs the exact SDK
+  version tested (1.10 MB with the SDK).
+
+**Shipped (free):** `licenseInactive()` / `activateUrl()` in `lib/pro.js`;
+the Schema screen's notice says "Activate your FoundHint Premium licence"
+with an Activate licence button (to the Plugins screen, where Freemius puts
+activation) when Premium is installed but not activated, and "Upgrade to
+Premium" without Premium. The last user-facing "Pro" strings became
+"Premium".
+
+**Verified:** Premium smoke 18 (+3: no features and `active: false`
+without a licence, no invented activation link without the SDK); database
+248 (+5: no features, routes refused with `license_required`, status still
+answers without a key, features back with a licence). Each new check was
+mutation-tested (failing open, ungated features, ungated routes, a status
+that needed a licence). On the dev site a real licence was activated
+through Freemius and Premium unlocked; forcing the licence off (a
+temporary must-use plugin, removed after) locked the Schema screen with
+the activation notice, and the home page fell back to the free markup
+(ProfessionalService, OfferCatalog, PetStore) — and back to Premium's
+Organization, ProfessionalService, WebSite, WebPage when removed. phpcs
+needed one documented exception: Freemius's own names (`fhp_fs`,
+`$fhp_fs`, `fhp_fs_loaded`).
+
+## Step 77 — Review round: names, defaults, switches, page source
+
+Changes asked for after testing:
+
+- **Tab names** without "schema": Organization, LocalBusiness, Locations,
+  Services (Website structure and Settings unchanged).
+- **Organization preview** shows the Organization alone. The WebSite node
+  (added to the business preview in QA D5) belongs to 05 Website structure
+  and prints from there; it is still published by the business.
+- **Website structure switches save at once** (toast, no Save needed),
+  like the tab switches. Turning on About or Contact with no page to use
+  yet still waits for its page and Save. (The tab-bar switches already
+  saved at once — verified against the server.)
+- **Organization starts on the home page**; the LocalBusiness keeps every
+  page.
+- **Everything starts off**: every tab, the website and each page
+  (`Settings::defaults()`), and every service — a service publishes only
+  once switched on in Schema (`ServiceSchema::view()`: a saved service with
+  no schema settings row is inactive; the list reads the same). On an
+  existing site this turns off services that were never saved in Schema;
+  on the dev site 2 of 15 stay on.
+- **Website tab without Premium** (or its licence) shows a locked Premium
+  panel (`PremiumTab`: Get Premium, or Activate licence) instead of
+  "Coming soon".
+- **Page source**: the JSON-LD sits between `<!-- This site uses FoundHint
+  Local SEO vX - https://foundhint.com/ -->` and `<!-- / FoundHint Local
+  SEO -->` (`Frontend\Schema::script_tag()`, so free and Premium output
+  both).
+- **Get Pro → foundhint.com/pricing/**: the default `fhint_upgrade_url`,
+  and a "Get Pro" link on the Plugins screen while Premium isn't installed.
+
+**Verified:** free smoke (schema-graph +2: the opening and closing
+comments) and database 721; Premium database 253 (updated: single-node
+previews, defaults all off; new: WebPage off, Organization on the home
+page, a never-saved service off and switched on, the website published by
+the business). Mutation-tested: Organization on every page, services on by
+default, WebSite back in the preview, a missing closing comment, the free
+defaults turning a tab on. Browser: renamed tabs; a Breadcrumbs switch
+saved to the server with no Save (and turned back off); the Organization
+preview without WebSite; the home page source with both comments; the
+Website tab's Premium panel with the licence forced off (temporary
+must-use plugin, removed).
+
+## Step 78 — Tab switches confirm their save
+
+The tab-bar switches already saved at once (`PUT schema/tabs`); they now
+also say so: "Services is on and added to your site." / "Services is off.
+Nothing from it is added to your site." (errors still show their message).
+The off panel's "Turn on" uses the same path, so it confirms too.
+Browser: Services switched off and on, each time the toast showed and the
+setting changed on the server.
+
+## Step 79 — Photos from the Media Library; the locked Schema screen
+
+**Photos.** On the Business Profile's Photos tab, "Upload logo", "Upload
+cover photo", "Upload another" and the gallery's "Add photos" open the
+WordPress Media Library (JPEG and PNG only, the types Google takes; several
+at once for the gallery). The chosen image is used as it is —
+`POST /profile/media` takes `attachment_id` instead of a file
+(`MediaUpload::add_attachment()`), checked against Google's size and
+dimension limits from the file itself. Dropping files on a slot still
+uploads them, and without the library on the page the file picker is used.
+
+Fixed on the way: removing a waiting photo deleted its attachment, which
+would have deleted an image the owner picked from their library. Files
+FoundHint uploads now carry `_fhint_uploaded`, and only those are deleted.
+
+The Media Library helpers moved from `pages/schema/lib/media.js` to the
+shared `lib/media.js` (with a `types` filter).
+
+**Locked Schema.** Without Premium, each schema tab shows sample content
+(a made-up dentist, never the site's data), blurred and hidden from
+assistive technology, under a card: "The Schema Manager is a Premium
+feature" with **Unlock with Premium** → foundhint.com/pricing/ (new tab).
+With Premium installed but its licence inactive, the same card offers
+**Activate licence**. Settings stays usable — "Who publishes it" is free —
+and keeps the header notice; the other tabs drop it, so the button is not
+shown twice. New component: `components/page/LockedSchema.jsx`.
+
+**Verified:** free database 728 (+7: a library image becomes a waiting
+photo in its role, an undersized one and a missing one are refused,
+removing it keeps the owner's image, an uploaded one is still deleted);
+mutation-tested (discard deleting library images, never deleting uploads,
+skipping the size check). Browser: the gallery button opened the Media
+Library with "Add to gallery"; the Schema screen without Premium (forced
+through a temporary must-use plugin, removed) showed the blurred sample
+and the card, with Unlock with Premium linking to foundhint.com/pricing/,
+and Activate licence when Premium was installed but unlicensed; Settings
+kept "Who publishes it".
+
+## Step 80 — The lock covers only the schema preview
+
+Step 79's lock blurred the whole tab. Now, without Premium, every tab shows
+its real content read-only as before (fields visible, none editable), and
+only the JSON-LD preview is locked: `JsonPreview` takes `locked` and hands
+off to `shared/LockedPreview.jsx` — the panel's frame, sample markup
+blurred and hidden from assistive technology, and a card "Schema preview is
+a Premium feature" with **Unlock with Premium** (foundhint.com/pricing/, new
+tab), or **Activate licence** when Premium is installed but unlicensed.
+Business, Location and Service tabs pass `locked`. `LockedSchema.jsx` is
+removed and the header's upgrade notice is back on every locked tab.
+
+Browser (Premium hidden through a temporary must-use plugin, removed):
+LocalBusiness 21 fields, Organization 15, Services 27 — none editable — and
+the card only in the preview; the unlock link goes to the pricing page.
+
+## Step 81 — Premium highlighted on the schema tabs
+
+Without Premium, a schema tab whose summary is just "Premium" shows it as
+an orange pill with a sparkle icon (brand #D8521F on #FFF1EB) instead of
+plain grey text. `tabSummaries()` now returns `premium: { key: true }` for
+those tabs, so `TabBar` styles them without comparing translated text.
+LocalBusiness keeps its free summary (the free plugin prints that schema)
+and Settings keeps "Who publishes it". Browser: Organization, Locations,
+Services and Website structure carry the pill with Premium hidden.
+LocalBusiness now carries the Premium pill too: without Premium its summary
+is "Premium" rather than the free markup's type (`tabSummaries()` no longer
+takes `free`).
+
+## Step 82 — Scheduling posts: the free side (Phase 1)
+
+Plan: `docs/POSTS-SCHEDULE-PLAN.md`, from the "FoundHint Posts" design.
+Scheduling is Premium (`posts.schedule`); this step is everything the free
+plugin owns. Premium's schedule route and its sender are still open there.
+
+**Server:**
+- `PUT /posts/{id}` on a `scheduled` post checks the publishing rules on
+  every save (it is sent by itself later) and keeps its status and time.
+- New free `POST /posts/{id}/unschedule`: scheduled → draft, time cleared;
+  `409 fhint_post_not_scheduled` otherwise. Needs only the capability.
+- Every post carries `scheduled_local` (site wall time, datetime-local
+  shape); `GET /posts/state` carries `timezone`.
+- List order in SQL, the design's rule: newest first puts what was posted
+  first and the scheduled posts after it, soonest due first; oldest first
+  is the exact reverse.
+
+**Screen:** `Composer.jsx` (696 lines) split into `components/composer/*`,
+`hooks/useComposer.js` and `lib/composer.js`, every file ≤ 150 lines.
+When to publish → Schedule shows "Publish on" with the site's time zone;
+saving is the free save and then Premium's `schedule` call; a refused time
+shows at the picker and the post stays a draft (new) or keeps its earlier
+time (already scheduled). Choosing Draft on a scheduled post unschedules it.
+Rows: "Goes live in 3d · date", **Publish now**, **Cancel schedule**,
+**Change**; *Scheduled* in the status filter. Without Premium the option
+keeps its `PRO` tag; a post already queued says "Needs FoundHint Premium to
+send", shows its time read-only, and can still be published, changed or
+cancelled.
+
+**Verified:** database suite 741 (13 new: order both ways, strict save,
+time kept, unschedule and its 409/404), each rule mutation-checked (strict
+check removed → 1 fail; unschedule left scheduled → 2; old order → 3); REST
+routes smoke 685 (route registered, capability-only guard); every smoke
+suite, `composer lint` and `npm run lint` clean. Real bundle in the browser
+against a stateful mock with Premium on and off: reschedule, too-soon time
+(error at the picker — this caught a wrong "saved as a draft" note for a
+post that was already scheduled; fixed), new scheduled post (create +
+schedule), cancel, publish now, scheduled → draft (PUT + unschedule),
+Premium off (disabled option, read-only time, save sends only PUT, toast no
+longer promises a send). Not yet run against Premium itself — its route
+does not exist yet.
+
+## Step 83 — Scheduling posts: Premium's route and sender
+
+The Schedule option was locked on the dev site because Premium did not yet
+serve `posts.schedule`. Built in `found-hint-premium`:
+
+- `App/Post/ScheduleRules` — the time rules, pure: site wall time
+  (`wp_timezone()`) → UTC; required, real date (no "Feb 31" rollover), ≥ 5
+  minutes ahead, ≤ a year, before an event ends.
+- `App/Post/Scheduler` — `schedule()` (draft, failed or scheduled only;
+  Publish's rules plus the time rules; then one cron event at the post's
+  own time) and `run()`, the sender: a five-minute WP-Cron sweep, kept
+  scheduled on every load and cleared on deactivation, 10 posts a run.
+- `App/Post/Queue` — the only queries Premium runs on the free posts
+  table: due posts, the claim (`scheduled` → `sending` in one conditional
+  UPDATE, so two overlapping sweeps never send a post twice), and posts
+  stuck `sending` 15 minutes → failed with a reason, never resent.
+- `API/PostSchedule` — `POST fhint-premium/v1/posts/{id}/schedule`
+  `{ scheduled_at }`; needs the licence, the capability and Google.
+- `posts.schedule` added to `Features::active()`.
+
+Free plugin: new short-lived status `sending` — documented in
+`CreatePostsTable`, listed under *Scheduled*, labelled "Sending" with "Being
+sent to Google now"; edit, publish, unschedule and delete answer `409
+fhint_post_sending` while it lasts. New messages for
+`fhint_post_not_scheduled`, `fhint_post_sending`,
+`fhintpremium_post_not_schedulable`; `fhintpremium_google_required` now
+reads "Connect your Google Business Profile first." (it is shared by schema
+and posts).
+
+**Verified:** Premium smoke 17 (time rules, incl. summer time; the "a year"
+bound was first written as wall time and failed across the DST change —
+the test was wrong, now computed from the timestamp), Premium database 42
+on its own tables with Google answered in-process. Mutation-checked: claim
+without its status check (first passed — MySQL reports 0 changed rows for
+an unchanged row, so a second claim on the same row proved nothing; a
+"cancelled before the sweep" case was added and now catches it), stuck
+posts returned to the queue, scheduling without Publish's rules, the free
+mid-send guard, no lead time — each fails its tests. Free database 741,
+every free smoke suite, Premium schema suites (253 + 286), both PHPCS and
+ESLint clean, build clean. On the dev site: the route is registered,
+`posts.schedule` is listed, the sweep is queued. Not verified: a real
+scheduled send to Google (it would post on the live listing), and the
+screen while logged in.
+
+## Step 84 — Newest post on top, scheduled ones included
+
+Changed on request: the design grouped scheduled posts after the posted
+ones (soonest due first); the list now puts the last post added on top,
+whatever its status — ordered by when it was published, else last saved
+(a scheduled post: when it was scheduled). `PostRepository::all()` is back
+to `COALESCE( published_at, updated_at )`, id as the tie-break; `old` is
+the exact reverse. Database suite 740, the ordering test rewritten and
+mutation-checked: grouping scheduled posts last fails it, and so does
+ordering by id alone.
+
+## Step 85 — "Turn reviews into posts" removed
+
+Removed on request from the Posts screen: the card (`ReviewsCard.jsx`),
+its `reviewPost()` helper, and `reviews` from `GET /posts/state` (with
+`Posts::shareable_reviews()`, so the state no longer queries reviews).
+Posts already written from a review keep their `review` source and its
+"From a review" tag; `review` stays an allowed source. ESLint, PHPCS and
+the build are clean; posts smoke 86, REST routes 685, database 740.
+
+## Step 86 — "Schedule with a CSV file" removed
+
+Removed on request: the disabled, Premium-tagged button in the Posts header
+(`PostsHeader.jsx`) and the `posts.csv` row in `docs/EXTENDING.md`. CSV
+scheduling (Phase 2 of `docs/POSTS-SCHEDULE-PLAN.md`) is on hold. The
+`csv` source and its "From CSV" tag stay, for any post that carries it.
+ESLint and the build are clean.
+
+## Step 87 — Share your blog on Google (Premium, `posts.blog`)
+
+Requested: the card's "Share Website Blog" button becomes a switch; when on,
+a "GBP Posting" link after View under each blog post opens a new post on
+the FoundHint Posts screen, published like any other. Kept Premium-only
+(owner's call).
+
+**Free:** setting `posts.blog_sharing` (default off, written only by
+Premium). `Admin\BlogSharing` adds "GBP Posting" after View in Posts → All
+Posts — published `post`s only, for users who can manage FoundHint, and only
+when `fhint_blog_sharing_enabled` (new filter, Premium answers it) is true;
+it links to `admin.php?page=fhint#/posts?share=<id>`. `BlogCard` is a
+`Switch` (PRO tag and disabled without Premium). `useBlogShare` waits for
+the location's listing, opens the composer on `blogPost()` (title + excerpt
+as the text, "Learn more" to the article, the featured image when Google
+can fetch it, source `blog`), then drops `share` from the URL so a reload
+does not reopen it.
+
+**Premium:** `App/Post/BlogSharing` (`is_on()` = licence + switch, `set()`,
+`blog_post()`, `summary()` cut to 1,500 characters, adds source `blog`),
+`API/PostBlog` (`GET|PUT posts/blog-sharing`, `GET posts/blog/{id}`),
+`posts.blog` in `Features::active()`.
+
+**Verified:** Premium smoke 21 (summary), Premium database 62 (+20: the
+draft shape, drafts and pages refused, switch off → no link, link right
+after View and to the right URL, not for drafts/pages/logged-out, both
+routes, a post saved with source `blog`; the test blog posts and the site's
+settings are removed/restored), mutation-checked — the "after View" test
+first passed with that rule broken (View was last in the test row); View now
+sits mid-row and the mutation fails it. In the browser against the mock:
+switch on/off, the share link opens a filled composer and publishing sends
+`source=blog`; **caught a bug** — a link to a missing blog post reopened the
+previous one, because RTK Query keeps the last answer while loading the
+next; fixed with `currentData` and an id check. Premium off: switch disabled
+with its tag, the link shows a Premium message and opens nothing. Free
+database 740, all smoke suites, both PHPCS, ESLint, build clean. Not
+checked: the real All Posts screen while logged in.
+
+## Step 88 — Fix: every admin page crashed after step 87
+
+`Admin::init()` called `BlogSharing::init()` without importing
+`FHINT\Admin\BlogSharing`, so PHP looked for `FHINT\BlogSharing` and every
+wp-admin request died ("Class "FHINT\BlogSharing" not found"). Step 87's
+tests called `Admin\BlogSharing` directly and never ran `Admin::init()`,
+which only runs on admin pages. Fixed with the `use` line; the database
+suite now runs `FHINT\Admin::init()` and checks the link is wired (741).
+With the import removed it dies with exit 255 and no summary line — the
+fatal goes to the WordPress debug log, not the console.
+
+## Step 89 — GBP Posting in the block editor
+
+Requested: the GBP Posting button in the post editor's top bar (beside
+its other pinned icons), opening the composer as a popup right there.
+
+**How:** the editor has no public API for a bare header button; a plugin
+sidebar (`wp.editor.PluginSidebar`) is what pins an icon there. So
+`src/editor/toolbar.js` registers one, and when it opens it puts back the
+sidebar that was open (or closes it) and opens FoundHint's popup for the
+current post — one click. The popup is the Posts `Composer` in this
+bundle's own React tree (`.fhint-ui` host on `<body>`), with its own
+store, toasts and theme. `useEditorShare` walks: Premium → Google listings
+(asks which one when there are several; the editor has no location bar)
+→ the blog post (Premium's `posts/blog/{id}`; an unpublished post is
+explained, not shared) → the composer, filled as from the list link.
+
+**Separate bundle:** `vite.editor.config.js` → `assets/build/editor`
+(`npm run build` builds both). `Admin\EditorAssets` enqueues it on
+`enqueue_block_editor_assets` only for a `post` in the block editor, for a
+FoundHint manager, while `BlogSharing::enabled()`; it localises the same
+`window.FHINT` (`Enqueue::bootstrap_data()` is now public). The admin's CSS
+was split: `src/admin/styles/theme.css` holds tokens and FoundHint-only
+rules for both bundles; `index.css` keeps the page-wide preflight and base
+rules — its build output is byte-identical to before. The editor gets
+Tailwind's preflight (4.x) wrapped in `@scope (.fhint-ui, [data-slot=
+"dialog-portal"], [data-slot="alert-dialog-portal"], [data-sonner-toaster])`.
+ESLint skips the Tailwind entry stylesheets.
+
+**Verified:** database 747 (+6: hooked; loads for a blog post in the block
+editor with sharing on; not in the classic editor, not for a page, not
+with sharing off, not for a non-manager), each condition mutation-checked.
+Built editor CSS: the reset only inside `@scope`; outside it only
+Tailwind's `--tw-*` variable defaults. Real editor bundle in a browser
+page with a stand-in for `wp.*` and WordPress-styled elements: their
+margins, font size, padding and border unchanged before, during and after
+the popup; the toolbar click opens the filled composer and publishing
+sends `source=blog`. **Caught a bug:** the sidebar open before the first
+click was not put back (it was only recorded on a store change); now
+recorded at registration. Not checked: the real WordPress editor (needs a
+login) — the store names `core/interface` and `getActiveComplementaryArea`
+are WordPress's, scope `core` (and `core/edit-post` before 6.6).
+
+## Step 89 — GBP Posting in the block editor
+
+Requested: the GBP Posting button in the post editor's top bar (beside
+its other pinned icons), opening the composer as a popup right there.
+
+**How:** the editor has no public API for a bare header button; a plugin
+sidebar (`wp.editor.PluginSidebar`) is what pins an icon there. So
+`src/editor/toolbar.js` registers one, and when it opens it puts back the
+sidebar that was open (or closes it) and opens FoundHint's popup for the
+current post — one click. The popup is the Posts `Composer` in this
+bundle's own React tree (`.fhint-ui` host on `<body>`), with its own
+store, toasts and theme. `useEditorShare` walks: Premium → Google listings
+(asks which one when there are several; the editor has no location bar)
+→ the blog post (Premium's `posts/blog/{id}`; an unpublished post is
+explained, not shared) → the composer, filled as from the list link.
+
+**Separate bundle:** `vite.editor.config.js` → `assets/build/editor`
+(`npm run build` builds both). `Admin\EditorAssets` enqueues it on
+`enqueue_block_editor_assets` only for a `post` in the block editor, for a
+FoundHint manager, while `BlogSharing::enabled()`; it localises the same
+`window.FHINT` (`Enqueue::bootstrap_data()` is now public). The admin's CSS
+was split: `src/admin/styles/theme.css` holds tokens and FoundHint-only
+rules for both bundles; `index.css` keeps the page-wide preflight and base
+rules — its build output is byte-identical to before. The editor gets
+Tailwind's preflight (4.x) wrapped in `@scope (.fhint-ui, [data-slot=
+"dialog-portal"], [data-slot="alert-dialog-portal"], [data-sonner-toaster])`.
+ESLint skips the Tailwind entry stylesheets.
+
+**Verified:** database 747 (+6: hooked; loads for a blog post in the block
+editor with sharing on; not in the classic editor, not for a page, not
+with sharing off, not for a non-manager), each condition mutation-checked.
+Built editor CSS: the reset only inside `@scope`; outside it only
+Tailwind's `--tw-*` variable defaults. Real editor bundle in a browser
+page with a stand-in for `wp.*` and WordPress-styled elements: their
+margins, font size, padding and border unchanged before, during and after
+the popup; the toolbar click opens the filled composer and publishing
+sends `source=blog`. **Caught a bug:** the sidebar open before the first
+click was not put back (it was only recorded on a store change); now
+recorded at registration. Not checked: the real WordPress editor (needs a
+login) — the store names `core/interface` and `getActiveComplementaryArea`
+are WordPress's, scope `core` (and `core/edit-post` before 6.6).
+
+## Step 90 — GBP Posting: icon, link, Media Library, blank description
+
+Requested: the toolbar icon as a page with a "+" badge in the brand colour;
+the button link the published post's URL by default; "Choose photo" opening
+the Media Library on the Posts screen and in the editor; the description
+blank.
+
+- **Icon:** `src/editor/toolbar.js` draws a page with a folded corner,
+  lines and a "+" badge, stroked `#FF6B35`.
+- **Link:** already the article's permalink (`cta_url`, "Learn more");
+  now covered by a Premium database test.
+- **Description:** starts blank. Premium's `posts/blog/{id}` no longer
+  builds text (`summary()` and the excerpt removed; test says so).
+- **Media Library:** the photo field passes `onAttachments` to the shared
+  `Picker`, so "Choose photo" opens `wp.media` (files can still be
+  dropped). New `PostMedia::from_library()` + `POST /posts/media/library`:
+  Google's limits checked from the file, no copy in the library, own link
+  when reachable else via the listing's gallery. `EditorAssets` also calls
+  `wp_enqueue_media()`. While the library is open the composer stops being
+  modal and ignores close requests (`lib/media.js` announces it,
+  `hooks/useMediaOpen`), so clicking in the library or pressing its Esc no
+  longer closes the post.
+- **Split:** `PhotoField.jsx` (was 316 lines) → `photo/GooglePhotoPicker`,
+  `photo/PhotoChooser`, `photo/PhotoNotes`, `hooks/usePhotoChoice`; the
+  composer's photo handler moved into `useComposer` (Composer 141 lines).
+
+**Verified:** database 756 (+9: library photo via the gallery with Google's
+lasting link, same attachment, no library copy, missing/unknown refused, a
+too-small photo refused before anything is sent), REST routes 695; the
+size check and the reachable branch each mutation-checked. Premium 17 +
+63. In the browser with a stand-in `wp.media` window (above the dialog,
+with a search box, Esc to close), on both the Posts screen and the editor:
+the library opens, its search keeps focus, clicking in it leaves the post
+open, Select sends `POST /posts/media/library` once and shows Google's
+link; Esc closes only the library, a second Esc the post. Icon rendered
+from the toolbar code on light and dark. All smoke suites, both PHPCS,
+ESLint and both builds clean. Not checked: the real `wp.media` and editor.
+
+## Step 91 — "Customer photos" removed from post photos
+
+Removed on request, on the Posts screen and the editor popup alike (one
+shared photo field): the "Customer photos" pill (`photo/PhotoChooser`), the
+customer branch of the picker (now `GooglePhotoPicker` shows "Your gallery"
+only), and the warning's mention of it. Server: `PostMedia::choices()` —
+`GET /posts/photos` — returns `{ gallery }` only and no longer reads
+reviews. Reviews keep their own photos on the Reviews screen. Database
+757 (+1: only the gallery is offered), smoke suites, PHPCS, ESLint, both
+builds clean.
+
+## Step 92 — Checked: FoundHint without Premium, and Premium unlicensed
+
+Run on the dev site's real database without changing it: WordPress loaded
+with Premium filtered out of `active_plugins` (or its licence filtered off)
+for that one process.
+
+**Premium not active** — all fine: FoundHint loads; the admin module wires;
+no "GBP Posting" link under blog posts; the editor bundle is not loaded;
+the app gets no `pro` data (PRO tags, Schedule and the blog switch
+disabled — checked in the browser earlier); no `fhint-premium` routes;
+`/posts` and `/posts/state` answer 200; unscheduling still works; source
+`blog` refused; nothing listens to a leftover sender event. The home page
+renders with the free schema markup. (The one PHP warning on every request,
+`WP_DEBUG_LOG already defined`, is the container's `WORDPRESS_CONFIG_EXTRA`
+repeating `wp-config.php` — not FoundHint.)
+
+**Premium active, licence inactive** — one bug, fixed: every route answered
+`403 fhintpremium_license_required`, features were empty and blog sharing
+stayed off even with its switch on — but the five-minute sender still sent
+posts scheduled before the licence lapsed (while the screen said they wait
+for Premium). `Scheduler::run()` now returns early without a licence; posts
+stay scheduled and go out once it is back. Premium database 66 (+3); with
+the guard removed the new checks fail. PHPCS clean.

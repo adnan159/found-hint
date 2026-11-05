@@ -16,7 +16,7 @@ export function ShownSwitch({ id, shown, onToggle }) {
         </span>
         <span
           id={`${id}-shown-hint`}
-          className="fhint:text-[13px] fhint:text-muted-strong"
+          className="fhint:text-sm fhint:text-muted-strong"
         >
           {__(
             "Turn this off to hide the service for now without deleting it.",

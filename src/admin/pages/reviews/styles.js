@@ -1,28 +1,33 @@
 import { cn } from "cn";
-import { input, quietButton, smallInput } from "@/pages/profile/styles";
+import { focus, input } from "@/pages/profile/styles";
 
 /**
- * Borders for controls inside the Reviews dialogs.
+ * The Reviews screen's look — the Business Profile's and the Schema
+ * Manager's, by construction.
  *
- * The theme's own border colour is a very pale grey; on a white dialog over
- * a dark backdrop it nearly disappears, and buttons stop reading as buttons.
- * The design draws these edges firmly, so they are set here — for the
- * dialogs only, leaving every other screen as it is. A disabled button
- * keeps a lighter edge, so it still reads as not available.
+ * Panels, their heading rows, fields and dialog buttons are imported from
+ * the Schema Manager's styles (which take them from the profile), never
+ * spelled out again here. Change the profile's look and this screen follows.
  */
-const EDGE = "fhint:border-[#b9b2af]";
+export {
+  dialogButton,
+  panelTitle,
+  primaryAction,
+} from "@/pages/schema/components/styles";
 
-// Swapped, not added: with both border colours on an element, whichever the
-// stylesheet happens to list later wins, and the theme's pale one is later.
-const firm = (classes) => classes.replace("fhint:border-input", EDGE);
+/**
+ * A field in a Reviews dialog: the profile's field, with the brand accent
+ * on focus (`fhint-focus-accent` in `index.css`) — the grey edge stays and
+ * an orange outline sits just outside it.
+ */
+export const dialogInput = cn(input, "fhint-focus-accent");
 
-export const dialogButton = cn(
-  firm(quietButton),
-  "fhint:hover:bg-muted fhint:disabled:border-[#e2dcda] fhint:disabled:hover:bg-card",
+/**
+ * A small square icon button: Edit and Delete beside a review's reply and
+ * beside a post. The icon is the label's picture; each button carries its
+ * words for screen readers.
+ */
+export const iconButton = cn(
+  "fhint:grid fhint:size-7 fhint:cursor-pointer fhint:place-items-center fhint:border fhint:border-border fhint:bg-card fhint:text-muted-strong fhint:hover:text-foreground fhint:disabled:cursor-not-allowed",
+  focus,
 );
-
-// Fields also take `fhint-firm-edge`: index.css restates every field's
-// border colour above any utility, and that class is what it lets through.
-export const dialogInput = cn(firm(input), "fhint-firm-edge");
-
-export const dialogSmallInput = cn(firm(smallInput), "fhint-firm-edge");

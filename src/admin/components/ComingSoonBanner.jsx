@@ -29,14 +29,14 @@ export function ComingSoonBanner({ title, description }) {
       </span>
       <div className="fhint:grid fhint:min-w-0 fhint:flex-1 fhint:gap-0.5">
         <div className="fhint:flex fhint:flex-wrap fhint:items-center fhint:gap-2">
-          <strong className="fhint:text-[14.5px] fhint:font-extrabold">
+          <strong className="fhint:text-sm fhint:font-extrabold">
             {title}
           </strong>
           <span className="fhint:rounded-full fhint:border fhint:border-notice-border fhint:bg-card fhint:px-2 fhint:py-0.5 fhint:text-[10.5px] fhint:font-extrabold fhint:tracking-[0.08em] fhint:text-notice-foreground fhint:uppercase">
             {__("Coming soon", "foundhint-local-seo")}
           </span>
         </div>
-        <p className="fhint:m-0 fhint:text-[13px] fhint:leading-relaxed">
+        <p className="fhint:m-0 fhint:text-sm fhint:leading-relaxed">
           {description}
         </p>
       </div>

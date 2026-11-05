@@ -2,6 +2,7 @@ import { useId, useRef, useState } from "react";
 import { __, sprintf } from "@wordpress/i18n";
 import { MapPinIcon, XIcon } from "lucide-react";
 import { cn } from "cn";
+import { chipBox, chipBoxInput } from "@/lib/fieldStyles";
 import { errorText, focus, help, label as labelClass } from "../../styles";
 
 /**
@@ -69,7 +70,7 @@ export function ServiceAreaField({ value, onChange, errors, max = 20 }) {
         </label>
         <span
           aria-live="polite"
-          className="fhint:ml-auto fhint:text-[12.5px] fhint:font-bold fhint:text-muted-strong"
+          className="fhint:ml-auto fhint:text-sm fhint:font-bold fhint:text-muted-strong"
         >
           {sprintf(
             /* translators: 1: places added, 2: the most allowed. */
@@ -80,12 +81,7 @@ export function ServiceAreaField({ value, onChange, errors, max = 20 }) {
         </span>
       </div>
 
-      <div
-        className={cn(
-          "fhint:flex fhint:min-h-[46px] fhint:flex-wrap fhint:items-center fhint:gap-2 fhint:border fhint:border-input fhint:bg-card fhint:px-2 fhint:py-1.5",
-          "fhint:focus-within:ring-2 fhint:focus-within:ring-ring fhint:focus-within:ring-offset-1",
-        )}
-      >
+      <div className={cn(chipBox, "fhint:min-h-[46px] fhint:gap-2")}>
         <ul
           aria-label={__("Places served", "foundhint-local-seo")}
           className="fhint:m-0 fhint:flex fhint:list-none fhint:flex-wrap fhint:gap-2 fhint:p-0"
@@ -94,7 +90,7 @@ export function ServiceAreaField({ value, onChange, errors, max = 20 }) {
             <li
               key={`${place.place_id || "typed"}-${place.name}`}
               className={cn(
-                "fhint:inline-flex fhint:items-center fhint:gap-1.5 fhint:rounded-full fhint:border fhint:bg-muted fhint:py-1 fhint:pr-1 fhint:pl-2.5 fhint:text-[13px] fhint:font-bold",
+                "fhint:inline-flex fhint:items-center fhint:gap-1.5 fhint:rounded-full fhint:border fhint:bg-muted fhint:py-1 fhint:pr-1 fhint:pl-2.5 fhint:text-sm fhint:font-bold",
                 place.place_id
                   ? "fhint:border-border"
                   : "fhint:border-dashed fhint:border-muted-strong",
@@ -154,7 +150,7 @@ export function ServiceAreaField({ value, onChange, errors, max = 20 }) {
                   "foundhint-local-seo",
                 )
           }
-          className="fhint:min-w-[220px] fhint:flex-1 fhint:border-0! fhint:bg-transparent fhint:px-1! fhint:py-1! fhint:text-sm fhint:shadow-none! fhint:outline-none fhint:placeholder:text-muted-foreground fhint:disabled:cursor-not-allowed"
+          className={cn(chipBoxInput, "fhint:min-w-[220px]")}
         />
       </div>
 

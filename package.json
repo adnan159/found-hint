@@ -1,17 +1,18 @@
 {
   "name": "found-hint",
-  "version": "1.0.0",
+  "version": "1.2.2",
   "type": "module",
   "scripts": {
     "dev": "vite --config vite.admin.config.js",
     "start": "npm run dev",
     "lint": "npx eslint src",
-    "build": "vite build --config vite.admin.config.js",
+    "build": "vite build --config vite.admin.config.js && vite build --config vite.editor.config.js",
     "plugin:prepare": "npm run build && npm run i18n && node scripts/build.cjs && npm run plugin:vendor",
     "plugin:publish": "npm run plugin:prepare && node scripts/zip.cjs",
     "plugin:vendor": "composer install --no-dev --optimize-autoloader --classmap-authoritative --working-dir=build --quiet",
     "i18n": "node scripts/make-pot.cjs",
-    "categories:update": "node scripts/update-google-categories.cjs"
+    "categories:update": "node scripts/update-google-categories.cjs",
+    "dev:editor": "vite --config vite.editor.config.js"
   },
   "buildExclude": [
     "node_modules",

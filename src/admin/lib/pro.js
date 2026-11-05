@@ -22,7 +22,29 @@ export function hasPro(feature) {
   );
 }
 
-/** The add-on's REST base (`…/fhint-pro/v1`), or "" without Pro. */
+/**
+ * Where "Upgrade to Pro" goes. From the bootstrap data (`upgrade_url`), so
+ * it can change without a release of the app.
+ */
+export function upgradeUrl() {
+  return window.FHINT?.upgrade_url || "https://foundhint.com/pricing/";
+}
+
+/**
+ * Premium is installed but its licence isn't active (Freemius): every
+ * Premium feature is locked until it is. Different from "no Premium", so
+ * the screen asks to activate rather than to buy.
+ */
+export function licenseInactive() {
+  return Boolean(pro?.license && !pro.license.active);
+}
+
+/** Where the licence is activated (the Plugins screen, by Freemius). */
+export function activateUrl() {
+  return pro?.license?.activate_url || "";
+}
+
+/** The add-on's REST base (`…/fhint-premium/v1`), or "" without Pro. */
 export function proRestUrl() {
   return pro?.rest_url ?? "";
 }

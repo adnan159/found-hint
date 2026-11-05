@@ -2,6 +2,7 @@ import { useId, useState } from "react";
 import { __, sprintf } from "@wordpress/i18n";
 import Hint from "@/components/Hint";
 import { cn } from "cn";
+import { chipBox, chipBoxInput } from "@/lib/fieldStyles";
 import { errorText, focus, label } from "../../styles";
 import CategorySearch from "../CategorySearch";
 
@@ -32,7 +33,7 @@ export function ExtraCategoriesField({ model, onChange, errors, max }) {
             )}
           />
         </div>
-        <span className="fhint:ml-auto fhint:text-[12.5px] fhint:font-bold fhint:text-muted-strong">
+        <span className="fhint:ml-auto fhint:text-sm fhint:font-bold fhint:text-muted-strong">
           {sprintf(
             /* translators: 1: how many extra categories are chosen, 2: how many Google allows. */
             __("%1$d of %2$d used", "foundhint-local-seo"),
@@ -43,14 +44,14 @@ export function ExtraCategoriesField({ model, onChange, errors, max }) {
       </div>
       <div
         className={cn(
-          "fhint:flex fhint:flex-wrap fhint:items-center fhint:gap-1.5 fhint:border fhint:border-input fhint:p-[7px]",
+          chipBox,
           errors?.secondary_categories && "fhint:border-destructive",
         )}
       >
         {extra.map((category) => (
           <span
             key={category.id}
-            className="fhint:inline-flex fhint:items-center fhint:gap-[7px] fhint:rounded-full fhint:border fhint:border-border fhint:bg-background fhint:py-[5px] fhint:pr-2 fhint:pl-3 fhint:text-[13px] fhint:font-semibold"
+            className="fhint:inline-flex fhint:items-center fhint:gap-[7px] fhint:rounded-full fhint:border fhint:border-border fhint:bg-background fhint:py-[5px] fhint:pr-2 fhint:pl-3 fhint:text-sm fhint:font-semibold"
           >
             {category.name}
             <button
@@ -91,7 +92,7 @@ export function ExtraCategoriesField({ model, onChange, errors, max }) {
                 )
               : __("Type a category and choose it", "foundhint-local-seo")
           }
-          inputClassName="fhint:w-full fhint:border-0 fhint:bg-transparent fhint:p-1.5 fhint:text-[13px] fhint:outline-none"
+          inputClassName={cn(chipBoxInput, "fhint:w-full fhint:text-sm")}
           onType={setExtraDraft}
           onChoose={(category) => {
             onChange({

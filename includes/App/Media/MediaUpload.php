@@ -36,6 +36,13 @@ class MediaUpload {
 	const TYPES = array( 'image/jpeg', 'image/png' );
 
 	/**
+	 * Post meta on an attachment FoundHint created from an upload. Only those
+	 * are deleted when their photo is discarded; an image the owner picked
+	 * from the Media Library is never deleted.
+	 */
+	const OWNED_META = '_fhint_uploaded';
+
+	/**
 	 * Step one of three: ask Google for somewhere to put the bytes.
 	 *
 	 * `%1$s` is the account resource name, `%2$s` the location's.
@@ -133,6 +140,64 @@ class MediaUpload {
 			);
 		}
 
+		update_post_meta( (int) $attachment_id, self::OWNED_META, 1 );
+
+		return self::keep( (int) $location_id, $role, (int) $attachment_id, (string) $size['mime'], (int) $size[0], (int) $size[1] );
+	}
+
+	/**
+	 * Use an image already in the Media Library as a photo waiting to go to
+	 * Google — checked against Google's limits from the file itself, like an
+	 * upload. The image stays the owner's: discarding the photo never
+	 * deletes it.
+	 *
+	 * @param int    $location_id   Row id in wp_fhint_locations.
+	 * @param string $role          logo | cover | gallery.
+	 * @param int    $attachment_id Attachment post id.
+	 * @return array|ValidationResult|WP_Error The stored row.
+	 */
+	public static function add_attachment( $location_id, $role, $attachment_id ) {
+		$role          = in_array( (string) $role, MediaRepository::roles(), true ) ? (string) $role : MediaRepository::ROLE_GALLERY;
+		$attachment_id = (int) $attachment_id;
+		$path          = $attachment_id && 'attachment' === get_post_type( $attachment_id ) ? get_attached_file( $attachment_id ) : '';
+
+		if ( ! $path || ! is_readable( (string) $path ) ) {
+			return new WP_Error(
+				'fhint_media_not_found',
+				__( 'That image is no longer in your media library.', 'foundhint-local-seo' ),
+				array( 'status' => 404 )
+			);
+		}
+
+		$size       = getimagesize( (string) $path );
+		$validation = self::validate(
+			array(
+				'mime_type' => is_array( $size ) && ! empty( $size['mime'] ) ? (string) $size['mime'] : '',
+				'file_size' => (int) filesize( (string) $path ),
+				'width'     => is_array( $size ) ? (int) $size[0] : 0,
+				'height'    => is_array( $size ) ? (int) $size[1] : 0,
+			)
+		);
+
+		if ( ! $validation->is_valid() ) {
+			return $validation;
+		}
+
+		return self::keep( (int) $location_id, $role, $attachment_id, (string) $size['mime'], (int) $size[0], (int) $size[1] );
+	}
+
+	/**
+	 * Store an attachment as a photo waiting to go to Google.
+	 *
+	 * @param int    $location_id   Row id in wp_fhint_locations.
+	 * @param string $role          logo | cover | gallery.
+	 * @param int    $attachment_id Attachment post id.
+	 * @param string $mime          Its type.
+	 * @param int    $width         Width in pixels.
+	 * @param int    $height        Height in pixels.
+	 * @return array|WP_Error The stored row.
+	 */
+	private static function keep( $location_id, $role, $attachment_id, $mime, $width, $height ) {
 		// A listing has one logo and one cover. Choosing another replaces the
 		// one that was waiting rather than queueing two.
 		if ( MediaRepository::ROLE_GALLERY !== $role ) {
@@ -149,15 +214,17 @@ class MediaUpload {
 				'role'          => $role,
 				'attachment_id' => (int) $attachment_id,
 				'url'           => (string) wp_get_attachment_url( $attachment_id ),
-				'mime_type'     => (string) $size['mime'],
+				'mime_type'     => $mime,
 				'file_size'     => (int) filesize( (string) get_attached_file( $attachment_id ) ),
-				'width'         => (int) $size[0],
-				'height'        => (int) $size[1],
+				'width'         => (int) $width,
+				'height'        => (int) $height,
 			)
 		);
 
 		if ( ! $row ) {
-			wp_delete_attachment( $attachment_id, true );
+			if ( get_post_meta( (int) $attachment_id, self::OWNED_META, true ) ) {
+				wp_delete_attachment( $attachment_id, true );
+			}
 
 			return new WP_Error(
 				'fhint_save_failed',
@@ -374,7 +441,9 @@ class MediaUpload {
 	 * @return void
 	 */
 	private static function discard( array $photo ) {
-		if ( $photo['attachment_id'] ) {
+		// Only a file FoundHint uploaded is deleted with its photo; an image
+		// picked from the Media Library stays there.
+		if ( $photo['attachment_id'] && get_post_meta( (int) $photo['attachment_id'], self::OWNED_META, true ) ) {
 			wp_delete_attachment( $photo['attachment_id'], true );
 		}
 

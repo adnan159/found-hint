@@ -178,7 +178,7 @@ export function OpeningHoursEditor({ value, onChange, errors = {} }) {
             className="fhint:flex fhint:flex-col fhint:gap-2 fhint:border-b fhint:border-b-border fhint:pb-3 fhint:last:border-b-0 fhint:last:pb-0"
           >
             <div className="fhint:flex fhint:flex-wrap fhint:items-center fhint:gap-3">
-              <span className="fhint:w-28 fhint:shrink-0 fhint:text-[13px] fhint:font-bold">
+              <span className="fhint:w-28 fhint:shrink-0 fhint:text-sm fhint:font-bold">
                 {day.dayName}
               </span>
 

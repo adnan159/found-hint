@@ -62,7 +62,7 @@ export function PageHeader({ title, description, actions, hidden = false }) {
         ) : null}
       </div>
       {description ? (
-        <p className="fhint:m-0 fhint:max-w-[76ch] fhint:text-[13.5px] fhint:text-muted-strong">
+        <p className="fhint:m-0 fhint:max-w-[76ch] fhint:text-sm fhint:text-muted-strong">
           {description}
         </p>
       ) : null}

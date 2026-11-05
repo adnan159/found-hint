@@ -90,7 +90,7 @@ export function Hint({
         side={side}
         align={align}
         className={cn(
-          "fhint:max-w-75 fhint:flex-col fhint:items-start fhint:gap-2 fhint:px-3 fhint:py-2.5 fhint:text-[12.5px] fhint:leading-relaxed",
+          "fhint:max-w-75 fhint:flex-col fhint:items-start fhint:gap-2 fhint:px-3 fhint:py-2.5 fhint:text-sm fhint:leading-relaxed",
           contentClassName,
         )}
       >

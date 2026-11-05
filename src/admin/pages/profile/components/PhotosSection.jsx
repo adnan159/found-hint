@@ -17,10 +17,8 @@ import usePhotoActions from "./photos/usePhotoActions";
  * one at a time so each can say whether Google took it.
  */
 export function PhotosSection({ media, google, locationId, onChanged }) {
-  const { busy, sending, problems, add, remove, upload } = usePhotoActions(
-    locationId,
-    onChanged,
-  );
+  const { busy, sending, problems, add, addFromLibrary, remove, upload } =
+    usePhotoActions(locationId, onChanged);
 
   const gallery = media?.gallery ?? [];
   const waiting = media?.pending ?? [];
@@ -30,7 +28,7 @@ export function PhotosSection({ media, google, locationId, onChanged }) {
     !media?.logo && !media?.cover && !gallery.length && !waiting.length;
   return (
     <>
-      <p className={cn(help, "fhint:m-0 fhint:text-[13px]")}>
+      <p className={cn(help, "fhint:m-0 fhint:text-sm")}>
         <strong className="fhint:text-foreground">
           {__("What Google accepts:", "foundhint-local-seo")}
         </strong>{" "}
@@ -51,6 +49,7 @@ export function PhotosSection({ media, google, locationId, onChanged }) {
           waiting={waitingFor("logo")}
           disabled={busy}
           onFiles={add("logo")}
+          onAttachments={addFromLibrary("logo")}
         />
         <PhotoSlot
           title={__("Cover photo", "foundhint-local-seo")}
@@ -60,6 +59,7 @@ export function PhotosSection({ media, google, locationId, onChanged }) {
           waiting={waitingFor("cover")}
           disabled={busy}
           onFiles={add("cover")}
+          onAttachments={addFromLibrary("cover")}
           wide
         />
 
@@ -68,6 +68,7 @@ export function PhotosSection({ media, google, locationId, onChanged }) {
           multiple
           disabled={busy}
           onFiles={add("gallery")}
+          onAttachments={addFromLibrary("gallery")}
           label={__("Choose photos for your gallery", "foundhint-local-seo")}
           className="fhint:grid fhint:cursor-pointer fhint:content-start fhint:justify-items-start fhint:gap-2.5 fhint:rounded-[12px] fhint:border fhint:border-dashed fhint:border-primary/40 fhint:bg-primary/5 fhint:p-4 fhint:text-left fhint:transition-colors fhint:hover:bg-primary/10"
           draggingClassName="fhint:border-primary fhint:bg-primary/15"
@@ -78,7 +79,7 @@ export function PhotosSection({ media, google, locationId, onChanged }) {
           >
             <ArrowUpToLineIcon className="fhint:size-4" />
           </span>
-          <strong className="fhint:text-[14.5px] fhint:font-extrabold">
+          <strong className="fhint:text-sm fhint:font-extrabold">
             {__("Add photos to your gallery", "foundhint-local-seo")}
           </strong>
           <span className={cn(help, "fhint:leading-relaxed")}>
@@ -88,7 +89,7 @@ export function PhotosSection({ media, google, locationId, onChanged }) {
             )}
           </span>
           {/* Looks like a button; the whole card is what opens the picker. */}
-          <span className="fhint:mt-1 fhint:inline-flex fhint:items-center fhint:rounded-full fhint:bg-primary fhint:px-[18px] fhint:py-2.5 fhint:text-[13.5px] fhint:font-extrabold fhint:text-primary-foreground">
+          <span className="fhint:mt-1 fhint:inline-flex fhint:items-center fhint:rounded-full fhint:bg-primary fhint:px-[18px] fhint:py-2.5 fhint:text-sm fhint:font-extrabold fhint:text-primary-foreground">
             {busy && !sending
               ? __("Working…", "foundhint-local-seo")
               : gallery.length
@@ -126,14 +127,14 @@ export function PhotosSection({ media, google, locationId, onChanged }) {
       {gallery.length ? <Gallery gallery={gallery} /> : null}
 
       {nothing ? (
-        <div className="fhint:rounded-[12px] fhint:border fhint:border-dashed fhint:border-[#cfc8c6] fhint:px-6 fhint:py-7">
+        <div className="fhint:rounded-[12px] fhint:border fhint:border-dashed fhint:border-input fhint:px-6 fhint:py-7">
           <strong className="fhint:mb-1.5 fhint:block fhint:text-base fhint:font-extrabold">
             {__("Your Google photos will appear here", "foundhint-local-seo")}
           </strong>
           <span
             className={cn(
               help,
-              "fhint:block fhint:max-w-[62ch] fhint:text-[13.5px] fhint:leading-relaxed",
+              "fhint:block fhint:max-w-[62ch] fhint:text-sm fhint:leading-relaxed",
             )}
           >
             {google?.mapped

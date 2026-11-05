@@ -1,0 +1,18 @@
+/*
+ * The GBP Posting popup in the post editor. Unlike the admin app this never
+ * resets the page: Tailwind's preflight is limited to the popup
+ * (preflight-scoped.css), and everything else shared is FoundHint-only
+ * (src/admin/styles/theme.css).
+ */
+@layer theme, base, components;
+@import "tailwindcss/theme.css" layer(theme) prefix(fhint);
+@import "./preflight-scoped.css" layer(base);
+@import "tailwindcss/utilities.css";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+@import "@fontsource-variable/dm-sans";
+
+@source "./**/*.{js,jsx}";
+@source "../admin/**/*.{js,jsx}";
+
+@import "../admin/styles/theme.css";

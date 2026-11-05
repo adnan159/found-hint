@@ -48,7 +48,7 @@ export function AdditionalPhonesField({ value, onChange, errors, country }) {
         </span>
         <span
           aria-live="polite"
-          className="fhint:ml-auto fhint:text-[12.5px] fhint:font-bold fhint:text-muted-strong"
+          className="fhint:ml-auto fhint:text-sm fhint:font-bold fhint:text-muted-strong"
         >
           {sprintf(
             /* translators: 1: numbers added, 2: the most allowed. */
@@ -125,7 +125,7 @@ export function AdditionalPhonesField({ value, onChange, errors, country }) {
           type="button"
           onClick={add}
           className={cn(
-            "fhint:inline-flex fhint:w-fit fhint:cursor-pointer fhint:items-center fhint:gap-1.5 fhint:border-0 fhint:bg-notice fhint:px-3 fhint:py-2 fhint:text-[12.5px] fhint:font-extrabold fhint:text-notice-foreground",
+            "fhint:inline-flex fhint:w-fit fhint:cursor-pointer fhint:items-center fhint:gap-1.5 fhint:border-0 fhint:bg-notice fhint:px-3 fhint:py-2 fhint:text-sm fhint:font-extrabold fhint:text-notice-foreground",
             focus,
           )}
         >

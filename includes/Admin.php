@@ -7,6 +7,8 @@
 
 namespace FHINT;
 
+use FHINT\Admin\BlogSharing;
+use FHINT\Admin\EditorAssets;
 use FHINT\Admin\Enqueue;
 use FHINT\Admin\Menu;
 
@@ -25,6 +27,8 @@ class Admin {
 	public static function init() {
 		Menu::init();
 		Enqueue::init();
+		BlogSharing::init();
+		EditorAssets::init();
 
 		add_filter( 'plugin_action_links_' . FHINT_BASENAME, array( __CLASS__, 'plugin_action_links' ) );
 	}
@@ -43,6 +47,15 @@ class Admin {
 		);
 
 		array_unshift( $links, $settings_link );
+
+		// Without Premium installed: where to get it.
+		if ( ! defined( 'FHINTPREMIUM_VERSION' ) ) {
+			$links[] = sprintf(
+				'<a href="%s" target="_blank" rel="noopener noreferrer" style="color:#D8521F;font-weight:700;">%s</a>',
+				esc_url( (string) apply_filters( 'fhint_upgrade_url', 'https://foundhint.com/pricing/' ) ),
+				esc_html__( 'Get Pro', 'foundhint-local-seo' )
+			);
+		}
 
 		return $links;
 	}

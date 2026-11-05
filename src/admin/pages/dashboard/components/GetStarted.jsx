@@ -116,10 +116,10 @@ function Welcome({ onStart, headingRef }) {
               <div className="fhint:mb-2 fhint:text-[11px] fhint:font-extrabold fhint:tracking-[0.14em] fhint:text-primary">
                 {item.step()}
               </div>
-              <div className="fhint:mb-1 fhint:text-[14.5px] fhint:font-extrabold">
+              <div className="fhint:mb-1 fhint:text-sm fhint:font-extrabold">
                 {item.title()}
               </div>
-              <div className="fhint:text-[13px] fhint:leading-[1.45] fhint:text-muted-strong">
+              <div className="fhint:text-sm fhint:leading-[1.45] fhint:text-muted-strong">
                 {item.body()}
               </div>
             </div>
@@ -127,7 +127,7 @@ function Welcome({ onStart, headingRef }) {
         </div>
       </div>
 
-      <p className="fhint:mt-3.5 fhint:text-[12.5px] fhint:text-muted-foreground">
+      <p className="fhint:mt-3.5 fhint:text-sm fhint:text-muted-foreground">
         {__(
           "Takes about 5 minutes. You can change anything later.",
           "foundhint-local-seo",
@@ -148,10 +148,10 @@ function OptionCard({ accent, label, title, body, points, action }) {
       <h3 className="fhint:m-0 fhint:mb-2.5 fhint:font-heading fhint:text-[21px] fhint:font-extrabold">
         {title}
       </h3>
-      <p className="fhint:mb-4.5 fhint:text-[14px] fhint:leading-[1.5] fhint:text-muted-strong">
+      <p className="fhint:mb-4.5 fhint:text-sm fhint:leading-[1.5] fhint:text-muted-strong">
         {body}
       </p>
-      <ul className="fhint:mb-5.5 fhint:grid fhint:list-none fhint:gap-[7px] fhint:p-0 fhint:text-[13.5px] fhint:text-foreground-soft">
+      <ul className="fhint:mb-5.5 fhint:grid fhint:list-none fhint:gap-[7px] fhint:p-0 fhint:text-sm fhint:text-foreground-soft">
         {points.map((point) => (
           <li key={point}>{point}</li>
         ))}
@@ -227,7 +227,7 @@ function Decision({ onConnect, isConnecting, headingRef }) {
                   second tab. */}
               <Button
                 variant="outline"
-                className="fhint:h-auto fhint:border-foreground fhint:px-[18px] fhint:py-3 fhint:text-[14.5px] fhint:font-extrabold"
+                className="fhint:h-auto fhint:border-foreground fhint:px-[18px] fhint:py-3 fhint:text-sm fhint:font-extrabold fhint:text-foreground!"
                 render={
                   <a
                     href={GOOGLE_CREATE_URL}

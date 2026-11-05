@@ -33,7 +33,7 @@ export function SpecialDayRow({ day, errors: dayErrors, onChange, onRemove }) {
           onChange={(next) => onChange(next)}
         />
       ) : (
-        <span className="fhint:min-w-0 fhint:flex-1 fhint:text-[13px] fhint:text-muted-foreground">
+        <span className="fhint:min-w-0 fhint:flex-1 fhint:text-sm fhint:text-muted-foreground">
           {__("Closed all day", "foundhint-local-seo")}
         </span>
       )}

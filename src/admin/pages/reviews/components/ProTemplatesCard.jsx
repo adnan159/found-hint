@@ -1,8 +1,8 @@
 import { __, sprintf } from "@wordpress/i18n";
-import { BadgeCheckIcon } from "lucide-react";
+import { BadgeCheckIcon, MessageSquareTextIcon } from "lucide-react";
 import RequestError from "@/components/RequestError";
-import SectionCard from "@/components/SectionCard";
 import { useGetProStatusQuery } from "@/store/api/proApi";
+import Panel from "@/components/Panel";
 
 /**
  * Reply templates with FoundHint Pro active — shown in place of the
@@ -15,22 +15,25 @@ export function ProTemplatesCard() {
   const { data, error } = useGetProStatusQuery();
 
   return (
-    <SectionCard title={__("Reply templates", "foundhint-local-seo")}>
+    <Panel
+      icon={MessageSquareTextIcon}
+      title={__("Reply templates", "foundhint-local-seo")}
+    >
       <RequestError error={error} />
-      <p className="fhint:m-0 fhint:flex fhint:items-center fhint:gap-2 fhint:text-[13px]">
+      <p className="fhint:m-0 fhint:flex fhint:items-center fhint:gap-2 fhint:text-sm">
         <BadgeCheckIcon
           aria-hidden="true"
           className="fhint:size-4 fhint:text-primary"
         />
         {data
           ? sprintf(
-              /* translators: %s: the FoundHint Pro version. */
-              __("FoundHint Pro %s is active.", "foundhint-local-seo"),
+              /* translators: %s: the FoundHint Premium version. */
+              __("FoundHint Premium %s is active.", "foundhint-local-seo"),
               data.version,
             )
-          : __("Loading FoundHint Pro…", "foundhint-local-seo")}
+          : __("Loading FoundHint Premium…", "foundhint-local-seo")}
       </p>
-    </SectionCard>
+    </Panel>
   );
 }
 

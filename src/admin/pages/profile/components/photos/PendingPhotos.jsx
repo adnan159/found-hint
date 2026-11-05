@@ -6,6 +6,7 @@ import {
   focus,
   linkButton,
   primaryButton,
+  primaryLink,
   tag,
   tagTones,
 } from "../../styles";
@@ -37,7 +38,7 @@ export function PendingPhotos({
     <div className="fhint:grid fhint:gap-3 fhint:border fhint:border-notice-border fhint:bg-notice fhint:p-[15px]">
       <div className="fhint:flex fhint:flex-wrap fhint:items-center fhint:gap-3">
         <div className="fhint:min-w-0 fhint:flex-1 fhint:text-notice-foreground">
-          <strong className="fhint:block fhint:text-[13.5px]">
+          <strong className="fhint:block fhint:text-sm">
             {sprintf(
               /* translators: %d: number of photos. */
               _n(
@@ -49,7 +50,7 @@ export function PendingPhotos({
               waiting.length,
             )}
           </strong>
-          <span className="fhint:text-[12.5px]">
+          <span className="fhint:text-sm">
             {mapped
               ? __(
                   "Not on Google yet. Press Upload to Google to send them.",
@@ -81,10 +82,7 @@ export function PendingPhotos({
               : __("Upload to Google", "foundhint-local-seo")}
           </button>
         ) : (
-          <Link
-            to="/google"
-            className={cn(primaryButton, "fhint:no-underline")}
-          >
+          <Link to="/google" className={primaryLink}>
             {__("Connect Google", "foundhint-local-seo")}
           </Link>
         )}

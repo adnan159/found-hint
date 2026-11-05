@@ -121,12 +121,14 @@ class Enqueue {
 	 *
 	 * @return array
 	 */
-	private static function bootstrap_data() {
+	public static function bootstrap_data() {
 		$data = array(
 			'rest_url'   => rest_url( \FHINT\API::NAMESPACE_NAME . '/' . \FHINT\API::VERSION ),
 			'rest_nonce' => wp_create_nonce( 'wp_rest' ),
 			'plugin_url' => FHINT_URL,
 			'version'    => FHINT_VERSION,
+			// Where "Upgrade to Pro" goes; filterable for a campaign link.
+			'upgrade_url' => (string) apply_filters( 'fhint_upgrade_url', 'https://foundhint.com/pricing/' ),
 			'reference'  => array(
 				'business_types'    => Business::types(),
 				'location_statuses' => Location::statuses(),

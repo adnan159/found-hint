@@ -13,8 +13,16 @@ class with a static `init()` owning one subdirectory of classes. The admin
 is a Vite-built React SPA mounted on a single WordPress admin page.
 
 The data layer (business, locations, opening hours, services), its REST API
-and the admin screens for all of it are built. The audit engine and schema
-output are not — see `docs/PROGRESS.md` for exactly what is done and next.
+and the admin screens for all of it are built.
+
+**Schema Manager (built; Premium):** the six-tab Schema screen — 01
+Organization, 02 LocalBusiness (main business), 03 Locations (list, setup,
+branch editor), 04 Services, 05 Website structure, 06 Settings — each schema
+tab with an on/off switch. Premium prints the site's schema itself
+(`schema.output`): one `@graph` per page. Decisions, data model, the
+Free/Premium split and every checklist are in
+[`docs/SCHEMA-PLAN.md`](docs/SCHEMA-PLAN.md); open items are unticked there.
+See `docs/PROGRESS.md` for exactly what is done and how it was verified.
 
 The sibling `local-seo` plugin in this same directory is the reference for
 the *product*: its `docs/DATABASE.md`, `API.md` and `FEATURES.md` describe
@@ -25,7 +33,7 @@ from there; the structure is defined here.
 
 ```bash
 npm run dev              # Vite dev server for the admin React SPA (vite.admin.config.js)
-npm run build            # Production build of the admin SPA → assets/build/admin
+npm run build            # Production build of the admin SPA → assets/build/admin, then the editor bundle → assets/build/editor
 npm run lint              # eslint over src/
 npm run plugin:prepare    # build + copy everything (minus buildExclude globs in package.json) into ./build
 npm run plugin:publish    # plugin:prepare + zip ./build into found-hint.zip
@@ -131,6 +139,7 @@ includes/
 ├── functions.php           global non-class helpers only
 └── hooks.php               global hook wiring only
 src/admin/                  Vite-built React SPA (see below)
+src/editor/                 GBP Posting button + popup in the block editor (vite.editor.config.js)
 assets/build/               Vite output, gitignored — never hand-edit
 assets/static/              hand-written, directly-enqueued, no build step
 libs/assets.php             vite-for-wp integration (FHINT\Libs\Assets)
@@ -258,7 +267,13 @@ route in `routes.jsx` and an entry in the sidebar; do not add
   source.
 - **Assets load on our screen only.** `Enqueue` gates on the exact hook
   suffix `toplevel_page_fhint`. Verify by loading an unrelated admin page
-  and grepping the HTML for `fhint-admin`.
+  and grepping the HTML for `fhint-admin`. The one other bundle is
+  `src/editor` (`Admin\EditorAssets`): the block editor for a blog post,
+  while blog sharing is on. It must never import `src/admin/index.css` —
+  that resets every element on the page. Shared look lives in
+  `src/admin/styles/theme.css` (FoundHint-only selectors); the editor gets
+  Tailwind's reset inside `@scope` (`src/editor/preflight-scoped.css`,
+  regenerate it after a Tailwind upgrade).
 - **Field errors come from the server.** REST returns machine codes; the
   client maps them to translated strings.
 - **Every string through `__()`** with the `found-hint` text domain.
@@ -275,6 +290,21 @@ route in `routes.jsx` and an entry in the sidebar; do not add
   `components.json` is configured (`style: base-vega`, `prefix: fhint`,
   `baseColor: neutral`, Lucide icons, JSX not TSX). Twenty primitives are
   already in `src/admin/components/ui/`.
+- **Never let a React component file grow past 150 lines.** Before it does,
+  split it: data and side effects into a hook (`<screen>/hooks/`), pure
+  helpers into `<screen>/lib/`, and each visual block into its own
+  component. A screen's `index.jsx` lays the screen out and little else —
+  `pages/reviews/` is the worked example. Generated `components/ui/**` files
+  are exempt.
+- **Use Tailwind's spacing scale, never a bracketed pixel value, for
+  spacing and sizing.** Tailwind v4 takes any multiple of `0.25` (one unit
+  is 4px), so every whole pixel has a scale class: divide by 4. Write
+  `fhint:size-5.5` (22px), not `fhint:size-[22px]`; `fhint:size-3.25`
+  (13px), not `fhint:size-[13px]`; likewise `fhint:px-5.5` over
+  `fhint:px-[22px]` and `fhint:min-h-17` over `fhint:min-h-[68px]`. This
+  covers `size`, `w`, `h`, `min-*`/`max-*`, padding, margin, gap, inset and
+  translate. Brackets stay only where there is no spacing scale — a font
+  size like `fhint:text-[12.5px]`, letter-spacing, a colour.
 
 ### Working with generated components
 
@@ -330,14 +360,19 @@ through it, so a Pro tier raises a number instead of rewriting core. If
 Pro needs more, add narrow filters at the specific points it needs and
 document them; don't reintroduce a generic registry.
 
-**FoundHint Pro** is a separate add-on plugin (`../found-hint-pro`) that is
-**server-side only**: REST routes (`fhint-pro/v1`), data, jobs, limits.
+**FoundHint Pro** is a separate add-on plugin (`../found-hint-premium`) that is
+**server-side only**: REST routes (`fhint-premium/v1`), data, jobs, limits.
 **All UI — Pro screens included — lives in this plugin.** A Pro screen is
 wrapped in `<ProFeature feature="…" fallback={upsell}>` and shows only
 when Pro reports serving that feature through `fhint_admin_bootstrap_data`
 (`src/admin/lib/pro.js`). See [`docs/EXTENDING.md`](docs/EXTENDING.md).
 UI-side gating (`PRO` badges, greyed "PRO ONLY" rows, sample-data cards)
 is described in `docs/NAVIGATION.md`.
+
+Premium has its own release build, the same shape as this plugin's minus
+Vite: `npm run plugin:publish` in `../found-hint-premium` makes
+`found-hint-premium.zip` (see its `CLAUDE.md`). Ship the free release a
+Premium release depends on first.
 
 ## Never do
 

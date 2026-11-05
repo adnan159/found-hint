@@ -77,7 +77,7 @@ function StatusLine({ state }) {
             : __("Needs reconnecting", "foundhint-local-seo")}
         </span>
         {state.account_email ? (
-          <span className="fhint:text-[13px] fhint:text-muted-strong">
+          <span className="fhint:text-sm fhint:text-muted-strong">
             {sprintf(
               /* translators: %s: the Google account email address. */
               __("as %s", "foundhint-local-seo"),
@@ -308,7 +308,7 @@ export default function GooglePage() {
           </summary>
 
           <div className="fhint:flex fhint:flex-col fhint:gap-5 fhint:px-[22px] fhint:py-5">
-            <p className="fhint:m-0 fhint:max-w-[76ch] fhint:text-[13px] fhint:text-muted-strong">
+            <p className="fhint:m-0 fhint:max-w-[76ch] fhint:text-sm fhint:text-muted-strong">
               {__(
                 "You do not need this. FoundHint signs you in through its own Google client, and your data and quota stay yours either way. Enter a client from your own Google Cloud project only if you want this site to use that project — once saved, it is used instead of FoundHint's.",
                 "foundhint-local-seo",
@@ -408,6 +408,7 @@ export default function GooglePage() {
               </Button>
               <Button
                 variant="outline"
+                className="fhint:text-foreground!"
                 render={
                   <a
                     href={GOOGLE_CONSOLE_URL}
@@ -524,6 +525,7 @@ export default function GooglePage() {
             </Button>
             <Button
               variant="outline"
+              className="fhint:text-foreground!"
               render={
                 <a
                   href={GOOGLE_CONSOLE_URL}
@@ -550,7 +552,7 @@ export default function GooglePage() {
         {/* The prototype's trust line, kept word for word: it is the
             sentence that answers the question people actually have when a
             plugin asks them to sign in to Google. */}
-        <p className="fhint:max-w-[76ch] fhint:text-[13.5px] fhint:text-muted-strong">
+        <p className="fhint:max-w-[76ch] fhint:text-sm fhint:text-muted-strong">
           {__(
             "You sign in on Google's own page. FoundHint never sees your password, and nothing on your profile changes without your confirmation.",
             "foundhint-local-seo",
@@ -558,7 +560,7 @@ export default function GooglePage() {
         </p>
 
         {connected ? (
-          <dl className="fhint:mt-5 fhint:flex fhint:flex-col fhint:gap-2 fhint:text-[13px]">
+          <dl className="fhint:mt-5 fhint:flex fhint:flex-col fhint:gap-2 fhint:text-sm">
             <div className="fhint:flex fhint:gap-2">
               <dt className="fhint:font-bold">
                 {__("Account", "foundhint-local-seo")}
@@ -636,7 +638,7 @@ export default function GooglePage() {
         {!state.configured ? (
           <p
             id="fhint-google-needs-client"
-            className="fhint:mt-4 fhint:text-[13px] fhint:text-muted-strong"
+            className="fhint:mt-4 fhint:text-sm fhint:text-muted-strong"
           >
             {__(
               "Add your Google client ID and secret above first — this button will take you to them.",

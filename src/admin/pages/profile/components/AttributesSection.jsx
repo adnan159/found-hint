@@ -1,11 +1,11 @@
 import { __ } from "@wordpress/i18n";
 import { Link } from "react-router";
 import { cn } from "cn";
-import { focus, help, primaryButton } from "../styles";
+import { focus, help, primaryButton, primaryLink } from "../styles";
 
 const pill = (on) =>
   cn(
-    "fhint:inline-flex fhint:cursor-pointer fhint:items-center fhint:gap-2 fhint:rounded-full fhint:border fhint:px-3 fhint:py-[7px] fhint:text-[13px]",
+    "fhint:inline-flex fhint:cursor-pointer fhint:items-center fhint:gap-2 fhint:rounded-full fhint:border fhint:px-3 fhint:py-[7px] fhint:text-sm",
     on
       ? "fhint:border-primary fhint:bg-notice fhint:font-bold fhint:text-notice-foreground"
       : "fhint:border-border fhint:bg-card fhint:font-medium fhint:text-foreground-soft",
@@ -20,7 +20,7 @@ function Box({ on }) {
         "fhint:grid fhint:size-[15px] fhint:flex-none fhint:place-items-center fhint:rounded-[3px] fhint:border fhint:text-[10px] fhint:font-extrabold fhint:text-primary-foreground",
         on
           ? "fhint:border-primary fhint:bg-primary"
-          : "fhint:border-[#9b9797] fhint:bg-card",
+          : "fhint:border-muted-foreground fhint:bg-card",
       )}
     >
       {on ? "✓" : ""}
@@ -108,7 +108,7 @@ export function AttributesSection({
         aria-label={item.label}
         className="fhint:flex fhint:w-full fhint:flex-wrap fhint:items-center fhint:gap-2"
       >
-        <span className="fhint:text-[13px] fhint:font-bold">{item.label}</span>
+        <span className="fhint:text-sm fhint:font-bold">{item.label}</span>
         {(item.options ?? []).map((option) => {
           const on = chosen.includes(option.value);
 
@@ -143,7 +143,7 @@ export function AttributesSection({
 
   return (
     <>
-      <p className={cn(help, "fhint:m-0 fhint:max-w-[70ch] fhint:text-[13px]")}>
+      <p className={cn(help, "fhint:m-0 fhint:max-w-[70ch] fhint:text-sm")}>
         {__(
           "Tick everything that is true about your business. Customers filter by these on Google, for example “wheelchair accessible” or “accepts credit cards”.",
           "foundhint-local-seo",
@@ -174,7 +174,7 @@ export function AttributesSection({
       {!definitions.length ? (
         <div className="fhint:flex fhint:flex-wrap fhint:items-center fhint:gap-3 fhint:border fhint:border-dashed fhint:border-input fhint:bg-muted fhint:px-[15px] fhint:py-[13px]">
           <div className="fhint:min-w-0 fhint:flex-1">
-            <strong className="fhint:block fhint:text-[13px]">
+            <strong className="fhint:block fhint:text-sm">
               {google?.mapped
                 ? __(
                     "Your attributes have not been read from Google yet",
@@ -204,10 +204,7 @@ export function AttributesSection({
                 : __("Read from Google", "foundhint-local-seo")}
             </button>
           ) : (
-            <Link
-              to="/google"
-              className={cn(primaryButton, "fhint:no-underline")}
-            >
+            <Link to="/google" className={primaryLink}>
               {__("Connect Google", "foundhint-local-seo")}
             </Link>
           )}
