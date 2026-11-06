@@ -1,18 +1,16 @@
-import { useMemo } from "react";
 import { hasPro } from "@/lib/pro";
 import {
   useDeleteReviewTemplateMutation,
   useGetReviewTemplatesQuery,
   useSaveReviewTemplateMutation,
 } from "@/store/api/reviewTemplatesApi";
-import { sampleTemplates } from "../lib/templates";
 
 /**
  * One Google listing's reply templates, for the card and the reply dialog.
  *
  * With FoundHint Premium serving `reviews.templates`: the owner's own for
  * that listing, editable — each listing has its own. With no listing,
- * none. Without Premium: the sample set, as a read-only preview.
+ * none. Without Premium: none — there are no sample templates.
  *
  * @param {string} locationName The Google listing, '' for none.
  * @return {{templates: Object[], editable: boolean, loading: boolean, error: *, save: Function, remove: Function,
@@ -20,7 +18,6 @@ import { sampleTemplates } from "../lib/templates";
  */
 export function useTemplates(locationName = "") {
   const editable = hasPro("reviews.templates");
-  const samples = useMemo(() => sampleTemplates(), []);
   const { data, isLoading, error } = useGetReviewTemplatesQuery(
     { locationName },
     { skip: !editable || !locationName },
@@ -29,7 +26,7 @@ export function useTemplates(locationName = "") {
   const [deleteTemplate, deleteState] = useDeleteReviewTemplateMutation();
 
   return {
-    templates: editable ? (locationName ? (data ?? []) : []) : samples,
+    templates: editable && locationName ? (data ?? []) : [],
     editable,
     loading: editable && Boolean(locationName) && isLoading,
     error,

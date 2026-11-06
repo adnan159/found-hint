@@ -3217,3 +3217,10 @@ its own. Checked in the harness with two linked locations: switching the
 location in the bar reloads that location's templates and auto-reply
 settings (`?location_name=locations/1` → `locations/2`) without a page
 reload.
+
+**No sample templates without Premium.** `useTemplates()` returns none
+without `reviews.templates`; `sampleTemplates()` is gone from
+`lib/templates.js`. The Reply templates card shows `TemplatesUpsell`
+(what templates do, Unlock with Premium / Activate licence) instead of
+tabs and a list, and the reply dialog offers only the built-in reply.
+Checked in the harness with Premium off and on.
