@@ -4,7 +4,7 @@ Tags: local seo, google business profile, local business schema, multi location,
 Requires at least: 6.4
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 1.2.2
+Stable tag: 1.2.3
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -34,11 +34,12 @@ Most WordPress local SEO plugins either lock multiple locations behind a paid ad
 * **Google Business Profile posts**, publish Update, Event and Offer posts to each location, with a live Google preview.
 * **Post scheduling**, choose the date and time a post goes out *(Premium)*.
 * **Share your blog on Google**, turn a published blog post into a Google post from the post list or the block editor *(Premium)*.
+* **Review auto-reply**, reply to new Google reviews automatically with your own template for each star rating, set up separately for each location *(Premium)*.
 * **Local SEO dashboard**, your health score, what to fix and your Google connection at a glance.
 * **Advanced schema**, Organization, every branch, services, WebSite, WebPage, About, Contact and Breadcrumb schema *(Premium)*.
 * **Location landing pages**, a page for each branch with its address, hours and map *(Premium)*.
 
-**Coming soon:** review auto-reply, a post calendar, local citations, a local ranking grid with competitor history, service landing pages, an advanced audit and Business Profile performance analytics.
+**Coming soon:** AI review replies, a post calendar, local citations, a local ranking grid with competitor history, service landing pages, an advanced audit and Business Profile performance analytics.
 
 ### A WordPress Local SEO Plugin That’s Free Where It Counts
 
@@ -382,7 +383,7 @@ Yes. FoundHint runs alongside WooCommerce, so stores with physical locations can
 
 = What does FoundHint Premium add? =
 
-The Schema Manager: Organization, LocalBusiness, branch, service and website structure schema, each with its own switch and a live preview, plus location pages created from your saved data. Post scheduling, sharing your blog posts on Google, and reply templates for reviews are included too. Premium is a separate add-on that needs this free plugin. See [pricing](https://foundhint.com/pricing/).
+The Schema Manager: Organization, LocalBusiness, branch, service and website structure schema, each with its own switch and a live preview, plus location pages created from your saved data. Post scheduling, sharing your blog posts on Google, review auto-reply and reply templates for each location are included too. Premium is a separate add-on that needs this free plugin. See [pricing](https://foundhint.com/pricing/).
 
 = How can I see the schema FoundHint adds to my pages? =
 
@@ -404,6 +405,18 @@ No. Google is never contacted on visitor-facing pages, and no scripts or stylesh
 8. Google Business Profile posts with a live Google preview.
 
 == Changelog ==
+
+= 1.2.3 =
+* New: Review auto-reply with FoundHint Premium. Each Google listing has its own: switch it on from the Reviews screen, choose new reviews only or unanswered ones too, and pick a reply template for each star rating. Every rating starts on "Don't reply", and AI replies are marked as coming soon.
+* New: Reply templates belong to each location. Switching location in the top bar shows that location's templates, and the reply dialog offers the templates of the review's own location.
+* New: The Reviews and Posts screens warn when auto-reply or scheduled posts have stopped running, with a "How to fix" guide to setting up a cron job.
+* New: Choose how many older reviews auto-reply answers each day, so a large backlog goes out gradually. New reviews are always answered first.
+* Improvement: {{business_keyword}} now fills in your business category, and {{location_city}} uses the city from Google when a location has none.
+* Improvement: Reply placeholders work with spaces or capitals, names typed in lower case get a capital letter, and a long quoted review is shortened to fit Google's limit.
+* Improvement: The reply dialog says when a detail such as the city was left out, so you can reword before publishing.
+* Improvement: Refreshed layout for the Schema screen's Business, Locations, Services and Settings tabs.
+* Fix: On a location with more than 1,000 reviews, reading reviews no longer marks the older ones as removed.
+* Removed: The "Import from CSV" button on the Reply templates card.
 
 = 1.2.2 =
 * New: Schedule posts for a date and time, in your site's time zone, with FoundHint Premium. Scheduled posts show when they go live, and can be changed, published now or cancelled back to a draft.
@@ -467,6 +480,9 @@ No. Google is never contacted on visitor-facing pages, and no scripts or stylesh
 * Google reviews for each location, with replies.
 
 == Upgrade Notice ==
+
+= 1.2.3 =
+Review auto-reply for each location (with FoundHint Premium 1.0.2), reply templates per location, a warning when background tasks stop running, and a fix for locations with more than 1,000 reviews.
 
 = 1.2.2 =
 Post scheduling and sharing your blog on Google (with FoundHint Premium), and choosing post photos from the Media Library.

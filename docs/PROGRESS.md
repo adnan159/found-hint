@@ -4,7 +4,7 @@
 step finishes: what shipped, and how it was verified — the evidence, not the
 intent. Name any bug the verification caught.
 
-Last updated: step 100. The data layer, its REST API and the admin screens
+Last updated: step 101. The data layer, its REST API and the admin screens
 for everything it covers exist. The Schema Manager is built in FoundHint
 Premium and matches the design (`FoundHint Schema (1).html`): six tabs —
 01 Organization, 02 LocalBusiness, 03 Locations (list, setup, branch
@@ -3217,3 +3217,19 @@ its own. Checked in the harness with two linked locations: switching the
 location in the bar reloads that location's templates and auto-reply
 settings (`?location_name=locations/1` → `locations/2`) without a page
 reload.
+
+## Step 101 — Release FoundHint 1.2.3 and Premium 1.0.2
+
+Versions bumped in each plugin's header and constant, `package.json`,
+`package-lock.json` and `readme.txt` (stable tag). Premium's
+`FHINTPREMIUM_MIN_FREE_VERSION` is now 1.2.3 (the per-location screens,
+`ReplyContext` and short review reads); its readme says so. Changelogs and
+FoundHint's upgrade notice cover auto-reply and per-location templates, the
+cron warning, the placeholder fixes, the review-sync fix, the CSV import
+removal, the Schema screen refresh (356b8cf) and Premium's uninstall fix
+(004051d). FoundHint's feature list gains review auto-reply (Premium), and
+"Coming soon" now names AI review replies instead.
+
+**Verified:** all smoke and database suites, both PHPCS, ESLint and the
+build pass; the dev site reports FoundHint 1.2.3 / Premium 1.0.2 with no
+requirements problem. Release order: FoundHint 1.2.3 first.
