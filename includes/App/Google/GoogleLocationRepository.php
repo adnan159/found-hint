@@ -60,6 +60,28 @@ class GoogleLocationRepository {
 	}
 
 	/**
+	 * The raw location object Google returned for a listing — for the odd
+	 * field no column holds (the city on its address, for a reply).
+	 *
+	 * @param string $location_name Google location resource name.
+	 * @return array
+	 */
+	public static function payload( $location_name ) {
+		global $wpdb;
+
+		$table = Tables::name( Tables::GOOGLE_LOCATIONS );
+
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+		$json = $wpdb->get_var(
+			// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+			$wpdb->prepare( "SELECT payload FROM {$table} WHERE location_name = %s", (string) $location_name )
+		);
+		$data = $json ? json_decode( (string) $json, true ) : null;
+
+		return is_array( $data ) ? $data : array();
+	}
+
+	/**
 	 * The Google location mapped to one of our locations.
 	 *
 	 * @param int $fhint_location_id Row id in wp_fhint_locations.

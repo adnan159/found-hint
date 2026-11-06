@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { __ } from "@wordpress/i18n";
 import { toast } from "sonner";
+import CronWarning from "@/components/cron/CronWarning";
 import { errorMessage, fieldErrors } from "@/lib/errors";
 import TemplateDialog from "../TemplateDialog";
 import AutoReplyBand from "./AutoReplyBand";
@@ -25,10 +26,10 @@ export function AutoReplySection({ autoReply, templates }) {
   const countFor = (rating, kind) => templatesFor(rating, kind).length;
 
   const open = () => {
-    const { on, scope, rules, picks } = autoReply.state;
+    const { on, scope, daily_limit, rules, picks } = autoReply.state;
 
     setError(null);
-    setDraft({ on, scope, rules, picks });
+    setDraft({ on, scope, daily_limit, rules, picks });
   };
 
   const save = async () => {
@@ -70,6 +71,7 @@ export function AutoReplySection({ autoReply, templates }) {
   return (
     <>
       <AutoReplyBand autoReply={autoReply} onSetUp={open} />
+      {autoReply.available ? <CronWarning job="auto_reply" /> : null}
 
       {draft && adding ? (
         <TemplateDialog
@@ -111,6 +113,7 @@ export function AutoReplySection({ autoReply, templates }) {
           draft={draft}
           setDraft={setDraft}
           unanswered={autoReply.state?.unanswered ?? 0}
+          olderToday={autoReply.state?.older_today ?? 0}
           templatesFor={templatesFor}
           errors={errors}
           problem={problem}

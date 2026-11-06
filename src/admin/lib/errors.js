@@ -205,8 +205,20 @@ const MESSAGES = {
     __("Choose a business type from the list.", "foundhint-local-seo"),
   "schema.location.page.not_found": () =>
     __("That page no longer exists. Choose another.", "foundhint-local-seo"),
+  "auto_reply.location.invalid": () =>
+    __(
+      "Choose a location linked to a Google listing first.",
+      "foundhint-local-seo",
+    ),
+  "review_template.location.invalid": () =>
+    __(
+      "Choose a location linked to a Google listing first; each listing has its own templates.",
+      "foundhint-local-seo",
+    ),
   "auto_reply.scope.invalid": () =>
     __("Choose which reviews to reply to.", "foundhint-local-seo"),
+  "auto_reply.daily_limit.invalid": () =>
+    __("Choose how many older reviews to answer a day.", "foundhint-local-seo"),
   "auto_reply.rule.invalid": () =>
     __("Choose how to reply to these reviews.", "foundhint-local-seo"),
   "auto_reply.rule.no_templates": () =>
@@ -228,6 +240,11 @@ const MESSAGES = {
     __("Write the reply.", "foundhint-local-seo"),
   "review_template.text.too_long": () =>
     __("Google takes replies of up to 4096 characters.", "foundhint-local-seo"),
+  "review_template.text.unknown_placeholder": () =>
+    __(
+      "This uses a detail FoundHint doesn't know, such as {{name}}. Use one from Insert a detail, written exactly as shown.",
+      "foundhint-local-seo",
+    ),
   "schema.location.page.no_name": () =>
     __(
       "Give this branch a name first; the page is named after it.",

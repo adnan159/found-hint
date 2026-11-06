@@ -1,5 +1,6 @@
 import { useState } from "react";
 import RequestError from "@/components/RequestError";
+import CronWarning from "@/components/cron/CronWarning";
 import BlogCard from "./components/BlogCard";
 import Composer from "./components/Composer";
 import PostsHeader from "./components/PostsHeader";
@@ -50,6 +51,7 @@ export default function Posts() {
 
       {list.listing ? (
         <div className="fhint:grid fhint:gap-5">
+          <CronWarning job="posts" />
           <BlogCard blogPosts={list.state?.blog_posts ?? 0} />
           <PostsSection list={list} onEdit={setComposing} />
         </div>

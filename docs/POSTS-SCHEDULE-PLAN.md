@@ -81,5 +81,7 @@ Step-by-step composer, posting one post to several locations, Facebook as a
 channel, "Partly failed" status — in the design, separate from scheduling.
 
 ## 7. Caveat
-WP-Cron runs on visits. A quiet site sends late; the Settings screen should
-recommend a real cron job (`DISABLE_WP_CRON` + system cron).
+WP-Cron runs on visits. A quiet site sends late. Built (step 96): while a
+post is on the schedule and the sweep is more than 20 minutes overdue, the
+Posts screen warns and links to a guide to a real cron job (Premium
+`CronHealth`, free `components/cron/`).

@@ -1,4 +1,4 @@
-import { proRestUrl } from "@/lib/pro";
+import { proRestUrl, proUrl } from "@/lib/pro";
 import { baseApi } from "./baseApi";
 
 /**
@@ -6,13 +6,14 @@ import { baseApi } from "./baseApi";
  * `fhint-premium/v1/reviews/templates` (an absolute URL, so it shares this
  * app's store and nonce). Only called when `hasPro("reviews.templates")`.
  *
- * A template is `{ id, rating, kind, name, text }`; one set is shared by
- * every location.
+ * A template is `{ id, location_name, rating, kind, name, text }`: each
+ * Google listing has its own, so the list is asked for one listing.
  */
 export const reviewTemplatesApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
     getReviewTemplates: builder.query({
-      query: () => `${proRestUrl()}/reviews/templates`,
+      query: ({ locationName }) =>
+        proUrl("/reviews/templates", { location_name: locationName }),
       transformResponse: (response) => response?.data ?? [],
       providesTags: ["ReviewTemplates"],
     }),

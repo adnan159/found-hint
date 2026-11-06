@@ -1144,8 +1144,12 @@ last answered, and the locations reviews can be read for. This is what the
 screen and any dashboard card read; it never measures and never calls Google.
 
 
-Each entry in `locations` is `{ location_name, title, location_id, count }`;
-`location_id` is the FoundHint location the listing belongs to, 0 for none.
+Each entry in `locations` is `{ location_name, title, location_id, count,
+reply }`; `location_id` is the FoundHint location the listing belongs to, 0
+for none. `reply` is `{ location_name, location_city, keyword }` — what a
+reply's `{{location_name}}`, `{{location_city}}` and `{{business_keyword}}`
+become for this listing (`App\Review\ReplyContext`, which Premium's
+auto-reply uses too), `''` where unknown.
 
 ### `POST /reviews/sync`
 
@@ -1153,7 +1157,9 @@ Asks Google for fresh reviews, for one `location_name` or for every synced
 location. Upserts on Google's review id, so a re-read updates rows rather
 than multiplying them, and **marks reviews Google no longer returns as
 removed** — kept for the owner to read, but out of every count the owner is
-judged on.
+judged on. Only a read that reaches Google's last page marks
+removals: a location past 1,000 reviews (20 pages) is read in part, and the
+reviews past that are not taken as gone.
 
 `data` carries the counts (`locations`, `reviews`, `failed`) and `meta.state`
 the refreshed figures, so a screen does not need a second request after a sync.

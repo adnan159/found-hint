@@ -3,6 +3,7 @@ import { __ } from "@wordpress/i18n";
 import RequestError from "@/components/RequestError";
 import ListFooter from "@/components/ListFooter";
 import ReplyDialog from "./components/ReplyDialog";
+import { replyContextFor } from "./lib/replies";
 import ReviewFilters from "./components/ReviewFilters";
 import ReviewList from "./components/ReviewList";
 import ReviewsHeader from "./components/ReviewsHeader";
@@ -36,13 +37,8 @@ export default function Reviews() {
   });
   const [replying, setReplying] = useState(null);
   // Premium's own templates, or the sample set as a preview.
-  const templates = useTemplates();
-  const autoReply = useAutoReply();
-
-  const replyContext = {
-    locationName: list.listing?.title ?? list.current?.name ?? "",
-    locationCity: list.current?.city ?? "",
-  };
+  const templates = useTemplates(list.locationName);
+  const autoReply = useAutoReply(list.locationName);
 
   return (
     <>
@@ -133,8 +129,7 @@ export default function Reviews() {
       {replying ? (
         <ReplyDialog
           review={replying}
-          context={replyContext}
-          templates={templates.templates}
+          context={replyContextFor(list.listings, replying)}
           onClose={() => setReplying(null)}
         />
       ) : null}

@@ -57,7 +57,7 @@ export function ScopePicker({ scope, unanswered, onChange }) {
           ? sprintf(
               /* translators: %d: reviews with no reply yet. */
               __(
-                "Replies to the %d reviews that have no reply yet first, then to new ones as they arrive.",
+                "Replies to new reviews as they arrive, and to the %d that have no reply yet, oldest first.",
                 "foundhint-local-seo",
               ),
               unanswered,

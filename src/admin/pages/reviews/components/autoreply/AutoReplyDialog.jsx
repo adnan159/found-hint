@@ -5,6 +5,7 @@ import { errorText, help } from "@/pages/profile/styles";
 import { dialogButton, primaryAction } from "../../styles";
 import ReviewsDialog from "../ReviewsDialog";
 import RulesGrid from "./RulesGrid";
+import DailyLimit from "./DailyLimit";
 import ScopePicker from "./ScopePicker";
 import { changeCell } from "../../lib/autoReply";
 
@@ -16,6 +17,7 @@ import { changeCell } from "../../lib/autoReply";
  * @param {Object}   props.draft      `{ on, scope, rules, picks }` being edited.
  * @param {Function} props.setDraft   Receives the changed draft.
  * @param {number}   props.unanswered Reviews with no reply yet.
+ * @param {number}   props.olderToday Older reviews answered today.
  * @param {Function} props.templatesFor `(rating, kind)` → templates there.
  * @param {Object}   props.errors     Server messages by field.
  * @param {string}   props.problem    A message not tied to one field.
@@ -28,6 +30,7 @@ export function AutoReplyDialog({
   draft,
   setDraft,
   unanswered,
+  olderToday,
   templatesFor,
   errors,
   problem,
@@ -115,6 +118,15 @@ export function AutoReplyDialog({
         unanswered={unanswered}
         onChange={(scope) => setDraft({ ...draft, scope })}
       />
+
+      {draft.scope === "all" ? (
+        <DailyLimit
+          value={draft.daily_limit}
+          today={olderToday}
+          error={errors.daily_limit}
+          onChange={(limit) => setDraft({ ...draft, daily_limit: limit })}
+        />
+      ) : null}
 
       <RulesGrid
         rules={draft.rules}

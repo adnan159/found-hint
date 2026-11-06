@@ -15,8 +15,9 @@ import CardActions from "./templates/CardActions";
 /**
  * Reply templates, one set per star rating, in the sidebar.
  *
- * With FoundHint Premium (`editable`): the owner's own templates, written,
- * changed and removed here. Without it: the sample set, drawn as it will
+ * With FoundHint Premium (`editable`): the owner's own templates for the
+ * Google listing in the bar — each listing has its own — written, changed
+ * and removed here. Without it: the sample set, drawn as it will
  * work, with the editor as a preview that cannot save.
  *
  * @param {Object} props From `useTemplates()`.
@@ -90,7 +91,7 @@ export function TemplatesCard({
 
       <p className={cn(help, "fhint:m-0")}>
         {__(
-          "Templates are shared by all your locations. Words in curly brackets are swapped for the reviewer's and the location's details when you reply.",
+          "These templates belong to this location — each location has its own. Words in curly brackets are swapped for the reviewer's and the location's details when you reply.",
           "foundhint-local-seo",
         )}
       </p>
