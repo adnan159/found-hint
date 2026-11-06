@@ -5,6 +5,7 @@ import { errorMessage, fieldErrors } from "@/lib/errors";
 import TemplateDialog from "../TemplateDialog";
 import AutoReplyBand from "./AutoReplyBand";
 import AutoReplyDialog from "./AutoReplyDialog";
+import { KINDS, RATINGS, changeCell, needsPick } from "../../lib/autoReply";
 
 /**
  * Auto-reply on the Reviews screen: the band, and — from Set up — the setup
@@ -19,29 +20,28 @@ export function AutoReplySection({ autoReply, templates }) {
   const [draft, setDraft] = useState(null);
   const [adding, setAdding] = useState(null);
   const [error, setError] = useState(null);
-  const countFor = (rating, kind) =>
-    templates.templates.filter((t) => t.rating === rating && t.kind === kind)
-      .length;
+  const templatesFor = (rating, kind) =>
+    templates.templates.filter((t) => t.rating === rating && t.kind === kind);
+  const countFor = (rating, kind) => templatesFor(rating, kind).length;
 
   const open = () => {
-    const { on, scope, rules } = autoReply.state;
+    const { on, scope, rules, picks } = autoReply.state;
 
     setError(null);
-    setDraft({ on, scope, rules });
+    setDraft({ on, scope, rules, picks });
   };
 
   const save = async () => {
-    const empty = [1, 2, 3, 4, 5].some((rating) =>
-      ["comment", "stars"].some(
-        (kind) =>
-          draft.rules[rating][kind] === "template" && !countFor(rating, kind),
+    const missing = RATINGS.some((rating) =>
+      KINDS.some(([kind]) =>
+        needsPick(draft, rating, kind, templatesFor(rating, kind)),
       ),
     );
 
-    if (empty) {
+    if (missing) {
       setError({
         message: __(
-          "Some ratings are set to My templates but have none. Add one or pick another option.",
+          "Some ratings are set to My templates without a template chosen. Choose one, add one, or pick another option.",
           "foundhint-local-seo",
         ),
       });
@@ -79,7 +79,28 @@ export function AutoReplySection({ autoReply, templates }) {
           countFor={countFor}
           editable={templates.editable}
           saving={templates.saving}
-          onSave={templates.save}
+          onSave={async (template) => {
+            const saved = await templates.save(template);
+
+            // The new template is the one this cell sends.
+            if (
+              saved?.id &&
+              saved.rating === adding.rating &&
+              saved.kind === adding.kind
+            ) {
+              setDraft((current) =>
+                changeCell(
+                  current,
+                  adding.rating,
+                  adding.kind,
+                  { pick: saved.id },
+                  [],
+                ),
+              );
+            }
+
+            return saved;
+          }}
           onRemove={templates.remove}
           onClose={() => setAdding(null)}
         />
@@ -90,7 +111,7 @@ export function AutoReplySection({ autoReply, templates }) {
           draft={draft}
           setDraft={setDraft}
           unanswered={autoReply.state?.unanswered ?? 0}
-          countFor={countFor}
+          templatesFor={templatesFor}
           errors={errors}
           problem={problem}
           saving={autoReply.saving}

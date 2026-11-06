@@ -6,9 +6,10 @@ import { baseApi } from "./baseApi";
  * `fhint-premium/v1/reviews/auto-reply` (an absolute URL, so it shares this
  * app's store and nonce). Only called when `hasPro("reviews.auto_reply")`.
  *
- * The state is `{ on, scope, rules, sent, unanswered, replied_ids }`; a
- * rule is `template`, `builtin` or `off` for each rating (1–5) and kind
- * (`comment`, `stars`).
+ * The state is `{ on, scope, rules, picks, sent, unanswered, replied_ids }`;
+ * a rule is `template` or `off` for each rating (1–5) and kind (`comment`,
+ * `stars`), and `picks` holds the template id each `template` rule sends
+ * (0 = none chosen).
  */
 export const autoReplyApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({

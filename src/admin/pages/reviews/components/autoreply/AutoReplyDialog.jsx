@@ -6,16 +6,17 @@ import { dialogButton, primaryAction } from "../../styles";
 import ReviewsDialog from "../ReviewsDialog";
 import RulesGrid from "./RulesGrid";
 import ScopePicker from "./ScopePicker";
+import { changeCell } from "../../lib/autoReply";
 
 /**
  * "Set up auto-reply" (design): the switch, which reviews, and how to reply
  * to each rating and kind. Nothing changes until Save.
  *
  * @param {Object}   props
- * @param {Object}   props.draft      `{ on, scope, rules }` being edited.
+ * @param {Object}   props.draft      `{ on, scope, rules, picks }` being edited.
  * @param {Function} props.setDraft   Receives the changed draft.
  * @param {number}   props.unanswered Reviews with no reply yet.
- * @param {Function} props.countFor   `(rating, kind)` → templates there.
+ * @param {Function} props.templatesFor `(rating, kind)` → templates there.
  * @param {Object}   props.errors     Server messages by field.
  * @param {string}   props.problem    A message not tied to one field.
  * @param {boolean}  props.saving     Saving.
@@ -27,7 +28,7 @@ export function AutoReplyDialog({
   draft,
   setDraft,
   unanswered,
-  countFor,
+  templatesFor,
   errors,
   problem,
   saving,
@@ -38,8 +39,9 @@ export function AutoReplyDialog({
   const replying = [1, 2, 3, 4, 5].reduce(
     (sum, rating) =>
       sum +
-      ["comment", "stars"].filter((kind) => draft.rules[rating][kind] !== "off")
-        .length,
+      ["comment", "stars"].filter(
+        (kind) => draft.rules[rating][kind] === "template",
+      ).length,
     0,
   );
 
@@ -116,17 +118,14 @@ export function AutoReplyDialog({
 
       <RulesGrid
         rules={draft.rules}
-        countFor={countFor}
+        picks={draft.picks}
+        templatesFor={templatesFor}
         errors={errors}
         onAdd={onAdd}
-        onChange={(rating, kind, source) =>
-          setDraft({
-            ...draft,
-            rules: {
-              ...draft.rules,
-              [rating]: { ...draft.rules[rating], [kind]: source },
-            },
-          })
+        onChange={(rating, kind, change) =>
+          setDraft(
+            changeCell(draft, rating, kind, change, templatesFor(rating, kind)),
+          )
         }
       />
     </ReviewsDialog>

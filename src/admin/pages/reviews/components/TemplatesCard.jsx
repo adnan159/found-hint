@@ -55,6 +55,7 @@ export function TemplatesCard({
       )}
       bodyClassName="fhint:gap-3"
     >
+      <CardActions onAdd={() => setEditing("new")} />
       <RequestError error={error} />
       <RatingTabs rating={rating} onChange={setRating} />
 
@@ -86,8 +87,6 @@ export function TemplatesCard({
           </li>
         )}
       </ul>
-
-      <CardActions editable={editable} onAdd={() => setEditing("new")} />
 
       <p className={cn(help, "fhint:m-0")}>
         {__(

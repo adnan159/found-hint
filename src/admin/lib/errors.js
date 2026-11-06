@@ -214,6 +214,8 @@ const MESSAGES = {
       "No templates for this rating yet. Add one, or pick another option.",
       "foundhint-local-seo",
     ),
+  "auto_reply.rule.pick_template": () =>
+    __("Choose which template to send.", "foundhint-local-seo"),
   "review_template.rating.invalid": () =>
     __("Choose a rating from 1 to 5 stars.", "foundhint-local-seo"),
   "review_template.kind.invalid": () =>
@@ -746,6 +748,11 @@ export function errorMessage(error) {
     fhint_post_sending: () =>
       __(
         "This post is being sent to Google right now. Try again in a minute.",
+        "foundhint-local-seo",
+      ),
+    fhintpremium_template_in_use: () =>
+      __(
+        'Auto-reply sends this template. Choose another one for it in "Set up auto-reply" first.',
         "foundhint-local-seo",
       ),
     fhintpremium_blog_post_not_found: () =>

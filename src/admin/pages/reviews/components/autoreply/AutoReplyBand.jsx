@@ -69,7 +69,7 @@ export function AutoReplyBand({ autoReply, onSetUp }) {
                 "foundhint-local-seo",
               )
             : __(
-                "Choose a template or a built-in reply for each star rating, then switch it on.",
+                "Choose a template for each star rating, then switch it on.",
                 "foundhint-local-seo",
               )}
         </span>

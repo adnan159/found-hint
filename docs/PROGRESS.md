@@ -4,7 +4,7 @@
 step finishes: what shipped, and how it was verified — the evidence, not the
 intent. Name any bug the verification caught.
 
-Last updated: step 92. The data layer, its REST API and the admin screens
+Last updated: step 95. The data layer, its REST API and the admin screens
 for everything it covers exist. The Schema Manager is built in FoundHint
 Premium and matches the design (`FoundHint Schema (1).html`): six tabs —
 01 Organization, 02 LocalBusiness, 03 Locations (list, setup, branch
@@ -2958,3 +2958,75 @@ the label (temporary log row, removed). Test data removed; auto-reply left
 off.
 
 How it works, end to end: `docs/AUTO-REPLY.md`.
+
+## Step 94 — Auto-reply: never twice when runs overlap; templates in use
+
+Review of the auto-reply commits (31bd946, Premium d6b5a95) against
+`docs/AUTO-REPLY.md` found two bugs; both fixed in Premium.
+
+1. **A review could be answered twice.** The sender posted the reply, then
+   wrote the log row, so two overlapping runs (a run can outlast WP-Cron's
+   60-second lock) could both answer it — the second overwriting the first,
+   perhaps with another template, and skewing template turns. Now
+   `AutoReplyLog::claim()` takes the review first: the unique-key insert as
+   `sending`, or one conditional update of a `failed` row; only the claimer
+   sends (`AutoReplier::answer()`, public for the test). `due()` skips a
+   review another run is sending; a claim older than 15 minutes
+   (`STUCK_AFTER`) can be taken over. `CreateAutoRepliesTable` documents
+   the `sending` status (no column change).
+2. **Deleting a template could lock the settings.** With a *My templates*
+   rule left without templates, every save — even the band's on/off switch
+   — was refused (`auto_reply.rule.no_templates` checked all ten cells).
+   Now `Templates::delete()` refuses the last template of a rating and kind
+   whose rule uses templates (`409 fhintpremium_template_in_use`, message
+   in `lib/errors.js`), and `AutoReplySettings::save()` checks only the
+   cells a save sets.
+
+**Verified:** Premium auto-reply 63 (+15), mutation-checked — sending
+without the claim, claiming any row, never taking over a dead claim,
+deleting the last template in use, and checking every cell on save each
+fail the suite. Two tests first passed against broken code and were fixed:
+the race test went through `run()`, whose `due()` already skipped the
+claimed review (now `due()` then `answer()`, as two real runs would), and
+a second claim in the same second changed no row so MySQL reported 0 rows
+either way (the first claim is aged 30 s). Templates 31, posts 66 + 17,
+schema 253 + 286, requirements 18; PHPCS, ESLint, both builds clean.
+
+## Step 95 — Auto-reply: one chosen template per rating; no built-in reply
+
+Owner's decisions on auto-reply, built across both plugins:
+
+1. **AI reply, coming soon.** Each cell of "How to reply" lists *AI reply*,
+   disabled, with the *Coming soon* badge (`SoonTag`). The server still
+   refuses `ai`.
+2. **Defaults to Don't reply.** `AutoReplySettings::defaults()` sets every
+   cell `off`.
+3. **No built-in reply.** Removed from the cell options, `SOURCES`,
+   `AutoReplier::choose()` and `ReplyText` (`builtin()` deleted). A saved
+   `builtin` rule reads as `off`, so nothing goes out until the owner
+   chooses again. The table keeps `builtin` on older rows. The manual reply
+   dialog's suggested replies (`lib/replies.js`) are untouched.
+4. **My templates → choose one.** Choosing *My templates* shows a second
+   list with that rating and kind's templates; the chosen id is saved in a
+   new `picks` setting and sent every time (no more taking turns —
+   `AutoReplyLog::template_turns()` removed). One template is chosen at
+   once; "Add one" chooses the new template. Save is refused without a
+   choice (`auto_reply.rule.pick_template`, new in `lib/errors.js`). A
+   chosen template can't be deleted or moved to another rating or kind
+   (`fhintpremium_template_in_use`).
+5. **CSV import removed** from the Reply templates card (`CardActions`),
+   and **Add a template** moved to the top of the card, above the rating
+   tabs.
+
+UI: Base UI selects (`components/ui/select`) in a new `RuleCell.jsx`;
+`RulesGrid` is layout only; helpers in `pages/reviews/lib/autoReply.js`.
+
+**Verified:** Premium auto-reply 75, mutation-checked — skipping the
+rating/kind check on a pick, never treating a template as in use, not
+saving picks, and allowing `builtin` each fail the suite. Templates 31,
+posts 66 + 17, schema 286, requirements 18; PHPCS, ESLint, both builds
+clean. In the browser against a mocked API: defaults all Don't reply; AI
+reply disabled with its badge; the template list shows only that rating
+and kind; Save without a choice is refused; the PUT carries
+`rules` + `picks`; reopening shows the saved choices; "Add one" comes back
+with the new template chosen; no Import from CSV button.
