@@ -20,6 +20,7 @@ import {
   useSetLocationPageMutation,
 } from "@/store/api/schemaManagerApi";
 import { BADGE, ROLES, STATUSES, TONES, issueText } from "../../lib/locations";
+import { panelTitle, sectionTitle } from "../styles";
 
 const SECTION =
   "fhint:grid fhint:gap-2.5 fhint:border-b fhint:border-b-[#f0eeee] fhint:px-5 fhint:py-4";
@@ -38,7 +39,7 @@ function Heading({ number, title, required, requiredBad, children }) {
       <span className="fhint:text-[12px] fhint:font-bold fhint:text-[#D8521F]">
         {number}
       </span>
-      <h3 className="fhint:m-0 fhint:text-[15px] fhint:font-bold">{title}</h3>
+      <h3 className={sectionTitle}>{title}</h3>
       {required ? (
         <span
           className={cn(
@@ -187,10 +188,7 @@ export function BranchSections({
 
       <div className="fhint:flex fhint:flex-wrap fhint:items-center fhint:gap-3 fhint:border-b fhint:border-b-[#e6e3e3] fhint:px-5 fhint:py-4">
         <span className="fhint:flex fhint:min-w-0 fhint:flex-[1_1_260px] fhint:items-center fhint:gap-2">
-          <h2
-            id="fhint-schema-location-title"
-            className="fhint:m-0 fhint:text-[16px] fhint:font-bold"
-          >
+          <h2 id="fhint-schema-location-title" className={panelTitle}>
             {name}
           </h2>
           <Hint

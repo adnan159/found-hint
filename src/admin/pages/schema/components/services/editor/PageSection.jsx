@@ -1,3 +1,4 @@
+import { FileTextIcon } from "lucide-react";
 import { useState } from "react";
 import { __, sprintf } from "@wordpress/i18n";
 import { cn } from "cn";
@@ -63,7 +64,7 @@ export function PageSection({ form, resolved, pageTitle, usedBy, warnings }) {
 
   return (
     <EditorSection
-      number="04"
+      icon={FileTextIcon}
       title={__("Service page", "foundhint-local-seo")}
       hint={__(
         "The page about this service. The schema is printed there, and its address becomes the service's identity.",

@@ -35,6 +35,7 @@ import {
 } from "../../lib/locations";
 import LocationSetup from "./LocationSetup";
 import SeparatePanel from "./SeparatePanel";
+import { panelTitle } from "../styles";
 
 // The design's columns: location, role, page, output, warnings, actions.
 const COLUMNS =
@@ -163,9 +164,7 @@ export function LocationList({ roster, syncedAt, onEdit, onOpenMain }) {
           <MapPinIcon className="fhint:size-[18px]" />
         </span>
         <span className="fhint:grid fhint:min-w-0 fhint:flex-[1_1_360px] fhint:gap-0.5">
-          <h2 className="fhint:m-0 fhint:text-[15px] fhint:font-bold">
-            {rosterSummary(roster)}
-          </h2>
+          <h2 className={panelTitle}>{rosterSummary(roster)}</h2>
           <span className="fhint:text-[12.5px] fhint:text-[#625e5e]">
             {syncLine}
           </span>

@@ -4,7 +4,7 @@
 step finishes: what shipped, and how it was verified — the evidence, not the
 intent. Name any bug the verification caught.
 
-Last updated: step 92. The data layer, its REST API and the admin screens
+Last updated: step 101. The data layer, its REST API and the admin screens
 for everything it covers exist. The Schema Manager is built in FoundHint
 Premium and matches the design (`FoundHint Schema (1).html`): six tabs —
 01 Organization, 02 LocalBusiness, 03 Locations (list, setup, branch
@@ -2882,3 +2882,361 @@ posts scheduled before the licence lapsed (while the screen said they wait
 for Premium). `Scheduler::run()` now returns early without a licence; posts
 stay scheduled and go out once it is back. Premium database 66 (+3); with
 the guard removed the new checks fail. PHPCS clean.
+
+## Step 82 — Review reply templates work with Premium
+
+Before: without Premium the Reviews screen drew the full templates card
+from sample data (a preview that could not save); with Premium it showed a
+placeholder ("FoundHint Premium X is active"), and Premium had no template
+code. Now Premium stores and serves them, and the same card works for real.
+
+**Premium:** table `fhintpremium_review_templates` (DB 1.1.0); rules in
+`App\Review\Templates` (rating 1–5, kind comment|stars, name ≤ 100, reply ≤
+4096, ≤ 20 per rating and kind, per-field `review_template.*` codes); routes
+`GET/POST reviews/templates`, `PUT/DELETE reviews/templates/{id}`, licence
+required. Templates are shared by every location (owner's choice). The table
+goes on uninstall only with "Delete data on uninstall" on.
+
+**Free:** `hooks/useTemplates` gives the card and the reply dialog the
+owner's templates with Premium, or the samples without. The card (split per
+the 150-line rule into `templates/RatingTabs`, `TemplateItem`,
+`TemplateCount`, `CardActions`, `TemplateFields`, `InsertDetail`,
+`DialogFooter`) adds, edits and deletes (delete asks once); the server's
+messages show under each field; the reply dialog's quick templates are the
+owner's. `ProTemplatesCard` is removed. The help line now says templates are
+shared by all locations. Import from CSV stays disabled ("coming soon").
+
+**Verified:** Premium database `templates.php` 31 (dbDelta idempotent, every
+rule, the limit and the other kind's own 20, moving into a full rating,
+404s, routes with and without a licence, uninstall keeping or dropping the
+table), mutation-tested (limit off by one, kind unchecked, no text maximum,
+moving into a full rating, uninstall ignoring the setting, order). Browser
+with Premium: empty save showed "Give the template a name." / "Write the
+reply."; a template saved, filled the reply dialog ("Hi shahjalal, thank you
+for visiting us!" — not sent), was renamed and deleted (list back to empty);
+without Premium the sample preview, Save disabled, no Delete.
+
+## Step 83 — Review auto-reply (without AI)
+
+From the FHReviews design (`Product roadmap priorities – FHReviews.html`),
+everything except the AI parts, which come later.
+
+**Premium:** `AutoReplier` (WP-Cron every 10 minutes while on: sync reviews,
+answer the due ones through the free `ReviewReply::save()`), `AutoReplySettings`
+(on, scope new|all, rules per rating × comment|stars = template|builtin|off),
+`ReplyText` (built-in replies + placeholders, mirroring `lib/replies.js`),
+`AutoReplyLog` + table `fhintpremium_auto_replies` (one row per review; sent
+count; retries up to 3), route `GET/PUT reviews/auto-reply`, feature
+`reviews.auto_reply`. DB 1.2.0; deactivation clears the event; uninstall
+removes the option (and the table with "Delete data on uninstall").
+
+**Free:** the band on Reviews (Active/Paused, sent count, Set up, a switch
+that saves at once; without Premium a Premium pill and Unlock/Activate), the
+"Set up auto-reply" dialog (switch, Which reviews, the How to reply grid with
+My templates / Built-in reply / Don't reply, "N templates take turns", "No
+templates yet. Add one" opening the template editor and coming back with the
+draft kept, the 1–2 star advice, "N of 10 review kinds get a reply"), and
+"Sent by auto-reply" on replies it wrote. Left out: AI reply, AI writing
+style, AI credits.
+
+**Bug fixed on the way (both sides):** filling a reply for an anonymous
+reviewer left "Thanks for the 4 stars,!" and ", we're sorry…"; a comma
+before `!.?` and a leading comma are now removed, and the first letter
+capitalised.
+
+**Verified:** Premium `autoreply.php` 48 (defaults, every validation, `since`
+on switch-on, first names and empty placeholders, due reviews by scope /
+rule / rating / removed / replied / limit / order, template rotation, a run
+putting both replies to Google with the right text, nothing twice, failure
+logged and retried to the limit, off and no-licence send nothing, schedule
+follows the switch, route and uninstall), mutation-tested (scope ignored,
+retry forever, answering twice, no rotation, no licence check, newest
+first, template rule unchecked, `since` not set). Browser (real admin): the
+band, the dialog, Add one → template saved → back with the rule kept, Save
+while off, the switch on and straight off (no event left, nothing sent),
+the label (temporary log row, removed). Test data removed; auto-reply left
+off.
+
+How it works, end to end: `docs/AUTO-REPLY.md`.
+
+## Step 94 — Auto-reply: never twice when runs overlap; templates in use
+
+Review of the auto-reply commits (31bd946, Premium d6b5a95) against
+`docs/AUTO-REPLY.md` found two bugs; both fixed in Premium.
+
+1. **A review could be answered twice.** The sender posted the reply, then
+   wrote the log row, so two overlapping runs (a run can outlast WP-Cron's
+   60-second lock) could both answer it — the second overwriting the first,
+   perhaps with another template, and skewing template turns. Now
+   `AutoReplyLog::claim()` takes the review first: the unique-key insert as
+   `sending`, or one conditional update of a `failed` row; only the claimer
+   sends (`AutoReplier::answer()`, public for the test). `due()` skips a
+   review another run is sending; a claim older than 15 minutes
+   (`STUCK_AFTER`) can be taken over. `CreateAutoRepliesTable` documents
+   the `sending` status (no column change).
+2. **Deleting a template could lock the settings.** With a *My templates*
+   rule left without templates, every save — even the band's on/off switch
+   — was refused (`auto_reply.rule.no_templates` checked all ten cells).
+   Now `Templates::delete()` refuses the last template of a rating and kind
+   whose rule uses templates (`409 fhintpremium_template_in_use`, message
+   in `lib/errors.js`), and `AutoReplySettings::save()` checks only the
+   cells a save sets.
+
+**Verified:** Premium auto-reply 63 (+15), mutation-checked — sending
+without the claim, claiming any row, never taking over a dead claim,
+deleting the last template in use, and checking every cell on save each
+fail the suite. Two tests first passed against broken code and were fixed:
+the race test went through `run()`, whose `due()` already skipped the
+claimed review (now `due()` then `answer()`, as two real runs would), and
+a second claim in the same second changed no row so MySQL reported 0 rows
+either way (the first claim is aged 30 s). Templates 31, posts 66 + 17,
+schema 253 + 286, requirements 18; PHPCS, ESLint, both builds clean.
+
+## Step 95 — Auto-reply: one chosen template per rating; no built-in reply
+
+Owner's decisions on auto-reply, built across both plugins:
+
+1. **AI reply, coming soon.** Each cell of "How to reply" lists *AI reply*,
+   disabled, with the *Coming soon* badge (`SoonTag`). The server still
+   refuses `ai`.
+2. **Defaults to Don't reply.** `AutoReplySettings::defaults()` sets every
+   cell `off`.
+3. **No built-in reply.** Removed from the cell options, `SOURCES`,
+   `AutoReplier::choose()` and `ReplyText` (`builtin()` deleted). A saved
+   `builtin` rule reads as `off`, so nothing goes out until the owner
+   chooses again. The table keeps `builtin` on older rows. The manual reply
+   dialog's suggested replies (`lib/replies.js`) are untouched.
+4. **My templates → choose one.** Choosing *My templates* shows a second
+   list with that rating and kind's templates; the chosen id is saved in a
+   new `picks` setting and sent every time (no more taking turns —
+   `AutoReplyLog::template_turns()` removed). One template is chosen at
+   once; "Add one" chooses the new template. Save is refused without a
+   choice (`auto_reply.rule.pick_template`, new in `lib/errors.js`). A
+   chosen template can't be deleted or moved to another rating or kind
+   (`fhintpremium_template_in_use`).
+5. **CSV import removed** from the Reply templates card (`CardActions`),
+   and **Add a template** moved to the top of the card, above the rating
+   tabs.
+
+UI: Base UI selects (`components/ui/select`) in a new `RuleCell.jsx`;
+`RulesGrid` is layout only; helpers in `pages/reviews/lib/autoReply.js`.
+
+**Verified:** Premium auto-reply 75, mutation-checked — skipping the
+rating/kind check on a pick, never treating a template as in use, not
+saving picks, and allowing `builtin` each fail the suite. Templates 31,
+posts 66 + 17, schema 286, requirements 18; PHPCS, ESLint, both builds
+clean. In the browser against a mocked API: defaults all Don't reply; AI
+reply disabled with its badge; the template list shows only that rating
+and kind; Save without a choice is refused; the PUT carries
+`rules` + `picks`; reopening shows the saved choices; "Add one" comes back
+with the new template chosen; no Import from CSV button.
+
+## Step 96 — Cron health: warn when background jobs stop
+
+WP-Cron runs only on site requests, so on a quiet site, behind a full-page
+cache, or where the site can't call itself, auto-reply and scheduled posts
+stop without a word. Action Scheduler was considered and rejected: it
+needs the same requests, or a server cron, to run.
+
+- **Premium** `App/Core/CronHealth.php`: `seen( $job )` records each run
+  (first thing in `AutoReplier::run()` and `Scheduler::run()`, before the
+  licence check); `state()` reports per job `last_run`, `next_run` and
+  `late` — WP-Cron's next run is over 20 minutes past and the job has work
+  (auto-reply on / a post scheduled; asked only when overdue) — plus `disabled`
+  (`DISABLE_WP_CRON`) and the site's `cron_url`. Sent as `pro.cron` in the
+  bootstrap data; the option is removed on uninstall.
+- **Free**: `components/cron/CronWarning.jsx` (amber warning: "Auto-reply
+  has not checked for reviews in 3 hours.", **How to fix**) under the
+  auto-reply band and at the top of Posts; `CronGuide.jsx` (host cron line
+  for this site with Copy, a free online cron service, `DISABLE_WP_CRON`);
+  `lib/cron.js`. Nothing shows while jobs run on time.
+
+**Verified:** Premium `tests/Integration/cron.php` 14 and the
+requirements smoke test 19 (AppData carries `cron`), mutation-checked —
+no grace period, warning without work, recording the run after the
+licence check, and posts never "needed" each fail. Auto-reply 75, posts
+66 + 17, templates 31; PHPCS, ESLint, both builds clean. Browser (mocked
+API): the warning on Reviews and Posts with the right wording and hours,
+the guide with the site's own cron line, and no warning when on time.
+
+## Step 97 — Auto-reply: large backlogs
+
+A load test (1,000 unanswered reviews, Google faked) showed auto-reply
+works at that size, but three things would hurt on a real host. All three
+fixed, plus a bug found on the way.
+
+1. **Bug (free): a capped read marked reviews removed.** `ReviewSync`
+   called `mark_removed_for_location()` after its 20-page cap, so on a
+   location with more than 1,000 reviews every older stored review was
+   marked removed. Now only a read that reaches the last page marks
+   removals. New `$max_pages` argument on `ReviewSync::run()` (clamped to
+   1–20). Covered by the new `tests/Integration/review-sync.php` (10).
+2. **Light reads (Premium).** Auto-reply reads the newest 2 pages
+   (`QUICK_PAGES`) on most runs and every page once a day
+   (`AutoReplyState`, option `fhintpremium_auto_reply_state`) — about 2
+   Google requests a run instead of up to 20 per location.
+3. **Time budget (Premium).** A run stops sending after 20 s
+   (`TIME_BUDGET`, filter `fhintpremium_auto_reply_time_budget`), always
+   after at least one; the rest go next run.
+4. **Daily limit for older reviews.** New setting `daily_limit` (0 | 25 |
+   50 | **100** | 200; `auto_reply.daily_limit.invalid`) shown as "Older
+   reviews per day" (`DailyLimit.jsx`) under *New and unanswered*, with
+   today's count (`older_today`). `due()` now puts new reviews first, then
+   older ones up to what is left of the day's limit.
+
+**Verified:** Premium auto-reply 95, mutation-checked — no budget, a
+budget that can send nothing, the limit ignored, older reviews first, not
+counting older replies, always a full read, the full read not recorded,
+and (free) a capped read marking removals each fail it. Free review-sync
+10, mutation-checked (always removing, ignoring the page limit, no clamp).
+All smoke suites, both PHPCS, ESLint and builds clean. Browser (mocked
+API): the limit appears with *New and unanswered*, defaults to 100 a day,
+and saves `daily_limit`.
+
+**Load test** (1,000 older reviews, no daily limit, Google faked, with
+reads): at 0.5 s a request, 51 runs, all answered once, about 11 s and
+48 MB a run, the full-read run stopping at 20 s after 19 replies.
+At 1 s a request: 57 runs, all answered once, about 20 s a run (the budget
+holding every run to 18 replies, the full-read run to 1), 48 MB.
+
+## Step 98 — Reply placeholders: right values, no broken replies
+
+A check of every placeholder against real reviews found five problems;
+all fixed, in both the server filler (Premium `ReplyText`, auto-reply) and
+the reply dialog's (`lib/replies.js`), which agree on 17 compared cases.
+
+1. **`{{business_keyword}}` was always empty.** Now the linked location's
+   category, else the business's, read mid-sentence ("dentist"); none for a
+   listing not linked to FoundHint (it may be another business).
+2. **`{{location_city}}` was empty for an unlinked listing.** Now falls
+   back to the city on Google's address (`storefrontAddress.locality`,
+   new `GoogleLocationRepository::payload()`).
+   Both come from the new free `App\Review\ReplyContext`, sent to the
+   Reviews screen as `locations[].reply`. The reply dialog now fills from
+   the **review's own listing**, not the location in the bar.
+3. **Typos.** `{{ reviewer_name }}` was posted with its braces and
+   `{{name}}` vanished. Now spaces and capitals are accepted, and a
+   template with an unknown placeholder is not saved
+   (`review_template.text.unknown_placeholder`).
+4. **Lower-case names** ("shahjalal") now get their capital.
+5. **Google's limit**: `{{review_text}}` is shortened with "…" (whole
+   letters) when the reply would pass 4,096 bytes.
+
+A value still missing (no city anywhere, an unlinked listing's keyword)
+would break the sentence, so **auto-reply does not send that reply**: it is
+logged failed with the reason (`ReplyText::missing()`, Logger event
+`auto_reply.missing_value`) and retried up to 3 attempts. The reply dialog
+fills it and says which detail was left out (`reply/QuickTemplates.jsx`).
+`ReplyDialog.jsx` was split (`QuickTemplates`, `ReplyField`, `ReviewQuote`)
+from 239 to 146 lines.
+
+**Verified:** Premium `tests/Smoke/reply-text.php` 24, mutation-checked
+(no capital, no spaces, case-sensitive, no cut, city not required, unknown
+check without trimming, keyword not lowered); free `review-sync.php` 17
+with `ReplyContext` (no Google-city fallback, keyword for unlinked
+listings, business over location each fail). PHP and JS fillers compared
+on 17 cases: identical.
+
+## Step 99 — Test suites must not touch the site's Google connection
+
+The 1,000-review load test (step 97) wrote fake Google tokens into the real
+options table for 30 minutes (a swapped `$wpdb->prefix` does not swap
+`$wpdb->options`). At 08:48 a real WP-Cron run on the dev site used them;
+Google refused, `Connection` logged `google.grant_revoked` and cleared the
+tokens; the test's restore then did nothing (its cached copy said the row
+existed, so `update_option()` ran an UPDATE on a deleted row). The dev site
+lost its Google connection — reconnect it on the Google screen.
+
+Fixed in every database suite that fakes Google (`review-sync.php`,
+Premium `autoreply.php`, `posts.php`): tokens are kept in memory through
+`pre_option_` / `pre_update_option_fhint_google_tokens`, never written, and
+`fhint_google_tokens` is no longer restored (it is never touched). Restores
+now `wp_cache_flush()` first (also `cron.php`). `posts.php` restores
+`fhintpremium_cron_seen`, which its sender run writes. Verified: with the
+real token row absent, all five suites pass and the row is still absent
+afterwards. The rule is in `CLAUDE.md`.
+
+## Step 100 — Auto-reply and templates per Google listing
+
+Owner's decision: each location's auto-reply is its own — enabling it, its
+rules and its templates for one Google listing must not affect another.
+Chosen: a template library per listing; settings follow the location bar.
+
+- **Templates (Premium DB 1.3.0)**: new `location_name` column (+ key);
+  limit 20 per listing, rating and kind; a template must name a listing
+  FoundHint has read (`review_template.location.invalid`) and never moves to
+  another. `GET reviews/templates?location_name=` (none without one).
+  Upgrade `Installer::templates_to_listings()` copies each older template
+  to every listing (first keeps it), idempotent.
+- **Settings**: `AutoReplySettings` holds `{ listings: { name: set } }` —
+  `get( $name )`, `save( $name, … )` (`auto_reply.location.invalid`),
+  `enabled()`, `any_on()`. A pick must be the listing's own template.
+  Older single settings are not carried over: each listing is switched on
+  on its own. `AutoReplyState` counts the daily limit per listing;
+  `AutoReplyLog::sent_count( $name )`.
+- **Sender**: reads Google only for listings that are on; `due()` takes
+  the enabled sets and answers each review by its listing's set.
+- **Route**: `reviews/auto-reply?location_name=` (always returns `listings[]`
+  in brief); PUT requires `location_name`.
+- **UI**: `useTemplates( locationName )`, `useAutoReply( locationName )`
+  follow the bar's listing; the reply dialog loads the review's own
+  listing's templates; a new template carries the listing.
+  A location with no Google listing has no Reviews screen, so a listing must
+  be linked to a FoundHint location to be set up (an "all listings" summary
+  was built, found unreachable, and removed).
+
+**Verified:** Premium auto-reply 118 (+18: one listing on leaves another
+off; settings for an unknown listing refused; another listing's template
+refused even of the same rating; each listing answered with its own
+template; switching one off leaves the other on and sends nothing for it;
+daily counts per listing; GET summary; PUT without a listing refused; the
+template copy and its re-run), templates 38. Mutations caught: any
+listing's template accepted, every listing treated as on (with the due()
+guard also removed), shared template limit, GET ignoring the listing,
+migration not copying, a shared daily count. Browser (mocked API): the bar's
+listing drives the band, templates and the switch's PUT
+(`location_name: locations/1`); a new template is saved with its listing.
+Dev site upgraded: its template exists once per listing; dbDelta clean;
+auto-reply off for both listings until switched on.
+
+**Fix after step 100 — "No route was found" on plain permalinks.** The new
+`?location_name=` queries were appended to the Premium base with a raw `?`;
+on a site with plain permalinks the base is already
+`index.php?rest_route=/fhint-premium/v1`, so the second `?` made WordPress
+answer `rest_no_route` (templates and auto-reply could not load or save).
+New `proUrl( path, params )` in `lib/pro.js` (moved from
+`schemaManagerApi`) picks `&` or `?` from the base; `autoReplyApi` and
+`reviewTemplatesApi` use it. Verified on the dev site (plain permalinks):
+the old shape answers 404 `rest_no_route`, the new one reaches the route.
+The mocked browser harness uses pretty URLs, which is why it passed —
+check Premium query strings against a plain-permalink site.
+
+**Templates card copy.** It still said "Templates are shared by all your
+locations"; it now says they belong to this location and each location has
+its own. Checked in the harness with two linked locations: switching the
+location in the bar reloads that location's templates and auto-reply
+settings (`?location_name=locations/1` → `locations/2`) without a page
+reload.
+
+## Step 101 — Release FoundHint 1.2.3 and Premium 1.0.2
+
+Versions bumped in each plugin's header and constant, `package.json`,
+`package-lock.json` and `readme.txt` (stable tag). Premium's
+`FHINTPREMIUM_MIN_FREE_VERSION` is now 1.2.3 (the per-location screens,
+`ReplyContext` and short review reads); its readme says so. Changelogs and
+FoundHint's upgrade notice cover auto-reply and per-location templates, the
+cron warning, the placeholder fixes, the review-sync fix, the CSV import
+removal, the Schema screen refresh (356b8cf) and Premium's uninstall fix
+(004051d). FoundHint's feature list gains review auto-reply (Premium), and
+"Coming soon" now names AI review replies instead.
+
+**Verified:** all smoke and database suites, both PHPCS, ESLint and the
+build pass; the dev site reports FoundHint 1.2.3 / Premium 1.0.2 with no
+requirements problem. Release order: FoundHint 1.2.3 first.
+
+**No sample templates without Premium** (merged into 1.2.3).
+`useTemplates()` returns none without `reviews.templates`;
+`sampleTemplates()` is gone from `lib/templates.js`. The Reply templates
+card shows `TemplatesUpsell` (what templates do, Unlock with Premium /
+Activate licence) instead of tabs and a list, and the reply dialog offers
+only the built-in reply. Checked in the harness with Premium off and on.

@@ -33,7 +33,7 @@ export function SubtypePicker({
     (type ? { type, label: typeLabel || type } : null);
 
   return (
-    <div className="fhint:grid fhint:gap-1.5 fhint:border-b fhint:border-b-border fhint:px-5 fhint:py-4">
+    <div className="fhint:grid fhint:gap-1.5 fhint:border-b fhint:border-b-border fhint:p-5">
       <div className="fhint:flex fhint:flex-wrap fhint:items-center fhint:gap-2">
         <label htmlFor={id} className={label}>
           {__("Business subtype", "foundhint-local-seo")}

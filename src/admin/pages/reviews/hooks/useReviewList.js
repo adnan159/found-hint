@@ -68,6 +68,7 @@ export function useReviewList() {
   return {
     current,
     listing,
+    listings,
     locationName,
     query,
     filters,

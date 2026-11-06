@@ -24,6 +24,10 @@ Free/Premium split and every checklist are in
 [`docs/SCHEMA-PLAN.md`](docs/SCHEMA-PLAN.md); open items are unticked there.
 See `docs/PROGRESS.md` for exactly what is done and how it was verified.
 
+**Review auto-reply (built; Premium, no AI yet):** how a reply is chosen,
+sent and recorded, and where each part lives —
+[`docs/AUTO-REPLY.md`](docs/AUTO-REPLY.md).
+
 The sibling `local-seo` plugin in this same directory is the reference for
 the *product*: its `docs/DATABASE.md`, `API.md` and `FEATURES.md` describe
 the model and the features this plugin grows into. Take the requirements
@@ -67,6 +71,10 @@ docker exec foundhunt_app php \
   /var/www/html/wp-content/plugins/found-hint/tests/Integration/database.php
 ```
 
+`tests/Integration/review-sync.php` covers reading reviews from Google
+(Google answered in-process): short reads, the page cap, and when a review
+is marked removed.
+
 The site is `foundhunt_app` in Docker — `http://localhost:8100`, phpMyAdmin
 on `:8101`. That suite covers dbDelta idempotency, every repository round
 trip, the cascades, plan limits and capability denial. **It runs against
@@ -74,6 +82,15 @@ its own tables**: it swaps `$wpdb->prefix`, since `Tables::name()` reads the
 prefix at call time, then drops them and restores the options it stamped.
 Keep it that way — a verification suite that eats the developer's own data
 gets run once and then never again.
+
+**Options are not swapped with the prefix** — `$wpdb->options` is fixed at
+load, so a suite writes the site's real options. Never put fake Google
+tokens there: a real request on the site (WP-Cron) picked them up once,
+Google refused them, and the owner's connection was cleared. Keep them in
+memory with `pre_option_fhint_google_tokens` /
+`pre_update_option_fhint_google_tokens` (see `review-sync.php`), and call
+`wp_cache_flush()` before restoring options, so a restore is never skipped
+because another request changed the row meanwhile.
 
 Two rules divide cleanly between them, and it is worth knowing which owns
 which: the **two-space `PRIMARY KEY  (id)`** rule is static
@@ -327,6 +344,10 @@ route in `routes.jsx` and an entry in the sidebar; do not add
   errors without a browser — and load the real bundle in a browser against
   a mocked API before calling a screen done. The select bug below survived
   a clean build, a clean lint and a passing SSR render.
+- **Build Premium URLs with query strings through `proUrl()`** (`lib/pro.js`),
+  free ones through `withQuery()` (`store/api/baseApi.js`). On plain
+  permalinks the base already holds `?rest_route=`, and a second `?` is a
+  404 `rest_no_route`.
 - **Never pass `undefined` as a controlled component's value.** Base UI
   treats `undefined` as "uncontrolled" on first render and then ignores the
   real value when it arrives, so a saved value shows as the placeholder

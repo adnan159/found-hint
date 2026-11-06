@@ -99,31 +99,128 @@ export function builtInReply(review, context) {
 }
 
 /**
+ * What a review's placeholders become: from its own Google listing (the
+ * Reviews state's `locations[].reply`, built by `ReplyContext` on the
+ * server) — not the location in the bar, which may be "all".
+ *
+ * @param {Object[]} listings The Reviews state's locations.
+ * @param {Object}   review   The review.
+ * @return {{locationName: string, locationCity: string, keyword: string}}
+ */
+export function replyContextFor(listings, review) {
+  const reply =
+    (listings ?? []).find((item) => item.location_name === review.location_name)
+      ?.reply ?? {};
+
+  return {
+    locationName: reply.location_name ?? "",
+    locationCity: reply.location_city ?? "",
+    keyword: reply.keyword ?? "",
+  };
+}
+
+/**
  * Swap the placeholders in a reply for this review's details. One with no
  * value here — no city yet — is taken out, rather than left in curly
- * brackets on a public reply.
+ * brackets on a public reply. `{{ Reviewer_Name }}` reads as
+ * `{{reviewer_name}}`. When `{{review_text}}` would push the reply past
+ * Google's limit, the review's words are shortened to fit.
+ *
+ * Premium's `ReplyText::fill()` does the same for auto-reply — change both
+ * together.
  */
 export function fillPlaceholders(text, review, context = {}) {
-  const firstName = firstNameOf(review);
   const values = {
-    reviewer_name: firstName,
+    reviewer_name: firstNameOf(review),
     location_name: context.locationName ?? "",
     location_city: context.locationCity ?? "",
     business_keyword: context.keyword ?? "",
     rating: String(review.star_rating ?? ""),
     review_text: String(review.comment ?? ""),
   };
+  const filled = fillWith(text, values);
+  const over = bytes(filled) - MAX_BYTES;
 
-  return String(text)
-    .replace(/\{\{(\w+)\}\}/g, (_, key) => values[key] ?? "")
+  if (over <= 0 || !values.review_text) {
+    return filled;
+  }
+
+  return fillWith(text, {
+    ...values,
+    review_text:
+      cutBytes(
+        values.review_text,
+        bytes(values.review_text) - over - bytes("…"),
+      ) + "…",
+  });
+}
+
+/** Placeholders that cannot be left out without breaking the sentence. */
+const REQUIRED = [
+  "location_name",
+  "location_city",
+  "business_keyword",
+  "review_text",
+];
+
+/**
+ * The placeholders a text uses whose value, for this review, is missing
+ * and cannot just be left out ("in {{location_city}}" with no city reads
+ * "in."). Premium's `ReplyText::missing()` decides the same for
+ * auto-reply, which does not send such a reply.
+ *
+ * @return {string[]} Names, e.g. `location_city`.
+ */
+export function missingValues(text, review, context = {}) {
+  const values = {
+    location_name: context.locationName ?? "",
+    location_city: context.locationCity ?? "",
+    business_keyword: context.keyword ?? "",
+    review_text: String(review.comment ?? "").trim(),
+  };
+  const used = [...String(text).matchAll(/\{\{\s*(\w+)\s*\}\}/g)].map(
+    ([, key]) => key.toLowerCase(),
+  );
+
+  return [
+    ...new Set(used.filter((key) => REQUIRED.includes(key) && !values[key])),
+  ];
+}
+
+function fillWith(text, values) {
+  // An empty value leaves stray punctuation: "stars, !" or ", we're".
+  const filled = String(text)
+    .replace(
+      /\{\{\s*(\w+)\s*\}\}/g,
+      (_, key) => values[key.toLowerCase()] ?? "",
+    )
     .replace(/\s+([,.!?])/g, "$1")
+    .replace(/,(\s*[.!?])/g, "$1")
+    .replace(/^[\s,]+/, "")
     .replace(/ {2,}/g, " ")
     .trim();
+
+  return filled.charAt(0).toUpperCase() + filled.slice(1);
+}
+
+/** The longest start of a text that fits in `max` bytes, whole letters only. */
+function cutBytes(text, max) {
+  let out = "";
+
+  for (const letter of text) {
+    if (bytes(out + letter) > max) {
+      break;
+    }
+    out += letter;
+  }
+
+  return out.trimEnd();
 }
 
 /**
  * The name to greet a reviewer by: their first name, or nothing for an
- * anonymous one.
+ * anonymous one. "IMAM" reads as shouting and "imam" as careless: both
+ * become "Imam".
  */
 export function firstNameOf(review) {
   if (review.is_anonymous || !review.reviewer_name) {
@@ -131,11 +228,12 @@ export function firstNameOf(review) {
   }
 
   const first = String(review.reviewer_name).trim().split(/\s+/)[0];
+  const tidy =
+    first === first.toUpperCase() && first.length > 1
+      ? first.charAt(0) + first.slice(1).toLowerCase()
+      : first;
 
-  // "IMAM" reads as shouting in a reply; "Imam" does not.
-  return first === first.toUpperCase() && first.length > 1
-    ? first.charAt(0) + first.slice(1).toLowerCase()
-    : first;
+  return tidy.charAt(0).toUpperCase() + tidy.slice(1);
 }
 
 /**
