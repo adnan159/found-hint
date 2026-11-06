@@ -3233,3 +3233,10 @@ removal, the Schema screen refresh (356b8cf) and Premium's uninstall fix
 **Verified:** all smoke and database suites, both PHPCS, ESLint and the
 build pass; the dev site reports FoundHint 1.2.3 / Premium 1.0.2 with no
 requirements problem. Release order: FoundHint 1.2.3 first.
+
+**No sample templates without Premium** (merged into 1.2.3).
+`useTemplates()` returns none without `reviews.templates`;
+`sampleTemplates()` is gone from `lib/templates.js`. The Reply templates
+card shows `TemplatesUpsell` (what templates do, Unlock with Premium /
+Activate licence) instead of tabs and a list, and the reply dialog offers
+only the built-in reply. Checked in the harness with Premium off and on.

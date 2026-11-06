@@ -416,7 +416,7 @@ No. Google is never contacted on visitor-facing pages, and no scripts or stylesh
 * Improvement: The reply dialog says when a detail such as the city was left out, so you can reword before publishing.
 * Improvement: Refreshed layout for the Schema screen's Business, Locations, Services and Settings tabs.
 * Fix: On a location with more than 1,000 reviews, reading reviews no longer marks the older ones as removed.
-* Removed: The "Import from CSV" button on the Reply templates card.
+* Removed: The "Import from CSV" button on the Reply templates card, and the sample reply templates shown without FoundHint Premium. Without Premium, the card now explains templates and links to Premium.
 
 = 1.2.2 =
 * New: Schedule posts for a date and time, in your site's time zone, with FoundHint Premium. Scheduled posts show when they go live, and can be changed, published now or cancelled back to a draft.

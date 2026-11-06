@@ -11,14 +11,14 @@ import RatingTabs from "./templates/RatingTabs";
 import TemplateItem from "./templates/TemplateItem";
 import TemplateCount from "./templates/TemplateCount";
 import CardActions from "./templates/CardActions";
+import TemplatesUpsell from "./templates/TemplatesUpsell";
 
 /**
  * Reply templates, one set per star rating, in the sidebar.
  *
  * With FoundHint Premium (`editable`): the owner's own templates for the
  * Google listing in the bar — each listing has its own — written, changed
- * and removed here. Without it: the sample set, drawn as it will
- * work, with the editor as a preview that cannot save.
+ * and removed here. Without it: no templates, and a way to Premium.
  *
  * @param {Object} props From `useTemplates()`.
  */
@@ -45,17 +45,27 @@ export function TemplatesCard({
       (template) => template.rating === stars && template.kind === kind,
     ).length;
 
+  const panel = {
+    icon: MessageSquareTextIcon,
+    title: __("Reply templates", "foundhint-local-seo"),
+    description: __(
+      "Ready-made replies for each star rating.",
+      "foundhint-local-seo",
+    ),
+    bodyClassName: "fhint:gap-3",
+  };
+
+  // Without Premium there are no templates to show: say what they do.
+  if (!editable) {
+    return (
+      <Panel {...panel} after={<SoonTag kind="pro" />}>
+        <TemplatesUpsell />
+      </Panel>
+    );
+  }
+
   return (
-    <Panel
-      icon={MessageSquareTextIcon}
-      title={__("Reply templates", "foundhint-local-seo")}
-      after={editable ? null : <SoonTag kind="pro" />}
-      description={__(
-        "Ready-made replies for each star rating.",
-        "foundhint-local-seo",
-      )}
-      bodyClassName="fhint:gap-3"
-    >
+    <Panel {...panel}>
       <CardActions onAdd={() => setEditing("new")} />
       <RequestError error={error} />
       <RatingTabs rating={rating} onChange={setRating} />
