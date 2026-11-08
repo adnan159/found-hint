@@ -3301,3 +3301,8 @@ Plugin Check on the release build: the offloading error on
 `PostMedia::is_temporary()` is a string test on a Google URL, nothing is
 loaded; the 85 `UnescapedDBParameter` warnings are table names from
 `Tables::name()`.
+
+**Release 1.2.4.** Version bumped in the header, `FHINT_VERSION`,
+`package.json` and the readme's stable tag; changelog and upgrade notice
+cover the fixes above and the WordPress 6.6 requirement. Premium is
+unchanged (it does not need 1.2.4).

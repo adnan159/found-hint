@@ -4,7 +4,7 @@ Tags: local seo, google business profile, local business schema, multi location,
 Requires at least: 6.6
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 1.2.3
+Stable tag: 1.2.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -242,6 +242,14 @@ No. Google is never contacted on visitor-facing pages, and no scripts or stylesh
 
 == Changelog ==
 
+= 1.2.4 =
+* Requirement: WordPress 6.6 or later.
+* Improvement: The admin screens and the block editor's GBP Posting popup now use the React and translation libraries that come with WordPress instead of bundled copies.
+* Improvement: The plugin's styles no longer change the look of the WordPress admin menu and toolbar on the FoundHint screen.
+* Improvement: Shorter plugin description.
+* Fix: Activation could fail to create the Google reference, services and location attributes tables on older MySQL setups, where an index may be at most 767 bytes.
+* Fix: Removed the unused schema_page_index table. It is dropped automatically on update.
+
 = 1.2.3 =
 * New: Review auto-reply with FoundHint Premium. Each Google listing has its own: switch it on from the Reviews screen, choose new reviews only or unanswered ones too, and pick a reply template for each star rating. Every rating starts on "Don't reply", and AI replies are marked as coming soon.
 * New: Reply templates belong to each location. Switching location in the top bar shows that location's templates, and the reply dialog offers the templates of the review's own location.
@@ -316,6 +324,9 @@ No. Google is never contacted on visitor-facing pages, and no scripts or stylesh
 * Google reviews for each location, with replies.
 
 == Upgrade Notice ==
+
+= 1.2.4 =
+Fixes activation on older MySQL setups and uses WordPress's own React. Requires WordPress 6.6.
 
 = 1.2.3 =
 Review auto-reply for each location (with FoundHint Premium 1.0.2), reply templates per location, a warning when background tasks stop running, and a fix for locations with more than 1,000 reviews.

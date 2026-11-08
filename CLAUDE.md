@@ -353,7 +353,8 @@ React. Both Vite configs therefore:
 Write code that runs on **React 18 and 19**: `npm` pins `react@18.3` to
 match WordPress, so no React 19-only API (`use()`, `<Context value>` as a
 provider, form `action` functions, `ref` as a prop on our own components —
-use `forwardRef`, ref cleanup functions). When WordPress moves to React 19
+use `forwardRef`, ref cleanup functions, `inert` as a boolean — React 18
+drops it with a warning). When WordPress moves to React 19
 the bundle needs no change. Test with `SCRIPT_DEBUG` on: it loads React's
 development build, the only one that prints its warnings.
 
