@@ -53,7 +53,6 @@ export function LockedPreview({ className }) {
       <div className="fhint:relative fhint:min-h-90">
         <pre
           aria-hidden="true"
-          inert
           className="fhint:pointer-events-none fhint:m-0 fhint:overflow-hidden fhint:px-4.5 fhint:py-4 fhint:font-mono fhint:text-[12px] fhint:leading-[1.75] fhint:text-[#cfcaca] fhint:blur-sm fhint:select-none"
         >
           {SAMPLE}

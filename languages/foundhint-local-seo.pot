@@ -4979,11 +4979,11 @@ msgstr ""
 msgid "OFF"
 msgstr ""
 
-#: src/admin/pages/reviews/components/autoreply/AutoReplyBand.jsx:118 src/admin/pages/reviews/components/templates/TemplatesUpsell.jsx:31 src/admin/pages/schema/components/page/PremiumTab.jsx:51 src/admin/pages/schema/components/page/SchemaHeader.jsx:131 src/admin/pages/schema/components/shared/LockedPreview.jsx:92
+#: src/admin/pages/reviews/components/autoreply/AutoReplyBand.jsx:118 src/admin/pages/reviews/components/templates/TemplatesUpsell.jsx:31 src/admin/pages/schema/components/page/PremiumTab.jsx:51 src/admin/pages/schema/components/page/SchemaHeader.jsx:131 src/admin/pages/schema/components/shared/LockedPreview.jsx:91
 msgid "Activate licence"
 msgstr ""
 
-#: src/admin/pages/reviews/components/autoreply/AutoReplyBand.jsx:119 src/admin/pages/reviews/components/templates/TemplatesUpsell.jsx:32 src/admin/pages/schema/components/shared/LockedPreview.jsx:93
+#: src/admin/pages/reviews/components/autoreply/AutoReplyBand.jsx:119 src/admin/pages/reviews/components/templates/TemplatesUpsell.jsx:32 src/admin/pages/schema/components/shared/LockedPreview.jsx:92
 msgid "Unlock with Premium"
 msgstr ""
 
@@ -7133,15 +7133,15 @@ msgstr ""
 msgid "Google can't reach %s. Copy the schema and paste it into the test's Code tab instead."
 msgstr ""
 
-#: src/admin/pages/schema/components/shared/LockedPreview.jsx:71
+#: src/admin/pages/schema/components/shared/LockedPreview.jsx:70
 msgid "Schema preview is a Premium feature"
 msgstr ""
 
-#: src/admin/pages/schema/components/shared/LockedPreview.jsx:75
+#: src/admin/pages/schema/components/shared/LockedPreview.jsx:74
 msgid "FoundHint Premium is installed but its licence isn't active."
 msgstr ""
 
-#: src/admin/pages/schema/components/shared/LockedPreview.jsx:79
+#: src/admin/pages/schema/components/shared/LockedPreview.jsx:78
 msgid "See and edit the exact markup each schema adds to your site."
 msgstr ""
 
