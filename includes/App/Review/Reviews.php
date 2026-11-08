@@ -139,6 +139,8 @@ class Reviews {
 				// so a screen can open on the location chosen elsewhere.
 				'location_id'   => (int) $location['fhint_location_id'],
 				'count'         => ReviewRepository::count( array( 'location_name' => $location['location_name'] ) ),
+				// What a reply's placeholders become for this listing.
+				'reply'         => ReplyContext::for_listing( $location['location_name'] ),
 			);
 		}
 

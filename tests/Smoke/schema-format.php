@@ -48,7 +48,6 @@ function fhint_capture_sql() {
 		Tables::SCHEMA_ENTITIES          => 'CreateSchemaEntitiesTable',
 		Tables::SCHEMA_SERVICE_PROVIDERS => 'CreateSchemaServiceProvidersTable',
 		Tables::SCHEMA_SERVICE_AREAS     => 'CreateSchemaServiceAreasTable',
-		Tables::SCHEMA_PAGE_INDEX        => 'CreateSchemaPageIndexTable',
 	);
 
 	foreach ( $classes as $key => $class ) {
@@ -73,7 +72,7 @@ function dbDelta( $sql ) { // phpcs:ignore WordPress.NamingConventions.ValidFunc
 
 $definitions = fhint_capture_sql();
 
-check_same( 19, count( $definitions ), 'every table has a definition' );
+check_same( 18, count( $definitions ), 'every table has a definition' );
 check_same( Tables::keys(), array_keys( $definitions ), 'definitions cover exactly the declared tables' );
 
 foreach ( $definitions as $key => $sql ) {
@@ -117,6 +116,40 @@ foreach ( $definitions as $key => $sql ) {
 			substr_count( $trimmed, ',' ) <= 1 || (bool) preg_match( '/\((?:[^)]*,)[^)]*\)/', $trimmed ),
 			"{$key}: one definition per line — {$trimmed}"
 		);
+	}
+
+	// Every index fits 767 bytes: the limit on older InnoDB setups (no
+	// large prefix, or COMPACT rows), where a longer key fails CREATE TABLE
+	// and the plugin activates without the table. Text is utf8mb4, four
+	// bytes a character, unless the column says CHARACTER SET ascii.
+	$fhint_bytes = array();
+
+	foreach ( explode( "\n", $body ) as $line ) {
+		if ( preg_match( '/^\s*([a-z_]+) (\w+)(?:\((\d+)(?:,\d+)?\))?(.*)$/', $line, $col ) && ! in_array( strtoupper( $col[1] ), array( 'PRIMARY', 'KEY', 'UNIQUE' ), true ) ) {
+			$sizes = array( 'bigint' => 8, 'int' => 4, 'smallint' => 2, 'tinyint' => 1, 'datetime' => 8, 'date' => 3, 'time' => 3, 'decimal' => 9 );
+			$type  = strtolower( $col[2] );
+
+			if ( in_array( $type, array( 'varchar', 'char' ), true ) ) {
+				$fhint_bytes[ $col[1] ] = (int) $col[3] * ( false !== stripos( $col[4], 'CHARACTER SET ascii' ) ? 1 : 4 );
+			} else {
+				$fhint_bytes[ $col[1] ] = isset( $sizes[ $type ] ) ? $sizes[ $type ] : PHP_INT_MAX;
+			}
+		}
+	}
+
+	foreach ( $lines as $line ) {
+		if ( ! preg_match( '/^\s*(?:UNIQUE )?KEY (\w+) \((.*)\)/', $line, $index ) ) {
+			continue;
+		}
+
+		$total = 0;
+
+		foreach ( explode( ',', $index[2] ) as $part ) {
+			preg_match( '/^\s*(\w+)(?:\((\d+)\))?/', $part, $p );
+			$total += isset( $p[2] ) ? (int) $p[2] * 4 : ( isset( $fhint_bytes[ $p[1] ] ) ? $fhint_bytes[ $p[1] ] : PHP_INT_MAX );
+		}
+
+		check( $total <= 767, "{$key}: index {$index[1]} fits 767 bytes ({$total})" );
 	}
 
 	check( (bool) preg_match( '/\)\s*DEFAULT CHARACTER SET/', $sql ), "{$key}: applies the charset collation" );

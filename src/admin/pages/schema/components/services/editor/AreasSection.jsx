@@ -1,7 +1,7 @@
 import { focus } from "@/pages/profile/styles";
 import { __, sprintf } from "@wordpress/i18n";
 import { cn } from "cn";
-import { XIcon } from "lucide-react";
+import { MapIcon, XIcon } from "lucide-react";
 import { useState } from "react";
 import { AREA_TYPES, areaTypeLabel, withArea } from "../../../lib/service";
 import { chip, input, muted } from "../../styles";
@@ -43,7 +43,7 @@ export function AreasSection({ form, suggestions = [] }) {
 
   return (
     <EditorSection
-      number="03"
+      icon={MapIcon}
       title={__("Service areas", "foundhint-local-seo")}
       hint={__(
         "Only add places you genuinely serve. A service area is not your business address, which lives in Location schema.",

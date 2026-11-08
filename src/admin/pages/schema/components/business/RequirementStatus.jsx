@@ -6,8 +6,11 @@ import { fieldLabel } from "../../lib/schema";
  * Whether the business has the details Google needs for a local business
  * result — Google's required properties only; it never claims the markup
  * is valid or will show (doc §5.3, §11.3).
+ *
+ * Shown above the JSON preview, so `className` drops the card's own
+ * margin there.
  */
-export function RequirementStatus({ kind, visitMode, missing }) {
+export function RequirementStatus({ kind, visitMode, missing, className }) {
   const ok = !missing.length;
   const names = missing.map(fieldLabel).join(", ");
 
@@ -19,36 +22,27 @@ export function RequirementStatus({ kind, visitMode, missing }) {
       ? __("Ready to publish.", "foundhint-local-seo")
       : __("Can't publish yet.", "foundhint-local-seo");
     body = ok
-      ? __(
-          "Organization schema doesn't need an address or opening hours.",
-          "foundhint-local-seo",
-        )
+      ? __("No address or hours needed.", "foundhint-local-seo")
       : sprintf(
           /* translators: %s: the fields that are missing. */
-          __("FoundHint needs: %s.", "foundhint-local-seo"),
+          __("Needs: %s.", "foundhint-local-seo"),
           names,
         );
   } else if (ok) {
-    title = __(
-      "Has the details Google needs for a local business result.",
-      "foundhint-local-seo",
-    );
+    title = __("Ready to publish.", "foundhint-local-seo");
     body =
       visitMode === "service_area"
         ? __(
-            "Service-area businesses publish their areas instead of a street address. Green badges improve how you show.",
+            "Your service areas stand in for an address.",
             "foundhint-local-seo",
           )
-        : __(
-            "Business name and physical address are in place. Green badges improve how you show.",
-            "foundhint-local-seo",
-          );
+        : __("Name and address are in place.", "foundhint-local-seo");
   } else {
     title = __("Can't publish yet.", "foundhint-local-seo");
     body = sprintf(
       /* translators: %s: the fields that are missing. */
       __(
-        "Google needs: %s. Everything else is optional. Until then this is saved as a draft and nothing is printed.",
+        "Google needs: %s. Saved as a draft until then.",
         "foundhint-local-seo",
       ),
       names,
@@ -63,6 +57,7 @@ export function RequirementStatus({ kind, visitMode, missing }) {
         ok
           ? "fhint:border-border fhint:bg-success-tint"
           : "fhint:border-warning-border fhint:bg-warning",
+        className,
       )}
     >
       <span

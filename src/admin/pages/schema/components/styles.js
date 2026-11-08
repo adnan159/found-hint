@@ -37,6 +37,20 @@ export const panelTitle =
 /** The count or state beside a panel title: "6 of 9 fields from Google". */
 export const panelChip = cn(headerChip, tagTones.accent);
 
+/*
+ * The type scale, largest first:
+ *
+ *   panelTitle   16px bold     a card's title: "Address" (the profile's)
+ *   sectionTitle 15px bold     a numbered step inside a card: "01 Location page"
+ *   groupHead    11.5px CAPS   a small run of items inside a card
+ *   label        14px bold     one field: "City" (the profile's)
+ */
+
+/** A numbered section's title inside a panel: "01 Location page". */
+export const sectionTitle =
+  "fhint:m-0 fhint:text-[15px] fhint:leading-snug fhint:font-bold fhint:text-foreground";
+
+/** A field's label: the Business Profile's. */
 export const label = fieldLabel;
 
 /** A group's small uppercase title, over a hairline: "ADDRESS". */

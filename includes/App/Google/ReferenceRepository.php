@@ -57,7 +57,8 @@ class ReferenceRepository {
 		foreach ( $entries as $entry ) {
 			$item_id = isset( $entry['item_id'] ) ? (string) $entry['item_id'] : '';
 
-			if ( '' === $item_id || isset( $seen[ $item_id ] ) ) {
+			// The id columns are ASCII (see CreateGoogleReferenceTable).
+			if ( '' === $item_id || isset( $seen[ $item_id ] ) || preg_match( '/[^\x20-\x7E]/', $item_id . $parent_id ) ) {
 				continue;
 			}
 

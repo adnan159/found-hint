@@ -338,7 +338,9 @@ class ServiceRepository {
 	private static function unique_slug( $slug, $business_id, $ignore_id = 0, $location_id = 0 ) {
 		global $wpdb;
 
-		$slug = sanitize_title( (string) $slug );
+		// The column is ASCII: percent-encode anything a sanitize_title
+		// filter left unencoded, as WordPress itself does.
+		$slug = utf8_uri_encode( sanitize_title( (string) $slug ) );
 
 		if ( '' === $slug ) {
 			return '';

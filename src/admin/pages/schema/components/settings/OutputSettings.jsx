@@ -21,6 +21,8 @@ import {
   label,
   muted,
   panel,
+  panelHeader,
+  panelTitle,
   primaryAction,
 } from "../styles";
 
@@ -137,19 +139,16 @@ export function OutputSettings() {
   return (
     <div className="fhint:grid fhint:min-w-0 fhint:gap-4">
       <section className={cn(panel, "fhint:min-w-0")}>
-        <div className="fhint:flex fhint:flex-wrap fhint:items-center fhint:gap-3 fhint:border-b fhint:border-b-border fhint:px-5 fhint:py-4">
+        <div className={panelHeader}>
           <span
             aria-hidden="true"
             className="fhint:grid fhint:size-[34px] fhint:shrink-0 fhint:place-items-center fhint:bg-[#FFF1EB] fhint:text-[#D8521F]"
           >
             <PanelTopIcon className="fhint:size-[18px]" />
           </span>
-          <span className="fhint:grid fhint:min-w-0 fhint:flex-[1_1_300px] fhint:gap-0.5">
+          <span className="fhint:grid fhint:min-w-0 fhint:flex-[1_1_300px] fhint:gap-1">
             <span className="fhint:flex fhint:items-center fhint:gap-2">
-              <h2
-                id={`${ids}-header`}
-                className="fhint:m-0 fhint:text-[16px] fhint:font-bold"
-              >
+              <h2 id={`${ids}-header`} className={panelTitle}>
                 {__("Add to my site header", "foundhint-local-seo")}
               </h2>
               <Hint
@@ -397,9 +396,9 @@ export function OutputSettings() {
       </section>
 
       <section className={cn(panel, "fhint:min-w-0")}>
-        <div className="fhint:flex fhint:flex-wrap fhint:items-center fhint:gap-3 fhint:border-b fhint:border-b-border fhint:px-5 fhint:py-4">
-          <span className="fhint:grid fhint:min-w-0 fhint:flex-1 fhint:gap-0.5">
-            <h2 className="fhint:m-0 fhint:text-[16px] fhint:font-bold">
+        <div className={panelHeader}>
+          <span className="fhint:grid fhint:min-w-0 fhint:flex-1 fhint:gap-1">
+            <h2 className={panelTitle}>
               {__("Works with your SEO plugin", "foundhint-local-seo")}
             </h2>
             <span className={muted}>

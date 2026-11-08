@@ -132,10 +132,10 @@ export function ServiceTab({
       <div
         className={cn(
           "fhint:grid fhint:min-w-0 fhint:grid-cols-[minmax(0,1fr)] fhint:items-start fhint:gap-4",
-          // With a service open, the list and its form are one card (no
-          // gap between them); the preview keeps its distance.
+          // With a service open: the list, then the editor's cards under
+          // it, the preview beside both.
           current &&
-            "fhint:gap-y-0 fhint:@4xl:grid-cols-[minmax(0,1.45fr)_minmax(0,1fr)]",
+            "fhint:@4xl:grid-cols-[minmax(0,1.45fr)_minmax(0,1fr)] fhint:2xl:grid-cols-[minmax(0,1.9fr)_minmax(0,1fr)]",
         )}
       >
         <div className="fhint:min-w-0 fhint:@4xl:col-start-1">{listPanel}</div>

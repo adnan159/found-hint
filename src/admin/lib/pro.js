@@ -48,3 +48,24 @@ export function activateUrl() {
 export function proRestUrl() {
   return pro?.rest_url ?? "";
 }
+
+/**
+ * A Premium route's full address, with query parameters. On a site with
+ * plain permalinks the base is `…/index.php?rest_route=/fhint-premium/v1`,
+ * which already has a `?` — a second one breaks the route ("No route was
+ * found"), so the separator is chosen from the base.
+ *
+ * @param {string} path   Path under the namespace, e.g. "/reviews/templates".
+ * @param {Object} params Query parameters.
+ * @return {string}
+ */
+export function proUrl(path, params) {
+  const base = `${proRestUrl()}${path}`;
+  const query = new URLSearchParams(params ?? {}).toString();
+
+  if (!query) {
+    return base;
+  }
+
+  return `${base}${base.includes("?") ? "&" : "?"}${query}`;
+}

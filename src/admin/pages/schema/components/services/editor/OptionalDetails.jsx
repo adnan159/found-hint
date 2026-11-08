@@ -2,15 +2,14 @@ import Hint from "@/components/Hint";
 import { focus } from "@/pages/profile/styles";
 import { __ } from "@wordpress/i18n";
 import { cn } from "cn";
-import { ChevronDownIcon } from "lucide-react";
+import { ChevronDownIcon, ReceiptIcon } from "lucide-react";
 import { useState } from "react";
 import { currencyOptions, pricingSummary } from "../../../lib/service";
-import { label, muted } from "../../styles";
-import { sectionNumber } from "./EditorSection";
+import { label, muted, panel, panelTitle } from "../../styles";
 import { FieldError } from "./FieldError";
 
 /**
- * 05 Optional details, folded away with the price summed up in a line:
+ * Optional details, a card folded away with the price summed up in a line:
  * pricing model, price (or a range) and currency.
  */
 export function OptionalDetails({ form }) {
@@ -21,19 +20,25 @@ export function OptionalDetails({ form }) {
   const setPricing = (changes) => set({ pricing: { ...pricing, ...changes } });
 
   return (
-    <section className="fhint:border-t-2 fhint:border-t-[#201e1d]">
+    <section className={cn(panel, "fhint:min-w-0")}>
       <button
         type="button"
         aria-expanded={open}
         aria-controls={field("optional")}
         onClick={() => setOpen((current) => !current)}
         className={cn(
-          "fhint:flex fhint:w-full fhint:cursor-pointer fhint:items-center fhint:gap-2.5 fhint:border-0 fhint:bg-transparent fhint:px-5 fhint:py-[18px] fhint:text-left fhint:text-[#201e1d]",
+          "fhint:flex fhint:w-full fhint:cursor-pointer fhint:flex-wrap fhint:items-center fhint:gap-3 fhint:border-0 fhint:bg-transparent fhint:px-5.5 fhint:py-4.5 fhint:text-left fhint:text-foreground",
+          open && "fhint:border-b-2 fhint:border-b-border",
           focus,
         )}
       >
-        <span className={sectionNumber}>05</span>
-        <strong className="fhint:text-[15px]">
+        <span
+          aria-hidden="true"
+          className="fhint:grid fhint:size-5.5 fhint:flex-none fhint:place-items-center fhint:text-muted-strong"
+        >
+          <ReceiptIcon className="fhint:size-4" />
+        </span>
+        <strong className={panelTitle}>
           {__("Optional details", "foundhint-local-seo")}
         </strong>
         <span className={cn(muted, "fhint:flex-1")}>
@@ -51,7 +56,7 @@ export function OptionalDetails({ form }) {
       {open ? (
         <div
           id={field("optional")}
-          className="fhint:grid fhint:grid-cols-[repeat(auto-fill,minmax(min(100%,180px),1fr))] fhint:gap-4 fhint:px-5 fhint:pb-4"
+          className="fhint:grid fhint:grid-cols-[repeat(auto-fill,minmax(min(100%,180px),1fr))] fhint:gap-4.5 fhint:p-5"
         >
           <div className="fhint:grid fhint:content-start fhint:gap-1.5">
             <span className="fhint:flex fhint:items-center fhint:gap-1.5">

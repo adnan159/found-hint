@@ -1,16 +1,16 @@
-import { Skeleton } from "@/components/ui/skeleton";
 import RequestError from "@/components/RequestError";
+import { Skeleton } from "@/components/ui/skeleton";
 import useSelectedLocation from "@/hooks/useSelectedLocation";
+import { errorMessage } from "@/lib/errors";
 import { hasPro } from "@/lib/pro";
 import { useGetSchemaQuery } from "@/store/api/schemaApi";
-import { __, sprintf } from "@wordpress/i18n";
-import { toast } from "sonner";
-import { errorMessage } from "@/lib/errors";
 import {
   useGetBusinessSchemaQuery,
   useGetSchemaStateQuery,
   useSetSchemaTabMutation,
 } from "@/store/api/schemaManagerApi";
+import { __, sprintf } from "@wordpress/i18n";
+import { toast } from "sonner";
 import ConnectGoogleNotice from "./components/page/ConnectGoogleNotice";
 import SchemaHeader from "./components/page/SchemaHeader";
 import TabBar, { TABS } from "./components/page/TabBar";

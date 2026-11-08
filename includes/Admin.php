@@ -7,6 +7,8 @@
 
 namespace FHINT;
 
+use FHINT\Admin\BlogSharing;
+use FHINT\Admin\EditorAssets;
 use FHINT\Admin\Enqueue;
 use FHINT\Admin\Menu;
 
@@ -25,6 +27,8 @@ class Admin {
 	public static function init() {
 		Menu::init();
 		Enqueue::init();
+		BlogSharing::init();
+		EditorAssets::init();
 
 		add_filter( 'plugin_action_links_' . FHINT_BASENAME, array( __CLASS__, 'plugin_action_links' ) );
 	}

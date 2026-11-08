@@ -1,6 +1,7 @@
 import { __, sprintf } from "@wordpress/i18n";
 import { ExternalLinkIcon } from "lucide-react";
 import { cn } from "cn";
+import { hasPro } from "@/lib/pro";
 import { focus, tag, tagTones } from "@/pages/profile/styles";
 import PostFailedNote from "./PostFailedNote";
 import PostRowActions from "./PostRowActions";
@@ -86,6 +87,11 @@ export function PostRow({ post, onEdit }) {
 
         <div className="fhint:flex fhint:flex-wrap fhint:items-center fhint:gap-x-3 fhint:gap-y-1 fhint:text-[12px] fhint:font-semibold fhint:text-muted-strong">
           <span>{whenText(post)}</span>
+          {post.status === "scheduled" && !hasPro("posts.schedule") ? (
+            <span className="fhint:text-notice-foreground">
+              {__("Needs FoundHint Premium to send", "foundhint-local-seo")}
+            </span>
+          ) : null}
           {post.search_url && post.on_google ? (
             <a
               href={post.search_url}

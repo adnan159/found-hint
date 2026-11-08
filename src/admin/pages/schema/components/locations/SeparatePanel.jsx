@@ -7,7 +7,7 @@ import { useGetSeparateSchemaQuery } from "@/store/api/schemaManagerApi";
 import { BADGE, TONES } from "../../lib/locations";
 import JsonPreview from "../shared/JsonPreview";
 import { focusRing as focus } from "@/lib/fieldStyles";
-import { panel } from "../styles";
+import { groupHead, panel, panelTitle } from "../styles";
 
 const TITLE_ID = "fhint-schema-separate-title";
 
@@ -101,7 +101,7 @@ export function SeparatePanel({ row, onBack, onTreatAsBranch }) {
             id={TITLE_ID}
             ref={heading}
             tabIndex={-1}
-            className="fhint:m-0 fhint:text-[16px] fhint:font-bold fhint:outline-none"
+            className={cn(panelTitle, "fhint:outline-none")}
           >
             {row.name}
           </h2>
@@ -148,7 +148,7 @@ export function SeparatePanel({ row, onBack, onTreatAsBranch }) {
           </div>
 
           <div className="fhint:grid fhint:gap-2">
-            <h3 className="fhint:m-0 fhint:text-[11.5px] fhint:font-bold fhint:tracking-[0.06em] fhint:text-[#625e5e] fhint:uppercase">
+            <h3 className={cn(groupHead, "fhint:m-0")}>
               {__("Publish it on its own website", "foundhint-local-seo")}
             </h3>
             <ol className="fhint:m-0 fhint:grid fhint:list-none fhint:gap-2 fhint:p-0">

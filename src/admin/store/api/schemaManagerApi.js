@@ -1,4 +1,4 @@
-import { proRestUrl } from "@/lib/pro";
+import { proUrl } from "@/lib/pro";
 import { baseApi } from "./baseApi";
 
 /**
@@ -6,16 +6,7 @@ import { baseApi } from "./baseApi";
  * `fhint-premium/v1/schema/*` (absolute URLs, so they share this app's store
  * and nonce). Only called inside a <ProFeature feature="schema.…">.
  */
-const url = (path, params) => {
-  const base = `${proRestUrl()}${path}`;
-  const query = new URLSearchParams(params ?? {}).toString();
-
-  if (!query) {
-    return base;
-  }
-
-  return `${base}${base.includes("?") ? "&" : "?"}${query}`;
-};
+const url = proUrl;
 
 export const schemaManagerApi = baseApi
   .enhanceEndpoints({ addTagTypes: ["SchemaManager"] })

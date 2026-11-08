@@ -2,14 +2,15 @@ import { __, sprintf } from "@wordpress/i18n";
 import { cn } from "cn";
 import { BUSINESS_GROUPS, STOREFRONT_ONLY } from "../../lib/business";
 import FieldRow from "../field/FieldRow";
-import { groupHead, muted } from "../styles";
+import FieldGroup from "../shared/FieldGroup";
+import { muted } from "../styles";
 import ExtraField from "./ExtraField";
 import VisitModePicker from "./VisitModePicker";
 
-const GROUP_HEAD = cn(
-  groupHead,
-  "fhint:col-span-full fhint:m-0 fhint:border-t fhint:border-t-border fhint:pt-2.5",
-);
+// Most groups: as many columns as fit. The address: two.
+const AUTO_GRID =
+  "fhint:grid-cols-[repeat(auto-fill,minmax(min(100%,230px),1fr))]";
+const ADDRESS_GRID = "fhint:sm:grid-cols-2";
 
 // Fields that take a whole row: all of Business information, and the long
 // address lines.
@@ -17,8 +18,8 @@ const fullRow = (group, key) =>
   group === "info" || ["street_address", "map_url"].includes(key);
 
 /**
- * The Business tab's fields, group by group, then the details specific to
- * the business type.
+ * The Business tab's fields, one bordered card per group, then the details
+ * specific to the business type.
  *
  * @param {Object}   props
  * @param {Object[]} props.fields     The fields to show.
@@ -65,7 +66,7 @@ export function BusinessFields({
   );
 
   return (
-    <div className="fhint:grid fhint:grid-cols-[repeat(auto-fill,minmax(min(100%,230px),1fr))] fhint:gap-4 fhint:px-5 fhint:pt-1 fhint:pb-[18px]">
+    <div className="fhint:grid fhint:gap-4">
       {BUSINESS_GROUPS.map(([group, title]) => {
         const inGroup = fields.filter((field) => field.group === group);
 
@@ -74,42 +75,40 @@ export function BusinessFields({
         }
 
         if (group !== "address") {
-          return [
-            <h3 key={`${group}-head`} className={GROUP_HEAD}>
-              {title()}
-            </h3>,
-            ...inGroup.map(row(group)),
-          ];
+          return (
+            <FieldGroup
+              key={group}
+              group={group}
+              title={title()}
+              grid={AUTO_GRID}
+            >
+              {inGroup.map(row(group))}
+            </FieldGroup>
+          );
         }
 
-        // The street and the map link take a row; the rest sits two to a
-        // row, on its own grid so the other groups keep theirs.
-        return [
-          <h3 key="address-head" className={GROUP_HEAD}>
-            {title()}
-          </h3>,
-          organization ? (
-            <p
-              key="visit"
-              className={cn(muted, "fhint:col-span-full fhint:m-0")}
-            >
-              {__(
-                "Optional. Fill in only what you want published — a city and country is enough.",
-                "foundhint-local-seo",
-              )}
-            </p>
-          ) : (
-            <VisitModePicker
-              key="visit"
-              value={visitMode}
-              locked={locked}
-              onChange={onVisitMode}
-            />
-          ),
-          <div
-            key="address-fields"
-            className="fhint:col-span-full fhint:grid fhint:grid-cols-1 fhint:gap-4 fhint:sm:grid-cols-2"
+        // The street and the map link take a row; the rest sits two to a row.
+        return (
+          <FieldGroup
+            key={group}
+            group={group}
+            title={title()}
+            grid={ADDRESS_GRID}
           >
+            {organization ? (
+              <p className={cn(muted, "fhint:col-span-full fhint:m-0")}>
+                {__(
+                  "Optional. Fill in only what you want published — a city and country is enough.",
+                  "foundhint-local-seo",
+                )}
+              </p>
+            ) : (
+              <VisitModePicker
+                value={visitMode}
+                locked={locked}
+                onChange={onVisitMode}
+              />
+            )}
             {inGroup
               .filter(
                 (field) =>
@@ -120,19 +119,20 @@ export function BusinessFields({
                   ),
               )
               .map(row(group))}
-          </div>,
-        ];
+          </FieldGroup>
+        );
       })}
 
       {extras?.fields.length ? (
-        <>
-          <h3 className={GROUP_HEAD}>
-            {sprintf(
-              /* translators: %s: the business type, e.g. "Dental practice". */
-              __("Details for %s", "foundhint-local-seo"),
-              extras.typeLabel,
-            )}
-          </h3>
+        <FieldGroup
+          group="extras"
+          title={sprintf(
+            /* translators: %s: the business type, e.g. "Dental practice". */
+            __("Details for %s", "foundhint-local-seo"),
+            extras.typeLabel,
+          )}
+          grid={AUTO_GRID}
+        >
           {extras.fields.map((extra) => (
             <ExtraField
               key={extra.key}
@@ -143,7 +143,7 @@ export function BusinessFields({
               onChange={(next) => extras.onChange(extra.key, next)}
             />
           ))}
-        </>
+        </FieldGroup>
       ) : null}
     </div>
   );

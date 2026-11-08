@@ -173,10 +173,7 @@ export function WebsiteTab({ live, onDirtyChange, saveRef }) {
     <section className={cn(panel, "fhint:min-w-0")}>
       <PanelHeading
         title={__("Website structure", "foundhint-local-seo")}
-        description={__(
-          "Tells Google what your site is, what each page is for and how pages connect.",
-          "foundhint-local-seo",
-        )}
+        srOnly
       />
 
       <ul className="fhint:m-0 fhint:list-none fhint:p-0">

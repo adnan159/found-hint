@@ -4,7 +4,7 @@
 step finishes: what shipped, and how it was verified — the evidence, not the
 intent. Name any bug the verification caught.
 
-Last updated: step 75. The data layer, its REST API and the admin screens
+Last updated: step 101. The data layer, its REST API and the admin screens
 for everything it covers exist. The Schema Manager is built in FoundHint
 Premium and matches the design (`FoundHint Schema (1).html`): six tabs —
 01 Organization, 02 LocalBusiness, 03 Locations (list, setup, branch
@@ -2562,3 +2562,747 @@ Services and Website structure carry the pill with Premium hidden.
 LocalBusiness now carries the Premium pill too: without Premium its summary
 is "Premium" rather than the free markup's type (`tabSummaries()` no longer
 takes `free`).
+
+## Step 82 — Scheduling posts: the free side (Phase 1)
+
+Plan: `docs/POSTS-SCHEDULE-PLAN.md`, from the "FoundHint Posts" design.
+Scheduling is Premium (`posts.schedule`); this step is everything the free
+plugin owns. Premium's schedule route and its sender are still open there.
+
+**Server:**
+- `PUT /posts/{id}` on a `scheduled` post checks the publishing rules on
+  every save (it is sent by itself later) and keeps its status and time.
+- New free `POST /posts/{id}/unschedule`: scheduled → draft, time cleared;
+  `409 fhint_post_not_scheduled` otherwise. Needs only the capability.
+- Every post carries `scheduled_local` (site wall time, datetime-local
+  shape); `GET /posts/state` carries `timezone`.
+- List order in SQL, the design's rule: newest first puts what was posted
+  first and the scheduled posts after it, soonest due first; oldest first
+  is the exact reverse.
+
+**Screen:** `Composer.jsx` (696 lines) split into `components/composer/*`,
+`hooks/useComposer.js` and `lib/composer.js`, every file ≤ 150 lines.
+When to publish → Schedule shows "Publish on" with the site's time zone;
+saving is the free save and then Premium's `schedule` call; a refused time
+shows at the picker and the post stays a draft (new) or keeps its earlier
+time (already scheduled). Choosing Draft on a scheduled post unschedules it.
+Rows: "Goes live in 3d · date", **Publish now**, **Cancel schedule**,
+**Change**; *Scheduled* in the status filter. Without Premium the option
+keeps its `PRO` tag; a post already queued says "Needs FoundHint Premium to
+send", shows its time read-only, and can still be published, changed or
+cancelled.
+
+**Verified:** database suite 741 (13 new: order both ways, strict save,
+time kept, unschedule and its 409/404), each rule mutation-checked (strict
+check removed → 1 fail; unschedule left scheduled → 2; old order → 3); REST
+routes smoke 685 (route registered, capability-only guard); every smoke
+suite, `composer lint` and `npm run lint` clean. Real bundle in the browser
+against a stateful mock with Premium on and off: reschedule, too-soon time
+(error at the picker — this caught a wrong "saved as a draft" note for a
+post that was already scheduled; fixed), new scheduled post (create +
+schedule), cancel, publish now, scheduled → draft (PUT + unschedule),
+Premium off (disabled option, read-only time, save sends only PUT, toast no
+longer promises a send). Not yet run against Premium itself — its route
+does not exist yet.
+
+## Step 83 — Scheduling posts: Premium's route and sender
+
+The Schedule option was locked on the dev site because Premium did not yet
+serve `posts.schedule`. Built in `found-hint-premium`:
+
+- `App/Post/ScheduleRules` — the time rules, pure: site wall time
+  (`wp_timezone()`) → UTC; required, real date (no "Feb 31" rollover), ≥ 5
+  minutes ahead, ≤ a year, before an event ends.
+- `App/Post/Scheduler` — `schedule()` (draft, failed or scheduled only;
+  Publish's rules plus the time rules; then one cron event at the post's
+  own time) and `run()`, the sender: a five-minute WP-Cron sweep, kept
+  scheduled on every load and cleared on deactivation, 10 posts a run.
+- `App/Post/Queue` — the only queries Premium runs on the free posts
+  table: due posts, the claim (`scheduled` → `sending` in one conditional
+  UPDATE, so two overlapping sweeps never send a post twice), and posts
+  stuck `sending` 15 minutes → failed with a reason, never resent.
+- `API/PostSchedule` — `POST fhint-premium/v1/posts/{id}/schedule`
+  `{ scheduled_at }`; needs the licence, the capability and Google.
+- `posts.schedule` added to `Features::active()`.
+
+Free plugin: new short-lived status `sending` — documented in
+`CreatePostsTable`, listed under *Scheduled*, labelled "Sending" with "Being
+sent to Google now"; edit, publish, unschedule and delete answer `409
+fhint_post_sending` while it lasts. New messages for
+`fhint_post_not_scheduled`, `fhint_post_sending`,
+`fhintpremium_post_not_schedulable`; `fhintpremium_google_required` now
+reads "Connect your Google Business Profile first." (it is shared by schema
+and posts).
+
+**Verified:** Premium smoke 17 (time rules, incl. summer time; the "a year"
+bound was first written as wall time and failed across the DST change —
+the test was wrong, now computed from the timestamp), Premium database 42
+on its own tables with Google answered in-process. Mutation-checked: claim
+without its status check (first passed — MySQL reports 0 changed rows for
+an unchanged row, so a second claim on the same row proved nothing; a
+"cancelled before the sweep" case was added and now catches it), stuck
+posts returned to the queue, scheduling without Publish's rules, the free
+mid-send guard, no lead time — each fails its tests. Free database 741,
+every free smoke suite, Premium schema suites (253 + 286), both PHPCS and
+ESLint clean, build clean. On the dev site: the route is registered,
+`posts.schedule` is listed, the sweep is queued. Not verified: a real
+scheduled send to Google (it would post on the live listing), and the
+screen while logged in.
+
+## Step 84 — Newest post on top, scheduled ones included
+
+Changed on request: the design grouped scheduled posts after the posted
+ones (soonest due first); the list now puts the last post added on top,
+whatever its status — ordered by when it was published, else last saved
+(a scheduled post: when it was scheduled). `PostRepository::all()` is back
+to `COALESCE( published_at, updated_at )`, id as the tie-break; `old` is
+the exact reverse. Database suite 740, the ordering test rewritten and
+mutation-checked: grouping scheduled posts last fails it, and so does
+ordering by id alone.
+
+## Step 85 — "Turn reviews into posts" removed
+
+Removed on request from the Posts screen: the card (`ReviewsCard.jsx`),
+its `reviewPost()` helper, and `reviews` from `GET /posts/state` (with
+`Posts::shareable_reviews()`, so the state no longer queries reviews).
+Posts already written from a review keep their `review` source and its
+"From a review" tag; `review` stays an allowed source. ESLint, PHPCS and
+the build are clean; posts smoke 86, REST routes 685, database 740.
+
+## Step 86 — "Schedule with a CSV file" removed
+
+Removed on request: the disabled, Premium-tagged button in the Posts header
+(`PostsHeader.jsx`) and the `posts.csv` row in `docs/EXTENDING.md`. CSV
+scheduling (Phase 2 of `docs/POSTS-SCHEDULE-PLAN.md`) is on hold. The
+`csv` source and its "From CSV" tag stay, for any post that carries it.
+ESLint and the build are clean.
+
+## Step 87 — Share your blog on Google (Premium, `posts.blog`)
+
+Requested: the card's "Share Website Blog" button becomes a switch; when on,
+a "GBP Posting" link after View under each blog post opens a new post on
+the FoundHint Posts screen, published like any other. Kept Premium-only
+(owner's call).
+
+**Free:** setting `posts.blog_sharing` (default off, written only by
+Premium). `Admin\BlogSharing` adds "GBP Posting" after View in Posts → All
+Posts — published `post`s only, for users who can manage FoundHint, and only
+when `fhint_blog_sharing_enabled` (new filter, Premium answers it) is true;
+it links to `admin.php?page=fhint#/posts?share=<id>`. `BlogCard` is a
+`Switch` (PRO tag and disabled without Premium). `useBlogShare` waits for
+the location's listing, opens the composer on `blogPost()` (title + excerpt
+as the text, "Learn more" to the article, the featured image when Google
+can fetch it, source `blog`), then drops `share` from the URL so a reload
+does not reopen it.
+
+**Premium:** `App/Post/BlogSharing` (`is_on()` = licence + switch, `set()`,
+`blog_post()`, `summary()` cut to 1,500 characters, adds source `blog`),
+`API/PostBlog` (`GET|PUT posts/blog-sharing`, `GET posts/blog/{id}`),
+`posts.blog` in `Features::active()`.
+
+**Verified:** Premium smoke 21 (summary), Premium database 62 (+20: the
+draft shape, drafts and pages refused, switch off → no link, link right
+after View and to the right URL, not for drafts/pages/logged-out, both
+routes, a post saved with source `blog`; the test blog posts and the site's
+settings are removed/restored), mutation-checked — the "after View" test
+first passed with that rule broken (View was last in the test row); View now
+sits mid-row and the mutation fails it. In the browser against the mock:
+switch on/off, the share link opens a filled composer and publishing sends
+`source=blog`; **caught a bug** — a link to a missing blog post reopened the
+previous one, because RTK Query keeps the last answer while loading the
+next; fixed with `currentData` and an id check. Premium off: switch disabled
+with its tag, the link shows a Premium message and opens nothing. Free
+database 740, all smoke suites, both PHPCS, ESLint, build clean. Not
+checked: the real All Posts screen while logged in.
+
+## Step 88 — Fix: every admin page crashed after step 87
+
+`Admin::init()` called `BlogSharing::init()` without importing
+`FHINT\Admin\BlogSharing`, so PHP looked for `FHINT\BlogSharing` and every
+wp-admin request died ("Class "FHINT\BlogSharing" not found"). Step 87's
+tests called `Admin\BlogSharing` directly and never ran `Admin::init()`,
+which only runs on admin pages. Fixed with the `use` line; the database
+suite now runs `FHINT\Admin::init()` and checks the link is wired (741).
+With the import removed it dies with exit 255 and no summary line — the
+fatal goes to the WordPress debug log, not the console.
+
+## Step 89 — GBP Posting in the block editor
+
+Requested: the GBP Posting button in the post editor's top bar (beside
+its other pinned icons), opening the composer as a popup right there.
+
+**How:** the editor has no public API for a bare header button; a plugin
+sidebar (`wp.editor.PluginSidebar`) is what pins an icon there. So
+`src/editor/toolbar.js` registers one, and when it opens it puts back the
+sidebar that was open (or closes it) and opens FoundHint's popup for the
+current post — one click. The popup is the Posts `Composer` in this
+bundle's own React tree (`.fhint-ui` host on `<body>`), with its own
+store, toasts and theme. `useEditorShare` walks: Premium → Google listings
+(asks which one when there are several; the editor has no location bar)
+→ the blog post (Premium's `posts/blog/{id}`; an unpublished post is
+explained, not shared) → the composer, filled as from the list link.
+
+**Separate bundle:** `vite.editor.config.js` → `assets/build/editor`
+(`npm run build` builds both). `Admin\EditorAssets` enqueues it on
+`enqueue_block_editor_assets` only for a `post` in the block editor, for a
+FoundHint manager, while `BlogSharing::enabled()`; it localises the same
+`window.FHINT` (`Enqueue::bootstrap_data()` is now public). The admin's CSS
+was split: `src/admin/styles/theme.css` holds tokens and FoundHint-only
+rules for both bundles; `index.css` keeps the page-wide preflight and base
+rules — its build output is byte-identical to before. The editor gets
+Tailwind's preflight (4.x) wrapped in `@scope (.fhint-ui, [data-slot=
+"dialog-portal"], [data-slot="alert-dialog-portal"], [data-sonner-toaster])`.
+ESLint skips the Tailwind entry stylesheets.
+
+**Verified:** database 747 (+6: hooked; loads for a blog post in the block
+editor with sharing on; not in the classic editor, not for a page, not
+with sharing off, not for a non-manager), each condition mutation-checked.
+Built editor CSS: the reset only inside `@scope`; outside it only
+Tailwind's `--tw-*` variable defaults. Real editor bundle in a browser
+page with a stand-in for `wp.*` and WordPress-styled elements: their
+margins, font size, padding and border unchanged before, during and after
+the popup; the toolbar click opens the filled composer and publishing
+sends `source=blog`. **Caught a bug:** the sidebar open before the first
+click was not put back (it was only recorded on a store change); now
+recorded at registration. Not checked: the real WordPress editor (needs a
+login) — the store names `core/interface` and `getActiveComplementaryArea`
+are WordPress's, scope `core` (and `core/edit-post` before 6.6).
+
+## Step 89 — GBP Posting in the block editor
+
+Requested: the GBP Posting button in the post editor's top bar (beside
+its other pinned icons), opening the composer as a popup right there.
+
+**How:** the editor has no public API for a bare header button; a plugin
+sidebar (`wp.editor.PluginSidebar`) is what pins an icon there. So
+`src/editor/toolbar.js` registers one, and when it opens it puts back the
+sidebar that was open (or closes it) and opens FoundHint's popup for the
+current post — one click. The popup is the Posts `Composer` in this
+bundle's own React tree (`.fhint-ui` host on `<body>`), with its own
+store, toasts and theme. `useEditorShare` walks: Premium → Google listings
+(asks which one when there are several; the editor has no location bar)
+→ the blog post (Premium's `posts/blog/{id}`; an unpublished post is
+explained, not shared) → the composer, filled as from the list link.
+
+**Separate bundle:** `vite.editor.config.js` → `assets/build/editor`
+(`npm run build` builds both). `Admin\EditorAssets` enqueues it on
+`enqueue_block_editor_assets` only for a `post` in the block editor, for a
+FoundHint manager, while `BlogSharing::enabled()`; it localises the same
+`window.FHINT` (`Enqueue::bootstrap_data()` is now public). The admin's CSS
+was split: `src/admin/styles/theme.css` holds tokens and FoundHint-only
+rules for both bundles; `index.css` keeps the page-wide preflight and base
+rules — its build output is byte-identical to before. The editor gets
+Tailwind's preflight (4.x) wrapped in `@scope (.fhint-ui, [data-slot=
+"dialog-portal"], [data-slot="alert-dialog-portal"], [data-sonner-toaster])`.
+ESLint skips the Tailwind entry stylesheets.
+
+**Verified:** database 747 (+6: hooked; loads for a blog post in the block
+editor with sharing on; not in the classic editor, not for a page, not
+with sharing off, not for a non-manager), each condition mutation-checked.
+Built editor CSS: the reset only inside `@scope`; outside it only
+Tailwind's `--tw-*` variable defaults. Real editor bundle in a browser
+page with a stand-in for `wp.*` and WordPress-styled elements: their
+margins, font size, padding and border unchanged before, during and after
+the popup; the toolbar click opens the filled composer and publishing
+sends `source=blog`. **Caught a bug:** the sidebar open before the first
+click was not put back (it was only recorded on a store change); now
+recorded at registration. Not checked: the real WordPress editor (needs a
+login) — the store names `core/interface` and `getActiveComplementaryArea`
+are WordPress's, scope `core` (and `core/edit-post` before 6.6).
+
+## Step 90 — GBP Posting: icon, link, Media Library, blank description
+
+Requested: the toolbar icon as a page with a "+" badge in the brand colour;
+the button link the published post's URL by default; "Choose photo" opening
+the Media Library on the Posts screen and in the editor; the description
+blank.
+
+- **Icon:** `src/editor/toolbar.js` draws a page with a folded corner,
+  lines and a "+" badge, stroked `#FF6B35`.
+- **Link:** already the article's permalink (`cta_url`, "Learn more");
+  now covered by a Premium database test.
+- **Description:** starts blank. Premium's `posts/blog/{id}` no longer
+  builds text (`summary()` and the excerpt removed; test says so).
+- **Media Library:** the photo field passes `onAttachments` to the shared
+  `Picker`, so "Choose photo" opens `wp.media` (files can still be
+  dropped). New `PostMedia::from_library()` + `POST /posts/media/library`:
+  Google's limits checked from the file, no copy in the library, own link
+  when reachable else via the listing's gallery. `EditorAssets` also calls
+  `wp_enqueue_media()`. While the library is open the composer stops being
+  modal and ignores close requests (`lib/media.js` announces it,
+  `hooks/useMediaOpen`), so clicking in the library or pressing its Esc no
+  longer closes the post.
+- **Split:** `PhotoField.jsx` (was 316 lines) → `photo/GooglePhotoPicker`,
+  `photo/PhotoChooser`, `photo/PhotoNotes`, `hooks/usePhotoChoice`; the
+  composer's photo handler moved into `useComposer` (Composer 141 lines).
+
+**Verified:** database 756 (+9: library photo via the gallery with Google's
+lasting link, same attachment, no library copy, missing/unknown refused, a
+too-small photo refused before anything is sent), REST routes 695; the
+size check and the reachable branch each mutation-checked. Premium 17 +
+63. In the browser with a stand-in `wp.media` window (above the dialog,
+with a search box, Esc to close), on both the Posts screen and the editor:
+the library opens, its search keeps focus, clicking in it leaves the post
+open, Select sends `POST /posts/media/library` once and shows Google's
+link; Esc closes only the library, a second Esc the post. Icon rendered
+from the toolbar code on light and dark. All smoke suites, both PHPCS,
+ESLint and both builds clean. Not checked: the real `wp.media` and editor.
+
+## Step 91 — "Customer photos" removed from post photos
+
+Removed on request, on the Posts screen and the editor popup alike (one
+shared photo field): the "Customer photos" pill (`photo/PhotoChooser`), the
+customer branch of the picker (now `GooglePhotoPicker` shows "Your gallery"
+only), and the warning's mention of it. Server: `PostMedia::choices()` —
+`GET /posts/photos` — returns `{ gallery }` only and no longer reads
+reviews. Reviews keep their own photos on the Reviews screen. Database
+757 (+1: only the gallery is offered), smoke suites, PHPCS, ESLint, both
+builds clean.
+
+## Step 92 — Checked: FoundHint without Premium, and Premium unlicensed
+
+Run on the dev site's real database without changing it: WordPress loaded
+with Premium filtered out of `active_plugins` (or its licence filtered off)
+for that one process.
+
+**Premium not active** — all fine: FoundHint loads; the admin module wires;
+no "GBP Posting" link under blog posts; the editor bundle is not loaded;
+the app gets no `pro` data (PRO tags, Schedule and the blog switch
+disabled — checked in the browser earlier); no `fhint-premium` routes;
+`/posts` and `/posts/state` answer 200; unscheduling still works; source
+`blog` refused; nothing listens to a leftover sender event. The home page
+renders with the free schema markup. (The one PHP warning on every request,
+`WP_DEBUG_LOG already defined`, is the container's `WORDPRESS_CONFIG_EXTRA`
+repeating `wp-config.php` — not FoundHint.)
+
+**Premium active, licence inactive** — one bug, fixed: every route answered
+`403 fhintpremium_license_required`, features were empty and blog sharing
+stayed off even with its switch on — but the five-minute sender still sent
+posts scheduled before the licence lapsed (while the screen said they wait
+for Premium). `Scheduler::run()` now returns early without a licence; posts
+stay scheduled and go out once it is back. Premium database 66 (+3); with
+the guard removed the new checks fail. PHPCS clean.
+
+## Step 82 — Review reply templates work with Premium
+
+Before: without Premium the Reviews screen drew the full templates card
+from sample data (a preview that could not save); with Premium it showed a
+placeholder ("FoundHint Premium X is active"), and Premium had no template
+code. Now Premium stores and serves them, and the same card works for real.
+
+**Premium:** table `fhintpremium_review_templates` (DB 1.1.0); rules in
+`App\Review\Templates` (rating 1–5, kind comment|stars, name ≤ 100, reply ≤
+4096, ≤ 20 per rating and kind, per-field `review_template.*` codes); routes
+`GET/POST reviews/templates`, `PUT/DELETE reviews/templates/{id}`, licence
+required. Templates are shared by every location (owner's choice). The table
+goes on uninstall only with "Delete data on uninstall" on.
+
+**Free:** `hooks/useTemplates` gives the card and the reply dialog the
+owner's templates with Premium, or the samples without. The card (split per
+the 150-line rule into `templates/RatingTabs`, `TemplateItem`,
+`TemplateCount`, `CardActions`, `TemplateFields`, `InsertDetail`,
+`DialogFooter`) adds, edits and deletes (delete asks once); the server's
+messages show under each field; the reply dialog's quick templates are the
+owner's. `ProTemplatesCard` is removed. The help line now says templates are
+shared by all locations. Import from CSV stays disabled ("coming soon").
+
+**Verified:** Premium database `templates.php` 31 (dbDelta idempotent, every
+rule, the limit and the other kind's own 20, moving into a full rating,
+404s, routes with and without a licence, uninstall keeping or dropping the
+table), mutation-tested (limit off by one, kind unchecked, no text maximum,
+moving into a full rating, uninstall ignoring the setting, order). Browser
+with Premium: empty save showed "Give the template a name." / "Write the
+reply."; a template saved, filled the reply dialog ("Hi shahjalal, thank you
+for visiting us!" — not sent), was renamed and deleted (list back to empty);
+without Premium the sample preview, Save disabled, no Delete.
+
+## Step 83 — Review auto-reply (without AI)
+
+From the FHReviews design (`Product roadmap priorities – FHReviews.html`),
+everything except the AI parts, which come later.
+
+**Premium:** `AutoReplier` (WP-Cron every 10 minutes while on: sync reviews,
+answer the due ones through the free `ReviewReply::save()`), `AutoReplySettings`
+(on, scope new|all, rules per rating × comment|stars = template|builtin|off),
+`ReplyText` (built-in replies + placeholders, mirroring `lib/replies.js`),
+`AutoReplyLog` + table `fhintpremium_auto_replies` (one row per review; sent
+count; retries up to 3), route `GET/PUT reviews/auto-reply`, feature
+`reviews.auto_reply`. DB 1.2.0; deactivation clears the event; uninstall
+removes the option (and the table with "Delete data on uninstall").
+
+**Free:** the band on Reviews (Active/Paused, sent count, Set up, a switch
+that saves at once; without Premium a Premium pill and Unlock/Activate), the
+"Set up auto-reply" dialog (switch, Which reviews, the How to reply grid with
+My templates / Built-in reply / Don't reply, "N templates take turns", "No
+templates yet. Add one" opening the template editor and coming back with the
+draft kept, the 1–2 star advice, "N of 10 review kinds get a reply"), and
+"Sent by auto-reply" on replies it wrote. Left out: AI reply, AI writing
+style, AI credits.
+
+**Bug fixed on the way (both sides):** filling a reply for an anonymous
+reviewer left "Thanks for the 4 stars,!" and ", we're sorry…"; a comma
+before `!.?` and a leading comma are now removed, and the first letter
+capitalised.
+
+**Verified:** Premium `autoreply.php` 48 (defaults, every validation, `since`
+on switch-on, first names and empty placeholders, due reviews by scope /
+rule / rating / removed / replied / limit / order, template rotation, a run
+putting both replies to Google with the right text, nothing twice, failure
+logged and retried to the limit, off and no-licence send nothing, schedule
+follows the switch, route and uninstall), mutation-tested (scope ignored,
+retry forever, answering twice, no rotation, no licence check, newest
+first, template rule unchecked, `since` not set). Browser (real admin): the
+band, the dialog, Add one → template saved → back with the rule kept, Save
+while off, the switch on and straight off (no event left, nothing sent),
+the label (temporary log row, removed). Test data removed; auto-reply left
+off.
+
+How it works, end to end: `docs/AUTO-REPLY.md`.
+
+## Step 94 — Auto-reply: never twice when runs overlap; templates in use
+
+Review of the auto-reply commits (31bd946, Premium d6b5a95) against
+`docs/AUTO-REPLY.md` found two bugs; both fixed in Premium.
+
+1. **A review could be answered twice.** The sender posted the reply, then
+   wrote the log row, so two overlapping runs (a run can outlast WP-Cron's
+   60-second lock) could both answer it — the second overwriting the first,
+   perhaps with another template, and skewing template turns. Now
+   `AutoReplyLog::claim()` takes the review first: the unique-key insert as
+   `sending`, or one conditional update of a `failed` row; only the claimer
+   sends (`AutoReplier::answer()`, public for the test). `due()` skips a
+   review another run is sending; a claim older than 15 minutes
+   (`STUCK_AFTER`) can be taken over. `CreateAutoRepliesTable` documents
+   the `sending` status (no column change).
+2. **Deleting a template could lock the settings.** With a *My templates*
+   rule left without templates, every save — even the band's on/off switch
+   — was refused (`auto_reply.rule.no_templates` checked all ten cells).
+   Now `Templates::delete()` refuses the last template of a rating and kind
+   whose rule uses templates (`409 fhintpremium_template_in_use`, message
+   in `lib/errors.js`), and `AutoReplySettings::save()` checks only the
+   cells a save sets.
+
+**Verified:** Premium auto-reply 63 (+15), mutation-checked — sending
+without the claim, claiming any row, never taking over a dead claim,
+deleting the last template in use, and checking every cell on save each
+fail the suite. Two tests first passed against broken code and were fixed:
+the race test went through `run()`, whose `due()` already skipped the
+claimed review (now `due()` then `answer()`, as two real runs would), and
+a second claim in the same second changed no row so MySQL reported 0 rows
+either way (the first claim is aged 30 s). Templates 31, posts 66 + 17,
+schema 253 + 286, requirements 18; PHPCS, ESLint, both builds clean.
+
+## Step 95 — Auto-reply: one chosen template per rating; no built-in reply
+
+Owner's decisions on auto-reply, built across both plugins:
+
+1. **AI reply, coming soon.** Each cell of "How to reply" lists *AI reply*,
+   disabled, with the *Coming soon* badge (`SoonTag`). The server still
+   refuses `ai`.
+2. **Defaults to Don't reply.** `AutoReplySettings::defaults()` sets every
+   cell `off`.
+3. **No built-in reply.** Removed from the cell options, `SOURCES`,
+   `AutoReplier::choose()` and `ReplyText` (`builtin()` deleted). A saved
+   `builtin` rule reads as `off`, so nothing goes out until the owner
+   chooses again. The table keeps `builtin` on older rows. The manual reply
+   dialog's suggested replies (`lib/replies.js`) are untouched.
+4. **My templates → choose one.** Choosing *My templates* shows a second
+   list with that rating and kind's templates; the chosen id is saved in a
+   new `picks` setting and sent every time (no more taking turns —
+   `AutoReplyLog::template_turns()` removed). One template is chosen at
+   once; "Add one" chooses the new template. Save is refused without a
+   choice (`auto_reply.rule.pick_template`, new in `lib/errors.js`). A
+   chosen template can't be deleted or moved to another rating or kind
+   (`fhintpremium_template_in_use`).
+5. **CSV import removed** from the Reply templates card (`CardActions`),
+   and **Add a template** moved to the top of the card, above the rating
+   tabs.
+
+UI: Base UI selects (`components/ui/select`) in a new `RuleCell.jsx`;
+`RulesGrid` is layout only; helpers in `pages/reviews/lib/autoReply.js`.
+
+**Verified:** Premium auto-reply 75, mutation-checked — skipping the
+rating/kind check on a pick, never treating a template as in use, not
+saving picks, and allowing `builtin` each fail the suite. Templates 31,
+posts 66 + 17, schema 286, requirements 18; PHPCS, ESLint, both builds
+clean. In the browser against a mocked API: defaults all Don't reply; AI
+reply disabled with its badge; the template list shows only that rating
+and kind; Save without a choice is refused; the PUT carries
+`rules` + `picks`; reopening shows the saved choices; "Add one" comes back
+with the new template chosen; no Import from CSV button.
+
+## Step 96 — Cron health: warn when background jobs stop
+
+WP-Cron runs only on site requests, so on a quiet site, behind a full-page
+cache, or where the site can't call itself, auto-reply and scheduled posts
+stop without a word. Action Scheduler was considered and rejected: it
+needs the same requests, or a server cron, to run.
+
+- **Premium** `App/Core/CronHealth.php`: `seen( $job )` records each run
+  (first thing in `AutoReplier::run()` and `Scheduler::run()`, before the
+  licence check); `state()` reports per job `last_run`, `next_run` and
+  `late` — WP-Cron's next run is over 20 minutes past and the job has work
+  (auto-reply on / a post scheduled; asked only when overdue) — plus `disabled`
+  (`DISABLE_WP_CRON`) and the site's `cron_url`. Sent as `pro.cron` in the
+  bootstrap data; the option is removed on uninstall.
+- **Free**: `components/cron/CronWarning.jsx` (amber warning: "Auto-reply
+  has not checked for reviews in 3 hours.", **How to fix**) under the
+  auto-reply band and at the top of Posts; `CronGuide.jsx` (host cron line
+  for this site with Copy, a free online cron service, `DISABLE_WP_CRON`);
+  `lib/cron.js`. Nothing shows while jobs run on time.
+
+**Verified:** Premium `tests/Integration/cron.php` 14 and the
+requirements smoke test 19 (AppData carries `cron`), mutation-checked —
+no grace period, warning without work, recording the run after the
+licence check, and posts never "needed" each fail. Auto-reply 75, posts
+66 + 17, templates 31; PHPCS, ESLint, both builds clean. Browser (mocked
+API): the warning on Reviews and Posts with the right wording and hours,
+the guide with the site's own cron line, and no warning when on time.
+
+## Step 97 — Auto-reply: large backlogs
+
+A load test (1,000 unanswered reviews, Google faked) showed auto-reply
+works at that size, but three things would hurt on a real host. All three
+fixed, plus a bug found on the way.
+
+1. **Bug (free): a capped read marked reviews removed.** `ReviewSync`
+   called `mark_removed_for_location()` after its 20-page cap, so on a
+   location with more than 1,000 reviews every older stored review was
+   marked removed. Now only a read that reaches the last page marks
+   removals. New `$max_pages` argument on `ReviewSync::run()` (clamped to
+   1–20). Covered by the new `tests/Integration/review-sync.php` (10).
+2. **Light reads (Premium).** Auto-reply reads the newest 2 pages
+   (`QUICK_PAGES`) on most runs and every page once a day
+   (`AutoReplyState`, option `fhintpremium_auto_reply_state`) — about 2
+   Google requests a run instead of up to 20 per location.
+3. **Time budget (Premium).** A run stops sending after 20 s
+   (`TIME_BUDGET`, filter `fhintpremium_auto_reply_time_budget`), always
+   after at least one; the rest go next run.
+4. **Daily limit for older reviews.** New setting `daily_limit` (0 | 25 |
+   50 | **100** | 200; `auto_reply.daily_limit.invalid`) shown as "Older
+   reviews per day" (`DailyLimit.jsx`) under *New and unanswered*, with
+   today's count (`older_today`). `due()` now puts new reviews first, then
+   older ones up to what is left of the day's limit.
+
+**Verified:** Premium auto-reply 95, mutation-checked — no budget, a
+budget that can send nothing, the limit ignored, older reviews first, not
+counting older replies, always a full read, the full read not recorded,
+and (free) a capped read marking removals each fail it. Free review-sync
+10, mutation-checked (always removing, ignoring the page limit, no clamp).
+All smoke suites, both PHPCS, ESLint and builds clean. Browser (mocked
+API): the limit appears with *New and unanswered*, defaults to 100 a day,
+and saves `daily_limit`.
+
+**Load test** (1,000 older reviews, no daily limit, Google faked, with
+reads): at 0.5 s a request, 51 runs, all answered once, about 11 s and
+48 MB a run, the full-read run stopping at 20 s after 19 replies.
+At 1 s a request: 57 runs, all answered once, about 20 s a run (the budget
+holding every run to 18 replies, the full-read run to 1), 48 MB.
+
+## Step 98 — Reply placeholders: right values, no broken replies
+
+A check of every placeholder against real reviews found five problems;
+all fixed, in both the server filler (Premium `ReplyText`, auto-reply) and
+the reply dialog's (`lib/replies.js`), which agree on 17 compared cases.
+
+1. **`{{business_keyword}}` was always empty.** Now the linked location's
+   category, else the business's, read mid-sentence ("dentist"); none for a
+   listing not linked to FoundHint (it may be another business).
+2. **`{{location_city}}` was empty for an unlinked listing.** Now falls
+   back to the city on Google's address (`storefrontAddress.locality`,
+   new `GoogleLocationRepository::payload()`).
+   Both come from the new free `App\Review\ReplyContext`, sent to the
+   Reviews screen as `locations[].reply`. The reply dialog now fills from
+   the **review's own listing**, not the location in the bar.
+3. **Typos.** `{{ reviewer_name }}` was posted with its braces and
+   `{{name}}` vanished. Now spaces and capitals are accepted, and a
+   template with an unknown placeholder is not saved
+   (`review_template.text.unknown_placeholder`).
+4. **Lower-case names** ("shahjalal") now get their capital.
+5. **Google's limit**: `{{review_text}}` is shortened with "…" (whole
+   letters) when the reply would pass 4,096 bytes.
+
+A value still missing (no city anywhere, an unlinked listing's keyword)
+would break the sentence, so **auto-reply does not send that reply**: it is
+logged failed with the reason (`ReplyText::missing()`, Logger event
+`auto_reply.missing_value`) and retried up to 3 attempts. The reply dialog
+fills it and says which detail was left out (`reply/QuickTemplates.jsx`).
+`ReplyDialog.jsx` was split (`QuickTemplates`, `ReplyField`, `ReviewQuote`)
+from 239 to 146 lines.
+
+**Verified:** Premium `tests/Smoke/reply-text.php` 24, mutation-checked
+(no capital, no spaces, case-sensitive, no cut, city not required, unknown
+check without trimming, keyword not lowered); free `review-sync.php` 17
+with `ReplyContext` (no Google-city fallback, keyword for unlinked
+listings, business over location each fail). PHP and JS fillers compared
+on 17 cases: identical.
+
+## Step 99 — Test suites must not touch the site's Google connection
+
+The 1,000-review load test (step 97) wrote fake Google tokens into the real
+options table for 30 minutes (a swapped `$wpdb->prefix` does not swap
+`$wpdb->options`). At 08:48 a real WP-Cron run on the dev site used them;
+Google refused, `Connection` logged `google.grant_revoked` and cleared the
+tokens; the test's restore then did nothing (its cached copy said the row
+existed, so `update_option()` ran an UPDATE on a deleted row). The dev site
+lost its Google connection — reconnect it on the Google screen.
+
+Fixed in every database suite that fakes Google (`review-sync.php`,
+Premium `autoreply.php`, `posts.php`): tokens are kept in memory through
+`pre_option_` / `pre_update_option_fhint_google_tokens`, never written, and
+`fhint_google_tokens` is no longer restored (it is never touched). Restores
+now `wp_cache_flush()` first (also `cron.php`). `posts.php` restores
+`fhintpremium_cron_seen`, which its sender run writes. Verified: with the
+real token row absent, all five suites pass and the row is still absent
+afterwards. The rule is in `CLAUDE.md`.
+
+## Step 100 — Auto-reply and templates per Google listing
+
+Owner's decision: each location's auto-reply is its own — enabling it, its
+rules and its templates for one Google listing must not affect another.
+Chosen: a template library per listing; settings follow the location bar.
+
+- **Templates (Premium DB 1.3.0)**: new `location_name` column (+ key);
+  limit 20 per listing, rating and kind; a template must name a listing
+  FoundHint has read (`review_template.location.invalid`) and never moves to
+  another. `GET reviews/templates?location_name=` (none without one).
+  Upgrade `Installer::templates_to_listings()` copies each older template
+  to every listing (first keeps it), idempotent.
+- **Settings**: `AutoReplySettings` holds `{ listings: { name: set } }` —
+  `get( $name )`, `save( $name, … )` (`auto_reply.location.invalid`),
+  `enabled()`, `any_on()`. A pick must be the listing's own template.
+  Older single settings are not carried over: each listing is switched on
+  on its own. `AutoReplyState` counts the daily limit per listing;
+  `AutoReplyLog::sent_count( $name )`.
+- **Sender**: reads Google only for listings that are on; `due()` takes
+  the enabled sets and answers each review by its listing's set.
+- **Route**: `reviews/auto-reply?location_name=` (always returns `listings[]`
+  in brief); PUT requires `location_name`.
+- **UI**: `useTemplates( locationName )`, `useAutoReply( locationName )`
+  follow the bar's listing; the reply dialog loads the review's own
+  listing's templates; a new template carries the listing.
+  A location with no Google listing has no Reviews screen, so a listing must
+  be linked to a FoundHint location to be set up (an "all listings" summary
+  was built, found unreachable, and removed).
+
+**Verified:** Premium auto-reply 118 (+18: one listing on leaves another
+off; settings for an unknown listing refused; another listing's template
+refused even of the same rating; each listing answered with its own
+template; switching one off leaves the other on and sends nothing for it;
+daily counts per listing; GET summary; PUT without a listing refused; the
+template copy and its re-run), templates 38. Mutations caught: any
+listing's template accepted, every listing treated as on (with the due()
+guard also removed), shared template limit, GET ignoring the listing,
+migration not copying, a shared daily count. Browser (mocked API): the bar's
+listing drives the band, templates and the switch's PUT
+(`location_name: locations/1`); a new template is saved with its listing.
+Dev site upgraded: its template exists once per listing; dbDelta clean;
+auto-reply off for both listings until switched on.
+
+**Fix after step 100 — "No route was found" on plain permalinks.** The new
+`?location_name=` queries were appended to the Premium base with a raw `?`;
+on a site with plain permalinks the base is already
+`index.php?rest_route=/fhint-premium/v1`, so the second `?` made WordPress
+answer `rest_no_route` (templates and auto-reply could not load or save).
+New `proUrl( path, params )` in `lib/pro.js` (moved from
+`schemaManagerApi`) picks `&` or `?` from the base; `autoReplyApi` and
+`reviewTemplatesApi` use it. Verified on the dev site (plain permalinks):
+the old shape answers 404 `rest_no_route`, the new one reaches the route.
+The mocked browser harness uses pretty URLs, which is why it passed —
+check Premium query strings against a plain-permalink site.
+
+**Templates card copy.** It still said "Templates are shared by all your
+locations"; it now says they belong to this location and each location has
+its own. Checked in the harness with two linked locations: switching the
+location in the bar reloads that location's templates and auto-reply
+settings (`?location_name=locations/1` → `locations/2`) without a page
+reload.
+
+## Step 101 — Release FoundHint 1.2.3 and Premium 1.0.2
+
+Versions bumped in each plugin's header and constant, `package.json`,
+`package-lock.json` and `readme.txt` (stable tag). Premium's
+`FHINTPREMIUM_MIN_FREE_VERSION` is now 1.2.3 (the per-location screens,
+`ReplyContext` and short review reads); its readme says so. Changelogs and
+FoundHint's upgrade notice cover auto-reply and per-location templates, the
+cron warning, the placeholder fixes, the review-sync fix, the CSV import
+removal, the Schema screen refresh (356b8cf) and Premium's uninstall fix
+(004051d). FoundHint's feature list gains review auto-reply (Premium), and
+"Coming soon" now names AI review replies instead.
+
+**Verified:** all smoke and database suites, both PHPCS, ESLint and the
+build pass; the dev site reports FoundHint 1.2.3 / Premium 1.0.2 with no
+requirements problem. Release order: FoundHint 1.2.3 first.
+
+**No sample templates without Premium** (merged into 1.2.3).
+`useTemplates()` returns none without `reviews.templates`;
+`sampleTemplates()` is gone from `lib/templates.js`. The Reply templates
+card shows `TemplatesUpsell` (what templates do, Unlock with Premium /
+Activate licence) instead of tabs and a list, and the reply dialog offers
+only the built-in reply. Checked in the harness with Premium off and on.
+
+## Step 102 — Plugin Directory review: activation, CSS, React
+
+The plugin was closed on WordPress.org (review of 8 Nov 2026). What the
+review and Plugin Check found in the code, and what changed:
+
+**Indexes past 767 bytes.** `google_reference.entry` (1,192 bytes as
+utf8mb4), `services.business_location_slug` (816) and
+`location_attributes.location_attribute` (772) were over the limit of older
+InnoDB setups. Their columns hold ASCII only (Google ids, WordPress slugs),
+so they are now `CHARACTER SET ascii` — one byte a character, no column
+shortened. dbDelta compares only the type, so existing installs are left
+alone. `ReferenceRepository::replace()` skips a non-ASCII id and
+`ServiceRepository::unique_slug()` percent-encodes one. `schema-format`
+now measures every index (mutation-tested on each of the three). Against
+MySQL: the old services table fails `ROW_FORMAT=COMPACT` with "Specified
+key was too long"; the new tables create, and a second dbDelta is empty.
+
+**Activation.** Fresh install on its own prefix: every table, no output,
+no PHP notices.
+
+**Unused table removed (DB 0.20.0).** `schema_page_index` was created on
+every site but never read or written (the page map comes from the cached
+graph). Its definition and registry entry are gone, and
+`Installer::drop_unused_tables()` drops it on upgrade. The other 18 free
+tables and Premium's two are each used by live code. `database.php` proves
+the drop (and fails when the migration does nothing); the dev site upgraded
+to 0.20.0 with the table gone and 18 present.
+
+**CSS reached WordPress's admin menu.** Tailwind's preflight was global on
+our screen (box-sizing and border colour changed on the admin menu and
+toolbar). It now runs in `@scope (#fhint-app, [data-base-ui-portal],
+[data-sonner-toaster])` (`src/admin/preflight-scoped.css`); in the browser
+the admin menu and toolbar now compute the same as on the Dashboard.
+`.modern-scroll` became `.fhint-scroll`.
+
+**React from WordPress (guideline 13; Plugin Check `inlined_react_dom`).**
+The bundles no longer carry React: `wp_scripts()` maps React, ReactDOM,
+the JSX runtime and `@wordpress/i18n` to WordPress's scripts,
+`vite/wp-require.js` serves react-redux's CommonJS `require("react")`, and
+`vite/forward-refs.js` wraps `components/ui/` in `forwardRef` so Base UI's
+refs survive React 18. `package.json` pins React 18.3.1 (WordPress 7.1's).
+Requires WordPress 6.6 (`react-jsx-runtime`). A side effect: `__()` now
+uses WordPress's `wp.i18n`, the one `wp_set_script_translations()` fills.
+
+**Verified** with `SCRIPT_DEBUG` on (React's development build): all 14
+screens render with no console error or warning; the auto-reply dialog and
+its selects, the location menu, the Disconnect confirmation (cancelled),
+the subtype combobox, a tooltip and the block editor's GBP Posting popup
+open, anchor to their triggers and return focus. The Disconnect trigger's
+fiber is a `forwardRef` whose ref reaches the button. `tests/Vite/
+forward-refs.mjs` passes (255) and fails when the ref is not passed on or a
+component is missed.
+
+**Readme.** The description was 2,394 words, past what WordPress.org
+shows; it is now 1,330 with the same features.
+
+Plugin Check on the release build: the offloading error on
+`PostMedia::is_temporary()` is a string test on a Google URL, nothing is
+loaded; the 85 `UnescapedDBParameter` warnings are table names from
+`Tables::name()`.
+
+**Release 1.2.4.** Version bumped in the header, `FHINT_VERSION`,
+`package.json` and the readme's stable tag; changelog and upgrade notice
+cover the fixes above and the WordPress 6.6 requirement. Premium is
+unchanged (it does not need 1.2.4).

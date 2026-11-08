@@ -18,6 +18,7 @@ function selects() {
       [
         ["", __("All statuses", "foundhint-local-seo")],
         ["live", __("Live", "foundhint-local-seo")],
+        ["scheduled", __("Scheduled", "foundhint-local-seo")],
         ["draft", __("Draft", "foundhint-local-seo")],
         ["failed", __("Failed", "foundhint-local-seo")],
       ],

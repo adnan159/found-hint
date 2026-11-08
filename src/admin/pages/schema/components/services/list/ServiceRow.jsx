@@ -53,16 +53,16 @@ export function ServiceRow({
       draggable={!locked}
       {...drag}
       className={cn(
-        "fhint:border-b fhint:border-b-[#f0eeee] fhint:last:border-b-0",
+        "fhint:border-b fhint:border-b-border fhint:last:border-b-0",
         current
-          ? "fhint:bg-[#FFF8F4] fhint:shadow-[inset_3px_0_0_#FF6B35]"
-          : "fhint:bg-white",
+          ? "fhint:bg-notice fhint:shadow-[inset_3px_0_0_var(--primary)]"
+          : "fhint:bg-card fhint:hover:bg-muted/50",
         dragged && "fhint:opacity-50",
       )}
     >
       <div
         className={cn(
-          "fhint:flex fhint:items-center fhint:gap-3 fhint:px-3.5 fhint:py-[11px]",
+          "fhint:flex fhint:items-center fhint:gap-3 fhint:px-5 fhint:py-3.5",
           !on && "fhint:opacity-70",
         )}
       >
@@ -106,7 +106,7 @@ export function ServiceRow({
           onClick={onPick}
           aria-current={current ? "true" : undefined}
           className={cn(
-            "fhint:grid fhint:min-w-0 fhint:flex-1 fhint:cursor-pointer fhint:gap-0.5 fhint:border-0 fhint:bg-transparent fhint:p-0 fhint:text-left fhint:text-[#201e1d]",
+            "fhint:grid fhint:min-w-0 fhint:flex-1 fhint:cursor-pointer fhint:gap-0.5 fhint:border-0 fhint:bg-transparent fhint:p-0 fhint:text-left fhint:text-foreground",
             focus,
           )}
         >

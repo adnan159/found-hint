@@ -24,6 +24,10 @@ Free/Premium split and every checklist are in
 [`docs/SCHEMA-PLAN.md`](docs/SCHEMA-PLAN.md); open items are unticked there.
 See `docs/PROGRESS.md` for exactly what is done and how it was verified.
 
+**Review auto-reply (built; Premium, no AI yet):** how a reply is chosen,
+sent and recorded, and where each part lives —
+[`docs/AUTO-REPLY.md`](docs/AUTO-REPLY.md).
+
 The sibling `local-seo` plugin in this same directory is the reference for
 the *product*: its `docs/DATABASE.md`, `API.md` and `FEATURES.md` describe
 the model and the features this plugin grows into. Take the requirements
@@ -33,7 +37,7 @@ from there; the structure is defined here.
 
 ```bash
 npm run dev              # Vite dev server for the admin React SPA (vite.admin.config.js)
-npm run build            # Production build of the admin SPA → assets/build/admin
+npm run build            # Production build of the admin SPA → assets/build/admin, then the editor bundle → assets/build/editor
 npm run lint              # eslint over src/
 npm run plugin:prepare    # build + copy everything (minus buildExclude globs in package.json) into ./build
 npm run plugin:publish    # plugin:prepare + zip ./build into found-hint.zip
@@ -54,6 +58,7 @@ php tests/Smoke/audit.php              # the rule set, scoring and the registry
 php tests/Smoke/dashboard.php          # the score trend and what the card may claim
 php tests/Smoke/google-refresh.php     # categories, attributes and photos read from a listing
 php tests/Smoke/posts.php              # post mapping to/from Google, validation, photo reachability
+node tests/Vite/forward-refs.mjs      # ui/ components take refs on WordPress's React 18
 ```
 
 The smoke suites run on plain PHP against stubbed WordPress
@@ -67,6 +72,10 @@ docker exec foundhunt_app php \
   /var/www/html/wp-content/plugins/found-hint/tests/Integration/database.php
 ```
 
+`tests/Integration/review-sync.php` covers reading reviews from Google
+(Google answered in-process): short reads, the page cap, and when a review
+is marked removed.
+
 The site is `foundhunt_app` in Docker — `http://localhost:8100`, phpMyAdmin
 on `:8101`. That suite covers dbDelta idempotency, every repository round
 trip, the cascades, plan limits and capability denial. **It runs against
@@ -74,6 +83,15 @@ its own tables**: it swaps `$wpdb->prefix`, since `Tables::name()` reads the
 prefix at call time, then drops them and restores the options it stamped.
 Keep it that way — a verification suite that eats the developer's own data
 gets run once and then never again.
+
+**Options are not swapped with the prefix** — `$wpdb->options` is fixed at
+load, so a suite writes the site's real options. Never put fake Google
+tokens there: a real request on the site (WP-Cron) picked them up once,
+Google refused them, and the owner's connection was cleared. Keep them in
+memory with `pre_option_fhint_google_tokens` /
+`pre_update_option_fhint_google_tokens` (see `review-sync.php`), and call
+`wp_cache_flush()` before restoring options, so a restore is never skipped
+because another request changed the row meanwhile.
 
 Two rules divide cleanly between them, and it is worth knowing which owns
 which: the **two-space `PRIMARY KEY  (id)`** rule is static
@@ -139,6 +157,7 @@ includes/
 ├── functions.php           global non-class helpers only
 └── hooks.php               global hook wiring only
 src/admin/                  Vite-built React SPA (see below)
+src/editor/                 GBP Posting button + popup in the block editor (vite.editor.config.js)
 assets/build/               Vite output, gitignored — never hand-edit
 assets/static/              hand-written, directly-enqueued, no build step
 libs/assets.php             vite-for-wp integration (FHINT\Libs\Assets)
@@ -240,12 +259,12 @@ Filter the required capability with `fhint_manage_capability`.
 
 | Concern | Use |
 |---|---|
-| React | `react` / `react-dom` (bundled by Vite, not `@wordpress/element`) |
+| React | WordPress's own `react` / `react-dom` / `react-jsx-runtime` scripts (18.3 today) — **not bundled** |
 | Routing | `react-router` (`createHashRouter`) — client-side, under one WP page |
 | Components | shadcn/ui (`src/admin/components/ui/`) + base-ui primitives |
 | State | Redux Toolkit + RTK Query (`src/admin/store/`) |
 | HTTP | RTK Query `fetchBaseQuery`, nonce from `window.FHINT` |
-| i18n | `@wordpress/i18n` (`__()`) with the `found-hint` text domain |
+| i18n | `@wordpress/i18n` (`__()`) with the `found-hint` text domain — WordPress's `wp-i18n`, not bundled |
 | Styling | Tailwind CSS v4, classes prefixed `fhint:` (see `components.json`) |
 | Build | Vite (`vite.admin.config.js`) via `@kucrut/vite-for-wp` |
 
@@ -266,7 +285,18 @@ route in `routes.jsx` and an entry in the sidebar; do not add
   source.
 - **Assets load on our screen only.** `Enqueue` gates on the exact hook
   suffix `toplevel_page_fhint`. Verify by loading an unrelated admin page
-  and grepping the HTML for `fhint-admin`.
+  and grepping the HTML for `fhint-admin`. The one other bundle is
+  `src/editor` (`Admin\EditorAssets`): the block editor for a blog post,
+  while blog sharing is on. It must never import `src/admin/index.css`.
+  Shared look lives in `src/admin/styles/theme.css` (FoundHint-only
+  selectors).
+- **CSS never reaches WordPress's own interface** — not even on our
+  screen (Plugin Directory review). Tailwind's reset runs inside `@scope`:
+  `src/admin/preflight-scoped.css` (the app's `#fhint-app` and the
+  `[data-base-ui-portal]` containers its popups render into) and
+  `src/editor/preflight-scoped.css` (the popup). Both are copies of
+  Tailwind's preflight; regenerate them after a Tailwind upgrade. Class
+  names we own are `fhint-` prefixed (`.fhint-scroll`).
 - **Field errors come from the server.** REST returns machine codes; the
   client maps them to translated strings.
 - **Every string through `__()`** with the `found-hint` text domain.
@@ -299,6 +329,35 @@ route in `routes.jsx` and an entry in the sidebar; do not add
   translate. Brackets stay only where there is no spacing scale — a font
   size like `fhint:text-[12.5px]`, letter-spacing, a colour.
 
+### React comes from WordPress
+
+Plugin Directory guideline 13: a plugin uses the libraries WordPress ships
+instead of bundling its own, and Plugin Check fails a bundle that inlines
+React. Both Vite configs therefore:
+
+- **`wp_scripts()`** (vite-for-wp) turns `react`, `react-dom`,
+  `react-dom/client`, `react/jsx-runtime` and `@wordpress/*` imports into
+  WordPress's globals. `Enqueue` and `EditorAssets` list `react`,
+  `react-dom`, `react-jsx-runtime` and `wp-i18n` as dependencies —
+  `react-jsx-runtime` is why the plugin requires WordPress 6.6.
+- **`vite/wp-require.js`** gives CommonJS packages (react-redux's
+  use-sync-external-store) a `require()` that returns those globals;
+  without it the bundle throws on load.
+- **`vite/forward-refs.js`** wraps every component in `components/ui/` in
+  `forwardRef` at build time. shadcn writes them for React 19, where `ref`
+  is a prop; on React 18 a ref given to a plain function component is
+  dropped, and Base UI passes one whenever our component is its `render`
+  (`render={<Button />}`). The files themselves stay untouched, so the CLI
+  can still regenerate them. Proved by `node tests/Vite/forward-refs.mjs`.
+
+Write code that runs on **React 18 and 19**: `npm` pins `react@18.3` to
+match WordPress, so no React 19-only API (`use()`, `<Context value>` as a
+provider, form `action` functions, `ref` as a prop on our own components —
+use `forwardRef`, ref cleanup functions, `inert` as a boolean — React 18
+drops it with a warning). When WordPress moves to React 19
+the bundle needs no change. Test with `SCRIPT_DEBUG` on: it loads React's
+development build, the only one that prints its warnings.
+
 ### Working with generated components
 
 - **Class merging comes from the `cn` package**, not a local helper —
@@ -320,6 +379,10 @@ route in `routes.jsx` and an entry in the sidebar; do not add
   errors without a browser — and load the real bundle in a browser against
   a mocked API before calling a screen done. The select bug below survived
   a clean build, a clean lint and a passing SSR render.
+- **Build Premium URLs with query strings through `proUrl()`** (`lib/pro.js`),
+  free ones through `withQuery()` (`store/api/baseApi.js`). On plain
+  permalinks the base already holds `?rest_route=`, and a second `?` is a
+  404 `rest_no_route`.
 - **Never pass `undefined` as a controlled component's value.** Base UI
   treats `undefined` as "uncontrolled" on first render and then ignores the
   real value when it arrives, so a saved value shows as the placeholder

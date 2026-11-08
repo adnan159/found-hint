@@ -10,7 +10,6 @@ import {
 import { movedIds } from "../../../lib/service";
 import ListHeader, { LIST_TITLE_ID } from "./ListHeader";
 import EmptyList from "./EmptyList";
-import ListSummary from "./ListSummary";
 import ServiceRow from "./ServiceRow";
 import { panel } from "../../styles";
 
@@ -103,21 +102,18 @@ export function ServiceList({
         locked={locked}
         canAdd={!locked && (limits?.can_add ?? true)}
         limits={limits}
+        branchName={list ? branchName : ""}
+        active={active}
+        inactive={services.length - active}
         onAdd={onAdd}
       />
 
-      <div className="fhint:grid fhint:gap-2.5 fhint:px-5 fhint:pt-3.5 fhint:pb-[18px]">
-        <ListSummary
-          branchName={list ? branchName : ""}
-          active={active}
-          inactive={services.length - active}
-        />
-
+      <div>
         {!services.length ? (
           <EmptyList locked={locked} list={list} branchName={branchName} />
         ) : (
           <ul
-            className="fhint:m-0 fhint:list-none fhint:border fhint:border-[#e6e3e3] fhint:p-0"
+            className="fhint:m-0 fhint:list-none fhint:p-0"
             aria-label={__("Services", "foundhint-local-seo")}
           >
             {services.map((service, index) => (

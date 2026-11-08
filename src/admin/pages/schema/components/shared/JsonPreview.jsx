@@ -112,7 +112,7 @@ export function JsonPreview({
     <aside
       aria-label={__("JSON-LD preview", "foundhint-local-seo")}
       className={cn(
-        "fhint:sticky fhint:top-4 fhint:min-w-0 fhint:flex-[1_1_380px] fhint:border fhint:border-border fhint:bg-[#1d1b1a] fhint:text-white",
+        "fhint:sticky fhint:top-4 fhint:min-w-0 fhint:flex-[1_1_380px] fhint:2xl:flex-[0.6_1_380px] fhint:border fhint:border-border fhint:bg-[#1d1b1a] fhint:text-white",
         className,
       )}
     >

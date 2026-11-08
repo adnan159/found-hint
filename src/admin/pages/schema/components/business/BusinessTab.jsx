@@ -20,11 +20,21 @@ import JsonPreview from "../shared/JsonPreview";
 import PlacementCards from "../shared/PlacementCards";
 import SaveBar from "../shared/SaveBar";
 import RequirementStatus from "./RequirementStatus";
-import PanelHeading from "../shared/PanelHeading";
+import PanelHeading, { Counter } from "../shared/PanelHeading";
 import { panel } from "../styles";
 import SubtypePicker from "./SubtypePicker";
 
 const TITLE_ID = "fhint-schema-business-title";
+
+// No outer panel: the type picker, each field group, where it prints and
+// the save bar are cards of their own. Their dividers, drawn for life inside
+// one panel, are dropped.
+const CARD = cn(panel, "fhint:*:border-y-0");
+
+// The preview's column: Ready to publish / Can't publish yet, a gap, then
+// the preview — pinned together 32px below the top as the form scrolls.
+const PREVIEW_COLUMN =
+  "fhint:sticky fhint:top-8 fhint:grid fhint:min-w-0 fhint:flex-[1_1_380px] fhint:gap-2 fhint:2xl:flex-[0.6_1_380px]";
 
 // The tab's own words, by kind.
 const NAMES = {
@@ -136,7 +146,7 @@ export function BusinessTab({
     <div className="fhint:flex fhint:flex-wrap fhint:items-start fhint:gap-4">
       <section
         aria-labelledby={TITLE_ID}
-        className={cn(panel, "fhint:min-w-0 fhint:flex-[1_1_580px]")}
+        className="fhint:grid fhint:min-w-0 fhint:flex-[1_1_580px] fhint:gap-4"
       >
         <PanelHeading
           id={TITLE_ID}
@@ -145,35 +155,27 @@ export function BusinessTab({
               ? __("Organization schema", "foundhint-local-seo")
               : __("LocalBusiness schema", "foundhint-local-seo")
           }
-          description={
-            organization
-              ? __(
-                  "Who owns or runs the business, however many locations it has.",
-                  "foundhint-local-seo",
-                )
-              : __(
-                  "A business at a physical location, with its address, hours and category.",
-                  "foundhint-local-seo",
-                )
-          }
-          counter={state.counter}
+          srOnly
         />
+        {state.counter ? (
+          <div className="fhint:flex fhint:justify-end">
+            <Counter counter={state.counter} />
+          </div>
+        ) : null}
 
         {organization ? null : (
-          <SubtypePicker
-            type={type}
-            typeLabel={draft.schema_type ? draft.schema_type : state.type_label}
-            matchedFrom={state.matched_from}
-            locked={locked}
-            onPick={(next) => set({ schema_type: next, extras: {} })}
-          />
+          <div className={CARD}>
+            <SubtypePicker
+              type={type}
+              typeLabel={
+                draft.schema_type ? draft.schema_type : state.type_label
+              }
+              matchedFrom={state.matched_from}
+              locked={locked}
+              onPick={(next) => set({ schema_type: next, extras: {} })}
+            />
+          </div>
         )}
-
-        <RequirementStatus
-          kind={kind}
-          visitMode={visitMode}
-          missing={missing}
-        />
 
         <BusinessFields
           fields={fields}
@@ -205,52 +207,65 @@ export function BusinessTab({
           }
         />
 
-        <PlacementCards
-          title={sprintf(
-            /* translators: %s: "organization schema" or "local business schema". */
-            __("Add %s to", "foundhint-local-seo"),
-            NAMES[organization ? "organization" : "localbusiness"](),
-          )}
-          name={`fhint-${organization ? "organization" : "business"}-placement`}
-          value={draft.placement ?? state.placement}
-          postIds={draft.post_ids ?? state.post_ids}
-          locked={locked}
-          onChange={(next) => set({ placement: next })}
-          onPages={(ids) => set({ post_ids: ids })}
-        />
+        <div className={CARD}>
+          <PlacementCards
+            title={sprintf(
+              /* translators: %s: "organization schema" or "local business schema". */
+              __("Add %s to", "foundhint-local-seo"),
+              NAMES[organization ? "organization" : "localbusiness"](),
+            )}
+            name={`fhint-${organization ? "organization" : "business"}-placement`}
+            value={draft.placement ?? state.placement}
+            postIds={draft.post_ids ?? state.post_ids}
+            locked={locked}
+            onChange={(next) => set({ placement: next })}
+            onPages={(ids) => set({ post_ids: ids })}
+          />
+        </div>
 
         {saveState.error && !Object.keys(errors).length ? (
           <p
             role="alert"
-            className="fhint:mx-5 fhint:mb-3 fhint:text-sm fhint:text-destructive"
+            className="fhint:m-0 fhint:text-sm fhint:text-destructive"
           >
             {errorMessage(saveState.error)}
           </p>
         ) : null}
 
         {locked ? null : (
-          <SaveBar
-            dirty={dirty}
-            saving={saveState.isLoading}
-            status={missing.length ? "draft" : state.status}
-            live={live}
-            onSave={onSave}
-          />
+          <div className={CARD}>
+            <SaveBar
+              dirty={dirty}
+              saving={saveState.isLoading}
+              status={missing.length ? "draft" : state.status}
+              live={live}
+              onSave={onSave}
+            />
+          </div>
         )}
       </section>
 
-      <JsonPreview
-        locked={locked}
-        document={document}
-        // With the website beside it the document is a @graph; the
-        // business is its first node.
-        rootType={
-          document?.["@type"] ?? document?.["@graph"]?.[0]?.["@type"] ?? ""
-        }
-        live={live && !dirty && state.status === "active"}
-        loading={preview.loading && !document}
-        dirty={dirty}
-      />
+      <div className={PREVIEW_COLUMN}>
+        <RequirementStatus
+          kind={kind}
+          visitMode={visitMode}
+          missing={missing}
+          className="fhint:m-0"
+        />
+        <JsonPreview
+          className="fhint:static"
+          locked={locked}
+          document={document}
+          // With the website beside it the document is a @graph; the
+          // business is its first node.
+          rootType={
+            document?.["@type"] ?? document?.["@graph"]?.[0]?.["@type"] ?? ""
+          }
+          live={live && !dirty && state.status === "active"}
+          loading={preview.loading && !document}
+          dirty={dirty}
+        />
+      </div>
     </div>
   );
 }

@@ -1,53 +1,77 @@
-import { useId, useRef, useState } from "react";
+import { useState } from "react";
 import { __, sprintf } from "@wordpress/i18n";
+import { toast } from "sonner";
 import { cn } from "cn";
-import { PlusIcon } from "lucide-react";
-import { focus, help, label } from "@/pages/profile/styles";
-import { dialogButton, dialogInput, primaryAction } from "../styles";
-import { PLACEHOLDERS } from "../lib/replies";
+import { errorMessage, fieldErrors } from "@/lib/errors";
+import { errorText } from "@/pages/profile/styles";
 import { TEMPLATE_LIMIT } from "../lib/templates";
 import ReviewsDialog from "./ReviewsDialog";
 import SoonTag from "./SoonTag";
-
-// A placeholder to insert: a pill that takes the accent on hover.
-const insertChip = cn(
-  "fhint:group fhint:inline-flex fhint:cursor-pointer fhint:items-center fhint:gap-1 fhint:rounded-full fhint:border fhint:border-input fhint:bg-card fhint:px-2.5 fhint:py-1 fhint:font-mono fhint:text-[11.5px] fhint:font-semibold fhint:text-foreground fhint:transition-colors",
-  "fhint:hover:border-primary fhint:hover:bg-notice fhint:hover:text-notice-foreground",
-  "fhint:active:scale-[0.97]",
-  focus,
-);
+import TemplateFields from "./templates/TemplateFields";
+import DialogFooter from "./templates/DialogFooter";
 
 /**
  * Adding or editing a reply template.
  *
- * The form works — choose the rating, name it, write it, insert the
- * placeholders — but saving is FoundHint Pro, so the button says so instead
- * of pretending to store anything.
+ * With FoundHint Premium (`editable`) it saves and deletes; without it the
+ * form works as a preview and the button says saving is Premium instead of
+ * pretending to store anything.
+ *
+ * @param {Object}   props
+ * @param {Object}   props.template The template to edit, or null for a new one.
+ * @param {number}   props.rating   A new template's starting rating.
+ * @param {string}   props.kind     A new template's starting kind.
+ * @param {Function} props.countFor `(rating, kind)` → templates already there.
+ * @param {boolean}  props.editable Premium serves templates.
+ * @param {boolean}  props.saving   A save or delete is running.
+ * @param {Function} props.onSave   Resolves with the template, or throws.
+ * @param {Function} props.onRemove Resolves when removed, or throws.
+ * @param {Function} props.onClose  Close the dialog.
  */
-export function TemplateDialog({ template, rating, count, onClose }) {
-  const id = useId();
-  const box = useRef(null);
+export function TemplateDialog({
+  template,
+  rating,
+  kind,
+  countFor,
+  editable,
+  saving,
+  onSave,
+  onRemove,
+  onClose,
+}) {
   const [form, setForm] = useState({
     rating: template?.rating ?? rating ?? 5,
-    kind: template?.kind ?? "comment",
+    kind: template?.kind ?? kind ?? "comment",
     name: template?.name ?? "",
     text: template?.text ?? "",
   });
+  const [error, setError] = useState(null);
+  const [confirming, setConfirming] = useState(false);
+  const errors = fieldErrors(error);
+  // A template already in this rating and kind does not take a new place.
+  const stays =
+    template && template.rating === form.rating && template.kind === form.kind;
+  const used = countFor(form.rating, form.kind) - (stays ? 1 : 0);
 
-  const insert = (placeholder) => {
-    const node = box.current;
-    const start = node?.selectionStart ?? form.text.length;
-    const end = node?.selectionEnd ?? form.text.length;
-    const text = form.text.slice(0, start) + placeholder + form.text.slice(end);
+  const save = async () => {
+    try {
+      await onSave({ ...(template ? { id: template.id } : {}), ...form });
+      toast.success(__("Template saved.", "foundhint-local-seo"));
+      onClose();
+    } catch (caught) {
+      setError(caught);
+    }
+  };
 
-    setForm({ ...form, text });
-    window.requestAnimationFrame(() => {
-      node?.focus();
-      node?.setSelectionRange(
-        start + placeholder.length,
-        start + placeholder.length,
-      );
-    });
+  const remove = async () => {
+    try {
+      await onRemove(template.id);
+      toast.success(__("Template deleted.", "foundhint-local-seo"));
+      onClose();
+    } catch (caught) {
+      setError(caught);
+      setConfirming(false);
+    }
   };
 
   return (
@@ -57,153 +81,50 @@ export function TemplateDialog({ template, rating, count, onClose }) {
           ? __("Edit template", "foundhint-local-seo")
           : __("New reply template", "foundhint-local-seo")
       }
-      description={__(
-        "Reply templates are part of FoundHint Premium.",
-        "foundhint-local-seo",
-      )}
+      description={
+        editable
+          ? __("Shared by all your locations.", "foundhint-local-seo")
+          : __(
+              "Reply templates are part of FoundHint Premium.",
+              "foundhint-local-seo",
+            )
+      }
       onClose={onClose}
-      width="fhint:sm:max-w-[680px]"
+      width="fhint:sm:max-w-170"
       note={sprintf(
         /* translators: 1: templates used, 2: the most allowed, 3: a star rating. */
         __("%1$d of %2$d used for %3$d-star reviews", "foundhint-local-seo"),
-        count,
+        used,
         TEMPLATE_LIMIT,
         Number(form.rating),
       )}
       footer={
-        <>
-          <button type="button" onClick={onClose} className={dialogButton}>
-            {__("Cancel", "foundhint-local-seo")}
-          </button>
-          <button
-            type="button"
-            disabled
-            title={__(
-              "Saving templates is part of FoundHint Premium.",
-              "foundhint-local-seo",
-            )}
-            className={primaryAction}
-          >
-            {__("Save template", "foundhint-local-seo")}
-          </button>
-        </>
+        <DialogFooter
+          editable={editable}
+          canDelete={editable && Boolean(template)}
+          saving={saving}
+          confirming={confirming}
+          onDelete={confirming ? remove : () => setConfirming(true)}
+          onSave={save}
+          onClose={onClose}
+        />
       }
     >
-      <p className="fhint:m-0 fhint:flex fhint:items-center fhint:gap-2 fhint:text-sm fhint:text-muted-strong">
-        <SoonTag kind="pro" />
-        {__(
-          "Saving your own templates comes with FoundHint Premium.",
-          "foundhint-local-seo",
-        )}
-      </p>
-
-      <div className="fhint:grid fhint:grid-cols-2 fhint:gap-3">
-        <span className="fhint:grid fhint:gap-1.5">
-          <label htmlFor={`${id}-rating`} className={label}>
-            {__("Star rating", "foundhint-local-seo")}
-          </label>
-          <select
-            id={`${id}-rating`}
-            value={form.rating}
-            onChange={(event) =>
-              setForm({ ...form, rating: Number(event.target.value) })
-            }
-            className={dialogInput}
-          >
-            {[5, 4, 3, 2, 1].map((stars) => (
-              <option key={stars} value={stars}>
-                {sprintf(
-                  /* translators: %d: a star rating from 1 to 5. */
-                  __("%d stars", "foundhint-local-seo"),
-                  stars,
-                )}
-              </option>
-            ))}
-          </select>
-        </span>
-        <span className="fhint:grid fhint:gap-1.5">
-          <label htmlFor={`${id}-kind`} className={label}>
-            {__("Used for", "foundhint-local-seo")}
-          </label>
-          <select
-            id={`${id}-kind`}
-            value={form.kind}
-            onChange={(event) => setForm({ ...form, kind: event.target.value })}
-            className={dialogInput}
-          >
-            <option value="comment">
-              {__("Reviews with a comment", "foundhint-local-seo")}
-            </option>
-            <option value="stars">
-              {__("Stars only", "foundhint-local-seo")}
-            </option>
-          </select>
-        </span>
-      </div>
-
-      <span className="fhint:grid fhint:gap-1.5">
-        <label htmlFor={`${id}-name`} className={label}>
-          {__("Name", "foundhint-local-seo")} <span aria-hidden="true">*</span>
-        </label>
-        <input
-          id={`${id}-name`}
-          value={form.name}
-          required
-          onChange={(event) => setForm({ ...form, name: event.target.value })}
-          placeholder={__("e.g. Warm thank-you", "foundhint-local-seo")}
-          className={dialogInput}
-        />
-      </span>
-
-      <span className="fhint:grid fhint:gap-1.5">
-        <label htmlFor={`${id}-text`} className={label}>
-          {__("Reply", "foundhint-local-seo")} <span aria-hidden="true">*</span>
-        </label>
-        <textarea
-          id={`${id}-text`}
-          ref={box}
-          rows={4}
-          required
-          value={form.text}
-          onChange={(event) => setForm({ ...form, text: event.target.value })}
-          className={cn(dialogInput, "fhint:resize-y")}
-        />
-      </span>
-
-      <div
-        role="group"
-        aria-labelledby={`${id}-insert`}
-        aria-describedby={`${id}-insert-help`}
-        className="fhint:grid fhint:gap-2.5 fhint:bg-[#faf6f4] fhint:px-4 fhint:py-3.5"
-      >
-        <div className="fhint:flex fhint:flex-wrap fhint:items-baseline fhint:gap-x-2 fhint:gap-y-0.5">
-          <span id={`${id}-insert`} className={label}>
-            {__("Insert a detail", "foundhint-local-seo")}
-          </span>
-          <span id={`${id}-insert-help`} className={help}>
-            {__(
-              "Added where the cursor is, and swapped for the real details when you reply.",
-              "foundhint-local-seo",
-            )}
-          </span>
-        </div>
-        <div className="fhint:flex fhint:flex-wrap fhint:gap-2">
-          {PLACEHOLDERS.map((placeholder) => (
-            <button
-              key={placeholder}
-              type="button"
-              onClick={() => insert(placeholder)}
-              className={insertChip}
-            >
-              <PlusIcon
-                aria-hidden="true"
-                className="fhint:size-3 fhint:text-muted-strong fhint:transition-colors fhint:group-hover:text-primary"
-              />
-              {placeholder}
-            </button>
-          ))}
-        </div>
-      </div>
+      {editable ? null : (
+        <p className="fhint:m-0 fhint:flex fhint:items-center fhint:gap-2 fhint:text-sm fhint:text-muted-strong">
+          <SoonTag kind="pro" />
+          {__(
+            "Saving your own templates comes with FoundHint Premium.",
+            "foundhint-local-seo",
+          )}
+        </p>
+      )}
+      {error && !Object.keys(errors).length ? (
+        <p role="alert" className={cn(errorText, "fhint:m-0")}>
+          {errorMessage(error)}
+        </p>
+      ) : null}
+      <TemplateFields form={form} setForm={setForm} errors={errors} />
     </ReviewsDialog>
   );
 }

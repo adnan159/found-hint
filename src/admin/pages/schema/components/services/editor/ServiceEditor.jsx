@@ -152,8 +152,9 @@ export function ServiceEditor({
         ref={top}
         aria-label={__("Service editor", "foundhint-local-seo")}
         className={cn(
-          panel,
-          "fhint:min-w-0 fhint:scroll-mt-4 fhint:border-t-0 fhint:@4xl:col-start-1",
+          // A column of cards, like the other tabs: the head, each
+          // section, where it prints, the save bar.
+          "fhint:grid fhint:min-w-0 fhint:scroll-mt-8 fhint:gap-4 fhint:@4xl:col-start-1",
           // Selects count as read-only to CSS, so the shared field style
           // greys them; the design's are white.
           "fhint:[&_select:not(:disabled)]:bg-white fhint:[&_select:not(:disabled)]:text-[#201e1d]",
@@ -187,44 +188,46 @@ export function ServiceEditor({
         />
         <OptionalDetails form={form} />
 
-        <PlacementCards
-          title={__("Add this schema to", "foundhint-local-seo")}
-          name={form.field("placement")}
-          value={values.placement}
-          postIds={values.post_ids}
-          locked={locked}
-          homeWarning={false}
-          choices={[
-            [
-              "own_page",
-              __("Its service page", "foundhint-local-seo"),
-              pageTitle && values.page.mode === "wp"
-                ? sprintf(
-                    /* translators: %s: page title. */
-                    __("Printed only on %s.", "foundhint-local-seo"),
-                    pageTitle,
-                  )
-                : __(
-                    "Printed only on the service page.",
-                    "foundhint-local-seo",
-                  ),
-            ],
-            [
-              "chosen",
-              __("Pages I choose", "foundhint-local-seo"),
-              __("Pick the pages below.", "foundhint-local-seo"),
-            ],
-          ]}
-          onChange={(next) => set({ placement: next })}
-          onPages={(next) => set({ post_ids: next })}
-        />
+        <div className={cn(panel, "fhint:*:border-y-0")}>
+          <PlacementCards
+            title={__("Add this schema to", "foundhint-local-seo")}
+            name={form.field("placement")}
+            value={values.placement}
+            postIds={values.post_ids}
+            locked={locked}
+            homeWarning={false}
+            choices={[
+              [
+                "own_page",
+                __("Its service page", "foundhint-local-seo"),
+                pageTitle && values.page.mode === "wp"
+                  ? sprintf(
+                      /* translators: %s: page title. */
+                      __("Printed only on %s.", "foundhint-local-seo"),
+                      pageTitle,
+                    )
+                  : __(
+                      "Printed only on the service page.",
+                      "foundhint-local-seo",
+                    ),
+              ],
+              [
+                "chosen",
+                __("Pages I choose", "foundhint-local-seo"),
+                __("Pick the pages below.", "foundhint-local-seo"),
+              ],
+            ]}
+            onChange={(next) => set({ placement: next })}
+            onPages={(next) => set({ post_ids: next })}
+          />
+        </div>
 
         {warnings
           .filter((warning) => PLACEMENT_WARNINGS.includes(warning.code))
           .map((warning) => (
             <p
               key={`${warning.code}-${warning.branch ?? ""}`}
-              className={warningNote}
+              className={cn(warningNote, "fhint:m-0")}
             >
               {warningText(warning)}
             </p>
@@ -233,20 +236,22 @@ export function ServiceEditor({
         {writeState.error && !Object.keys(errors).length ? (
           <p
             role="alert"
-            className="fhint:mx-5 fhint:mb-3 fhint:text-sm fhint:text-destructive"
+            className="fhint:m-0 fhint:text-sm fhint:text-destructive"
           >
             {errorMessage(writeState.error)}
           </p>
         ) : null}
 
         {locked ? null : (
-          <SaveBar
-            dirty={dirty}
-            saving={writeState.isLoading}
-            status={values.status === "inactive" ? "inactive" : "active"}
-            live={live}
-            onSave={onSave}
-          />
+          <div className={cn(panel, "fhint:*:border-t-0")}>
+            <SaveBar
+              dirty={dirty}
+              saving={writeState.isLoading}
+              status={values.status === "inactive" ? "inactive" : "active"}
+              live={live}
+              onSave={onSave}
+            />
+          </div>
         )}
       </section>
 
@@ -257,7 +262,7 @@ export function ServiceEditor({
         live={live && !dirty && values.status === "active"}
         loading={preview.loading && !document}
         dirty={dirty}
-        className="fhint:mt-4 fhint:@4xl:col-start-2 fhint:@4xl:row-span-2 fhint:@4xl:row-start-1 fhint:@4xl:mt-0 fhint:@4xl:self-start"
+        className="fhint:top-8 fhint:@4xl:col-start-2 fhint:@4xl:row-span-2 fhint:@4xl:row-start-1 fhint:@4xl:self-start"
       />
 
       <RemoveDialog

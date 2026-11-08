@@ -1,3 +1,4 @@
+import { TagIcon } from "lucide-react";
 import { __ } from "@wordpress/i18n";
 import { cn } from "cn";
 import { MAX_DESCRIPTION } from "../../../lib/service";
@@ -57,14 +58,14 @@ export function BasicsSection({ form, fromGoogle, options, nameRef }) {
 
   return (
     <EditorSection
-      number="01"
+      icon={TagIcon}
       title={__("Service", "foundhint-local-seo")}
       hint={__(
         "What you offer, in the words customers use. The description should match what the service page says.",
         "foundhint-local-seo",
       )}
     >
-      <div className="fhint:grid fhint:grid-cols-[repeat(auto-fill,minmax(min(100%,240px),1fr))] fhint:gap-4">
+      <div className="fhint:grid fhint:grid-cols-[repeat(auto-fill,minmax(min(100%,240px),1fr))] fhint:gap-x-4 fhint:gap-y-5">
         <div className="fhint:grid fhint:content-start fhint:gap-1.5">
           <span className="fhint:flex fhint:flex-wrap fhint:items-center fhint:gap-1.5">
             <label htmlFor={field("name")} className={label}>

@@ -110,6 +110,32 @@ class Installer {
 		self::drop_old_service_slug_key();
 		self::remember_google_listings();
 		self::rename_veterinarian_type();
+		self::drop_unused_tables();
+	}
+
+	/**
+	 * Tables an earlier version created and nothing uses any more.
+	 *
+	 * `schema_page_index` was meant to map pages to schema for the
+	 * front end; the page map is built from the cached graph instead, so the
+	 * table was never written. Dropped where it exists; on a new or already
+	 * cleaned site this is one SHOW TABLES per name.
+	 *
+	 * @return void
+	 */
+	private static function drop_unused_tables() {
+		global $wpdb;
+
+		foreach ( array( 'schema_page_index' ) as $key ) {
+			if ( ! Tables::exists( $key ) ) {
+				continue;
+			}
+
+			$table = Tables::name( $key );
+
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.SchemaChange, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+			$wpdb->query( "DROP TABLE IF EXISTS {$table}" );
+		}
 	}
 
 	/**

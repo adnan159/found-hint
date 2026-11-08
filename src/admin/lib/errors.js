@@ -205,6 +205,46 @@ const MESSAGES = {
     __("Choose a business type from the list.", "foundhint-local-seo"),
   "schema.location.page.not_found": () =>
     __("That page no longer exists. Choose another.", "foundhint-local-seo"),
+  "auto_reply.location.invalid": () =>
+    __(
+      "Choose a location linked to a Google listing first.",
+      "foundhint-local-seo",
+    ),
+  "review_template.location.invalid": () =>
+    __(
+      "Choose a location linked to a Google listing first; each listing has its own templates.",
+      "foundhint-local-seo",
+    ),
+  "auto_reply.scope.invalid": () =>
+    __("Choose which reviews to reply to.", "foundhint-local-seo"),
+  "auto_reply.daily_limit.invalid": () =>
+    __("Choose how many older reviews to answer a day.", "foundhint-local-seo"),
+  "auto_reply.rule.invalid": () =>
+    __("Choose how to reply to these reviews.", "foundhint-local-seo"),
+  "auto_reply.rule.no_templates": () =>
+    __(
+      "No templates for this rating yet. Add one, or pick another option.",
+      "foundhint-local-seo",
+    ),
+  "auto_reply.rule.pick_template": () =>
+    __("Choose which template to send.", "foundhint-local-seo"),
+  "review_template.rating.invalid": () =>
+    __("Choose a rating from 1 to 5 stars.", "foundhint-local-seo"),
+  "review_template.kind.invalid": () =>
+    __("Choose reviews with a comment, or stars only.", "foundhint-local-seo"),
+  "review_template.name.required": () =>
+    __("Give the template a name.", "foundhint-local-seo"),
+  "review_template.name.too_long": () =>
+    __("Keep the name to 100 characters.", "foundhint-local-seo"),
+  "review_template.text.required": () =>
+    __("Write the reply.", "foundhint-local-seo"),
+  "review_template.text.too_long": () =>
+    __("Google takes replies of up to 4096 characters.", "foundhint-local-seo"),
+  "review_template.text.unknown_placeholder": () =>
+    __(
+      "This uses a detail FoundHint doesn't know, such as {{name}}. Use one from Insert a detail, written exactly as shown.",
+      "foundhint-local-seo",
+    ),
   "schema.location.page.no_name": () =>
     __(
       "Give this branch a name first; the page is named after it.",
@@ -380,6 +420,23 @@ const MESSAGES = {
   "post.media_url.invalid": () =>
     __(
       "That photo is not a web address Google can open.",
+      "foundhint-local-seo",
+    ),
+  // Scheduling (FoundHint Premium checks the time).
+  "post.scheduled_at.required": () =>
+    __("Choose when to send it.", "foundhint-local-seo"),
+  "post.scheduled_at.invalid": () =>
+    __("Enter a date and a time.", "foundhint-local-seo"),
+  "post.scheduled_at.too_soon": () =>
+    __(
+      "Pick a time at least 5 minutes from now, or choose Now instead.",
+      "foundhint-local-seo",
+    ),
+  "post.scheduled_at.too_far": () =>
+    __("Pick a time within the next year.", "foundhint-local-seo"),
+  "post.scheduled_at.after_event": () =>
+    __(
+      "Send it before the event ends, or nobody will see it in time.",
       "foundhint-local-seo",
     ),
   "review.reply.required": () =>
@@ -677,16 +734,20 @@ export function errorMessage(error) {
         "Your account can't publish pages, so FoundHint can't create one. Use an existing page instead.",
         "foundhint-local-seo",
       ),
+    fhintpremium_template_limit: () =>
+      __(
+        "A star rating holds up to 20 templates for each kind of review. Delete one to add another.",
+        "foundhint-local-seo",
+      ),
+    fhintpremium_template_not_found: () =>
+      __("That template no longer exists.", "foundhint-local-seo"),
     fhintpremium_page_not_created: () =>
       __(
         "The page couldn't be created. Try again, or use an existing page.",
         "foundhint-local-seo",
       ),
     fhintpremium_google_required: () =>
-      __(
-        "Connect your Google Business Profile to set up schema.",
-        "foundhint-local-seo",
-      ),
+      __("Connect your Google Business Profile first.", "foundhint-local-seo"),
     fhint_post_not_found: () =>
       __(
         "That post no longer exists. Sync posts to see the latest.",
@@ -699,6 +760,28 @@ export function errorMessage(error) {
       ),
     fhint_post_already_live: () =>
       __("This post is already on Google.", "foundhint-local-seo"),
+    fhint_post_not_scheduled: () =>
+      __("This post is not scheduled any more.", "foundhint-local-seo"),
+    fhint_post_sending: () =>
+      __(
+        "This post is being sent to Google right now. Try again in a minute.",
+        "foundhint-local-seo",
+      ),
+    fhintpremium_template_in_use: () =>
+      __(
+        'Auto-reply sends this template. Choose another one for it in "Set up auto-reply" first.',
+        "foundhint-local-seo",
+      ),
+    fhintpremium_blog_post_not_found: () =>
+      __(
+        "That blog post is not published, or no longer exists.",
+        "foundhint-local-seo",
+      ),
+    fhintpremium_post_not_schedulable: () =>
+      __(
+        "Only a draft or a post that is not on Google yet can be scheduled.",
+        "foundhint-local-seo",
+      ),
     fhint_review_not_found: () =>
       __(
         "That review is no longer stored here. Read your reviews from Google again.",

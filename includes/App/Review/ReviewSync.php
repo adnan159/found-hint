@@ -53,10 +53,16 @@ class ReviewSync {
 	/**
 	 * Read reviews for one location, or for every synced location.
 	 *
+	 * Google returns the most recently written or changed reviews first, so
+	 * a short read (`$max_pages` 1 or 2) is enough to pick up what is new —
+	 * which is what auto-reply does on most runs.
+	 *
 	 * @param string $location_name Google location resource name, or '' for all.
+	 * @param int    $max_pages     Pages to read per location, at most MAX_PAGES.
 	 * @return array|WP_Error Counts, or an error when nothing could be read.
 	 */
-	public static function run( $location_name = '' ) {
+	public static function run( $location_name = '', $max_pages = self::MAX_PAGES ) {
+		$max_pages = max( 1, min( self::MAX_PAGES, (int) $max_pages ) );
 		$locations = self::targets( $location_name );
 
 		if ( ! $locations ) {
@@ -72,7 +78,7 @@ class ReviewSync {
 		$succeeded = 0;
 
 		foreach ( $locations as $location ) {
-			$result = self::run_one( $location['location_name'], $location['account_name'] );
+			$result = self::run_one( $location['location_name'], $location['account_name'], $max_pages );
 
 			if ( is_wp_error( $result ) ) {
 				$failed[] = $result;
@@ -117,13 +123,14 @@ class ReviewSync {
 	}
 
 	/**
-	 * Read every page of reviews for one location and store them.
+	 * Read pages of reviews for one location and store them.
 	 *
 	 * @param string $location_name Google location resource name.
 	 * @param string $account_name  Google account resource name.
+	 * @param int    $max_pages     Stop after this many pages.
 	 * @return int|WP_Error How many reviews were stored.
 	 */
-	private static function run_one( $location_name, $account_name ) {
+	private static function run_one( $location_name, $account_name, $max_pages ) {
 		$url   = sprintf( self::REVIEWS_URL, (string) $account_name, (string) $location_name );
 		$seen  = array();
 		$token = '';
@@ -151,13 +158,17 @@ class ReviewSync {
 
 			$token = isset( $response['nextPageToken'] ) ? (string) $response['nextPageToken'] : '';
 			$pages++;
-		} while ( '' !== $token && $pages < self::MAX_PAGES );
+		} while ( '' !== $token && $pages < $max_pages );
 
 		// A review Google no longer returns has been deleted or taken down.
 		// It is kept, marked removed, so the owner can still see it — but out
 		// of every count and average, which must not judge them on a review
-		// that no longer exists anywhere.
-		ReviewRepository::mark_removed_for_location( $location_name, $seen );
+		// that no longer exists anywhere. Only after reading to the end: a
+		// read that stopped early (a short read, or the page cap on a large
+		// location) has not seen the older reviews, and they are not gone.
+		if ( '' === $token ) {
+			ReviewRepository::mark_removed_for_location( $location_name, $seen );
+		}
 
 		return count( $seen );
 	}

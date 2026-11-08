@@ -15,8 +15,16 @@ import ReviewCard from "./ReviewCard";
  * @param {boolean}       props.isFetching Whether a page is on its way.
  * @param {boolean}       props.filtered   Whether any filter is set.
  * @param {Function}      props.onReply    Receives the review to reply to.
+ * @param {Set<string>}   props.autoReplied Review ids auto-reply answered.
  */
-export function ReviewList({ items, loaded, isFetching, filtered, onReply }) {
+export function ReviewList({
+  items,
+  loaded,
+  isFetching,
+  filtered,
+  onReply,
+  autoReplied,
+}) {
   if (isFetching && !loaded) {
     return (
       <div className="fhint:grid fhint:gap-4 fhint:p-5">
@@ -63,7 +71,11 @@ export function ReviewList({ items, loaded, isFetching, filtered, onReply }) {
     >
       {items.map((review) => (
         <li key={review.review_id} className="fhint:m-0">
-          <ReviewCard review={review} onReply={() => onReply(review)} />
+          <ReviewCard
+            review={review}
+            auto={Boolean(autoReplied?.has(review.review_id))}
+            onReply={() => onReply(review)}
+          />
         </li>
       ))}
     </ul>

@@ -1,27 +1,15 @@
 import { useId, useState } from "react";
-import { __, _n, sprintf } from "@wordpress/i18n";
+import { __, sprintf } from "@wordpress/i18n";
 import { toast } from "sonner";
-import { cn } from "cn";
 import { errorMessage, fieldErrors } from "@/lib/errors";
-import { errorText, focus, label } from "@/pages/profile/styles";
-import { dialogButton, dialogInput, primaryAction } from "../styles";
+import { dialogButton, primaryAction } from "../styles";
 import { useSaveReviewReplyMutation } from "@/store/api/reviewsApi";
-import {
-  MAX_BYTES,
-  builtInReply,
-  bytes,
-  fillPlaceholders,
-  firstNameOf,
-  formatDate,
-} from "../lib/replies";
+import { MAX_BYTES, bytes, firstNameOf } from "../lib/replies";
 import ReviewsDialog from "./ReviewsDialog";
-import Stars from "./Stars";
-
-// A quick template: a rounded pill that fills the reply when pressed.
-const pill = cn(
-  "fhint:inline-flex fhint:cursor-pointer fhint:items-center fhint:rounded-full fhint:border fhint:border-input fhint:bg-card fhint:px-3.5 fhint:py-1.5 fhint:text-sm fhint:font-bold fhint:text-foreground fhint:hover:bg-muted",
-  focus,
-);
+import QuickTemplates from "./reply/QuickTemplates";
+import ReplyField from "./reply/ReplyField";
+import ReviewQuote from "./reply/ReviewQuote";
+import useTemplates from "../hooks/useTemplates";
 
 /**
  * Writing, or rewriting, the reply to one review.
@@ -34,7 +22,9 @@ const pill = cn(
  * fills the reply with this review's details — the reviewer's first name,
  * the location and its city — ready to edit before it is published.
  */
-export function ReplyDialog({ review, context, templates, onClose }) {
+export function ReplyDialog({ review, context, onClose }) {
+  // The review's own listing's templates, whatever the bar shows.
+  const { templates } = useTemplates(review.location_name);
   const id = useId();
   const editing = Boolean(review.reply_comment);
   const [draft, setDraft] = useState(review.reply_comment ?? "");
@@ -119,118 +109,36 @@ export function ReplyDialog({ review, context, templates, onClose }) {
         </>
       }
     >
-      <blockquote className="fhint:m-0 fhint:grid fhint:gap-1.5 fhint:border fhint:border-border fhint:bg-[#faf6f4] fhint:px-3.5 fhint:py-3">
-        <span className="fhint:flex fhint:flex-wrap fhint:items-center fhint:gap-2 fhint:text-sm">
-          <strong>
-            {review.is_anonymous || !review.reviewer_name
-              ? __("Anonymous", "foundhint-local-seo")
-              : review.reviewer_name}
-          </strong>
-          <Stars value={rating} />
-          {review.reviewed_at ? (
-            <span className="fhint:text-[12px] fhint:text-muted-strong">
-              {formatDate(review.reviewed_at)}
-            </span>
-          ) : null}
-        </span>
-        <span className="fhint:text-sm fhint:leading-relaxed">
-          {review.comment ||
-            __("Left a star rating without a comment.", "foundhint-local-seo")}
-        </span>
-      </blockquote>
+      <ReviewQuote review={review} rating={rating} />
 
-      <div className="fhint:grid fhint:gap-2">
-        <span className={label}>
-          {rating
-            ? sprintf(
-                /* translators: %d: a star rating from 1 to 5. */
-                _n(
-                  "Quick templates for %d-star reviews",
-                  "Quick templates for %d-star reviews",
-                  rating,
-                  "foundhint-local-seo",
-                ),
-                rating,
-              )
-            : __("Quick templates", "foundhint-local-seo")}
-        </span>
-        <div className="fhint:flex fhint:flex-wrap fhint:items-center fhint:gap-2">
-          {forRating.map((template) => (
-            <button
-              key={template.id}
-              type="button"
-              onClick={() => {
-                reset();
-                setDraft(fillPlaceholders(template.text, review, context));
-              }}
-              className={pill}
-            >
-              {template.name}
-            </button>
-          ))}
-          <button
-            type="button"
-            onClick={() => {
-              reset();
-              setDraft(builtInReply(review, context));
-            }}
-            className={pill}
-          >
-            {__("Built-in reply", "foundhint-local-seo")}
-          </button>
-        </div>
-      </div>
+      <QuickTemplates
+        review={review}
+        context={context}
+        templates={forRating}
+        rating={rating}
+        onPick={(text) => {
+          reset();
+          setDraft(text);
+        }}
+      />
 
       <form
         id={`${id}-form`}
         onSubmit={publish}
         className="fhint:grid fhint:gap-1.5"
       >
-        <span className="fhint:flex fhint:items-center fhint:gap-2">
-          <label htmlFor={id} className={label}>
-            {__("Your reply", "foundhint-local-seo")}
-          </label>
-          <span
-            className={cn(
-              "fhint:ml-auto fhint:text-[12px] fhint:font-semibold",
-              tooLong ? "fhint:text-destructive" : "fhint:text-muted-strong",
-            )}
-          >
-            {sprintf(
-              /* translators: 1: bytes used, 2: the most Google allows. */
-              __("%1$s / %2$s", "foundhint-local-seo"),
-              used.toLocaleString(),
-              MAX_BYTES.toLocaleString(),
-            )}
-          </span>
-        </span>
-        <textarea
+        <ReplyField
           id={id}
-          value={draft}
-          rows={6}
-          autoFocus
-          onChange={(event) => {
+          draft={draft}
+          used={used}
+          tooLong={tooLong}
+          fieldError={fieldError}
+          requestError={requestError}
+          onChange={(text) => {
             reset();
-            setDraft(event.target.value);
+            setDraft(text);
           }}
-          aria-invalid={fieldError ? true : undefined}
-          aria-describedby={fieldError ? `${id}-error` : undefined}
-          placeholder={__(
-            "Write a short, personal reply. Use their first name and mention something they said.",
-            "foundhint-local-seo",
-          )}
-          className={cn(dialogInput, "fhint:resize-y")}
         />
-        {fieldError ? (
-          <span id={`${id}-error`} role="alert" className={errorText}>
-            {fieldError}
-          </span>
-        ) : null}
-        {requestError ? (
-          <span role="alert" className={errorText}>
-            {requestError}
-          </span>
-        ) : null}
       </form>
     </ReviewsDialog>
   );

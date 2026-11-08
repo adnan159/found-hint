@@ -100,7 +100,9 @@ class Enqueue {
 	 */
 	private static function script_options() {
 		return array(
-			'dependencies' => array( 'react', 'react-dom' ),
+			// WordPress's own React (the bundle leaves it out); react-jsx-runtime
+			// is why the plugin needs WordPress 6.6.
+			'dependencies' => array( 'react', 'react-dom', 'react-jsx-runtime', 'wp-i18n' ),
 			'handle'       => self::SCRIPT_HANDLE,
 			'in-footer'    => true,
 		);
@@ -121,7 +123,7 @@ class Enqueue {
 	 *
 	 * @return array
 	 */
-	private static function bootstrap_data() {
+	public static function bootstrap_data() {
 		$data = array(
 			'rest_url'   => rest_url( \FHINT\API::NAMESPACE_NAME . '/' . \FHINT\API::VERSION ),
 			'rest_nonce' => wp_create_nonce( 'wp_rest' ),

@@ -19,6 +19,10 @@ defined( 'ABSPATH' ) || exit;
  * changes: it may already be in a published URL, and silently changing it
  * would break that link. Changing a slug is an explicit write.
  *
+ * slug is ASCII (WordPress slugs are: sanitize_title() percent-encodes
+ * anything else), so the unique key fits the 767-byte index limit of older
+ * InnoDB setups; as utf8mb4 it would need 816 bytes.
+ *
  * price is decimal(18,4) rather than a float — money compared with floats
  * eventually disagrees with itself. A price requires a currency; the pair is
  * validated together in App\Service\Service.
@@ -74,7 +78,7 @@ class CreateServicesTable {
 	business_id bigint(20) unsigned NOT NULL default 0,
 	location_id bigint(20) unsigned NOT NULL default 0,
 	name varchar(255) NOT NULL default '',
-	slug varchar(200) NOT NULL default '',
+	slug varchar(200) CHARACTER SET ascii NOT NULL default '',
 	description text NULL,
 	image_attachment_id bigint(20) unsigned NOT NULL default 0,
 	image_url varchar(500) NOT NULL default '',

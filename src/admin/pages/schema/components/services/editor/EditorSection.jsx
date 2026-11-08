@@ -1,30 +1,33 @@
 import Hint from "@/components/Hint";
 import { useId } from "react";
-
-/** The small grey number before each section's title: 01, 02… */
-export const sectionNumber =
-  "fhint:text-[12px] fhint:font-bold fhint:text-[#D8521F]";
+import { cn } from "cn";
+import { panel, panelHeader, panelTitle } from "../../styles";
 
 /**
- * One numbered section of the service editor: number, title, an optional
- * hint, then its fields.
+ * One section of the service editor as a card, built like a Business
+ * Profile section: its icon and title (with an optional hint) over the
+ * heavy 2px rule, then its fields with the profile's 20px padding.
  */
-export function EditorSection({ number, title, hint, children }) {
+export function EditorSection({ icon: Icon, title, hint, children }) {
   const id = useId();
 
   return (
-    <section
-      aria-labelledby={id}
-      className="fhint:grid fhint:gap-3.5 fhint:border-t-2 fhint:border-t-[#201e1d] fhint:px-5 fhint:py-[18px] fhint:first-of-type:border-t-0"
-    >
-      <div className="fhint:flex fhint:items-center fhint:gap-2.5">
-        <span className={sectionNumber}>{number}</span>
-        <h3 id={id} className="fhint:m-0 fhint:text-sm fhint:font-bold">
+    <section aria-labelledby={id} className={cn(panel, "fhint:min-w-0")}>
+      <div className={panelHeader}>
+        {Icon ? (
+          <span
+            aria-hidden="true"
+            className="fhint:grid fhint:size-5.5 fhint:flex-none fhint:place-items-center fhint:text-muted-strong"
+          >
+            <Icon className="fhint:size-4" />
+          </span>
+        ) : null}
+        <h3 id={id} className={panelTitle}>
           {title}
         </h3>
         {hint ? <Hint about={title} text={hint} /> : null}
       </div>
-      {children}
+      <div className="fhint:grid fhint:gap-4.5 fhint:p-5">{children}</div>
     </section>
   );
 }

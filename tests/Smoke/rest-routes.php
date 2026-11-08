@@ -81,9 +81,11 @@ $expected = array(
 	'fhint/v1/posts/state',
 	'fhint/v1/posts/photos',
 	'fhint/v1/posts/media',
+	'fhint/v1/posts/media/library',
 	'fhint/v1/posts/sync',
 	'fhint/v1/posts/(?P<id>\d+)',
 	'fhint/v1/posts/(?P<id>\d+)/publish',
+	'fhint/v1/posts/(?P<id>\d+)/unschedule',
 	'fhint/v1/schema',
 	'fhint/v1/audits',
 	'fhint/v1/dashboard',
@@ -144,7 +146,9 @@ check_same( 'google_write_check', $fhint_post_guard( 'fhint/v1/posts', 'POST' ),
 check_same( 'google_write_check', $fhint_post_guard( 'fhint/v1/posts/(?P<id>\d+)', 'PUT' ), 'editing a post needs Google connected' );
 check_same( 'google_write_check', $fhint_post_guard( 'fhint/v1/posts/(?P<id>\d+)/publish', 'POST' ), 'publishing a post needs Google connected' );
 check_same( 'google_write_check', $fhint_post_guard( 'fhint/v1/posts/media', 'POST' ), 'uploading a post photo needs Google connected — it may go on the listing' );
+check_same( 'google_write_check', $fhint_post_guard( 'fhint/v1/posts/media/library', 'POST' ), 'a Media Library photo too — it may go on the listing' );
 check_same( 'permissions_check', $fhint_post_guard( 'fhint/v1/posts', 'GET' ), 'reading posts needs only the capability' );
+check_same( 'permissions_check', $fhint_post_guard( 'fhint/v1/posts/(?P<id>\d+)/unschedule', 'POST' ), 'cancelling a schedule needs only the capability — nothing goes to Google' );
 
 check( in_array( 'POST, PUT, PATCH', $methods_seen['fhint/v1/business'], true ), 'business accepts POST, PUT and PATCH' );
 check( in_array( 'GET', $methods_seen['fhint/v1/business'], true ), 'business is readable' );

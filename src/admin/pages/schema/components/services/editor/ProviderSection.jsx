@@ -1,3 +1,4 @@
+import { Building2Icon } from "lucide-react";
 import { __, sprintf } from "@wordpress/i18n";
 import { cn } from "cn";
 import Hint from "@/components/Hint";
@@ -54,7 +55,7 @@ export function ProviderSection({ form, options, list }) {
 
   return (
     <EditorSection
-      number="02"
+      icon={Building2Icon}
       title={__("Service provider", "foundhint-local-seo")}
       hint={__(
         "Who offers it. The service points at your business or branch, so it never creates a second business.",
@@ -139,7 +140,7 @@ export function ProviderSection({ form, options, list }) {
       ) : null}
       <FieldError messages={errors.provider} />
 
-      <div className="fhint:grid fhint:grid-cols-[repeat(auto-fill,minmax(min(100%,240px),1fr))] fhint:gap-4">
+      <div className="fhint:grid fhint:grid-cols-[repeat(auto-fill,minmax(min(100%,240px),1fr))] fhint:gap-x-4 fhint:gap-y-5">
         <div className="fhint:grid fhint:content-start fhint:gap-1.5">
           <span className="fhint:flex fhint:items-center fhint:gap-1.5">
             <label htmlFor={field("person")} className={label}>

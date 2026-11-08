@@ -34,6 +34,10 @@ defined( 'ABSPATH' ) || exit;
  * @column location_id  Row id in wp_fhint_locations.
  * @column attribute_id Google's id without its prefix, e.g. 'url_facebook'
  *                      or 'wheelchair_accessible_entrance'.
+ *                      ASCII: ids are [a-z0-9_] (LocationAttributes::
+ *                      normalize_id()), and as utf8mb4 the unique key
+ *                      would need 772 bytes, past the 767-byte index limit
+ *                      of older InnoDB setups.
  * @column value_type   bool | enum | repeated_enum | url — Google's own kind.
  * @column value        The value as JSON, in the shape Google expects back.
  * @column is_dirty     1 when changed here since the last push to Google.
@@ -57,7 +61,7 @@ class CreateLocationAttributesTable {
 		$sql = "CREATE TABLE {$table} (
 	id bigint(20) unsigned NOT NULL auto_increment,
 	location_id bigint(20) unsigned NOT NULL default 0,
-	attribute_id varchar(191) NOT NULL default '',
+	attribute_id varchar(191) CHARACTER SET ascii NOT NULL default '',
 	value_type varchar(32) NOT NULL default 'bool',
 	value longtext NULL,
 	is_dirty tinyint(1) NOT NULL default 0,

@@ -1,10 +1,10 @@
 === FoundHint – Local SEO, Schema & Google Business Profile Manager ===
 Contributors: foundhint
 Tags: local seo, google business profile, local business schema, multi location, google reviews
-Requires at least: 6.4
+Requires at least: 6.6
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 1.2.1
+Stable tag: 1.2.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -32,242 +32,82 @@ Most WordPress local SEO plugins either lock multiple locations behind a paid ad
 * **Local SEO audit**, find what's missing, sorted by severity and explained in plain words.
 * **Review management**, read, filter and reply to Google reviews without leaving WordPress.
 * **Google Business Profile posts**, publish Update, Event and Offer posts to each location, with a live Google preview.
+* **Post scheduling**, choose the date and time a post goes out *(Premium)*.
+* **Share your blog on Google**, turn a published blog post into a Google post from the post list or the block editor *(Premium)*.
+* **Review auto-reply**, reply to new Google reviews automatically with your own template for each star rating, set up separately for each location *(Premium)*.
 * **Local SEO dashboard**, your health score, what to fix and your Google connection at a glance.
 * **Advanced schema**, Organization, every branch, services, WebSite, WebPage, About, Contact and Breadcrumb schema *(Premium)*.
 * **Location landing pages**, a page for each branch with its address, hours and map *(Premium)*.
 
-**Coming soon:** review auto-reply, post scheduling and a post calendar, local citations, a local ranking grid with competitor history, service landing pages, an advanced audit and Business Profile performance analytics.
-
-### A WordPress Local SEO Plugin That’s Free Where It Counts
+**Coming soon:** AI review replies, a post calendar, local citations, a local ranking grid with competitor history, service landing pages, an advanced audit and Business Profile performance analytics.
 
 Multiple locations, Google Business Profile sync, schema, the audit and review replies are all included in the free version. No upsell to add your second branch.
 
-## Business Information Management
+## Business Information and NAP Consistency
 
-Stop typing the same details everywhere. Add them once, in one place:
+Add your details once: name, business type and categories (from Google's own list), description with its earlier versions, phone numbers, email, website, opening date, price range, social profiles, booking and messaging links (appointment link, texting number, WhatsApp), hours, services, service area, logo, cover and gallery photos.
 
-* Business name
-* Business type, primary category and additional categories
-* Business description, with a history of earlier versions
-* Phone number, up to two more phone numbers, email address and website
-* Opening date
-* Price range
-* Social profiles and directories
-* Booking and messaging links: appointment link, texting number and WhatsApp
-* Business hours, including special hours for holidays
-* Services
-* Service area
-* Logo, cover photo and gallery photos
-
-FoundHint uses this information across your whole local SEO setup.
-
-### NAP Consistency for WordPress
-
-Your name, address and phone (NAP) are stored once and reused in your schema, your audit and your Google Business Profile. That single source of truth is the easiest way to keep NAP consistent, and it lays the groundwork for local citation management.
-
-## Business Categories
-
-Tell search engines exactly what you do. Search Google's own list of categories, set a primary category and add secondary categories. Clear categories keep your business described the same way everywhere.
+Your name, address and phone (NAP) are stored once and reused in your schema, your audit and your Google Business Profile, so they stay consistent everywhere.
 
 ## Multi-Location SEO Plugin for WordPress
 
-Run many branches from one WordPress site, free. Switch between them from the bar at the top of every screen. FoundHint is a local SEO plugin for multiple locations, built for franchises, chains and agencies.
+Run many branches from one WordPress site, free, and switch between them from the bar at the top of every screen. Each location keeps its own address, map position, phone, website, opening hours, services, service area, photos, attributes and reviews. Built for franchises, chains and agencies.
 
-### Location Management
+**Opening hours:** set each day as Open, Closed or Open 24 Hours, with several periods per day for split hours, plus special hours for holidays and one-off dates.
 
-Each location keeps its own details:
-
-* Location name
-* Address line 1 and address line 2
-* City, state or region, country and postal code
-* Map position, shown on a Google map
-* Phone, website and opening date
-* Service area: the places you serve beyond your address
-
-### What Each Location Gets
-
-* Business information
-* Address and contact information
-* Opening hours
-* Services
-* Photos, attributes and reviews
-
-## Opening Hours Management
-
-Set your hours for each day of the week as **Open**, **Closed**, or **Open 24 Hours**. Multiple opening periods per day are supported, so split hours (like a lunch break) work too. Add special hours for holidays and one-off dates. Hours are saved in a structured format for use in schema and on Google.
-
-## Service Management
-
-List the services you offer, each with a name, description, price, currency, URL and status, matched to a ready-made service from Google's list for your category.
+**Services:** a name, description, price, currency, URL and status for each, matched to a ready-made service from Google's list for your category.
 
 ## Local Business Schema for WordPress
 
-Get accurate structured data with no coding. As a local schema plugin for WordPress, FoundHint builds LocalBusiness schema from your saved business, location, hours and service details:
+Get accurate structured data with no coding. FoundHint builds LocalBusiness schema (with subtypes, address, geo coordinates, opening hours, services, contact details, social profiles and areas served) from the details you have already saved. Every location is published, and in your page source the JSON-LD sits between two FoundHint comments, so you can always see which plugin printed it.
 
-* LocalBusiness and business subtypes
-* PostalAddress
-* Geo coordinates
-* Opening hours
-* Services
-* Contact information and social profiles
-* Areas served
+**No duplicate schema.** FoundHint detects **Yoast SEO**, **Rank Math**, **All in One SEO** and **SEOPress**. If one of them already outputs LocalBusiness schema, FoundHint can stand aside. It never changes or disables another plugin's settings.
 
-Every location is published. No separate schema-only data to maintain. In your page source, the JSON-LD sits between two FoundHint comments, so you can always see which plugin printed it.
-
-### How to Add Local Business Schema in WordPress
-
-Fill in your business and location details (or import them from Google), and FoundHint publishes valid JSON-LD for you. Open the Schema screen to see exactly what search engines see.
-
-### Schema Ownership (No Duplicate Schema)
-
-Already using another SEO plugin? FoundHint detects **Yoast SEO**, **Rank Math**, **All in One SEO** and **SEOPress**. If one of them already outputs LocalBusiness schema, FoundHint can stand aside so your pages never carry duplicate markup. FoundHint never changes or disables another plugin's settings.
-
-### Schema Manager *(FoundHint Premium)*
-
-Premium adds a tab for each schema, each with its own switch and a live JSON-LD preview: **Organization**, **LocalBusiness**, **Locations** (every branch, with its own page, subtype and parent), **Services** (provider, areas, page and price), **Website structure** (WebSite, WebPage, About, Contact, Breadcrumbs) and **Settings** (where it prints, a live check, and no duplicates with your SEO plugin).
+**Schema Manager *(Premium)*:** a tab for each schema, each with its own switch and a live JSON-LD preview: Organization, LocalBusiness, Locations (every branch, with its own page, subtype and parent), Services (provider, areas, page and price), Website structure (WebSite, WebPage, About, Contact, Breadcrumbs) and Settings.
 
 ## A Yoast Local SEO and Rank Math Local SEO Alternative
 
-Looking for a Yoast Local SEO alternative or a Rank Math local SEO alternative? FoundHint focuses only on local search: multiple locations, Google Business Profile sync and review replies, all free. Keep your current SEO plugin for content and on-page SEO, and let FoundHint handle the local side.
+FoundHint focuses only on local search: multiple locations, Google Business Profile sync and review replies, all free. Keep your current SEO plugin for content and on-page SEO, and let FoundHint handle the local side.
 
-## Local SEO Checklist for WordPress: The Audit
+## Local SEO Audit and Health Score
 
-Find out what's missing before it hurts your visibility. Run an audit right from your dashboard. It works as a built-in local SEO checklist for WordPress and checks:
+A built-in local SEO checklist for WordPress. The audit checks your business and location details, opening hours, structured data (and conflicts with other plugins), HTTPS, homepage availability, indexability and canonical URL, and your Google Business Profile connection, including whether the name and phone match your website.
 
-* **Business information:** business name, type, description, phone number, logo, services, social profiles
-* **Location information:** complete address, coordinates, primary location, status
-* **Opening hours:** hours configured and complete
-* **Structured data:** schema published, opening hours in schema, conflicts with other plugins
-* **Website signals:** HTTPS and site address
-* **Google Business Profile:** connected, mapped, and whether the name and phone match your website
-* **More website checks**: homepage availability, basic indexability, canonical URL
-
-### Local SEO Health Score
-
-See your progress at a glance with one simple score, with a trend over time. It covers business information, location, schema, opening hours, website signals and your Google connection.
+Every issue is sorted by severity (**Critical**, **High**, **Medium**, **Low**, **Passed**) and explained in plain words. One simple health score, with a trend over time, shows your progress.
 
 *Note: the Health Score shows your setup progress. It is not a Google ranking score and does not show your position in Google Search or Google Maps.*
 
-### Local SEO Issues
-
-Every problem found is sorted by severity: **Critical**, **High**, **Medium**, **Low** and **Passed**. Each issue explains what's wrong and why it matters, in plain words.
-
-### Safe Optimization Workflow
-
-You stay in control. Supported fixes follow a safe process:
-
-**Detect → Explain → Apply → Recheck**
-
-A one-click fix appears only when the right value is already known. Anything that needs your judgement stays a recommendation. Fixes apply only when you press the button, and the audit reruns straight away.
-
-* **Preview and confirm** each change before it is applied
-
-### How to Improve Local SEO on WordPress
-
-Run the audit, fix the Critical and High issues first, then make sure your website and Google Business Profile match. Complete, consistent business data is the foundation for showing up in the Google map pack.
+**Safe fixes: Detect → Explain → Apply → Recheck.** A one-click fix appears only when the right value is already known, you preview it first, and the audit reruns straight away. Anything that needs your judgement stays a recommendation.
 
 ## Google Business Profile WordPress Plugin
 
-### One-Click Google Business Profile Connection
+* **One-click connection:** no Google Cloud project, client ID or API key needed. Each Google listing your account manages is linked to its own FoundHint location.
+* **Website vs Google comparison:** name, description, phone, website, address, hours, categories, services and links side by side; you decide which version to keep.
+* **Import from Google:** a guided import of your details, hours, services, service area and links. **Refresh from Google** reads attributes and photos and only fills fields that are empty here.
+* **Send updates to Google:** business information, categories, hours and special hours, services, service area, attributes, links and photos. Review the changes first; anything left empty here is never sent as a deletion.
 
-Connect your Google account with one button: **no Google Cloud project, client ID or API key needed**. FoundHint finds the Business Profile locations your account manages, and each Google listing is linked to its own FoundHint location.
+## Google Reviews in WordPress
 
-### Google Business Profile Data Comparison
+See each location's reviews with the reviewer's photo and any photos they attached. Filter by rating, reply status and review status (live, edited or removed), search, page through 5 to 100 at a time and export to CSV. Post, edit or delete your reply without switching to Google. Reviews a customer later removes stay readable here, clearly marked, and no longer count toward your rating.
 
-Spot mismatches before customers do. Compare **Website Data vs Google Data** side by side, including name, description, phone, website, address, hours, categories, services and links, then decide which version to keep.
+## Google Business Profile Posts
 
-### Import from Google
-
-Bring your details in from Google in a guided import: name, description, categories, address, phone numbers, website, opening date, opening hours, services, service area, social and booking links. **Refresh from Google** reads your attributes and photos, and only fills fields that are empty here, so nothing you set is overwritten.
-
-### Send Updates to Google
-
-Send supported updates from FoundHint to Google: business information, phone numbers, website, opening date, categories, opening hours, special hours, services, service area, attributes, social and booking links, and photos. Review the changes first; anything left empty here is never sent as a deletion. Nothing gets blindly overwritten.
-
-## Google Review Management in WordPress
-
-### Google Business Profile Reviews
-
-See your customer reviews right inside your WordPress dashboard, for each location, with the reviewer's photo and any photos the customer attached. Filter by star rating, reply status and review status (live, edited, or removed by the reviewer), search by name or words, page through 5 to 100 reviews at a time, and export the list, or just the reviews you select, to CSV. Reviews a customer later removes from Google stay readable here, clearly marked, and no longer count toward your rating.
-
-### Review Replies
-
-Reply to reviews directly from FoundHint: post, edit or delete your reply. No more switching between WordPress and Google.
-
-### Google Business Profile Posts
-
-Publish posts to your Google Business Profile from WordPress, for each location:
-
-* **Update, Event and Offer posts**, with title, dates, coupon code and terms for offers
-* **Buttons** such as Book, Order online, Call now or Learn more
+* **Update, Event and Offer posts**, with dates, coupon code and terms for offers, and buttons such as Book, Order online, Call now or Learn more
 * **Live preview** of how the post looks on Google, updated as you type
-* **Photos** uploaded, or picked from your Google gallery or review photos
-* **Drafts**, plus editing and deleting live posts
-* **Sync posts** already on your Google profile
-* **Review to post**: turn a 5-star review into a thank-you post in one click
-* **Filters and history** by type, status and source
+* **Photos** from your Media Library or your Google gallery
+* **Drafts**, editing and deleting live posts, and syncing posts already on Google
+* **Scheduling** *(Premium)*: pick a date and time in your site's time zone
+* **Share your blog on Google** *(Premium)*: use "GBP Posting" under a published post or in the block editor to share it with a "Learn more" link
 
-### Local Landing Pages for WordPress
-
-With Premium, create a page for each branch from saved data, with its address, phone, hours, map and schema.
-
-## Your Local SEO Workflow
-
-**Build → Connect → Optimize → Grow**, then repeat.
-
-1. **Build:** set up your business, categories, locations, opening hours, services and schema.
-2. **Connect:** link your Google Business Profile and your Google locations.
-3. **Optimize:** use the SEO audit, its issues, data comparison and schema to improve your setup.
-4. **Grow:** publish posts, reply to reviews and keep Google in step with your website. Rank, competitor and performance tracking are coming soon.
+With Premium, also create a **local landing page** for each branch from saved data, with its address, phone, hours, map and schema.
 
 ## Works With Your WordPress Website
 
-FoundHint fits into your current setup. No need to replace your existing SEO workflow. It works alongside:
+FoundHint works alongside Gutenberg, the Classic Editor, Yoast SEO, Rank Math, All in One SEO, SEOPress, WooCommerce and common WordPress themes. No need to replace your existing SEO workflow.
 
-* Gutenberg
-* Classic Editor
-* Yoast SEO
-* Rank Math
-* All in One SEO
-* SEOPress
-* WooCommerce (great for local SEO for ecommerce with physical stores)
-* Common WordPress themes
+## Local SEO for Every Local Business
 
-## Local SEO for Small Businesses in Every Industry
-
-FoundHint is a local business SEO plugin for any business that depends on local customers. Pick the right Google category and LocalBusiness subtype, list your services, and your schema markup and Google Business Profile optimization follow from the same data.
-
-### Local SEO for Restaurants, Cafes and Hotels
-
-A restaurant SEO WordPress plugin needs accurate hours, holiday hours and fresh reviews. FoundHint covers local SEO for restaurants, cafes and coffee shops, bakeries, bars and pubs, food trucks, catering businesses, hotels and bed and breakfasts.
-
-### Local SEO for Plumbers, Electricians and Home Services
-
-Service area businesses can list the places they serve beyond their address. Ideal for local SEO for plumbers, electricians, HVAC companies, roofers, contractors, landscapers, pest control, cleaning services, locksmiths, painters, moving companies, pool services and handyman businesses.
-
-### Local SEO for Dentists, Doctors and Medical Practices
-
-Keep every clinic's hours, phone and services correct on Google and in your schema. Built for local SEO for dentists, doctors, chiropractors, medical practices, physical therapists, veterinarians, optometrists, pharmacies, med spas and therapists or counselors.
-
-### Local SEO for Lawyers, Law Firms and Professional Services
-
-Trust starts with consistent details and well-handled reviews. Use FoundHint for local SEO for lawyers and law firms (including personal injury lawyers), accountants and CPAs, financial advisors, insurance agents, real estate agents and mortgage brokers.
-
-### Local SEO for Salons, Spas and Gyms
-
-Add booking links, WhatsApp and appointment URLs to every location. Great for local SEO for salons, barbershops, spas, nail salons, tattoo shops, gyms, yoga studios and personal trainers.
-
-### Local SEO for Auto Repair Shops and Dealerships
-
-Show customers the right hours, services and location every time. Suited to local SEO for auto repair shops, car dealerships, auto body shops, car washes and towing companies.
-
-### Local SEO for Retail Stores and Other Local Businesses
-
-From one shop to a chain of stores: local SEO for retail stores, florists, jewelry stores, pet groomers, daycares, schools and tutoring centers, churches, wedding venues, photographers and event planners.
-
-### Local SEO for Agencies and Multi-Location Brands
-
-Franchises, multi-location businesses, local SEO agencies and digital marketing agencies can manage every client location from one dashboard.
+Restaurants, cafes and hotels; plumbers, electricians, HVAC and other service area businesses; dentists, doctors and clinics; lawyers, accountants and real estate agents; salons, spas and gyms; auto repair shops and dealerships; retail stores; and agencies managing many client locations. Pick the right Google category and LocalBusiness subtype, list your services, and your schema and Google Business Profile follow from the same data.
 
 == External services ==
 
@@ -379,7 +219,7 @@ Yes. FoundHint runs alongside WooCommerce, so stores with physical locations can
 
 = What does FoundHint Premium add? =
 
-The Schema Manager: Organization, LocalBusiness, branch, service and website structure schema, each with its own switch and a live preview, plus location pages created from your saved data. Reply templates for reviews are included too. Premium is a separate add-on that needs this free plugin. See [pricing](https://foundhint.com/pricing/).
+The Schema Manager: Organization, LocalBusiness, branch, service and website structure schema, each with its own switch and a live preview, plus location pages created from your saved data. Post scheduling, sharing your blog posts on Google, review auto-reply and reply templates for each location are included too. Premium is a separate add-on that needs this free plugin. See [pricing](https://foundhint.com/pricing/).
 
 = How can I see the schema FoundHint adds to my pages? =
 
@@ -401,6 +241,34 @@ No. Google is never contacted on visitor-facing pages, and no scripts or stylesh
 8. Google Business Profile posts with a live Google preview.
 
 == Changelog ==
+
+= 1.2.4 =
+* Requirement: WordPress 6.6 or later.
+* Improvement: The admin screens and the block editor's GBP Posting popup now use the React and translation libraries that come with WordPress instead of bundled copies.
+* Improvement: The plugin's styles no longer change the look of the WordPress admin menu and toolbar on the FoundHint screen.
+* Improvement: Shorter plugin description.
+* Fix: Activation could fail to create the Google reference, services and location attributes tables on older MySQL setups, where an index may be at most 767 bytes.
+* Fix: Removed the unused schema_page_index table. It is dropped automatically on update.
+
+= 1.2.3 =
+* New: Review auto-reply with FoundHint Premium. Each Google listing has its own: switch it on from the Reviews screen, choose new reviews only or unanswered ones too, and pick a reply template for each star rating. Every rating starts on "Don't reply", and AI replies are marked as coming soon.
+* New: Reply templates belong to each location. Switching location in the top bar shows that location's templates, and the reply dialog offers the templates of the review's own location.
+* New: The Reviews and Posts screens warn when auto-reply or scheduled posts have stopped running, with a "How to fix" guide to setting up a cron job.
+* New: Choose how many older reviews auto-reply answers each day, so a large backlog goes out gradually. New reviews are always answered first.
+* Improvement: {{business_keyword}} now fills in your business category, and {{location_city}} uses the city from Google when a location has none.
+* Improvement: Reply placeholders work with spaces or capitals, names typed in lower case get a capital letter, and a long quoted review is shortened to fit Google's limit.
+* Improvement: The reply dialog says when a detail such as the city was left out, so you can reword before publishing.
+* Improvement: Refreshed layout for the Schema screen's Business, Locations, Services and Settings tabs.
+* Fix: On a location with more than 1,000 reviews, reading reviews no longer marks the older ones as removed.
+* Removed: The "Import from CSV" button on the Reply templates card, and the sample reply templates shown without FoundHint Premium. Without Premium, the card now explains templates and links to Premium.
+
+= 1.2.2 =
+* New: Schedule posts for a date and time, in your site's time zone, with FoundHint Premium. Scheduled posts show when they go live, and can be changed, published now or cancelled back to a draft.
+* New: Share your blog on Google with FoundHint Premium. Turn it on from the Posts screen, then choose "GBP Posting" under a published post in Posts → All Posts, or the GBP Posting button in the block editor's top bar, to open a new post that links to the article.
+* New: "Choose photo" on a post opens the WordPress Media Library, on the Posts screen and in the block editor. Dropping a file still uploads it.
+* Improvement: The newest post is now always at the top of the posts list, scheduled or not.
+* Improvement: A scheduled post can't be edited or deleted while it is being sent.
+* Removed: The "Turn reviews into posts" card, the "Schedule with a CSV file" button and the "Customer photos" picker on the Posts screen.
 
 = 1.2.1 =
 * New: Choose your logo, cover photo and gallery photos from the WordPress Media Library on the Business Profile's Photos tab. Dropping files on a photo still uploads them.
@@ -456,6 +324,15 @@ No. Google is never contacted on visitor-facing pages, and no scripts or stylesh
 * Google reviews for each location, with replies.
 
 == Upgrade Notice ==
+
+= 1.2.4 =
+Fixes activation on older MySQL setups and uses WordPress's own React. Requires WordPress 6.6.
+
+= 1.2.3 =
+Review auto-reply for each location (with FoundHint Premium 1.0.2), reply templates per location, a warning when background tasks stop running, and a fix for locations with more than 1,000 reviews.
+
+= 1.2.2 =
+Post scheduling and sharing your blog on Google (with FoundHint Premium), and choosing post photos from the Media Library.
 
 = 1.2.1 =
 Pick your Business Profile photos from the Media Library, redesigned Posts and Reviews screens, and a fix that keeps your Media Library images safe when a waiting photo is removed.
