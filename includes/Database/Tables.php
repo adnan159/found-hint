@@ -38,7 +38,6 @@ class Tables {
 	const SCHEMA_ENTITIES          = 'schema_entities';
 	const SCHEMA_SERVICE_PROVIDERS = 'schema_service_providers';
 	const SCHEMA_SERVICE_AREAS     = 'schema_service_areas';
-	const SCHEMA_PAGE_INDEX        = 'schema_page_index';
 
 	/**
 	 * Every table this plugin owns, unprefixed.
@@ -65,7 +64,6 @@ class Tables {
 			self::SCHEMA_ENTITIES,
 			self::SCHEMA_SERVICE_PROVIDERS,
 			self::SCHEMA_SERVICE_AREAS,
-			self::SCHEMA_PAGE_INDEX,
 		);
 	}
 

@@ -349,41 +349,41 @@
 }
 
 @supports not selector(::-webkit-scrollbar) {
-  .modern-scroll {
+  .fhint-scroll {
     scrollbar-width: thin;
     scrollbar-color: #a8a09d transparent;
   }
 }
 
-.modern-scroll::-webkit-scrollbar {
+.fhint-scroll::-webkit-scrollbar {
   width: 7px;
   height: 7px;
 }
 
 /* Track */
-.modern-scroll::-webkit-scrollbar-track {
+.fhint-scroll::-webkit-scrollbar-track {
   background: transparent;
 }
 
 /* Handle */
-.modern-scroll::-webkit-scrollbar-thumb {
+.fhint-scroll::-webkit-scrollbar-thumb {
   background: #a8a09d;
   border-radius: 100px;
 }
 
 /* Handle on hover */
-.modern-scroll::-webkit-scrollbar-thumb:hover {
+.fhint-scroll::-webkit-scrollbar-thumb:hover {
   background: #867e7b;
 }
 
-.modern-scroll::-webkit-scrollbar-button {
+.fhint-scroll::-webkit-scrollbar-button {
   width: 0;
   height: 0;
   display: none;
 }
 
 /* Remove corner/background */
-.modern-scroll::-webkit-scrollbar-corner {
+.fhint-scroll::-webkit-scrollbar-corner {
   background: transparent;
 }
 

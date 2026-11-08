@@ -100,7 +100,9 @@ class Enqueue {
 	 */
 	private static function script_options() {
 		return array(
-			'dependencies' => array( 'react', 'react-dom' ),
+			// WordPress's own React (the bundle leaves it out); react-jsx-runtime
+			// is why the plugin needs WordPress 6.6.
+			'dependencies' => array( 'react', 'react-dom', 'react-jsx-runtime', 'wp-i18n' ),
 			'handle'       => self::SCRIPT_HANDLE,
 			'in-footer'    => true,
 		);

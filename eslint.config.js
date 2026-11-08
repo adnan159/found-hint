@@ -81,6 +81,7 @@ export default defineConfig([
       "src/admin/styles/theme.css",
       "src/editor/editor.css",
       "src/editor/preflight-scoped.css",
+      "src/admin/preflight-scoped.css",
     ],
     plugins: { css },
     language: "css/css",

@@ -162,11 +162,11 @@ No row = defaults (derived type, no overrides, active, default placement).
 `area_type` (`Place` · `City` · `AdministrativeArea` · `Country`),
 `source` (`google` · `manual`), `sort_order`.
 
-### `{prefix}fhint_schema_page_index` — resolved placement, for the front end
+### ~~`{prefix}fhint_schema_page_index`~~ — removed (DB 0.20.0)
 
-`id`, `post_id`, `entity_kind`, `entity_id`. Rebuilt by Pro on every save for
-`chosen` / `own_page` entities, so a page request does one indexed lookup.
-`every_page` / `home_only` entities need no rows.
+Planned as a page → entity lookup for the front end. The page map is built
+from `Output` (the cached graph) instead, so the table was never written;
+`Installer::drop_unused_tables()` drops it on upgrade.
 
 ### Settings keys (`App\Core\Settings::defaults()`, preferences only)
 
@@ -429,7 +429,7 @@ tab or page JSON), Works with your SEO plugin (rows, status chips, fix
 panel, "I've switched it off, check again").
 
 **Pro**
-- [x] `GET schema/page-map` — built from `Output` (cached entities + their placement) rather than a `fhint_schema_page_index` table; the table stays unused for now.
+- [x] `GET schema/page-map` — built from `Output` (cached entities + their placement) rather than a `fhint_schema_page_index` table; that table was removed in DB 0.20.0.
 - [ ] Amber in What goes where for a page with two conflicting entities; click a row to open its tab.
 - [x] SEO plugins (`SiteSettings::plugins()` on the free plugin's `Ownership::detected()`): Yoast (Local → duplicate, core → overlaps on website/page), Rank Math, AIOSEO, SEOPress, Slim SEO, The SEO Framework, WooCommerce; Yoast's fix steps; owner per type in `schema.owners` respected by the output.
 - [ ] Schema Pro detection; "Integrate" (switching another plugin's output off through its filters).

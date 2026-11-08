@@ -277,7 +277,8 @@ class PostMedia {
 	 * @return bool
 	 */
 	public static function is_temporary( $url ) {
-		return false !== strpos( (string) $url, '.googleusercontent.com/gpu-csl/' );
+		// Only inspects a link Google's API returned; nothing is loaded from it.
+		return false !== strpos( (string) $url, '.googleusercontent.com/gpu-csl/' ); // phpcs:ignore PluginCheck.CodeAnalysis.Offloading.OffloadedContent
 	}
 
 	/**

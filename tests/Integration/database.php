@@ -167,7 +167,7 @@ check( ! empty( $changes ), 'the first run creates tables' );
 $missing = Tables::missing();
 
 check_same( array(), $missing, 'every declared table exists after installation' );
-check_same( 19, count( Tables::all() ), 'all nineteen tables are declared' );
+check_same( 18, count( Tables::all() ), 'all eighteen tables are declared' );
 
 foreach ( array_keys( Tables::all() ) as $key ) {
 	check( Tables::exists( $key ), "table {$key} exists in MySQL" );
@@ -2251,6 +2251,18 @@ check_same( 'VeterinaryCare', BusinessRepository::get()['business_type'], 'a sto
 $fhint_rename->invoke( null );
 check_same( 'VeterinaryCare', BusinessRepository::get()['business_type'], 'and running it again changes nothing' );
 $wpdb->update( Tables::name( Tables::BUSINESS ), array( 'business_type' => $fhint_type_before ), array( 'id' => BusinessRepository::current_id() ) );
+
+// schema_page_index was created by earlier versions and never used: the
+// upgrade drops it, and only it.
+$wpdb->query( 'CREATE TABLE ' . Tables::name( 'schema_page_index' ) . ' (id bigint(20) unsigned NOT NULL auto_increment, PRIMARY KEY  (id))' ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+check( Tables::exists( 'schema_page_index' ), 'an old site has the unused schema_page_index table' );
+$fhint_drop = new ReflectionMethod( FHINT\Installer::class, 'drop_unused_tables' );
+$fhint_drop->setAccessible( true );
+$fhint_drop->invoke( null );
+check( ! Tables::exists( 'schema_page_index' ), 'the upgrade drops it' );
+check_same( array(), Tables::missing(), 'and leaves every table in use in place' );
+$fhint_drop->invoke( null );
+check( ! Tables::exists( 'schema_page_index' ), 'running it again on a cleaned site is harmless' );
 
 // Leave the table as the later sections expect it.
 LocationRepository::delete( (int) $fhint_shop['id'] );

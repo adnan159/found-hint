@@ -92,7 +92,6 @@ $fhint_tables = array(
 	'schema_entities',
 	'schema_service_providers',
 	'schema_service_areas',
-	'schema_page_index',
 );
 
 foreach ( $fhint_tables as $fhint_table ) {

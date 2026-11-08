@@ -33,6 +33,11 @@ defined( 'ABSPATH' ) || exit;
  * a service type and an attribute both belong to a category. Asking "what can
  * this dentist offer?" is one indexed lookup.
  *
+ * The four columns of the `entry` key are Google ids, so they are stored as
+ * ASCII (one byte a character): with utf8mb4 the key would need 1,192
+ * bytes, past the 767-byte index limit of older InnoDB setups, and the
+ * table would fail to create there.
+ *
  * @column id            Primary key.
  * @column kind          category | service_type | attribute.
  * @column item_id       Google's id, e.g. 'gcid:dentist' or 'url_facebook'.
@@ -61,10 +66,10 @@ class CreateGoogleReferenceTable {
 
 		$sql = "CREATE TABLE {$table} (
 	id bigint(20) unsigned NOT NULL auto_increment,
-	kind varchar(32) NOT NULL default '',
-	item_id varchar(150) NOT NULL default '',
-	parent_id varchar(100) NOT NULL default '',
-	language_code varchar(16) NOT NULL default '',
+	kind varchar(32) CHARACTER SET ascii NOT NULL default '',
+	item_id varchar(150) CHARACTER SET ascii NOT NULL default '',
+	parent_id varchar(100) CHARACTER SET ascii NOT NULL default '',
+	language_code varchar(16) CHARACTER SET ascii NOT NULL default '',
 	display_name varchar(255) NOT NULL default '',
 	value_type varchar(32) NOT NULL default '',
 	payload longtext NULL,

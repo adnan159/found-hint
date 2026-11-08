@@ -75,12 +75,12 @@ export function Composer({
         />
         <TypePicker type={type} locked={c.onGoogle} onChange={switchType} />
 
-        <div className="modern-scroll fhint:grid fhint:min-h-0 fhint:flex-1 fhint:overflow-y-auto fhint:md:grid-cols-[minmax(0,1fr)_minmax(0,0.7fr)] fhint:md:grid-rows-[minmax(0,1fr)] fhint:md:overflow-hidden">
+        <div className="fhint-scroll fhint:grid fhint:min-h-0 fhint:flex-1 fhint:overflow-y-auto fhint:md:grid-cols-[minmax(0,1fr)_minmax(0,0.7fr)] fhint:md:grid-rows-[minmax(0,1fr)] fhint:md:overflow-hidden">
           <form
             id={`${id}-form`}
             onSubmit={c.submit}
             noValidate
-            className="modern-scroll fhint:grid fhint:auto-rows-max fhint:content-start fhint:gap-4 fhint:px-5 fhint:py-4 fhint:md:min-h-0 fhint:md:overflow-y-auto"
+            className="fhint-scroll fhint:grid fhint:auto-rows-max fhint:content-start fhint:gap-4 fhint:px-5 fhint:py-4 fhint:md:min-h-0 fhint:md:overflow-y-auto"
           >
             <WritingFields {...fields} />
             {type !== "update" ? <DateFields {...fields} /> : null}

@@ -58,6 +58,7 @@ php tests/Smoke/audit.php              # the rule set, scoring and the registry
 php tests/Smoke/dashboard.php          # the score trend and what the card may claim
 php tests/Smoke/google-refresh.php     # categories, attributes and photos read from a listing
 php tests/Smoke/posts.php              # post mapping to/from Google, validation, photo reachability
+node tests/Vite/forward-refs.mjs      # ui/ components take refs on WordPress's React 18
 ```
 
 The smoke suites run on plain PHP against stubbed WordPress
@@ -258,12 +259,12 @@ Filter the required capability with `fhint_manage_capability`.
 
 | Concern | Use |
 |---|---|
-| React | `react` / `react-dom` (bundled by Vite, not `@wordpress/element`) |
+| React | WordPress's own `react` / `react-dom` / `react-jsx-runtime` scripts (18.3 today) — **not bundled** |
 | Routing | `react-router` (`createHashRouter`) — client-side, under one WP page |
 | Components | shadcn/ui (`src/admin/components/ui/`) + base-ui primitives |
 | State | Redux Toolkit + RTK Query (`src/admin/store/`) |
 | HTTP | RTK Query `fetchBaseQuery`, nonce from `window.FHINT` |
-| i18n | `@wordpress/i18n` (`__()`) with the `found-hint` text domain |
+| i18n | `@wordpress/i18n` (`__()`) with the `found-hint` text domain — WordPress's `wp-i18n`, not bundled |
 | Styling | Tailwind CSS v4, classes prefixed `fhint:` (see `components.json`) |
 | Build | Vite (`vite.admin.config.js`) via `@kucrut/vite-for-wp` |
 
@@ -286,11 +287,16 @@ route in `routes.jsx` and an entry in the sidebar; do not add
   suffix `toplevel_page_fhint`. Verify by loading an unrelated admin page
   and grepping the HTML for `fhint-admin`. The one other bundle is
   `src/editor` (`Admin\EditorAssets`): the block editor for a blog post,
-  while blog sharing is on. It must never import `src/admin/index.css` —
-  that resets every element on the page. Shared look lives in
-  `src/admin/styles/theme.css` (FoundHint-only selectors); the editor gets
-  Tailwind's reset inside `@scope` (`src/editor/preflight-scoped.css`,
-  regenerate it after a Tailwind upgrade).
+  while blog sharing is on. It must never import `src/admin/index.css`.
+  Shared look lives in `src/admin/styles/theme.css` (FoundHint-only
+  selectors).
+- **CSS never reaches WordPress's own interface** — not even on our
+  screen (Plugin Directory review). Tailwind's reset runs inside `@scope`:
+  `src/admin/preflight-scoped.css` (the app's `#fhint-app` and the
+  `[data-base-ui-portal]` containers its popups render into) and
+  `src/editor/preflight-scoped.css` (the popup). Both are copies of
+  Tailwind's preflight; regenerate them after a Tailwind upgrade. Class
+  names we own are `fhint-` prefixed (`.fhint-scroll`).
 - **Field errors come from the server.** REST returns machine codes; the
   client maps them to translated strings.
 - **Every string through `__()`** with the `found-hint` text domain.
@@ -322,6 +328,34 @@ route in `routes.jsx` and an entry in the sidebar; do not add
   covers `size`, `w`, `h`, `min-*`/`max-*`, padding, margin, gap, inset and
   translate. Brackets stay only where there is no spacing scale — a font
   size like `fhint:text-[12.5px]`, letter-spacing, a colour.
+
+### React comes from WordPress
+
+Plugin Directory guideline 13: a plugin uses the libraries WordPress ships
+instead of bundling its own, and Plugin Check fails a bundle that inlines
+React. Both Vite configs therefore:
+
+- **`wp_scripts()`** (vite-for-wp) turns `react`, `react-dom`,
+  `react-dom/client`, `react/jsx-runtime` and `@wordpress/*` imports into
+  WordPress's globals. `Enqueue` and `EditorAssets` list `react`,
+  `react-dom`, `react-jsx-runtime` and `wp-i18n` as dependencies —
+  `react-jsx-runtime` is why the plugin requires WordPress 6.6.
+- **`vite/wp-require.js`** gives CommonJS packages (react-redux's
+  use-sync-external-store) a `require()` that returns those globals;
+  without it the bundle throws on load.
+- **`vite/forward-refs.js`** wraps every component in `components/ui/` in
+  `forwardRef` at build time. shadcn writes them for React 19, where `ref`
+  is a prop; on React 18 a ref given to a plain function component is
+  dropped, and Base UI passes one whenever our component is its `render`
+  (`render={<Button />}`). The files themselves stay untouched, so the CLI
+  can still regenerate them. Proved by `node tests/Vite/forward-refs.mjs`.
+
+Write code that runs on **React 18 and 19**: `npm` pins `react@18.3` to
+match WordPress, so no React 19-only API (`use()`, `<Context value>` as a
+provider, form `action` functions, `ref` as a prop on our own components —
+use `forwardRef`, ref cleanup functions). When WordPress moves to React 19
+the bundle needs no change. Test with `SCRIPT_DEBUG` on: it loads React's
+development build, the only one that prints its warnings.
 
 ### Working with generated components
 

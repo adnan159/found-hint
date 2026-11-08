@@ -69,7 +69,7 @@ class EditorAssets {
 			FHINT_ASSETS_PATH . 'build/editor',
 			self::ENTRY,
 			array(
-				'dependencies' => array( 'wp-plugins', 'wp-editor', 'wp-element', 'wp-data' ),
+				'dependencies' => array( 'react', 'react-dom', 'react-jsx-runtime', 'wp-i18n', 'wp-plugins', 'wp-editor', 'wp-element', 'wp-data' ),
 				'handle'       => self::SCRIPT_HANDLE,
 				'in-footer'    => true,
 			)
