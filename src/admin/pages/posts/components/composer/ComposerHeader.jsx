@@ -9,7 +9,7 @@ import {
 import { focus } from "@/pages/profile/styles";
 
 /** The composer's title row: what is being written, for which listing. */
-export function ComposerHeader({ isNew, onGoogle, scheduled, businessName }) {
+export function ComposerHeader({ isNew, onGoogle, businessName }) {
   return (
     <div className="fhint:flex fhint:flex-none fhint:items-center fhint:gap-4 fhint:border-b fhint:border-b-border fhint:px-5 fhint:py-4">
       <div className="fhint:grid fhint:min-w-0 fhint:flex-1">
@@ -18,9 +18,7 @@ export function ComposerHeader({ isNew, onGoogle, scheduled, businessName }) {
             ? __("New post", "foundhint-local-seo")
             : onGoogle
               ? __("Edit post", "foundhint-local-seo")
-              : scheduled
-                ? __("Change scheduled post", "foundhint-local-seo")
-                : __("Finish post", "foundhint-local-seo")}
+              : __("Finish post", "foundhint-local-seo")}
         </DialogTitle>
         {businessName ? (
           <span className="fhint:truncate fhint:text-sm fhint:text-muted-strong">

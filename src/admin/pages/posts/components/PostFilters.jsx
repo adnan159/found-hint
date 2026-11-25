@@ -18,7 +18,6 @@ function selects() {
       [
         ["", __("All statuses", "foundhint-local-seo")],
         ["live", __("Live", "foundhint-local-seo")],
-        ["scheduled", __("Scheduled", "foundhint-local-seo")],
         ["draft", __("Draft", "foundhint-local-seo")],
         ["failed", __("Failed", "foundhint-local-seo")],
       ],
@@ -54,8 +53,7 @@ function selects() {
 }
 
 /**
- * The type tabs with their counts — underlined in the accent like the
- * reply templates' star tabs — then status, time, source and order as
+ * The type tabs with their counts — underlined in the accent — then status, time, source and order as
  * labelled fields, as the Reviews filters are.
  *
  * @param {Object}   props

@@ -127,7 +127,7 @@ class Profile {
 	 * Every section as read, with its values emptied.
 	 *
 	 * What describes the form stays — which social networks there are, the
-	 * attribute definitions, the plan limit — so the screen still draws its
+	 * attribute definitions, the limit — so the screen still draws its
 	 * fields; only what the owner entered or Google sent goes.
 	 *
 	 * @param array $sections Sections as read.

@@ -66,9 +66,6 @@ class Database {
 		$changes = array_merge( $changes, Database\CreateDescriptionHistoryTable::up( $prefix, $cc ) );
 		$changes = array_merge( $changes, Database\CreateGoogleReferenceTable::up( $prefix, $cc ) );
 		$changes = array_merge( $changes, Database\CreatePostsTable::up( $prefix, $cc ) );
-		$changes = array_merge( $changes, Database\CreateSchemaEntitiesTable::up( $prefix, $cc ) );
-		$changes = array_merge( $changes, Database\CreateSchemaServiceProvidersTable::up( $prefix, $cc ) );
-		$changes = array_merge( $changes, Database\CreateSchemaServiceAreasTable::up( $prefix, $cc ) );
 
 		// The Places lookup was removed in 0.4.0: its table and its scheduled
 		// event are cleared here rather than left behind on sites that ran an
@@ -92,9 +89,9 @@ class Database {
 	private static function clear_legacy_places() {
 		global $wpdb;
 
-		$table = $wpdb->prefix . 'fhint_place_links';
+		$table = esc_sql( $wpdb->prefix . 'fhint_place_links' );
 
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery.SchemaChange
 		$wpdb->query( "DROP TABLE IF EXISTS {$table}" );
 
 		delete_option( 'fhint_places_credentials' );

@@ -74,13 +74,11 @@ export default defineConfig([
     // Tailwind v4's at-rule syntax (`prefix()`, `@custom-variant`,
     // `@theme inline`), so every "error" it reports there is a false
     // positive. Any other CSS in the project is still linted.
-    // The shared theme and the editor's stylesheets are Tailwind entries
-    // too; preflight-scoped.css is Tailwind's own reset, copied.
+    // The shared theme is a Tailwind entry too; preflight-scoped.css is
+    // Tailwind's own reset, copied.
     ignores: [
       "src/admin/index.css",
       "src/admin/styles/theme.css",
-      "src/editor/editor.css",
-      "src/editor/preflight-scoped.css",
       "src/admin/preflight-scoped.css",
     ],
     plugins: { css },

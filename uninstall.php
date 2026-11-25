@@ -58,6 +58,11 @@ $wpdb->query(
 	)
 );
 
+// Scheduled work always goes, whether or not data is kept: a leftover
+// event would fire against code that is no longer installed.
+wp_clear_scheduled_hook( 'fhint_purge_logs' );
+wp_clear_scheduled_hook( 'fhint_run_audit' );
+
 $fhint_settings = get_option( 'fhint_settings', array() );
 $fhint_optin    = is_array( $fhint_settings )
 	&& ! empty( $fhint_settings['general']['delete_data_on_uninstall'] );
@@ -89,15 +94,22 @@ $fhint_tables = array(
 	'description_history',
 	'google_reference',
 	'posts',
+);
+
+/*
+ * Tables earlier versions created and this one no longer uses. Kept here so
+ * a clean removal still leaves nothing behind on sites that ran them.
+ */
+$fhint_legacy_tables = array(
 	'schema_entities',
 	'schema_service_providers',
 	'schema_service_areas',
 );
 
-foreach ( $fhint_tables as $fhint_table ) {
-	$fhint_name = $wpdb->prefix . 'fhint_' . $fhint_table;
+foreach ( array_merge( $fhint_tables, $fhint_legacy_tables ) as $fhint_table ) {
+	$fhint_name = esc_sql( $wpdb->prefix . 'fhint_' . $fhint_table );
 
-	// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+	// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery.SchemaChange
 	$wpdb->query( "DROP TABLE IF EXISTS {$fhint_name}" );
 }
 
@@ -107,6 +119,7 @@ $fhint_options = array(
 	'fhint_db_version',
 	'fhint_first_install_time',
 	'fhint_data_changed_at',
+	'fhint_schema_cache',
 	'fhint_onboarding',
 	'fhint_required_rewrite_flush',
 );
@@ -115,8 +128,3 @@ foreach ( $fhint_options as $fhint_option ) {
 	delete_option( $fhint_option );
 }
 
-$fhint_timestamp = wp_next_scheduled( 'fhint_purge_logs' );
-
-if ( $fhint_timestamp ) {
-	wp_unschedule_event( $fhint_timestamp, 'fhint_purge_logs' );
-}

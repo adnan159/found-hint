@@ -10,19 +10,6 @@ export function bytes(text) {
 }
 
 /**
- * The words a template may use, swapped for this review's details.
- * The same list the template editor offers to insert.
- */
-export const PLACEHOLDERS = [
-  "{{reviewer_name}}",
-  "{{location_name}}",
-  "{{location_city}}",
-  "{{business_keyword}}",
-  "{{rating}}",
-  "{{review_text}}",
-];
-
-/**
  * Ready-made replies for each star rating: one for a review with words,
  * one for a rating left without any. Plain and short on purpose — a
  * starting point to make personal, not a reply to send unread.
@@ -125,9 +112,6 @@ export function replyContextFor(listings, review) {
  * brackets on a public reply. `{{ Reviewer_Name }}` reads as
  * `{{reviewer_name}}`. When `{{review_text}}` would push the reply past
  * Google's limit, the review's words are shortened to fit.
- *
- * Premium's `ReplyText::fill()` does the same for auto-reply — change both
- * together.
  */
 export function fillPlaceholders(text, review, context = {}) {
   const values = {
@@ -153,38 +137,6 @@ export function fillPlaceholders(text, review, context = {}) {
         bytes(values.review_text) - over - bytes("…"),
       ) + "…",
   });
-}
-
-/** Placeholders that cannot be left out without breaking the sentence. */
-const REQUIRED = [
-  "location_name",
-  "location_city",
-  "business_keyword",
-  "review_text",
-];
-
-/**
- * The placeholders a text uses whose value, for this review, is missing
- * and cannot just be left out ("in {{location_city}}" with no city reads
- * "in."). Premium's `ReplyText::missing()` decides the same for
- * auto-reply, which does not send such a reply.
- *
- * @return {string[]} Names, e.g. `location_city`.
- */
-export function missingValues(text, review, context = {}) {
-  const values = {
-    location_name: context.locationName ?? "",
-    location_city: context.locationCity ?? "",
-    business_keyword: context.keyword ?? "",
-    review_text: String(review.comment ?? "").trim(),
-  };
-  const used = [...String(text).matchAll(/\{\{\s*(\w+)\s*\}\}/g)].map(
-    ([, key]) => key.toLowerCase(),
-  );
-
-  return [
-    ...new Set(used.filter((key) => REQUIRED.includes(key) && !values[key])),
-  ];
 }
 
 function fillWith(text, values) {

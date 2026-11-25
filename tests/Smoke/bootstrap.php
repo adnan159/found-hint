@@ -165,6 +165,16 @@ function wp_rand( $min = 0, $max = 0 ) {
 function get_current_user_id() {
 	return 1;
 }
+function esc_sql( $data ) {
+	return is_array( $data ) ? array_map( 'esc_sql', $data ) : addslashes( (string) $data );
+}
+// Bound to the action and the current user, like the real one.
+function wp_create_nonce( $action = -1 ) {
+	return substr( md5( $action . '|' . get_current_user_id() ), 0, 10 );
+}
+function wp_verify_nonce( $nonce, $action = -1 ) {
+	return is_string( $nonce ) && '' !== $nonce && hash_equals( wp_create_nonce( $action ), $nonce ) ? 1 : false;
+}
 function is_feed() {
 	return ! empty( $GLOBALS['__is_feed'] );
 }

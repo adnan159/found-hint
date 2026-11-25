@@ -131,7 +131,7 @@ class Installer {
 				continue;
 			}
 
-			$table = Tables::name( $key );
+			$table = esc_sql( Tables::name( $key ) );
 
 			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.SchemaChange, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 			$wpdb->query( "DROP TABLE IF EXISTS {$table}" );
@@ -153,7 +153,7 @@ class Installer {
 			return;
 		}
 
-		$table = Tables::name( Tables::BUSINESS );
+		$table = esc_sql( Tables::name( Tables::BUSINESS ) );
 
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 		$wpdb->query( $wpdb->prepare( "UPDATE {$table} SET business_type = %s WHERE business_type = %s", 'VeterinaryCare', 'Veterinarian' ) );
@@ -177,8 +177,8 @@ class Installer {
 			return;
 		}
 
-		$locations = Tables::name( Tables::LOCATIONS );
-		$google    = Tables::name( Tables::GOOGLE_LOCATIONS );
+		$locations = esc_sql( Tables::name( Tables::LOCATIONS ) );
+		$google    = esc_sql( Tables::name( Tables::GOOGLE_LOCATIONS ) );
 
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 		$wpdb->query(
@@ -204,7 +204,7 @@ class Installer {
 			return;
 		}
 
-		$table = Tables::name( Tables::SERVICES );
+		$table = esc_sql( Tables::name( Tables::SERVICES ) );
 
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 		$exists = $wpdb->get_var( $wpdb->prepare( "SHOW INDEX FROM {$table} WHERE Key_name = %s", 'business_slug' ) );

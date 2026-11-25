@@ -85,8 +85,8 @@ because the *message* is a fallback; the `code` is what a client keys off.
 | `fhint_business_required` | 409 | Creating a location/service before a business exists |
 | `fhint_location_not_found` | 404 | Unknown location id |
 | `fhint_service_not_found` | 404 | Unknown service id |
-| `fhint_location_limit_reached` | 403 | Plan limit hit (Free: 1) |
-| `fhint_service_limit_reached` | 403 | Plan limit hit (Free: 5) |
+| `fhint_location_limit_reached` | 403 | A limit set through `fhint_limits` was hit (none by default) |
+| `fhint_service_limit_reached` | 403 | A limit set through `fhint_limits` was hit (none by default) |
 | `fhint_nothing_to_reorder` | 400 | No submitted id belongs to this business |
 | `fhint_save_failed` | 500 | The write itself failed |
 | `fhint_google_required` | 409 | A write to the business details with no Google account linked |
@@ -249,8 +249,8 @@ is stored, and returned, as:
 
 # Locations
 
-Physical places the business trades from. Free allows one
-(`fhint_location_limit_reached` beyond that).
+Physical places the business trades from. Unlimited by default
+(`fhint_location_limit_reached` only when a limit is set).
 
 Contact fields are optional: **an empty `phone`, `email` or `website` means
 "use the business value"**. `FHINT\App\Nap\Nap` resolves location first,
@@ -348,8 +348,8 @@ Either shape is accepted:
 
 # Services
 
-What the business offers. Free allows five
-(`fhint_service_limit_reached` beyond that).
+What the business offers. Unlimited by default
+(`fhint_service_limit_reached` only when a limit is set).
 
 ### `GET /services` · `GET /services/{id}` · `POST /services` · `POST|PUT|PATCH /services/{id}` · `DELETE /services/{id}`
 
@@ -365,10 +365,8 @@ Writable: `name`, `slug`, `description`, `image_attachment_id`,
   URL. Send `slug` explicitly to change it.
 - A `price` requires a `currency`: `service.currency.required_with_price`.
 - `POST` returns `409 fhint_business_required` when no business exists.
-- `DELETE` also removes what the Schema Manager kept about the service —
-  its row in `fhint_schema_entities` and its providers and areas — so
-  nothing is left behind whether or not FoundHint Premium is active.
-  Deleting a location's own list does the same for every service on it.
+- `DELETE` fires `fhint_services_deleted` with the deleted ids, as does
+  deleting a location's own list, so anything keyed to a service can follow.
 
 ### `POST /services/reorder`
 
@@ -1148,8 +1146,7 @@ Each entry in `locations` is `{ location_name, title, location_id, count,
 reply }`; `location_id` is the FoundHint location the listing belongs to, 0
 for none. `reply` is `{ location_name, location_city, keyword }` — what a
 reply's `{{location_name}}`, `{{location_city}}` and `{{business_keyword}}`
-become for this listing (`App\Review\ReplyContext`, which Premium's
-auto-reply uses too), `''` where unknown.
+become for this listing (`App\Review\ReplyContext`), `''` where unknown.
 
 ### `POST /reviews/sync`
 
@@ -1230,14 +1227,14 @@ A post:
   "id": 7, "location_name": "locations/1", "location_title": "Northside Dental",
   "google_name": "accounts/1/locations/1/localPosts/p1",
   "topic_type": "update|event|offer",
-  "status": "draft|live|processing|rejected|failed|scheduled|sending",
+  "status": "draft|live|processing|rejected|failed",
   "source": "manual|review", "source_ref": "",
   "title": "", "summary": "", "cta_type": "", "cta_url": "",
   "starts_at": null, "ends_at": null,
   "coupon_code": "", "redeem_url": "", "terms": "",
   "media_url": "", "attachment_id": 0, "media_count": 0, "media_reachable": true,
   "search_url": "", "error": "", "on_google": true,
-  "scheduled_at": null, "scheduled_local": "", "published_at": "2026-10-20 09:00:00",
+  "published_at": "2026-10-20 09:00:00",
   "synced_at": "…", "created_at": "…", "updated_at": "…"
 }
 ```
@@ -1251,9 +1248,6 @@ A post:
   written on Google can carry several; this site keeps a link to the first.
 - `media_reachable`: whether Google could fetch `media_url` — false for a
   photo on a local or private site. Google takes a post's photo only by link.
-- `scheduled_at` is UTC; `scheduled_local` is the same moment as wall time in
-  the site's time zone, shaped for a `datetime-local` input
-  (`2026-11-06T09:00`), '' when there is none.
 
 ### `GET /posts`
 
@@ -1261,7 +1255,7 @@ A post:
 |---|---|---|
 | `location_name` | resource name | |
 | `type` | `''` `update` `event` `offer` | |
-| `status` | `''` `live` (incl. processing) `draft` `scheduled` (incl. sending) `failed` (incl. rejected) | |
+| `status` | `''` `live` (incl. processing) `draft` `failed` (incl. rejected) | |
 | `source` | a source key, or `''` | unknown keys are ignored |
 | `days` | `0` `7` `30` `90` | published (or, never published, last edited) within |
 | `sort` | `new` `old` | |
@@ -1272,20 +1266,16 @@ A post:
 offer }` under every filter but `type` — the numbers on the type tabs.
 
 Order: `new` puts the post added most recently on top, whatever its
-status — by when it was published, else when it was last saved (a scheduled
-post: when it was scheduled), not by when it is due. `old` is the exact
+status — by when it was published, else when it was last saved. `old` is the exact
 reverse.
 
 ### `GET /posts/state?location_name=`
 
 `{ locations: [{ location_name, title, location_id }], synced_at, website,
-blog_posts, uploads_reachable, timezone }`
+uploads_reachable }`
 — `website` for "Use my website address" (the listing's, else the site's);
-`blog_posts` the count
-of published WordPress posts; `uploads_reachable` whether Google can fetch
-a file from this site's uploads (when not, uploads go via the gallery);
-`timezone` the site's time zone (`wp_timezone_string()`), in which a
-scheduled time is entered and shown.
+`uploads_reachable` whether Google can fetch a file from this site's uploads
+(when not, uploads go via the gallery).
 
 ### `GET /posts/photos?location_name=`
 
@@ -1337,10 +1327,8 @@ editing that row instead of creating another.
 
 ### `PUT /posts/{id}`
 
-Same fields (`source`/`source_ref` are fixed once written). A draft, failed
-or scheduled post is saved, and sent when `publish` is true. **A scheduled
-post is checked with the publishing rules on every save** — it is sent by
-itself later, so it must stay ready to send — and keeps its status and time. **A post on Google
+Same fields (`source`/`source_ref` are fixed once written). A draft or
+failed post is saved, and sent when `publish` is true. **A post on Google
 can only be changed by publishing** (`409 fhint_post_live` otherwise), its
 type is locked (`post.type.locked`), and the row changes only once Google
 has taken the edit. The PATCH names `media` only when the photo changed.
@@ -1349,14 +1337,6 @@ has taken the edit. The PATCH names `media` only when the photo changed.
 
 Send a draft or retry a failed post. `409 fhint_post_already_live` for a
 post on Google.
-
-### `POST /posts/{id}/unschedule`
-
-Take a scheduled post off the schedule: it becomes a draft and
-`scheduled_at` is cleared. Free, and needs only the capability — nothing is
-sent — so a post queued while Premium was active can always be taken back.
-`409 fhint_post_not_scheduled` for any other status, `404
-fhint_post_not_found`.
 
 ### `DELETE /posts/{id}`
 
@@ -1372,23 +1352,11 @@ On Google: deleted there first (a 404 counts as done). Otherwise only here.
 `post.cta_url.required|invalid` `post.redeem_url.invalid`
 `post.coupon_code.too_long` (58) `post.terms.too_long` (5,000)
 `post.media_url.invalid`. Other codes: `fhint_post_not_found` (404),
-`fhint_no_google_location` (404), `fhint_post_sending` (409 — Premium's
-sender has claimed the post for a send that takes seconds; edit, publish,
-unschedule and delete all wait for it).
+`fhint_no_google_location` (404), `fhint_post_sending` (409 — the post is
+claimed for a send that takes seconds; edit, publish and delete wait for it).
 
-**Premium:** `fhint_post_sources` widens the sources a request may set
-(`ai`, `csv`, `blog`). Blog sharing: `fhint_blog_sharing_enabled` (Premium
-answers it) decides whether `Admin\BlogSharing` adds "GBP Posting" under
-published blog posts; the link opens `#/posts?share=<post id>`, and the
-composer is filled from Premium's `GET fhint-premium/v1/posts/blog/{id}`
-(`{ id, title, url, image_url, attachment_id, image_reachable }` — the
-button links to the article; the description starts blank)
-(`404 fhintpremium_blog_post_not_found` for anything but a published post). `scheduled` / `scheduled_at` are set only by
-Premium's `POST fhint-premium/v1/posts/{id}/schedule` `{ scheduled_at }`
-(site wall time, `YYYY-MM-DDTHH:MM`), whose codes the admin already maps:
-`post.scheduled_at.required|invalid|too_soon|too_far|after_event`. The free
-plugin lists, edits, publishes and unschedules them. See
-`docs/POSTS-SCHEDULE-PLAN.md`.
+`fhint_post_sources` filters the sources a request may set (default
+`manual`, `review`).
 
 ## How the score works
 
@@ -1804,7 +1772,7 @@ chose.
 
 ---
 
-# Plan limits
+# Limits
 
 `meta.limits` entries all share one shape, from
 `FHINT\App\Core\Limits::report()`:
@@ -1815,8 +1783,8 @@ chose.
 
 `limit: 0` means unlimited, and `remaining` is then `null`.
 
-Free allows **1 location** and **5 services**. Every limit check in the
-plugin goes through `Limits`; raising one is a filter, not a code change:
+There are no limits by default. Every limit check in the plugin goes
+through `Limits`; setting one is a filter, not a code change:
 
 ```php
 add_filter( 'fhint_limits', function ( $limits ) {

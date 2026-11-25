@@ -6,10 +6,9 @@ import { dialogButton, primaryAction } from "../styles";
 import { useSaveReviewReplyMutation } from "@/store/api/reviewsApi";
 import { MAX_BYTES, bytes, firstNameOf } from "../lib/replies";
 import ReviewsDialog from "./ReviewsDialog";
-import QuickTemplates from "./reply/QuickTemplates";
+import QuickReply from "./reply/QuickReply";
 import ReplyField from "./reply/ReplyField";
 import ReviewQuote from "./reply/ReviewQuote";
-import useTemplates from "../hooks/useTemplates";
 
 /**
  * Writing, or rewriting, the reply to one review.
@@ -18,13 +17,11 @@ import useTemplates from "../hooks/useTemplates";
  * it, so the footer says so and nothing is sent until "Publish reply". The
  * reply shown on the card afterwards is what Google accepted.
  *
- * Quick templates for the review's star rating come first: pressing one
- * fills the reply with this review's details — the reviewer's first name,
- * the location and its city — ready to edit before it is published.
+ * The built-in reply comes first: pressing it fills the reply with this
+ * review's details — the reviewer's first name, the location and its
+ * city — ready to edit before it is published.
  */
 export function ReplyDialog({ review, context, onClose }) {
-  // The review's own listing's templates, whatever the bar shows.
-  const { templates } = useTemplates(review.location_name);
   const id = useId();
   const editing = Boolean(review.reply_comment);
   const [draft, setDraft] = useState(review.reply_comment ?? "");
@@ -45,7 +42,6 @@ export function ReplyDialog({ review, context, onClose }) {
     error && !fieldErrors(error).comment ? errorMessage(error) : "";
   const name = firstNameOf(review);
   const rating = Number(review.star_rating) || 0;
-  const forRating = templates.filter((template) => template.rating === rating);
 
   const publish = async (event) => {
     event?.preventDefault();
@@ -111,11 +107,9 @@ export function ReplyDialog({ review, context, onClose }) {
     >
       <ReviewQuote review={review} rating={rating} />
 
-      <QuickTemplates
+      <QuickReply
         review={review}
         context={context}
-        templates={forRating}
-        rating={rating}
         onPick={(text) => {
           reset();
           setDraft(text);

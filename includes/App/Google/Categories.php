@@ -32,7 +32,7 @@ class Categories {
 	/**
 	 * How many additional categories Google allows beside the primary one.
 	 *
-	 * This is Google's rule, not a plan limit, which is why it lives here and
+	 * This is Google's rule, not a site limit, which is why it lives here and
 	 * not in `Limits`.
 	 */
 	const MAX_ADDITIONAL = 9;

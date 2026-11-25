@@ -27,8 +27,6 @@ defined( 'ABSPATH' ) || exit;
  *     draft ──publish──▶ live | processing | rejected
  *       │                  ▲
  *       └──publish fails──▶ failed ──retry──┘
- *     draft ◀──unschedule── scheduled (set by FoundHint Premium only)
- *                              └──due──▶ sending ──▶ live | failed
  *
  * - `draft`      saved here, never sent.
  * - `live`       on the listing (Google's LIVE).
@@ -38,11 +36,6 @@ defined( 'ABSPATH' ) || exit;
  * - `failed`     the last attempt to send it was refused before Google kept
  *                it; `error` holds the message. Nothing is on Google unless
  *                `google_name` is set (an edit to a live post that failed).
- * - `scheduled`  waiting for `scheduled_at`. The free plugin never sets it;
- *                it edits, publishes or unschedules (→ draft) one.
- * - `sending`    claimed by Premium's sender for one send — seconds. Nothing
- *                may change it meanwhile (409 `fhint_post_sending`). One
- *                left longer than 15 minutes is marked failed, never resent.
  *
  * Event and offer dates are the business's own wall-clock time, as Google
  * holds them (a date and a time of day, no zone) — **not UTC**, unlike every
@@ -57,8 +50,8 @@ defined( 'ABSPATH' ) || exit;
  * @column topic_type    update | event | offer (Google's STANDARD, EVENT, OFFER).
  * @column status        See the lifecycle above.
  * @column source        Where it came from: manual (written by the owner, or
- *                       read from Google), review (made from a review). Pro
- *                       adds ai, csv and blog.
+ *                       read from Google), review (made from a review). Other
+ *                       sources may be added via `fhint_post_sources`.
  * @column source_ref    The id behind the source — the review id for a post
  *                       made from a review. '' otherwise.
  * @column title         Event or offer title (Google caps it at 58). '' for an update.
@@ -77,7 +70,6 @@ defined( 'ABSPATH' ) || exit;
  * @column search_url    Google's link to the post on Search, once live.
  * @column error         Why the last send failed or Google rejected it, ''.
  * @column payload       Google's last answer for the post, JSON.
- * @column scheduled_at  When a scheduled post is due, UTC (Pro).
  * @column published_at  Google's createTime, UTC. NULL until on Google.
  * @column synced_at     When Google last answered for this row, UTC.
  * @column created_at    Row creation timestamp, UTC.
@@ -118,7 +110,6 @@ class CreatePostsTable {
 	search_url varchar(2048) NOT NULL default '',
 	error varchar(1000) NOT NULL default '',
 	payload longtext NULL,
-	scheduled_at datetime NULL,
 	published_at datetime NULL,
 	synced_at datetime NULL,
 	created_at datetime NULL,

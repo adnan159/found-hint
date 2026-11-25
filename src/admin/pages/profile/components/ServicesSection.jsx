@@ -215,9 +215,9 @@ export function ServicesSection({ model, onChange, errors, services }) {
       {full ? (
         <NoticeBar>
           {sprintf(
-            /* translators: %d: number of services the plan includes. */
+            /* translators: %d: the most services this site allows. */
             __(
-              "You have used all %d services on Free. Pro removes the limit.",
+              "This site allows up to %d services, and all of them are in use.",
               "foundhint-local-seo",
             ),
             limit,

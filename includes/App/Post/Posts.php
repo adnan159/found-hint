@@ -92,10 +92,6 @@ class Posts {
 			return self::not_found();
 		}
 
-		if ( 'sending' === $existing['status'] ) {
-			return self::sending();
-		}
-
 		$clean = PostValidator::sanitize( $input );
 
 		// Where a post came from is fixed when it is written.
@@ -128,9 +124,7 @@ class Posts {
 			return self::result( PostPublisher::send_edit( $existing, self::changes( $merged ) ) );
 		}
 
-		// A scheduled post is sent by itself later, so every save must leave
-		// it ready to send — the same strict rules as publishing.
-		$validation = PostValidator::validate( $merged, $publish || 'scheduled' === $existing['status'] );
+		$validation = PostValidator::validate( $merged, $publish );
 
 		if ( ! $validation->is_valid() ) {
 			return $validation;
@@ -158,10 +152,6 @@ class Posts {
 			return self::not_found();
 		}
 
-		if ( 'sending' === $post['status'] ) {
-			return self::sending();
-		}
-
 		if ( self::on_google( $post ) ) {
 			return new WP_Error(
 				'fhint_post_already_live',
@@ -180,66 +170,6 @@ class Posts {
 	}
 
 	/**
-	 * Take a scheduled post off the schedule: it becomes a draft again.
-	 *
-	 * Only FoundHint Premium schedules a post, but cancelling is free, so a
-	 * post queued while Premium was active can always be taken back.
-	 *
-	 * @param int $id Row id.
-	 * @return array|WP_Error The post.
-	 */
-	public static function unschedule( $id ) {
-		$post = PostRepository::find( $id );
-
-		if ( ! $post ) {
-			return self::not_found();
-		}
-
-		if ( 'sending' === $post['status'] ) {
-			return self::sending();
-		}
-
-		if ( 'scheduled' !== $post['status'] ) {
-			return new WP_Error(
-				'fhint_post_not_scheduled',
-				__( 'This post is not scheduled.', 'foundhint-local-seo' ),
-				array( 'status' => 409 )
-			);
-		}
-
-		$stored = PostRepository::update(
-			$post['id'],
-			array(
-				'status'       => 'draft',
-				'scheduled_at' => null,
-			)
-		);
-
-		return $stored ? self::present( $stored ) : self::save_failed();
-	}
-
-	/**
-	 * A UTC database time as wall time in the site's time zone, in the shape
-	 * a `datetime-local` input takes ("2026-11-05T09:30"); '' for none.
-	 *
-	 * @param string|null $utc "Y-m-d H:i:s" in UTC.
-	 * @return string
-	 */
-	public static function site_time( $utc ) {
-		if ( ! $utc ) {
-			return '';
-		}
-
-		try {
-			$time = new \DateTimeImmutable( (string) $utc, new \DateTimeZone( 'UTC' ) );
-		} catch ( \Exception $e ) {
-			return '';
-		}
-
-		return $time->setTimezone( wp_timezone() )->format( 'Y-m-d\TH:i' );
-	}
-
-	/**
 	 * Delete a post — from Google first when it is there.
 	 *
 	 * @param int $id Row id.
@@ -250,10 +180,6 @@ class Posts {
 
 		if ( ! $post ) {
 			return self::not_found();
-		}
-
-		if ( 'sending' === $post['status'] ) {
-			return self::sending();
 		}
 
 		return PostPublisher::delete( $post );
@@ -302,18 +228,13 @@ class Posts {
 			);
 		}
 
-		$counts = function_exists( 'wp_count_posts' ) ? wp_count_posts( 'post' ) : null;
-
 		return array(
 			'locations'  => $locations,
 			'synced_at'  => PostRepository::last_synced_at( (string) $location_name ),
 			'website'    => $listing && PostValidator::is_url( $listing['website'] ) ? $listing['website'] : home_url( '/' ),
-			'blog_posts' => $counts && isset( $counts->publish ) ? (int) $counts->publish : 0,
 			// Whether Google can fetch a photo stored on this site. When it
 			// cannot, an uploaded post photo goes on the listing's gallery.
 			'uploads_reachable' => PostMedia::is_reachable( self::uploads_url() ),
-			// The time zone a scheduled time is entered and shown in.
-			'timezone'   => wp_timezone_string(),
 		);
 	}
 
@@ -330,7 +251,6 @@ class Posts {
 		$post['location_title'] = isset( $titles[ $post['location_name'] ] ) ? $titles[ $post['location_name'] ] : '';
 		$post['on_google']      = self::on_google( $post );
 		$post['media_reachable'] = '' === $post['media_url'] || PostMedia::is_reachable( $post['media_url'] );
-		$post['scheduled_local'] = self::site_time( $post['scheduled_at'] );
 
 		return $post;
 	}
@@ -428,20 +348,6 @@ class Posts {
 		}
 
 		return $titles;
-	}
-
-	/**
-	 * A post Premium's sender has claimed: it is mid-send, so nothing may
-	 * change it until Google has answered.
-	 *
-	 * @return WP_Error
-	 */
-	private static function sending() {
-		return new WP_Error(
-			'fhint_post_sending',
-			__( 'This post is being sent to Google right now. Try again in a minute.', 'foundhint-local-seo' ),
-			array( 'status' => 409 )
-		);
 	}
 
 	/**

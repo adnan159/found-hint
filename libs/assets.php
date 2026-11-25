@@ -74,7 +74,7 @@ function get_manifest( string $manifest_dir ): object {
 	 * @param string $manifest_path Manifest file path.
 	 * @param bool   $is_dev        Whether this is a manifest for development assets.
 	 */
-	$manifest = apply_filters( 'vite_for_wp__manifest_data', $manifest, $manifest_dir, $manifest_path );
+	$manifest = apply_filters( 'fhint_vite_for_wp__manifest_data', $manifest, $manifest_dir, $manifest_path );
 
 	$manifests[ $manifest_path ] = (object) array(
 		'data'   => $manifest,
@@ -267,7 +267,7 @@ function load_development_asset( object $manifest, string $entry, array $options
 	 * @param string $entry    Entrypoint file.
 	 * @param array  $options  Enqueue options.
 	 */
-	$assets = apply_filters( 'vite_for_wp__development_assets', $assets, $manifest, $entry, $options );
+	$assets = apply_filters( 'fhint_vite_for_wp__development_assets', $assets, $manifest, $entry, $options );
 
 	return $assets;
 }
@@ -331,7 +331,7 @@ function load_production_asset( object $manifest, string $entry, array $options 
 	 * @param string $entry    Entrypoint file.
 	 * @param array  $options  Enqueue options.
 	 */
-	$assets = apply_filters( 'vite_for_wp__production_assets', $assets, $manifest, $entry, $options );
+	$assets = apply_filters( 'fhint_vite_for_wp__production_assets', $assets, $manifest, $entry, $options );
 
 	return $assets;
 }

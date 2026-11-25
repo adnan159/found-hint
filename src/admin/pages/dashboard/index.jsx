@@ -17,7 +17,6 @@ import {
 } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Skeleton } from "@/components/ui/skeleton";
-import ComingSoonBanner from "@/components/ComingSoonBanner";
 import PageHeader from "@/components/PageHeader";
 import useSelectedLocation from "@/hooks/useSelectedLocation";
 import SectionCard from "@/components/SectionCard";
@@ -152,14 +151,6 @@ export default function DashboardPage() {
         title={__("Dashboard", "foundhint-local-seo")}
         description={__(
           "What you have told FoundHint about your business so far.",
-          "foundhint-local-seo",
-        )}
-      />
-
-      <ComingSoonBanner
-        title={__("Advanced dashboard coming soon!", "foundhint-local-seo")}
-        description={__(
-          "Deeper insights into how customers find you are on the way. Everything here keeps working in the meantime.",
           "foundhint-local-seo",
         )}
       />

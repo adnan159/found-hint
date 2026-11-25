@@ -40,7 +40,7 @@ class ReferenceRepository {
 			return false;
 		}
 
-		$table = Tables::name( Tables::GOOGLE_REFERENCE );
+		$table = esc_sql( Tables::name( Tables::GOOGLE_REFERENCE ) );
 		$now   = Validator::now();
 
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
@@ -109,7 +109,7 @@ class ReferenceRepository {
 			return array();
 		}
 
-		$table = Tables::name( Tables::GOOGLE_REFERENCE );
+		$table = esc_sql( Tables::name( Tables::GOOGLE_REFERENCE ) );
 
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		$rows = $wpdb->get_results(
@@ -149,7 +149,7 @@ class ReferenceRepository {
 			return null;
 		}
 
-		$table = Tables::name( Tables::GOOGLE_REFERENCE );
+		$table = esc_sql( Tables::name( Tables::GOOGLE_REFERENCE ) );
 
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		$when = $wpdb->get_var(

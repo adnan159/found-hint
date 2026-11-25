@@ -42,7 +42,7 @@ class DescriptionHistoryRepository {
 			return array();
 		}
 
-		$table = Tables::name( Tables::DESCRIPTION_HISTORY );
+		$table = esc_sql( Tables::name( Tables::DESCRIPTION_HISTORY ) );
 
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		$rows = $wpdb->get_results(

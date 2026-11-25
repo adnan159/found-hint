@@ -111,9 +111,9 @@ export function ServicesStep({ onDone, onBack, onSkip }) {
       {!canAdd && limits ? (
         <p className="fhint:text-sm fhint:text-muted-strong">
           {sprintf(
-            /* translators: %d: number of services included in the plan. */
+            /* translators: %d: the maximum number of services on this site. */
             __(
-              "That is all %d services your plan includes.",
+              "That is all %d services this site allows.",
               "foundhint-local-seo",
             ),
             limits.limit,

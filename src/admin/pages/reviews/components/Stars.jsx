@@ -4,9 +4,8 @@ import { StarIcon } from "lucide-react";
 
 /**
  * A star rating, drawn and said: five Lucide stars, the rating's worth
- * filled in the star colour and the rest in grey — the same star the reply
- * templates use. The stars are decoration; the words beside them, for
- * screen readers, are the rating.
+ * filled in the star colour and the rest in grey. The stars are
+ * decoration; the words beside them, for screen readers, are the rating.
  */
 export function Stars({ value }) {
   const rating = Number(value) || 0;

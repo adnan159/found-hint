@@ -190,7 +190,7 @@ class Logger {
 
 		$days   = max( 1, (int) $days );
 		$cutoff = gmdate( 'Y-m-d H:i:s', time() - ( $days * DAY_IN_SECONDS ) );
-		$table  = Tables::name( Tables::LOGS );
+		$table  = esc_sql( Tables::name( Tables::LOGS ) );
 
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 		return (int) $wpdb->query( $wpdb->prepare( "DELETE FROM {$table} WHERE created_at < %s", $cutoff ) );
@@ -208,7 +208,7 @@ class Logger {
 			return 0;
 		}
 
-		$table = Tables::name( Tables::LOGS );
+		$table = esc_sql( Tables::name( Tables::LOGS ) );
 
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 		return (int) $wpdb->query( "DELETE FROM {$table}" );
@@ -226,7 +226,7 @@ class Logger {
 			return 0;
 		}
 
-		$table = Tables::name( Tables::LOGS );
+		$table = esc_sql( Tables::name( Tables::LOGS ) );
 
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 		return (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$table}" );

@@ -18,8 +18,8 @@ defined( 'ABSPATH' ) || exit;
  * to a fixed number of queries however many rules exist, and stops a rule
  * from quietly becoming a second source of truth for a phone number.
  *
- * Pro adds rules by appending to `fhint_audit_rules`; nothing in Free needs
- * to change to accommodate one.
+ * Further rules are added by appending to `fhint_audit_rules`; nothing here
+ * needs to change to accommodate one.
  */
 abstract class Rule {
 

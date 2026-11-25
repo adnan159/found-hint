@@ -12,10 +12,8 @@ defined( 'ABSPATH' ) || exit;
 /**
  * Creates the fhint_locations table.
  *
- * One row per physical place the business trades from. Free allows a single
- * location (enforced by App\Core\Limits, not by this schema) — the table is
- * shaped for many from the start so raising that limit is a settings change
- * rather than a migration.
+ * One row per physical place the business trades from, as many as the
+ * business has (any limit is App\Core\Limits', not this schema's).
  *
  * Contact columns are deliberately nullable-by-emptiness: an empty phone,
  * email or website means "use the business value", which is what lets a
@@ -28,9 +26,6 @@ defined( 'ABSPATH' ) || exit;
  * @column id                Auto-increment primary key.
  * @column business_id       FK → fhint_business.id. No database-level constraint;
  *                           the repositories own referential integrity.
- * @column wordpress_post_id Post/page representing this location on the site. Ships
- *                           unused; carrying it from the first release means the
- *                           location-pages feature needs no migration later.
  * @column name              Branch name, e.g. "Downtown" or "Gulshan Branch".
  * @column address_line_1    Street address.
  * @column address_line_2    Suite, unit or floor.
@@ -128,7 +123,6 @@ class CreateLocationsTable {
 		$sql = "CREATE TABLE {$table} (
 	id bigint(20) unsigned NOT NULL auto_increment,
 	business_id bigint(20) unsigned NOT NULL default 0,
-	wordpress_post_id bigint(20) unsigned NOT NULL default 0,
 	name varchar(255) NOT NULL default '',
 	address_line_1 varchar(255) NOT NULL default '',
 	address_line_2 varchar(255) NOT NULL default '',
@@ -159,7 +153,6 @@ class CreateLocationsTable {
 	updated_at datetime NULL,
 	PRIMARY KEY  (id),
 	KEY business_id (business_id),
-	KEY wordpress_post_id (wordpress_post_id),
 	KEY status (status),
 	KEY country_city (country,city),
 	KEY google_location_name (google_location_name),

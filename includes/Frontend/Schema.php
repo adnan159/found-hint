@@ -69,8 +69,7 @@ class Schema {
 	public static function placement() {
 		/**
 		 * Filters where the JSON-LD is printed: 'head' (wp_head) or 'footer'
-		 * (wp_footer). FoundHint Pro's Settings tab sets it; the free markup
-		 * always goes in the head.
+		 * (wp_footer). Defaults to the head.
 		 *
 		 * @param string $placement head | footer.
 		 */
@@ -103,10 +102,9 @@ class Schema {
 		 * Filters the whole document printed on this request.
 		 *
 		 * Return an array — a JSON-LD document — to print it instead of the
-		 * free LocalBusiness markup; null keeps the free markup. This is how
-		 * FoundHint Pro's Schema Manager takes over the output: its graph is
-		 * built per page, with its own placement and ownership rules, so
-		 * the free plugin's ownership check does not apply to it.
+		 * LocalBusiness markup this plugin builds; null keeps that markup. A
+		 * document returned here is printed as given: the ownership check
+		 * below applies only to the markup built here.
 		 *
 		 * @param array|null $document Null, or the document to print.
 		 * @param array      $context  { post_id, url, is_front_page }.

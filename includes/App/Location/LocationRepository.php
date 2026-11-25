@@ -38,7 +38,7 @@ class LocationRepository {
 			return array();
 		}
 
-		$table  = Tables::name( Tables::LOCATIONS );
+		$table  = esc_sql( Tables::name( Tables::LOCATIONS ) );
 		$where  = 'WHERE business_id = %d';
 		$params = array( $business_id );
 
@@ -57,9 +57,9 @@ class LocationRepository {
 			$params[]  = $offset;
 		}
 
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter -- table name from Tables::name(); $where/$limit_sql/$skip are fixed SQL holding only placeholders, values go through prepare().
 		$rows = $wpdb->get_results(
-			// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+			// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.PreparedSQLPlaceholders.UnfinishedPrepare
 			$wpdb->prepare( "SELECT * FROM {$table} {$where} ORDER BY is_primary DESC, id ASC{$limit_sql}", $params ),
 			ARRAY_A
 		);
@@ -82,7 +82,7 @@ class LocationRepository {
 			return null;
 		}
 
-		$table = Tables::name( Tables::LOCATIONS );
+		$table = esc_sql( Tables::name( Tables::LOCATIONS ) );
 
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 		$row = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$table} WHERE id = %d", $id ), ARRAY_A );
@@ -105,7 +105,7 @@ class LocationRepository {
 			return null;
 		}
 
-		$table = Tables::name( Tables::LOCATIONS );
+		$table = esc_sql( Tables::name( Tables::LOCATIONS ) );
 
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 		$row = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$table} WHERE google_location_name = %s ORDER BY id ASC LIMIT 1", $location_name ), ARRAY_A );
@@ -132,7 +132,7 @@ class LocationRepository {
 			return;
 		}
 
-		$table         = Tables::name( Tables::LOCATIONS );
+		$table         = esc_sql( Tables::name( Tables::LOCATIONS ) );
 		$location_name = (string) $location_name;
 
 		if ( '' !== $location_name ) {
@@ -179,7 +179,7 @@ class LocationRepository {
 			return 0;
 		}
 
-		$table = Tables::name( Tables::LOCATIONS );
+		$table = esc_sql( Tables::name( Tables::LOCATIONS ) );
 
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 		return (int) $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM {$table} WHERE business_id = %d", $business_id ) );
@@ -297,7 +297,7 @@ class LocationRepository {
 			return false;
 		}
 
-		$table = Tables::name( Tables::LOCATIONS );
+		$table = esc_sql( Tables::name( Tables::LOCATIONS ) );
 
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		$wpdb->query( 'START TRANSACTION' );
@@ -350,7 +350,7 @@ class LocationRepository {
 		global $wpdb;
 
 		$business_id = BusinessRepository::current_id();
-		$table       = Tables::name( Tables::LOCATIONS );
+		$table       = esc_sql( Tables::name( Tables::LOCATIONS ) );
 
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 		$wpdb->query( $wpdb->prepare( "UPDATE {$table} SET is_primary = 0 WHERE business_id = %d AND id != %d", $business_id, (int) $keep_id ) );
@@ -367,7 +367,6 @@ class LocationRepository {
 
 		$record['id']                = (int) $row['id'];
 		$record['business_id']       = (int) $row['business_id'];
-		$record['wordpress_post_id'] = (int) $row['wordpress_post_id'];
 		$record['is_primary']        = (bool) $row['is_primary'];
 		$record['latitude']          = ( null === $row['latitude'] || '' === $row['latitude'] ) ? null : (float) $row['latitude'];
 		$record['longitude']         = ( null === $row['longitude'] || '' === $row['longitude'] ) ? null : (float) $row['longitude'];
@@ -412,8 +411,6 @@ class LocationRepository {
 			'timezone'       => (string) $record['timezone'],
 			'status'         => (string) $record['status'],
 			'is_primary'     => ! empty( $record['is_primary'] ) ? 1 : 0,
-			// The page about this location (Schema Manager: its branch page).
-			'wordpress_post_id'    => isset( $record['wordpress_post_id'] ) ? max( 0, (int) $record['wordpress_post_id'] ) : 0,
 			'business_name'        => isset( $record['business_name'] ) ? (string) $record['business_name'] : '',
 			'description'          => isset( $record['description'] ) ? (string) $record['description'] : '',
 			// NULL until the location has links of its own; see the table docblock.

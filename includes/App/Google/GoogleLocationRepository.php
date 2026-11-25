@@ -30,7 +30,7 @@ class GoogleLocationRepository {
 	public static function all() {
 		global $wpdb;
 
-		$table = Tables::name( Tables::GOOGLE_LOCATIONS );
+		$table = esc_sql( Tables::name( Tables::GOOGLE_LOCATIONS ) );
 
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 		$rows = $wpdb->get_results( "SELECT * FROM {$table} ORDER BY account_name ASC, title ASC", ARRAY_A );
@@ -47,7 +47,7 @@ class GoogleLocationRepository {
 	public static function find_by_location_name( $location_name ) {
 		global $wpdb;
 
-		$table = Tables::name( Tables::GOOGLE_LOCATIONS );
+		$table = esc_sql( Tables::name( Tables::GOOGLE_LOCATIONS ) );
 
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		$row = $wpdb->get_row(
@@ -69,7 +69,7 @@ class GoogleLocationRepository {
 	public static function payload( $location_name ) {
 		global $wpdb;
 
-		$table = Tables::name( Tables::GOOGLE_LOCATIONS );
+		$table = esc_sql( Tables::name( Tables::GOOGLE_LOCATIONS ) );
 
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		$json = $wpdb->get_var(
@@ -90,7 +90,7 @@ class GoogleLocationRepository {
 	public static function find_by_fhint_location( $fhint_location_id ) {
 		global $wpdb;
 
-		$table = Tables::name( Tables::GOOGLE_LOCATIONS );
+		$table = esc_sql( Tables::name( Tables::GOOGLE_LOCATIONS ) );
 
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		$row = $wpdb->get_row(
@@ -115,7 +115,7 @@ class GoogleLocationRepository {
 	public static function upsert( array $data ) {
 		global $wpdb;
 
-		$table    = Tables::name( Tables::GOOGLE_LOCATIONS );
+		$table    = esc_sql( Tables::name( Tables::GOOGLE_LOCATIONS ) );
 		$existing = self::find_by_location_name( $data['location_name'] );
 		$now      = current_time( 'mysql', true );
 
@@ -208,7 +208,7 @@ class GoogleLocationRepository {
 	public static function map( $location_name, $fhint_location_id ) {
 		global $wpdb;
 
-		$table = Tables::name( Tables::GOOGLE_LOCATIONS );
+		$table = esc_sql( Tables::name( Tables::GOOGLE_LOCATIONS ) );
 		$now   = current_time( 'mysql', true );
 
 		// Release whatever this FoundHint location was mapped to before.
@@ -250,7 +250,7 @@ class GoogleLocationRepository {
 	public static function unmap( $location_name ) {
 		global $wpdb;
 
-		$table = Tables::name( Tables::GOOGLE_LOCATIONS );
+		$table = esc_sql( Tables::name( Tables::GOOGLE_LOCATIONS ) );
 
 		// Unlinking on purpose is the one time the location forgets.
 		$linked = self::find_by_location_name( $location_name );
@@ -283,7 +283,7 @@ class GoogleLocationRepository {
 	public static function release_for_location( $fhint_location_id ) {
 		global $wpdb;
 
-		$table = Tables::name( Tables::GOOGLE_LOCATIONS );
+		$table = esc_sql( Tables::name( Tables::GOOGLE_LOCATIONS ) );
 
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		$wpdb->update(
@@ -308,7 +308,7 @@ class GoogleLocationRepository {
 	public static function truncate() {
 		global $wpdb;
 
-		$table = Tables::name( Tables::GOOGLE_LOCATIONS );
+		$table = esc_sql( Tables::name( Tables::GOOGLE_LOCATIONS ) );
 
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 		$wpdb->query( "DELETE FROM {$table}" );
@@ -322,7 +322,7 @@ class GoogleLocationRepository {
 	public static function last_synced_at() {
 		global $wpdb;
 
-		$table = Tables::name( Tables::GOOGLE_LOCATIONS );
+		$table = esc_sql( Tables::name( Tables::GOOGLE_LOCATIONS ) );
 
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 		$value = $wpdb->get_var( "SELECT MAX(synced_at) FROM {$table}" );

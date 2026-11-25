@@ -16,8 +16,8 @@ defined( 'ABSPATH' ) || exit;
 /**
  * For one Google listing: `{ location_name, location_city, keyword }` —
  * what `{{location_name}}`, `{{location_city}}` and `{{business_keyword}}`
- * become in a reply. One place, so a reply typed on the Reviews screen and
- * one sent by auto-reply (Premium) say the same thing.
+ * become in a reply. One place, so every reply that uses them says the
+ * same thing.
  *
  * - Name: the listing's title on Google.
  * - City: the linked FoundHint location's city, else the city on Google's

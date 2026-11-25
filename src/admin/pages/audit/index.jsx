@@ -9,7 +9,6 @@ import { Progress } from "@/components/ui/progress";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Spinner } from "@/components/ui/spinner";
 import NoticeBar from "@/components/NoticeBar";
-import ComingSoonBanner from "@/components/ComingSoonBanner";
 import PageHeader from "@/components/PageHeader";
 import useSelectedLocation from "@/hooks/useSelectedLocation";
 import RequestError from "@/components/RequestError";
@@ -237,13 +236,6 @@ export default function AuditPage() {
           title={__("SEO audit", "foundhint-local-seo")}
           actions={runButton}
         />
-        <ComingSoonBanner
-          title={__("Advanced SEO audit coming soon!", "foundhint-local-seo")}
-          description={__(
-            "More checks and step-by-step fixes are on the way.",
-            "foundhint-local-seo",
-          )}
-        />
         <RequestError error={error ?? runError} />
         <Empty>
           <EmptyTitle>{__("No audit yet", "foundhint-local-seo")}</EmptyTitle>
@@ -268,14 +260,6 @@ export default function AuditPage() {
           formatWhen(audit.completed_at),
         )}
         actions={runButton}
-      />
-
-      <ComingSoonBanner
-        title={__("Advanced SEO audit coming soon!", "foundhint-local-seo")}
-        description={__(
-          "More checks and step-by-step fixes are on the way.",
-          "foundhint-local-seo",
-        )}
       />
 
       <RequestError error={error ?? runError} />

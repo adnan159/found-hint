@@ -1,9 +1,8 @@
 /*
- * FoundHint's look, shared by the admin app (src/admin/index.css) and the
- * post editor's GBP Posting popup (src/editor/editor.css): theme tokens,
- * colours, and rules aimed only at FoundHint's own elements — `#fhint-app`,
- * `[data-slot]` components and `.fhint-*` classes. Nothing here may style a
- * bare element page-wide: the editor bundle loads it on WordPress's screen.
+ * FoundHint's look, used by the admin app (src/admin/index.css): theme
+ * tokens, colours, and rules aimed only at FoundHint's own elements —
+ * `#fhint-app`, `[data-slot]` components and `.fhint-*` classes. Nothing
+ * here may style a bare element page-wide.
  */
 
 @custom-variant dark (&:is(.dark *));
@@ -144,7 +143,7 @@
   /* Sidebar sub-items, and the quieter disclosure chevron. */
   --sidebar-sub-foreground: #444141;
   --sidebar-chevron: #9b9797;
-  /* Plan-limit, "heads up" and "coming soon" notices — an accent-tinted
+  /* Limit, "heads up" and "coming soon" notices — an accent-tinted
      band, not an error — measured from the prototype. Left undefined (they
      were lost once, in the tooltip commit), `bg-notice` is transparent and
      `border-notice-border` falls back to the text colour: every notice

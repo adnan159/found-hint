@@ -2,15 +2,11 @@ import { useState } from "react";
 import { __ } from "@wordpress/i18n";
 import { toast } from "sonner";
 import { errorMessage, fieldErrors } from "@/lib/errors";
-import { hasPro } from "@/lib/pro";
-import { useSchedulePostMutation } from "@/store/api/postScheduleApi";
 import {
   useCreatePostMutation,
-  useUnschedulePostMutation,
   useUpdatePostMutation,
 } from "@/store/api/postsApi";
 import {
-  defaultScheduleAt,
   fieldsOf,
   formFromPost,
   initialWhen,
@@ -20,32 +16,18 @@ import {
 /**
  * The composer's state and its save.
  *
- * A save is one or two requests. The post is always saved first (created or
- * updated, and sent when publishing). Then:
- * - Schedule: FoundHint Premium puts it on the schedule. Premium checks the
- *   time; if it refuses, the post stays saved as a draft and the error
- *   shows at the picker.
- * - Draft, for a post that was scheduled: it is taken off the schedule.
- *
- * Without Premium a post already scheduled can still be edited (it stays
- * queued) or turned back into a draft, but not given a new time.
+ * One request: the post is created or updated, and sent to Google when
+ * publishing. A draft stays on this site only.
  */
 export default function useComposer({ post, locationName, onClose }) {
   const [savedId, setSavedId] = useState(post?.id ?? 0);
   const [form, setForm] = useState(() => formFromPost(post));
   const [when, setWhen] = useState(() => initialWhen(post));
-  const [scheduleAt, setScheduleAt] = useState(
-    () => post?.scheduled_local || defaultScheduleAt(),
-  );
   const [reachable, setReachable] = useState(post?.media_reachable ?? true);
   const [create, createState] = useCreatePostMutation();
   const [update, updateState] = useUpdatePostMutation();
-  const [schedule, scheduleState] = useSchedulePostMutation();
-  const [unschedule, unscheduleState] = useUnschedulePostMutation();
 
-  const requests = [createState, updateState, scheduleState, unscheduleState];
-  const canSchedule = hasPro("posts.schedule");
-  const wasScheduled = post?.status === "scheduled";
+  const requests = [createState, updateState];
   const onGoogle = Boolean(post?.on_google);
   const isNew = !savedId;
   const saving = requests.some((request) => request.isLoading);
@@ -53,18 +35,9 @@ export default function useComposer({ post, locationName, onClose }) {
   const errors = fieldErrors(error);
   const generalError =
     error && !Object.keys(errors).length ? errorMessage(error) : "";
-  // A new post saved but then refused — by Google, or by the schedule.
-  const keptAs = scheduleState.error
-    ? wasScheduled
-      ? __(
-          "Your changes are saved, and it still goes out at its earlier time.",
-          "foundhint-local-seo",
-        )
-      : __(
-          "It is saved as a draft and is not scheduled yet.",
-          "foundhint-local-seo",
-        )
-    : generalError && savedId && !post?.id
+  // A new post saved but then refused by Google.
+  const keptAs =
+    generalError && savedId && !post?.id
       ? __(
           "Google did not take the post. It is saved here, so you can fix it and try again.",
           "foundhint-local-seo",
@@ -102,17 +75,9 @@ export default function useComposer({ post, locationName, onClose }) {
     event?.preventDefault();
 
     try {
-      const id = await save(onGoogle || when === "now");
+      await save(onGoogle || when === "now");
 
-      if (!onGoogle && when === "schedule" && canSchedule) {
-        await schedule({ id, scheduledAt: scheduleAt }).unwrap();
-      }
-
-      if (!onGoogle && when === "draft" && wasScheduled) {
-        await unschedule({ id }).unwrap();
-      }
-
-      toast.success(savedMessage({ onGoogle, when, scheduleAt, canSchedule }));
+      toast.success(savedMessage({ onGoogle, when }));
       onClose();
     } catch (failure) {
       // A new post Google refused is still saved, as failed: carry on
@@ -149,12 +114,6 @@ export default function useComposer({ post, locationName, onClose }) {
       reset();
       setWhen(next);
     },
-    scheduleAt,
-    setScheduleAt: (next) => {
-      reset();
-      setScheduleAt(next);
-    },
-    canSchedule,
     reachable,
     setReachable,
     onGoogle,

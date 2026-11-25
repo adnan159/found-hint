@@ -170,6 +170,30 @@ check( $unknown instanceof WP_Error, 'an unknown state is rejected' );
 $missing = OAuth::claim_handshake( '' );
 check( $missing instanceof WP_Error, 'a missing state is rejected' );
 
+// -- State carries a WordPress nonce ----------------------------------------
+
+reset_google();
+Credentials::save( 'id', 'secret' );
+
+$url = OAuth::start( 1 );
+parse_str( (string) wp_parse_url( $url, PHP_URL_QUERY ), $query );
+
+check_same( wp_create_nonce( OAuth::NONCE_ACTION ), OAuth::state_nonce( $query['state'] ), 'state carries a nonce for the callback action' );
+check( false !== wp_verify_nonce( OAuth::state_nonce( $query['state'] ), OAuth::NONCE_ACTION ), 'and it verifies with wp_verify_nonce()' );
+check_same( '', OAuth::state_nonce( 'no-dot-here' ), 'a state without a nonce yields none' );
+
+// A state whose stored handshake exists but whose nonce was altered.
+$tampered = substr( $query['state'], 0, strrpos( $query['state'], '.' ) + 1 ) . 'bad0nce000';
+$GLOBALS['__transients'][ OAuth::HANDSHAKE_PREFIX . $tampered ] = $GLOBALS['__transients'][ OAuth::HANDSHAKE_PREFIX . $query['state'] ];
+
+$bad = OAuth::claim_handshake( $tampered );
+check( $bad instanceof WP_Error, 'a state with a wrong nonce is refused' );
+check_same( 'fhint_google_state_invalid', $bad instanceof WP_Error ? $bad->get_error_code() : 'claimed', 'as invalid' );
+check( ! isset( $GLOBALS['__transients'][ OAuth::HANDSHAKE_PREFIX . $tampered ] ), 'and is consumed, so it cannot be retried' );
+
+$good = OAuth::claim_handshake( $query['state'] );
+check( is_array( $good ), 'while the untouched state still completes' );
+
 // -- State belongs to the user who started it ------------------------------
 
 reset_google();
@@ -486,6 +510,27 @@ $exchange = json_decode( last_request()['args']['body'], true );
 check_same( $plain, $exchange['secret'], 'the secret sent is the real one' );
 check( ! Secrets::is_encrypted( $exchange['secret'] ), 'never the stored ciphertext' );
 check_same( 'handoff-xyz', $exchange['handoff'], 'with the handoff from the redirect' );
+
+// -- An error redirect from the connect service ------------------------------
+//
+// `fhint_connect_error` is believed only for an attempt this site started,
+// for the same user (and session, when the service names one). Anything
+// else must not be able to write the screen's notice.
+
+$fhint_pending = array( 'session_id' => 'session-abc', 'secret' => 'x', 'user_id' => 7 );
+
+unset( $GLOBALS['__transients'][ ConnectService::HANDSHAKE_TRANSIENT ] );
+check( ! ConnectService::abandon( '', 7 ), 'abandon: no attempt pending, the report is not believed' );
+
+$GLOBALS['__transients'][ ConnectService::HANDSHAKE_TRANSIENT ] = $fhint_pending;
+check( ! ConnectService::abandon( 'session-abc', 8 ), 'abandon: not for another user' );
+check( ! ConnectService::abandon( 'session-other', 7 ), 'abandon: not for another session' );
+check( isset( $GLOBALS['__transients'][ ConnectService::HANDSHAKE_TRANSIENT ] ), 'abandon: a refused report leaves the attempt in place' );
+check( ConnectService::abandon( 'session-abc', 7 ), 'abandon: the matching attempt is believed' );
+check( ! isset( $GLOBALS['__transients'][ ConnectService::HANDSHAKE_TRANSIENT ] ), 'abandon: and is consumed' );
+
+$GLOBALS['__transients'][ ConnectService::HANDSHAKE_TRANSIENT ] = $fhint_pending;
+check( ConnectService::abandon( '', 7 ), 'abandon: a report naming no session matches on the user' );
 
 $GLOBALS['__filters']['fhint_connect_url'] = array();
 

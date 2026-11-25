@@ -62,6 +62,15 @@ class OAuth {
 	const HANDSHAKE_PREFIX = 'fhint_google_oauth_';
 
 	/**
+	 * Nonce action carried inside `state`.
+	 *
+	 * Google sends the browser back to a fixed redirect URI, so a `_wpnonce`
+	 * parameter cannot ride along — but `state` comes back unchanged, so the
+	 * nonce travels inside it: `<random>.<nonce>`.
+	 */
+	const NONCE_ACTION = 'fhint_google_callback';
+
+	/**
 	 * The scopes this plugin asks for.
 	 *
 	 * Filterable so an extension can ask for more on the same consent
@@ -93,7 +102,9 @@ class OAuth {
 			);
 		}
 
-		$state    = self::random_string( 32 );
+		// A WordPress nonce for the user starting the sign-in, carried in
+		// `state` and checked by the callback with wp_verify_nonce().
+		$state    = self::random_string( 32 ) . '.' . wp_create_nonce( self::NONCE_ACTION );
 		$verifier = self::random_string( 64 );
 
 		// Tied to the user who started it, so a state lifted from one
@@ -147,6 +158,13 @@ class OAuth {
 			return new WP_Error( 'fhint_google_state_missing', __( 'That sign-in could not be verified.', 'foundhint-local-seo' ) );
 		}
 
+		if ( ! wp_verify_nonce( self::state_nonce( $state ), self::NONCE_ACTION ) ) {
+			// Consumed anyway, so a state that failed here cannot be retried.
+			delete_transient( self::HANDSHAKE_PREFIX . $state );
+
+			return new WP_Error( 'fhint_google_state_invalid', __( 'That sign-in could not be verified. Please try connecting again.', 'foundhint-local-seo' ) );
+		}
+
 		$key    = self::HANDSHAKE_PREFIX . $state;
 		$record = get_transient( $key );
 
@@ -161,6 +179,19 @@ class OAuth {
 		}
 
 		return $record;
+	}
+
+	/**
+	 * The WordPress nonce carried inside a `state`.
+	 *
+	 * @param string $state State as returned by Google.
+	 * @return string The nonce, or '' when the state carries none.
+	 */
+	public static function state_nonce( $state ) {
+		$state = (string) $state;
+		$dot   = strrpos( $state, '.' );
+
+		return false === $dot ? '' : (string) substr( $state, $dot + 1 );
 	}
 
 	/**

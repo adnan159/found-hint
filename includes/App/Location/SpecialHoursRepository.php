@@ -35,7 +35,7 @@ class SpecialHoursRepository {
 			return array();
 		}
 
-		$table = Tables::name( Tables::SPECIAL_HOURS );
+		$table = esc_sql( Tables::name( Tables::SPECIAL_HOURS ) );
 
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		$rows = $wpdb->get_results(
@@ -67,7 +67,7 @@ class SpecialHoursRepository {
 			return false;
 		}
 
-		$table = Tables::name( Tables::SPECIAL_HOURS );
+		$table = esc_sql( Tables::name( Tables::SPECIAL_HOURS ) );
 		$now   = Validator::now();
 
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
@@ -131,7 +131,7 @@ class SpecialHoursRepository {
 			return false;
 		}
 
-		$table = Tables::name( Tables::SPECIAL_HOURS );
+		$table = esc_sql( Tables::name( Tables::SPECIAL_HOURS ) );
 
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		return false !== $wpdb->query(

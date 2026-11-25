@@ -3,7 +3,7 @@ import { cn } from "cn";
 import { RotateCwIcon } from "lucide-react";
 import { toast } from "sonner";
 import { errorMessage } from "@/lib/errors";
-import { dialogButton } from "@/pages/schema/components/styles";
+import { dialogButton } from "@/lib/panelStyles";
 import { usePublishPostMutation } from "@/store/api/postsApi";
 
 /**

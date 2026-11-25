@@ -1,9 +1,8 @@
 /**
- * The accent-tinted band used for plan limits and similar "heads up"
- * messages.
+ * The accent-tinted band used for limits and similar "heads up" messages.
  *
- * Deliberately not an Alert: an Alert reads as a problem, and being on the
- * free plan is not a problem. The colours come from the notice tokens in
+ * Deliberately not an Alert: an Alert reads as a problem, and these are
+ * not problems. The colours come from the notice tokens in
  * index.css rather than literal hex values.
  */
 export function NoticeBar({ children, action }) {

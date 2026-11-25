@@ -45,7 +45,6 @@ class PostRepository {
 		'search_url'    => '',
 		'error'         => '',
 		'payload'       => null,
-		'scheduled_at'  => null,
 		'published_at'  => null,
 		'synced_at'     => null,
 	);
@@ -66,7 +65,7 @@ class PostRepository {
 			return array();
 		}
 
-		$table = Tables::name( Tables::POSTS );
+		$table = esc_sql( Tables::name( Tables::POSTS ) );
 
 		list( $where, $params ) = self::where( $args );
 
@@ -81,14 +80,14 @@ class PostRepository {
 			$params[]  = $offset;
 		}
 
-		// Newest first: the post added (published, or last saved — a scheduled
-		// one when it was scheduled) most recently leads, whatever its status.
+		// Newest first: the post added (published, or last saved) most
+		// recently leads, whatever its status.
 		// Oldest first is the exact reverse.
 		$ordering = "COALESCE( published_at, updated_at ) {$order}, id {$order}";
 
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter -- table name from Tables::name(); $where/$limit_sql/$skip are fixed SQL holding only placeholders, values go through prepare().
 		$rows = $wpdb->get_results(
-			// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+			// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.PreparedSQLPlaceholders.UnfinishedPrepare
 			$wpdb->prepare( "SELECT * FROM {$table} {$where} ORDER BY {$ordering}{$limit_sql}", $params ),
 			ARRAY_A
 		);
@@ -109,11 +108,11 @@ class PostRepository {
 			return 0;
 		}
 
-		$table = Tables::name( Tables::POSTS );
+		$table = esc_sql( Tables::name( Tables::POSTS ) );
 
 		list( $where, $params ) = self::where( $args );
 
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.PreparedSQLPlaceholders.UnfinishedPrepare, PluginCheck.Security.DirectDB.UnescapedDBParameter -- table name from Tables::name(); $where/$limit_sql/$skip are fixed SQL holding only placeholders, values go through prepare().
 		return (int) $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM {$table} {$where}", $params ) );
 	}
 
@@ -142,11 +141,11 @@ class PostRepository {
 
 		unset( $args['topic_type'] );
 
-		$table = Tables::name( Tables::POSTS );
+		$table = esc_sql( Tables::name( Tables::POSTS ) );
 
 		list( $where, $params ) = self::where( $args );
 
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.PreparedSQLPlaceholders.UnfinishedPrepare, PluginCheck.Security.DirectDB.UnescapedDBParameter -- table name from Tables::name(); $where/$limit_sql/$skip are fixed SQL holding only placeholders, values go through prepare().
 		$rows = $wpdb->get_results( $wpdb->prepare( "SELECT topic_type, COUNT(*) AS n FROM {$table} {$where} GROUP BY topic_type", $params ), ARRAY_A );
 
 		foreach ( is_array( $rows ) ? $rows : array() as $row ) {
@@ -165,9 +164,8 @@ class PostRepository {
 	 *
 	 * - `location_name`: one Google location, or '' for all.
 	 * - `topic_type`: update | event | offer, or '' for any.
-	 * - `status`: live (Google's LIVE or still processing), draft,
-	 *   scheduled (incl. sending), failed (failed or rejected by Google), or
-	 *   '' for any.
+	 * - `status`: live (Google's LIVE or still processing), draft, failed
+	 *   (failed or rejected by Google), or '' for any.
 	 * - `source`: manual | review | … , or '' for any.
 	 * - `days`: only posts published — or, for one never published, last
 	 *   edited — in the last N days. 0 for any time.
@@ -195,10 +193,6 @@ class PostRepository {
 				break;
 			case 'failed':
 				$where .= " AND status IN ( 'failed', 'rejected' )";
-				break;
-			case 'scheduled':
-				// A post mid-send is still the schedule's, for the seconds it takes.
-				$where .= " AND status IN ( 'scheduled', 'sending' )";
 				break;
 			case 'draft':
 				$where   .= ' AND status = %s';
@@ -234,7 +228,7 @@ class PostRepository {
 			return null;
 		}
 
-		$table = Tables::name( Tables::POSTS );
+		$table = esc_sql( Tables::name( Tables::POSTS ) );
 
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 		$row = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$table} WHERE id = %d", (int) $id ), ARRAY_A );
@@ -255,7 +249,7 @@ class PostRepository {
 			return null;
 		}
 
-		$table = Tables::name( Tables::POSTS );
+		$table = esc_sql( Tables::name( Tables::POSTS ) );
 
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 		$row = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$table} WHERE google_name = %s ORDER BY id ASC LIMIT 1", (string) $google_name ), ARRAY_A );
@@ -398,7 +392,7 @@ class PostRepository {
 			return '';
 		}
 
-		$table = Tables::name( Tables::POSTS );
+		$table = esc_sql( Tables::name( Tables::POSTS ) );
 
 		if ( '' === (string) $location_name ) {
 			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
@@ -427,7 +421,7 @@ class PostRepository {
 				$row[ $column ] = null === $value ? null : wp_json_encode( $value );
 			} elseif ( 'attachment_id' === $column ) {
 				$row[ $column ] = absint( $value );
-			} elseif ( in_array( $column, array( 'starts_at', 'ends_at', 'scheduled_at', 'published_at', 'synced_at' ), true ) ) {
+			} elseif ( in_array( $column, array( 'starts_at', 'ends_at', 'published_at', 'synced_at' ), true ) ) {
 				$row[ $column ] = $value && 'invalid' !== $value ? (string) $value : null;
 			} else {
 				$row[ $column ] = null === $value ? '' : (string) $value;

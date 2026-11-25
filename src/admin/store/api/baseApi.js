@@ -64,8 +64,6 @@ export const baseApi = createApi({
     "Posts",
     "Profile",
     "Dashboard",
-    "ReviewTemplates",
-    "AutoReply",
   ],
   endpoints: () => ({}),
 });

@@ -12,8 +12,8 @@ defined( 'ABSPATH' ) || exit;
 /**
  * Creates the fhint_services table.
  *
- * What the business actually offers. Free allows five (enforced by
- * App\Core\Limits, not by this schema).
+ * What the business actually offers, as many as it has (any limit is
+ * App\Core\Limits', not this schema's).
  *
  * The slug is unique per business and is **not** regenerated when the name
  * changes: it may already be in a published URL, and silently changing it

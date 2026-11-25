@@ -167,7 +167,7 @@ check( ! empty( $changes ), 'the first run creates tables' );
 $missing = Tables::missing();
 
 check_same( array(), $missing, 'every declared table exists after installation' );
-check_same( 18, count( Tables::all() ), 'all eighteen tables are declared' );
+check_same( 15, count( Tables::all() ), 'all fifteen tables are declared' );
 
 foreach ( array_keys( Tables::all() ) as $key ) {
 	check( Tables::exists( $key ), "table {$key} exists in MySQL" );
@@ -1691,40 +1691,7 @@ remove_filter( 'pre_http_request', $fhint_fake_reply, 10 );
 // Admin::init() runs only on admin pages, so a class it names wrongly
 // crashes every admin page yet nothing else in this suite. Run it here.
 FHINT\Admin::init();
-check( false !== has_filter( 'post_row_actions', array( 'FHINT\\Admin\\BlogSharing', 'row_actions' ) ), 'admin: the GBP Posting link is wired' );
-check( false !== has_action( 'enqueue_block_editor_assets', array( 'FHINT\\Admin\\EditorAssets', 'enqueue' ) ), 'admin: the editor button is wired' );
-
-// When the editor bundle loads: a blog post, in the block editor, for a
-// manager, with blog sharing on (Premium answers the filter; forced here).
-require_once ABSPATH . 'wp-admin/includes/class-wp-screen.php';
-require_once ABSPATH . 'wp-admin/includes/screen.php';
-$fhint_editor_user = get_users( array( 'role' => 'administrator', 'number' => 1, 'fields' => 'ID' ) );
-wp_set_current_user( (int) ( $fhint_editor_user[0] ?? 0 ) );
-$fhint_sharing = static function () {
-	return true;
-};
-add_filter( 'fhint_blog_sharing_enabled', $fhint_sharing, 99 );
-$fhint_screen = WP_Screen::get( 'post' );
-$fhint_screen->is_block_editor( true );
-set_current_screen( $fhint_screen );
-check( FHINT\Admin\EditorAssets::applies(), 'editor: the button loads for a blog post with sharing on' );
-$fhint_screen->is_block_editor( false );
-check( ! FHINT\Admin\EditorAssets::applies(), 'editor: not in the classic editor' );
-$fhint_screen->is_block_editor( true );
-$fhint_page = WP_Screen::get( 'page' );
-$fhint_page->is_block_editor( true );
-set_current_screen( $fhint_page );
-check( ! FHINT\Admin\EditorAssets::applies(), 'editor: not for a page' );
-set_current_screen( $fhint_screen );
-remove_filter( 'fhint_blog_sharing_enabled', $fhint_sharing, 99 );
-add_filter( 'fhint_blog_sharing_enabled', '__return_false', 99 );
-check( ! FHINT\Admin\EditorAssets::applies(), 'editor: not while sharing is off' );
-remove_filter( 'fhint_blog_sharing_enabled', '__return_false', 99 );
-wp_set_current_user( 0 );
-add_filter( 'fhint_blog_sharing_enabled', $fhint_sharing, 99 );
-check( ! FHINT\Admin\EditorAssets::applies(), 'editor: not for someone who cannot manage FoundHint' );
-remove_filter( 'fhint_blog_sharing_enabled', $fhint_sharing, 99 );
-$GLOBALS['current_screen'] = null;
+check( false !== has_filter( 'plugin_action_links_' . FHINT_BASENAME, array( 'FHINT\\Admin', 'plugin_action_links' ) ), 'admin: the plugin row links are wired' );
 
 // -- Posts, with Google answered in-process ----------------------------------
 //
@@ -1893,50 +1860,6 @@ check_same(
 $fhint_ordered = PostRepository::all( array( 'location_name' => 'locations/1', 'sort' => 'old' ) );
 check_same( $fhint_live['id'], $fhint_ordered[0]['id'], 'posts: oldest first starts with the earliest published' );
 check_same( 2, count( PostRepository::all( array( 'per_page' => 2 ) ) ), 'posts: paging limits the page' );
-
-// Scheduled posts (Premium sets the status; the free plugin lists, edits and
-// cancels them). They sit after everything posted, soonest first.
-$fhint_scheduled_row = static function ( $due ) {
-	return PostRepository::create(
-		array(
-			'location_name' => 'locations/1',
-			'account_name'  => 'accounts/1',
-			'topic_type'    => 'update',
-			'summary'       => 'Due ' . $due,
-			'source'        => 'manual',
-			'status'        => 'scheduled',
-			'scheduled_at'  => $due,
-		)
-	);
-};
-$fhint_due_late = $fhint_scheduled_row( '2099-02-01 09:00:00' );
-$fhint_due_soon = $fhint_scheduled_row( '2099-01-01 09:00:00' );
-// Added after everything above, so — newest first — they lead the list,
-// the last one added on top, whenever each is due.
-$fhint_ordered = array_column( PostRepository::all( array( 'location_name' => 'locations/1' ) ), 'id' );
-check_same( array( $fhint_due_soon['id'], $fhint_due_late['id'] ), array_slice( $fhint_ordered, 0, 2 ), 'posts: newest first puts the last post added on top, scheduled or not' );
-$fhint_ordered = array_column( PostRepository::all( array( 'location_name' => 'locations/1', 'sort' => 'old' ) ), 'id' );
-check_same( array( $fhint_due_late['id'], $fhint_due_soon['id'] ), array_slice( $fhint_ordered, -2 ), 'posts: oldest first is the exact reverse' );
-check_same( 2, PostRepository::count( array( 'location_name' => 'locations/1', 'status' => 'scheduled' ) ), 'posts: the scheduled filter finds them' );
-
-$fhint_post_calls = array();
-$fhint_result     = FHINT\App\Post\Posts::update( $fhint_due_soon['id'], array( 'summary' => '' ), false );
-check( $fhint_result instanceof FHINT\App\Core\ValidationResult, 'posts: a scheduled post is held to the publishing rules on every save' );
-$fhint_result = FHINT\App\Post\Posts::update( $fhint_due_soon['id'], array( 'summary' => 'Changed while queued' ), false );
-check( is_array( $fhint_result ) && 'scheduled' === $fhint_result['status'], 'posts: editing a scheduled post keeps it scheduled' );
-check_same( '2099-01-01 09:00:00', $fhint_result['scheduled_at'], 'posts: and keeps its time' );
-check_same( array(), $fhint_post_calls, 'posts: without asking Google' );
-check( 1 === preg_match( '/^2099-01-0[12]T\d\d:\d\d$/', $fhint_result['scheduled_local'] ), 'posts: its time is also given as site wall time, in the picker\'s shape' );
-
-$fhint_result = FHINT\App\Post\Posts::unschedule( $fhint_due_soon['id'] );
-check( is_array( $fhint_result ) && 'draft' === $fhint_result['status'], 'posts: cancelling a schedule makes the post a draft' );
-check_same( null, PostRepository::find( $fhint_due_soon['id'] )['scheduled_at'], 'posts: and forgets the time' );
-$fhint_result = FHINT\App\Post\Posts::unschedule( $fhint_due_soon['id'] );
-check( is_wp_error( $fhint_result ) && 409 === $fhint_result->get_error_data()['status'], 'posts: a post that is not scheduled cannot be cancelled' );
-$fhint_result = FHINT\App\Post\Posts::unschedule( 999999 );
-check( is_wp_error( $fhint_result ) && 404 === $fhint_result->get_error_data()['status'], 'posts: nor can one that does not exist' );
-PostRepository::delete( $fhint_due_soon['id'] );
-PostRepository::delete( $fhint_due_late['id'] );
 
 // A sync: Google's copy wins, but what only this site knows is kept, and a
 // post gone from Google is forgotten — drafts are never touched.
@@ -4384,8 +4307,7 @@ if ( $admins ) {
 
 	check( ServiceRepository::count() >= 6, 'services are not capped either' );
 
-	// The limits remain enforceable: a filter is still the way to cap them,
-	// which is what a Pro plan would use.
+	// The limits remain enforceable: a filter is still the way to cap them.
 	add_filter(
 		'fhint_limits',
 		static function ( $limits ) {

@@ -54,8 +54,7 @@ class ReviewSync {
 	 * Read reviews for one location, or for every synced location.
 	 *
 	 * Google returns the most recently written or changed reviews first, so
-	 * a short read (`$max_pages` 1 or 2) is enough to pick up what is new —
-	 * which is what auto-reply does on most runs.
+	 * a short read (`$max_pages` 1 or 2) is enough to pick up what is new.
 	 *
 	 * @param string $location_name Google location resource name, or '' for all.
 	 * @param int    $max_pages     Pages to read per location, at most MAX_PAGES.
