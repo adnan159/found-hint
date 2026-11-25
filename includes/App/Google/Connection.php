@@ -69,28 +69,6 @@ class Connection {
 	}
 
 	/**
-	 * Record that Google's return reached this site.
-	 *
-	 * @param string $event Event name.
-	 * @return void
-	 */
-	private static function breadcrumb( $event ) {
-		// phpcs:ignore WordPress.Security.NonceVerification.Recommended
-		$names = array_keys( is_array( $_GET ) ? $_GET : array() );
-
-		Logger::log(
-			Logger::INFO,
-			'google',
-			$event,
-			sprintf(
-				/* translators: %s: the query parameter names Google's return carried. */
-				__( 'Google\'s return reached this site carrying: %s', 'foundhint-local-seo' ),
-				implode( ', ', array_map( 'sanitize_key', $names ) )
-			)
-		);
-	}
-
-	/**
 	 * The connection's state, safe to send to a browser.
 	 *
 	 * Carries no token, and no client secret — only whether one is stored.
@@ -206,13 +184,6 @@ class Connection {
 				array( 'response' => 403 )
 			);
 		}
-
-		// Recorded once the user is known to be allowed here, so a
-		// connection that never completes can be told apart from one that
-		// never came back at all. Parameter *names* only: the values are a
-		// one-time code. Never written for a request that fails the
-		// capability check, so nobody else can fill the log.
-		self::breadcrumb( 'google.callback_received' );
 
 		// The connect service reports a refusal in its own parameter, because
 		// Google's `error` never reaches this site on that route — Google
