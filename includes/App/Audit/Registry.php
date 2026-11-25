@@ -12,9 +12,9 @@ defined( 'ABSPATH' ) || exit;
 /**
  * Collects the rules an audit will run.
  *
- * **Free lists its own rules here and nowhere else; Pro appends to the
- * filter.** That is the whole extension contract — adding a rule must never
- * require editing a Free class, or every Pro release becomes a merge.
+ * **This plugin lists its own rules here and nowhere else; other code
+ * appends to the filter.** That is the whole extension contract — adding a
+ * rule must never require editing this class.
  *
  * Rules are registered as class names, not instances, so a run builds only
  * what it is about to use and an extension that registers thirty rules
@@ -23,7 +23,7 @@ defined( 'ABSPATH' ) || exit;
 class Registry {
 
 	/**
-	 * The Free rule set, in the order findings are grouped.
+	 * The built-in rule set, in the order findings are grouped.
 	 *
 	 * @return string[]
 	 */

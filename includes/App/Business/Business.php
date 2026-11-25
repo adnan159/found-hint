@@ -256,10 +256,19 @@ class Business {
 		$has_name = array_key_exists( 'primary_category', $clean );
 
 		if ( $has_id && '' !== $clean['primary_category_id'] ) {
-			$category = Categories::resolve( $clean['primary_category_id'] );
+			// The name sent with the id is kept; Google is asked for one only
+			// when the id came alone.
+			$category = Categories::resolve(
+				array(
+					'id'   => $clean['primary_category_id'],
+					'name' => $has_name ? (string) $clean['primary_category'] : '',
+				)
+			);
 
 			$clean['primary_category_id'] = $category['id'];
 
+			// Always written with the id, so a name merged in from the
+			// category shown before can never stay beside a new id.
 			if ( Categories::exists( $category['id'] ) ) {
 				$clean['primary_category'] = $category['name'];
 			}

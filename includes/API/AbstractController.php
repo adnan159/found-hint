@@ -172,7 +172,7 @@ abstract class AbstractController extends WP_REST_Controller {
 	}
 
 	/**
-	 * A plan-limit error.
+	 * A limit-reached error.
 	 *
 	 * @param string $resource Resource name, e.g. 'location'.
 	 * @param int    $limit    The limit that was hit.
@@ -182,8 +182,8 @@ abstract class AbstractController extends WP_REST_Controller {
 		return new WP_Error(
 			'fhint_' . $resource . '_limit_reached',
 			sprintf(
-				/* translators: %d: the maximum number allowed on this plan. */
-				__( 'This plan allows up to %d of these.', 'foundhint-local-seo' ),
+				/* translators: %d: the maximum number allowed on this site. */
+				__( 'This site allows up to %d of these.', 'foundhint-local-seo' ),
 				(int) $limit
 			),
 			array(

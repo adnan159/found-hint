@@ -3240,3 +3240,69 @@ requirements problem. Release order: FoundHint 1.2.3 first.
 card shows `TemplatesUpsell` (what templates do, Unlock with Premium /
 Activate licence) instead of tabs and a list, and the reply dialog offers
 only the built-in reply. Checked in the harness with Premium off and on.
+
+## Step 102 — Plugin Directory review: activation, CSS, React
+
+The plugin was closed on WordPress.org (review of 8 Nov 2026). What the
+review and Plugin Check found in the code, and what changed:
+
+**Indexes past 767 bytes.** `google_reference.entry` (1,192 bytes as
+utf8mb4), `services.business_location_slug` (816) and
+`location_attributes.location_attribute` (772) were over the limit of older
+InnoDB setups. Their columns hold ASCII only (Google ids, WordPress slugs),
+so they are now `CHARACTER SET ascii` — one byte a character, no column
+shortened. dbDelta compares only the type, so existing installs are left
+alone. `ReferenceRepository::replace()` skips a non-ASCII id and
+`ServiceRepository::unique_slug()` percent-encodes one. `schema-format`
+now measures every index (mutation-tested on each of the three). Against
+MySQL: the old services table fails `ROW_FORMAT=COMPACT` with "Specified
+key was too long"; the new tables create, and a second dbDelta is empty.
+
+**Activation.** Fresh install on its own prefix: every table, no output,
+no PHP notices.
+
+**Unused table removed (DB 0.20.0).** `schema_page_index` was created on
+every site but never read or written (the page map comes from the cached
+graph). Its definition and registry entry are gone, and
+`Installer::drop_unused_tables()` drops it on upgrade. The other 18 free
+tables and Premium's two are each used by live code. `database.php` proves
+the drop (and fails when the migration does nothing); the dev site upgraded
+to 0.20.0 with the table gone and 18 present.
+
+**CSS reached WordPress's admin menu.** Tailwind's preflight was global on
+our screen (box-sizing and border colour changed on the admin menu and
+toolbar). It now runs in `@scope (#fhint-app, [data-base-ui-portal],
+[data-sonner-toaster])` (`src/admin/preflight-scoped.css`); in the browser
+the admin menu and toolbar now compute the same as on the Dashboard.
+`.modern-scroll` became `.fhint-scroll`.
+
+**React from WordPress (guideline 13; Plugin Check `inlined_react_dom`).**
+The bundles no longer carry React: `wp_scripts()` maps React, ReactDOM,
+the JSX runtime and `@wordpress/i18n` to WordPress's scripts,
+`vite/wp-require.js` serves react-redux's CommonJS `require("react")`, and
+`vite/forward-refs.js` wraps `components/ui/` in `forwardRef` so Base UI's
+refs survive React 18. `package.json` pins React 18.3.1 (WordPress 7.1's).
+Requires WordPress 6.6 (`react-jsx-runtime`). A side effect: `__()` now
+uses WordPress's `wp.i18n`, the one `wp_set_script_translations()` fills.
+
+**Verified** with `SCRIPT_DEBUG` on (React's development build): all 14
+screens render with no console error or warning; the auto-reply dialog and
+its selects, the location menu, the Disconnect confirmation (cancelled),
+the subtype combobox, a tooltip and the block editor's GBP Posting popup
+open, anchor to their triggers and return focus. The Disconnect trigger's
+fiber is a `forwardRef` whose ref reaches the button. `tests/Vite/
+forward-refs.mjs` passes (255) and fails when the ref is not passed on or a
+component is missed.
+
+**Readme.** The description was 2,394 words, past what WordPress.org
+shows; it is now 1,330 with the same features.
+
+Plugin Check on the release build: the offloading error on
+`PostMedia::is_temporary()` is a string test on a Google URL, nothing is
+loaded; the 85 `UnescapedDBParameter` warnings are table names from
+`Tables::name()`.
+
+**Release 1.2.4.** Version bumped in the header, `FHINT_VERSION`,
+`package.json` and the readme's stable tag; changelog and upgrade notice
+cover the fixes above and the WordPress 6.6 requirement. Premium is
+unchanged (it does not need 1.2.4).

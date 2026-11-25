@@ -174,7 +174,7 @@ class Services {
 			return $validation;
 		}
 
-		// The plan limit is only a question when the list grows: a business
+		// The limit is only a question when the list grows: a business
 		// already over a lowered limit must still be able to edit and remove.
 		if ( count( $plan ) > count( $existing ) && ! Limits::can_add( Limits::SERVICES, count( $plan ) - 1 ) ) {
 			$limit = Limits::get( Limits::SERVICES );
@@ -182,8 +182,8 @@ class Services {
 			return new WP_Error(
 				'fhint_service_limit_reached',
 				sprintf(
-					/* translators: %d: the maximum number allowed on this plan. */
-					__( 'This plan allows up to %d of these.', 'foundhint-local-seo' ),
+					/* translators: %d: the maximum number allowed on this site. */
+					__( 'This site allows up to %d of these.', 'foundhint-local-seo' ),
 					(int) $limit
 				),
 				array(

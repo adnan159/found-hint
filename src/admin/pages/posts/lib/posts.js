@@ -46,8 +46,6 @@ export function statusLabel(status) {
     rejected: __("Rejected", "foundhint-local-seo"),
     failed: __("Failed", "foundhint-local-seo"),
     draft: __("Draft", "foundhint-local-seo"),
-    scheduled: __("Scheduled", "foundhint-local-seo"),
-    sending: __("Sending", "foundhint-local-seo"),
   }[status];
 }
 
@@ -60,8 +58,6 @@ export function statusTone(status) {
       rejected: "bad",
       failed: "bad",
       draft: "quiet",
-      scheduled: "accent",
-      sending: "accent",
     }[status] ?? "quiet"
   );
 }
@@ -69,9 +65,6 @@ export function statusTone(status) {
 export function sourceLabel(source) {
   return {
     review: __("From a review", "foundhint-local-seo"),
-    ai: __("Written with AI", "foundhint-local-seo"),
-    csv: __("From CSV", "foundhint-local-seo"),
-    blog: __("Source: Website blog", "foundhint-local-seo"),
   }[source];
 }
 
@@ -114,57 +107,8 @@ export function ago(utc) {
   return sprintf(__("%dd ago", "foundhint-local-seo"), Math.round(hours / 24));
 }
 
-/**
- * "in 3d" until a UTC 'Y-m-d H:i:s'; "any minute" once it is due (the
- * sender runs every few minutes, so a due post is about to go).
- *
- * @param {string} utc Stored time.
- * @return {string}
- */
-export function until(utc) {
-  const then = utc ? Date.parse(`${utc.replace(" ", "T")}Z`) : NaN;
-
-  if (Number.isNaN(then)) {
-    return "";
-  }
-
-  const minutes = Math.round((then - Date.now()) / 60000);
-
-  if (minutes < 1) {
-    return __("any minute", "foundhint-local-seo");
-  }
-
-  if (minutes < 60) {
-    /* translators: %d: minutes. Short, as in "in 5m". */
-    return sprintf(__("in %dm", "foundhint-local-seo"), minutes);
-  }
-
-  const hours = Math.round(minutes / 60);
-
-  if (hours < 24) {
-    /* translators: %d: hours. Short, as in "in 3h". */
-    return sprintf(__("in %dh", "foundhint-local-seo"), hours);
-  }
-
-  /* translators: %d: days. Short, as in "in 3d". */
-  return sprintf(__("in %dd", "foundhint-local-seo"), Math.round(hours / 24));
-}
-
 /** "Posted 3d ago", "Draft, last edited 2d ago", … for a post row. */
 export function whenText(post) {
-  if (post.status === "sending") {
-    return __("Being sent to Google now", "foundhint-local-seo");
-  }
-
-  if (post.status === "scheduled") {
-    return sprintf(
-      /* translators: 1: e.g. "in 3d", 2: the date and time it goes out. */
-      __("Goes live %1$s · %2$s", "foundhint-local-seo"),
-      until(post.scheduled_at),
-      formatWhen(post.scheduled_local, true),
-    );
-  }
-
   if (post.status === "draft") {
     return sprintf(
       /* translators: %s: e.g. "2d ago". */
@@ -238,24 +182,6 @@ export function blankPost(type = "update") {
     attachment_id: 0,
     source: "manual",
     source_ref: "",
-  };
-}
-
-/**
- * A blog post (Premium's `posts/blog/{id}`) as the start of an update:
- * "Learn more" to the published article, and its featured image when Google
- * can fetch it. The description starts blank, for the owner to write.
- */
-export function blogPost(blog) {
-  return {
-    ...blankPost("update"),
-    summary: "",
-    cta_type: "learn_more",
-    cta_url: blog.url ?? "",
-    media_url: blog.image_url ?? "",
-    attachment_id: blog.attachment_id ?? 0,
-    source: "blog",
-    source_ref: String(blog.id ?? ""),
   };
 }
 

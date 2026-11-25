@@ -72,7 +72,7 @@ class Posts extends AbstractController {
 								),
 								'status'   => array(
 									'type'    => 'string',
-									'enum'    => array( '', 'live', 'draft', 'scheduled', 'failed' ),
+									'enum'    => array( '', 'live', 'draft', 'failed' ),
 									'default' => '',
 								),
 								'source'   => array(
@@ -220,18 +220,6 @@ class Posts extends AbstractController {
 					'methods'             => WP_REST_Server::CREATABLE,
 					'callback'            => array( $this, 'publish_item' ),
 					'permission_callback' => array( $this, 'google_write_check' ),
-				),
-			)
-		);
-
-		register_rest_route(
-			$this->namespace,
-			'/posts/(?P<id>\d+)/unschedule',
-			array(
-				array(
-					'methods'             => WP_REST_Server::CREATABLE,
-					'callback'            => array( $this, 'unschedule_item' ),
-					'permission_callback' => array( $this, 'permissions_check' ),
 				),
 			)
 		);
@@ -420,16 +408,6 @@ class Posts extends AbstractController {
 	 */
 	public function publish_item( $request ) {
 		return $this->answer( PostService::publish( (int) $request['id'] ) );
-	}
-
-	/**
-	 * Take a scheduled post off the schedule; it becomes a draft.
-	 *
-	 * @param \WP_REST_Request $request Request.
-	 * @return \WP_REST_Response|\WP_Error
-	 */
-	public function unschedule_item( $request ) {
-		return $this->answer( PostService::unschedule( (int) $request['id'] ) );
 	}
 
 	/**

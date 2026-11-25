@@ -48,15 +48,22 @@ foreach ( $fhint_google_options as $fhint_google_option ) {
 
 global $wpdb;
 
-// Any half-finished handshake, which holds a PKCE verifier.
+// Every transient this plugin set: caches, and any half-finished sign-in
+// (a PKCE verifier, or the connect service's encrypted secret). None of
+// them is the operator's data, so they always go.
 // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 $wpdb->query(
 	$wpdb->prepare(
 		"DELETE FROM {$wpdb->options} WHERE option_name LIKE %s OR option_name LIKE %s",
-		$wpdb->esc_like( '_transient_fhint_google_oauth_' ) . '%',
-		$wpdb->esc_like( '_transient_timeout_fhint_google_oauth_' ) . '%'
+		$wpdb->esc_like( '_transient_fhint_' ) . '%',
+		$wpdb->esc_like( '_transient_timeout_fhint_' ) . '%'
 	)
 );
+
+// Scheduled work always goes, whether or not data is kept: a leftover
+// event would fire against code that is no longer installed.
+wp_clear_scheduled_hook( 'fhint_purge_logs' );
+wp_clear_scheduled_hook( 'fhint_run_audit' );
 
 $fhint_settings = get_option( 'fhint_settings', array() );
 $fhint_optin    = is_array( $fhint_settings )
@@ -89,16 +96,22 @@ $fhint_tables = array(
 	'description_history',
 	'google_reference',
 	'posts',
+);
+
+/*
+ * Tables earlier versions created and this one no longer uses. Kept here so
+ * a clean removal still leaves nothing behind on sites that ran them.
+ */
+$fhint_legacy_tables = array(
 	'schema_entities',
 	'schema_service_providers',
 	'schema_service_areas',
-	'schema_page_index',
 );
 
-foreach ( $fhint_tables as $fhint_table ) {
-	$fhint_name = $wpdb->prefix . 'fhint_' . $fhint_table;
+foreach ( array_merge( $fhint_tables, $fhint_legacy_tables ) as $fhint_table ) {
+	$fhint_name = esc_sql( $wpdb->prefix . 'fhint_' . $fhint_table );
 
-	// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+	// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery.SchemaChange
 	$wpdb->query( "DROP TABLE IF EXISTS {$fhint_name}" );
 }
 
@@ -108,16 +121,17 @@ $fhint_options = array(
 	'fhint_db_version',
 	'fhint_first_install_time',
 	'fhint_data_changed_at',
+	'fhint_schema_cache',
 	'fhint_onboarding',
 	'fhint_required_rewrite_flush',
+	'fhint_encryption_unavailable',
 );
 
 foreach ( $fhint_options as $fhint_option ) {
 	delete_option( $fhint_option );
 }
 
-$fhint_timestamp = wp_next_scheduled( 'fhint_purge_logs' );
+// The marker on photos uploaded through this plugin. The photos themselves
+// are the site's media and stay in the library.
+delete_post_meta_by_key( '_fhint_uploaded' );
 
-if ( $fhint_timestamp ) {
-	wp_unschedule_event( $fhint_timestamp, 'fhint_purge_logs' );
-}

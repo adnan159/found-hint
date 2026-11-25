@@ -58,7 +58,7 @@ class MediaRepository {
 			return array();
 		}
 
-		$table = Tables::name( Tables::MEDIA );
+		$table = esc_sql( Tables::name( Tables::MEDIA ) );
 
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		$rows = $wpdb->get_results(
@@ -85,7 +85,7 @@ class MediaRepository {
 			return null;
 		}
 
-		$table = Tables::name( Tables::MEDIA );
+		$table = esc_sql( Tables::name( Tables::MEDIA ) );
 
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 		$row = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$table} WHERE id = %d", $id ), ARRAY_A );
@@ -152,7 +152,7 @@ class MediaRepository {
 			return false;
 		}
 
-		$table = Tables::name( Tables::MEDIA );
+		$table = esc_sql( Tables::name( Tables::MEDIA ) );
 		$now   = Validator::now();
 
 		$row = array(
@@ -207,7 +207,7 @@ class MediaRepository {
 			return 0;
 		}
 
-		$table = Tables::name( Tables::MEDIA );
+		$table = esc_sql( Tables::name( Tables::MEDIA ) );
 		$keep  = array_flip( array_map( 'strval', $keep ) );
 		$gone  = 0;
 
@@ -298,7 +298,7 @@ class MediaRepository {
 			return false;
 		}
 
-		$table = Tables::name( Tables::MEDIA );
+		$table = esc_sql( Tables::name( Tables::MEDIA ) );
 
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		return false !== $wpdb->query(

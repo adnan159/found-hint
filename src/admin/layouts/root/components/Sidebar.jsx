@@ -50,9 +50,8 @@ const NAV_ITEMS = [
   },
   {
     to: "/posts",
-    label: () => __("Posts & Scheduling", "foundhint-local-seo"),
+    label: () => __("Posts", "foundhint-local-seo"),
   },
-  // The Schema screen has its own five tabs, so no sub-items here.
   {
     to: "/schema",
     label: () => __("Schema", "foundhint-local-seo"),
@@ -353,14 +352,10 @@ export function Sidebar({ counts }) {
         )}
       </ul>
 
-      {/* The plan strip is permanent, not an upsell that appears when you
-          are near a limit — knowing what the plan covers is part of
-          reading the screen. The prototype closes it with a "See what Pro
-          unlocks" button; there is nothing for it to open yet, so the
-          figures ship without it. */}
+      {/* What this site holds: locations, services and so on, at a glance. */}
       <div className="fhint:border-t fhint:border-t-divider fhint:px-3.5 fhint:py-3">
         <div className="fhint:text-[11px] fhint:font-bold fhint:tracking-[0.1em] fhint:text-muted-foreground fhint:uppercase">
-          {__("FoundHint Free", "foundhint-local-seo")}
+          {__("This site", "foundhint-local-seo")}
         </div>
         <div className="fhint:mt-1 fhint:text-[12px] fhint:text-muted-strong">
           {counts}

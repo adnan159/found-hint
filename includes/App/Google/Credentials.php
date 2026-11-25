@@ -7,6 +7,8 @@
 
 namespace FHINT\App\Google;
 
+use FHINT\App\Core\Secrets;
+
 defined( 'ABSPATH' ) || exit;
 
 /**
@@ -41,7 +43,9 @@ class Credentials {
 
 		return array(
 			'client_id'     => isset( $stored['client_id'] ) ? (string) $stored['client_id'] : '',
-			'client_secret' => isset( $stored['client_secret'] ) ? (string) $stored['client_secret'] : '',
+			// Encrypted at rest like the tokens are; a value saved before
+			// that is plain text, which decrypt() passes through unchanged.
+			'client_secret' => isset( $stored['client_secret'] ) ? Secrets::decrypt( (string) $stored['client_secret'] ) : '',
 		);
 	}
 
@@ -100,7 +104,7 @@ class Credentials {
 			self::OPTION,
 			array(
 				'client_id'     => '' === $client_id ? $current['client_id'] : $client_id,
-				'client_secret' => '' === $client_secret ? $current['client_secret'] : $client_secret,
+				'client_secret' => Secrets::encrypt( '' === $client_secret ? $current['client_secret'] : $client_secret ),
 			)
 		);
 	}

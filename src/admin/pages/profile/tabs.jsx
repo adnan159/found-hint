@@ -204,7 +204,7 @@ export function buildProfileTabs({
               serviceCount,
             )
           : sprintf(
-              /* translators: 1: services added, 2: services the plan includes. */
+              /* translators: 1: services added, 2: services this site allows. */
               __("%1$d of %2$d used", "foundhint-local-seo"),
               serviceCount,
               serviceLimits.limit,

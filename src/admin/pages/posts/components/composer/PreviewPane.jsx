@@ -9,7 +9,7 @@ export function PreviewPane({ form, businessName }) {
   return (
     <aside
       aria-label={__("Preview", "foundhint-local-seo")}
-      className="modern-scroll fhint:grid fhint:auto-rows-max fhint:content-start fhint:gap-3 fhint:md:min-h-0 fhint:md:overflow-y-auto fhint:border-t fhint:border-t-border fhint:bg-[#faf6f4] fhint:px-5 fhint:py-4 fhint:md:border-t-0 fhint:md:border-l fhint:md:border-l-border"
+      className="fhint-scroll fhint:grid fhint:auto-rows-max fhint:content-start fhint:gap-3 fhint:md:min-h-0 fhint:md:overflow-y-auto fhint:border-t fhint:border-t-border fhint:bg-[#faf6f4] fhint:px-5 fhint:py-4 fhint:md:border-t-0 fhint:md:border-l fhint:md:border-l-border"
     >
       <span className={cn(label, "fhint:flex fhint:items-center fhint:gap-2")}>
         <EyeIcon

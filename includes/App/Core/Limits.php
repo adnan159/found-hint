@@ -1,6 +1,6 @@
 <?php
 /**
- * Plan limits.
+ * Creation limits.
  *
  * @package FoundHint
  */
@@ -12,10 +12,9 @@ defined( 'ABSPATH' ) || exit;
 /**
  * How much of each thing this install may create.
  *
- * **Every limit check in the plugin goes through this class.** A hardcoded
- * `if ( count( $locations ) >= 1 )` anywhere else is what would force a Pro
- * tier to rewrite core instead of filtering a number, so there must not be
- * one. Raising a limit is a filter, not a code change:
+ * **Every limit check in the plugin goes through this class.** There are
+ * no limits by default (0 = unlimited); a site that wants one sets it
+ * through a filter rather than a code change:
  *
  *     add_filter( 'fhint_limits', function ( $limits ) {
  *         $limits['locations'] = 0; // 0 = unlimited
@@ -28,7 +27,7 @@ class Limits {
 	const SERVICES  = 'services';
 
 	/**
-	 * Free-tier limits. 0 means unlimited.
+	 * Default limits. 0 means unlimited.
 	 *
 	 * @return array<string, int>
 	 */
@@ -49,7 +48,7 @@ class Limits {
 	 */
 	public static function all() {
 		/**
-		 * Filters the plan limits. 0 means unlimited.
+		 * Filters the limits. 0 means unlimited.
 		 *
 		 * @param array<string, int> $limits Limits keyed by resource.
 		 */

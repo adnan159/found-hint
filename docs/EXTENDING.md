@@ -56,6 +56,6 @@ once Pro adds them through the `fhint_post_sources` filter).
 | `schema.output` | Front-end markup | Free LocalBusiness markup | Premium's per-page graph replaces it (shipped); "Add to my site header" off prints nothing |
 
 The Schema Manager's tables (`fhint_schema_entities`, `…_service_providers`,
-`…_service_areas`, `…_page_index`) are created and dropped by this plugin
-and written only by Pro.
+`…_service_areas`) are created and dropped by this plugin and written only
+by Pro.
 

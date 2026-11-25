@@ -35,7 +35,7 @@ class LocationAttributeRepository {
 			return array();
 		}
 
-		$table = Tables::name( Tables::LOCATION_ATTRIBUTES );
+		$table = esc_sql( Tables::name( Tables::LOCATION_ATTRIBUTES ) );
 
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		$rows = $wpdb->get_results(
@@ -69,14 +69,14 @@ class LocationAttributeRepository {
 			return false;
 		}
 
-		$table = Tables::name( Tables::LOCATION_ATTRIBUTES );
+		$table = esc_sql( Tables::name( Tables::LOCATION_ATTRIBUTES ) );
 		$now   = Validator::now();
 
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		$wpdb->query( 'START TRANSACTION' );
 
 		foreach ( $remove as $attribute_id ) {
-			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter -- table name from Tables::name(); $where/$limit_sql/$skip are fixed SQL holding only placeholders, values go through prepare().
 			$wpdb->query(
 				// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 				$wpdb->prepare( "DELETE FROM {$table} WHERE location_id = %d AND attribute_id = %s", $location_id, (string) $attribute_id )
@@ -84,7 +84,7 @@ class LocationAttributeRepository {
 		}
 
 		foreach ( $set as $attribute_id => $typed ) {
-			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter -- table name from Tables::name(); $where/$limit_sql/$skip are fixed SQL holding only placeholders, values go through prepare().
 			$existing = $wpdb->get_var(
 				// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 				$wpdb->prepare( "SELECT id FROM {$table} WHERE location_id = %d AND attribute_id = %s", $location_id, (string) $attribute_id )
@@ -146,7 +146,7 @@ class LocationAttributeRepository {
 			return false;
 		}
 
-		$table  = Tables::name( Tables::LOCATION_ATTRIBUTES );
+		$table  = esc_sql( Tables::name( Tables::LOCATION_ATTRIBUTES ) );
 		$now    = Validator::now();
 		$stored = 0;
 		$dirty  = array();
@@ -233,13 +233,13 @@ class LocationAttributeRepository {
 			return false;
 		}
 
-		$table        = Tables::name( Tables::LOCATION_ATTRIBUTES );
+		$table        = esc_sql( Tables::name( Tables::LOCATION_ATTRIBUTES ) );
 		$placeholders = implode( ',', array_fill( 0, count( $attribute_ids ), '%s' ) );
 		$params       = array_merge( array( Validator::now(), $location_id ), array_map( 'strval', array_values( $attribute_ids ) ) );
 
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 		return false !== $wpdb->query(
-			// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.PreparedSQLPlaceholders.UnfinishedPrepare
+			// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.PreparedSQLPlaceholders.UnfinishedPrepare, WordPress.DB.PreparedSQLPlaceholders.ReplacementsWrongNumber
 			$wpdb->prepare( "UPDATE {$table} SET is_dirty = 0, synced_at = %s WHERE location_id = %d AND attribute_id IN ({$placeholders})", $params )
 		);
 	}
@@ -259,7 +259,7 @@ class LocationAttributeRepository {
 			return false;
 		}
 
-		$table = Tables::name( Tables::LOCATION_ATTRIBUTES );
+		$table = esc_sql( Tables::name( Tables::LOCATION_ATTRIBUTES ) );
 
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		return false !== $wpdb->query(

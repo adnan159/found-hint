@@ -75,7 +75,6 @@ class Location {
 		return array(
 			'id'                => 0,
 			'business_id'       => 0,
-			'wordpress_post_id' => 0,
 			'name'              => '',
 			'address_line_1'    => '',
 			'address_line_2'    => '',

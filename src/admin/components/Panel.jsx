@@ -1,17 +1,12 @@
 import { help } from "@/pages/profile/styles";
 import { cn } from "cn";
 import { useId } from "react";
-import {
-  panel,
-  panelChip,
-  panelHeader,
-  panelTitle,
-} from "@/pages/schema/components/styles";
+import { panel, panelChip, panelHeader, panelTitle } from "@/lib/panelStyles";
 
 /**
  * A card drawn as a Business Profile section: an icon, the title (with an
  * optional line under it) and its chip over the heavier 2px rule, then the
- * body. Reviews and Posts & Scheduling build their screens from it.
+ * body. Reviews and Posts build their screens from it.
  *
  * A panel with no children is its heading row alone.
  *

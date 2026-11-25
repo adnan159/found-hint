@@ -9,7 +9,7 @@ import { pillButton } from "@/components/location-bar/styles";
  * A screen's title row, drawn as the Business Profile's
  * (`pages/profile/components/header/TitleBar`): "FoundHint / <screen>" over
  * the title, an info hint beside it, and the screen's buttons on the right.
- * Reviews and Posts & Scheduling use it.
+ * Reviews and Posts use it.
  *
  * The bar runs edge to edge under the business bar, cancelling `main`'s
  * padding. Whichever row is on top carries the rule that meets the

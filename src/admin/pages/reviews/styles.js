@@ -2,18 +2,13 @@ import { cn } from "cn";
 import { focus, input } from "@/pages/profile/styles";
 
 /**
- * The Reviews screen's look — the Business Profile's and the Schema
- * Manager's, by construction.
+ * The Reviews screen's look — the Business Profile's, by construction.
  *
  * Panels, their heading rows, fields and dialog buttons are imported from
- * the Schema Manager's styles (which take them from the profile), never
- * spelled out again here. Change the profile's look and this screen follows.
+ * the shared panel styles (which take them from the profile), never spelled
+ * out again here. Change the profile's look and this screen follows.
  */
-export {
-  dialogButton,
-  panelTitle,
-  primaryAction,
-} from "@/pages/schema/components/styles";
+export { dialogButton, panelTitle, primaryAction } from "@/lib/panelStyles";
 
 /**
  * A field in a Reviews dialog: the profile's field, with the brand accent

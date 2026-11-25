@@ -38,7 +38,7 @@ final class Category {
 	}
 
 	/**
-	 * Relative weights, filterable so Pro can retune them.
+	 * Relative weights, filterable so they can be retuned.
 	 *
 	 * @return array<string, int>
 	 */

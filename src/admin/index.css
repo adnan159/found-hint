@@ -1,6 +1,6 @@
 @layer theme, base, components;
 @import "tailwindcss/theme.css" layer(theme) prefix(fhint);
-@import "tailwindcss/preflight.css" layer(base);
+@import "./preflight-scoped.css" layer(base);
 @import "tailwindcss/utilities.css";
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
@@ -11,11 +11,14 @@
 /* Tokens and component rules, shared with the editor bundle. */
 @import "./styles/theme.css";
 
-/* Admin page only: these reach every element on the page. */
+/* FoundHint's own elements only, like the reset above. */
 @layer base {
-  * {
-    @apply fhint:border-border fhint:outline-ring/50;
+  @scope (#fhint-app, [data-base-ui-portal], [data-sonner-toaster]) {
+    * {
+      @apply fhint:border-border fhint:outline-ring/50;
+    }
   }
+  /* The app fills the content area of its own screen (this file loads only there). */
   #wpcontent {
     @apply fhint:bg-background fhint:pl-0!;
   }

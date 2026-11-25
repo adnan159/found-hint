@@ -183,7 +183,7 @@ class AuditRepository {
 	private static function completed( $limit, $location_ids = null ) {
 		global $wpdb;
 
-		$table  = Tables::name( Tables::AUDITS );
+		$table  = esc_sql( Tables::name( Tables::AUDITS ) );
 		$where  = 'status = %s';
 		$params = array( self::STATUS_COMPLETED );
 
@@ -200,7 +200,7 @@ class AuditRepository {
 
 		$params[] = (int) $limit;
 
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter -- table name from Tables::name(); $where/$limit_sql/$skip are fixed SQL holding only placeholders, values go through prepare().
 		$rows = $wpdb->get_results(
 			// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.PreparedSQLPlaceholders.UnfinishedPrepare
 			$wpdb->prepare( "SELECT * FROM {$table} WHERE {$where} ORDER BY completed_at DESC, id DESC LIMIT %d", $params ),
@@ -219,7 +219,7 @@ class AuditRepository {
 	public static function find( $id ) {
 		global $wpdb;
 
-		$table = Tables::name( Tables::AUDITS );
+		$table = esc_sql( Tables::name( Tables::AUDITS ) );
 
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		$row = $wpdb->get_row(
@@ -254,7 +254,7 @@ class AuditRepository {
 	public static function completed_runs( $location_id ) {
 		global $wpdb;
 
-		$table = Tables::name( Tables::AUDITS );
+		$table = esc_sql( Tables::name( Tables::AUDITS ) );
 
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		$rows = $wpdb->get_results(
@@ -295,7 +295,7 @@ class AuditRepository {
 	public static function open_counts( $audit_id ) {
 		global $wpdb;
 
-		$table = Tables::name( Tables::AUDIT_ISSUES );
+		$table = esc_sql( Tables::name( Tables::AUDIT_ISSUES ) );
 
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		$rows = $wpdb->get_results(
@@ -333,7 +333,7 @@ class AuditRepository {
 	public static function issues( $audit_id, $type = 'issue' ) {
 		global $wpdb;
 
-		$table = Tables::name( Tables::AUDIT_ISSUES );
+		$table = esc_sql( Tables::name( Tables::AUDIT_ISSUES ) );
 
 		if ( '' === $type ) {
 			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
@@ -366,7 +366,7 @@ class AuditRepository {
 	 * Sorted here rather than in SQL because severity is a set of words, not
 	 * an order MySQL knows, and here rather than in each screen because a
 	 * list that claims to be urgent-first has to be urgent-first everywhere
-	 * — the audit screen, the dashboard, and anything Pro adds.
+	 * — the audit screen, the dashboard, and anything else that lists them.
 	 *
 	 * Ties keep their insertion order, which is rule registration order, so
 	 * two findings of equal severity stay grouped by the area they concern.
@@ -408,7 +408,7 @@ class AuditRepository {
 	public static function find_issue( $id ) {
 		global $wpdb;
 
-		$table = Tables::name( Tables::AUDIT_ISSUES );
+		$table = esc_sql( Tables::name( Tables::AUDIT_ISSUES ) );
 
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		$row = $wpdb->get_row(
@@ -454,8 +454,8 @@ class AuditRepository {
 	public static function prune() {
 		global $wpdb;
 
-		$audits = Tables::name( Tables::AUDITS );
-		$issues = Tables::name( Tables::AUDIT_ISSUES );
+		$audits = esc_sql( Tables::name( Tables::AUDITS ) );
+		$issues = esc_sql( Tables::name( Tables::AUDIT_ISSUES ) );
 
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		$keep = $wpdb->get_col(
@@ -467,15 +467,22 @@ class AuditRepository {
 			return 0;
 		}
 
-		$ids = implode( ',', array_map( 'intval', $keep ) );
+		$keep         = array_map( 'intval', $keep );
+		$placeholders = implode( ',', array_fill( 0, count( $keep ), '%d' ) );
 
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-		$removed = (int) $wpdb->query( "DELETE FROM {$audits} WHERE id NOT IN ({$ids})" );
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+		$removed = (int) $wpdb->query(
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.PreparedSQLPlaceholders.UnfinishedPrepare -- table name from Tables::name(); one %d per kept id.
+			$wpdb->prepare( "DELETE FROM {$audits} WHERE id NOT IN ({$placeholders})", $keep )
+		);
 
 		// The issue rows go with them: no foreign keys here, so the cascade
 		// is this line and nothing else.
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-		$wpdb->query( "DELETE FROM {$issues} WHERE audit_id NOT IN ({$ids})" );
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+		$wpdb->query(
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.PreparedSQLPlaceholders.UnfinishedPrepare -- table name from Tables::name(); one %d per kept id.
+			$wpdb->prepare( "DELETE FROM {$issues} WHERE audit_id NOT IN ({$placeholders})", $keep )
+		);
 
 		return $removed;
 	}

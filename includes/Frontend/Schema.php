@@ -69,8 +69,7 @@ class Schema {
 	public static function placement() {
 		/**
 		 * Filters where the JSON-LD is printed: 'head' (wp_head) or 'footer'
-		 * (wp_footer). FoundHint Pro's Settings tab sets it; the free markup
-		 * always goes in the head.
+		 * (wp_footer). Defaults to the head.
 		 *
 		 * @param string $placement head | footer.
 		 */
@@ -103,10 +102,9 @@ class Schema {
 		 * Filters the whole document printed on this request.
 		 *
 		 * Return an array — a JSON-LD document — to print it instead of the
-		 * free LocalBusiness markup; null keeps the free markup. This is how
-		 * FoundHint Pro's Schema Manager takes over the output: its graph is
-		 * built per page, with its own placement and ownership rules, so
-		 * the free plugin's ownership check does not apply to it.
+		 * LocalBusiness markup this plugin builds; null keeps that markup. A
+		 * document returned here is printed as given: the ownership check
+		 * below applies only to the markup built here.
 		 *
 		 * @param array|null $document Null, or the document to print.
 		 * @param array      $context  { post_id, url, is_front_page }.
@@ -168,11 +166,16 @@ class Schema {
 		}
 
 		// Marked in the page source, as SEO plugins do, so whoever reads it
-		// sees which plugin printed the structured data.
-		$version = defined( 'FHINT_VERSION' ) ? ' v' . FHINT_VERSION : '';
-
-		return "\n" . '<!-- This site uses FoundHint Local SEO' . $version . ' - https://foundhint.com/ -->' . "\n"
-			. '<script type="application/ld+json" id="fhint-schema">' . $json . '</script>' . "\n"
+		// sees which plugin printed the structured data. A name only: no
+		// link and no version on the public site.
+		return "\n" . '<!-- This site uses FoundHint Local SEO -->' . "\n"
+			. wp_get_inline_script_tag(
+				$json,
+				array(
+					'type' => 'application/ld+json',
+					'id'   => 'fhint-schema',
+				)
+			)
 			. '<!-- / FoundHint Local SEO -->' . "\n";
 	}
 

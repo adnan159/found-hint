@@ -30,8 +30,8 @@ class PostValidator {
 	const COUPON_MAX  = 58;
 
 	/**
-	 * Where a post may say it came from, on a request. Pro widens this
-	 * through `fhint_post_sources` when it adds its own ways to write one.
+	 * Where a post may say it came from, on a request. Another plugin may
+	 * widen this through `fhint_post_sources`.
 	 *
 	 * @return string[]
 	 */

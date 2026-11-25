@@ -139,7 +139,7 @@ class Graph {
 		/**
 		 * Filter the finished graph.
 		 *
-		 * The extension point Pro attaches to — adding a node here is how a
+		 * The extension point for added markup — adding a node here is how a
 		 * feature contributes markup without this class learning about it.
 		 *
 		 * @param array $document The JSON-LD document.
@@ -380,8 +380,8 @@ class Graph {
 	/**
 	 * The PostalAddress node.
 	 *
-	 * Public because FoundHint Pro's Schema Manager builds its nodes with
-	 * it — one implementation of the rule, not two that can drift.
+	 * Public so any code building schema nodes uses it — one
+	 * implementation of the rule, not two that can drift.
 	 *
 	 * @param array $address Address parts from Nap.
 	 * @return array
@@ -413,8 +413,8 @@ class Graph {
 	 * hours describe normal weeks, and normal weeks are not what is
 	 * happening.
 	 *
-	 * Public because FoundHint Pro's Schema Manager builds its nodes with
-	 * it — one implementation of the rule, not two that can drift.
+	 * Public so any code building schema nodes uses it — one
+	 * implementation of the rule, not two that can drift.
 	 *
 	 * @param array $nap Resolved NAP values.
 	 * @return array[]
@@ -504,8 +504,8 @@ class Graph {
 	/**
 	 * Social profile URLs, as sameAs.
 	 *
-	 * Public because FoundHint Pro's Schema Manager builds its nodes with
-	 * it — one implementation of the rule, not two that can drift.
+	 * Public so any code building schema nodes uses it — one
+	 * implementation of the rule, not two that can drift.
 	 *
 	 * @param array $profiles Social profiles keyed by network.
 	 * @return string[]

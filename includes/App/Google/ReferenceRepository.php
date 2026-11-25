@@ -40,7 +40,7 @@ class ReferenceRepository {
 			return false;
 		}
 
-		$table = Tables::name( Tables::GOOGLE_REFERENCE );
+		$table = esc_sql( Tables::name( Tables::GOOGLE_REFERENCE ) );
 		$now   = Validator::now();
 
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
@@ -57,7 +57,8 @@ class ReferenceRepository {
 		foreach ( $entries as $entry ) {
 			$item_id = isset( $entry['item_id'] ) ? (string) $entry['item_id'] : '';
 
-			if ( '' === $item_id || isset( $seen[ $item_id ] ) ) {
+			// The id columns are ASCII (see CreateGoogleReferenceTable).
+			if ( '' === $item_id || isset( $seen[ $item_id ] ) || preg_match( '/[^\x20-\x7E]/', $item_id . $parent_id ) ) {
 				continue;
 			}
 
@@ -108,7 +109,7 @@ class ReferenceRepository {
 			return array();
 		}
 
-		$table = Tables::name( Tables::GOOGLE_REFERENCE );
+		$table = esc_sql( Tables::name( Tables::GOOGLE_REFERENCE ) );
 
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		$rows = $wpdb->get_results(
@@ -148,7 +149,7 @@ class ReferenceRepository {
 			return null;
 		}
 
-		$table = Tables::name( Tables::GOOGLE_REFERENCE );
+		$table = esc_sql( Tables::name( Tables::GOOGLE_REFERENCE ) );
 
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		$when = $wpdb->get_var(

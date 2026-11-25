@@ -13,7 +13,7 @@ msgstr ""
 msgid "You must be logged in to do that."
 msgstr ""
 
-#: includes/API/AbstractController.php:56 includes/App/Google/Connection.php:205
+#: includes/API/AbstractController.php:56 includes/App/Google/Connection.php:204
 msgid "You do not have permission to manage this."
 msgstr ""
 
@@ -38,7 +38,7 @@ msgid "The changes could not be saved."
 msgstr ""
 
 #: includes/API/AbstractController.php:186 includes/App/Profile/Sections/Services.php:186
-msgid "This plan allows up to %d of these."
+msgid "This site allows up to %d of these."
 msgstr ""
 
 #: includes/API/Audits.php:220
@@ -53,23 +53,15 @@ msgstr ""
 msgid "None of those services belong to this business."
 msgstr ""
 
-#: includes/Admin/BlogSharing.php:90
-msgid "Share “%s” as a Google Business Profile post"
-msgstr ""
-
-#: includes/Admin/BlogSharing.php:91 src/editor/toolbar.js:62
-msgid "GBP Posting"
-msgstr ""
-
-#: includes/Admin/Menu.php:55 includes/Admin/Menu.php:56 src/admin/components/PageHeader.jsx:48 src/admin/layouts/root/components/Sidebar.jsx:311 src/admin/layouts/root/components/Sidebar.jsx:330 src/admin/pages/setup/components/WizardShell.jsx:44
+#: includes/Admin/Menu.php:55 includes/Admin/Menu.php:56 src/admin/components/PageHeader.jsx:48 src/admin/layouts/root/components/Sidebar.jsx:310 src/admin/layouts/root/components/Sidebar.jsx:329 src/admin/pages/setup/components/WizardShell.jsx:44
 msgid "FoundHint"
 msgstr ""
 
-#: includes/Admin.php:46 src/admin/layouts/root/components/Sidebar.jsx:99 src/admin/pages/schema/components/page/TabBar.jsx:21 src/admin/pages/settings/index.jsx:87 src/admin/pages/settings/index.jsx:96
+#: includes/Admin.php:42 src/admin/layouts/root/components/Sidebar.jsx:98 src/admin/pages/settings/index.jsx:87 src/admin/pages/settings/index.jsx:96
 msgid "Settings"
 msgstr ""
 
-#: includes/Admin.php:56
+#: includes/Admin.php:52
 msgid "Get Pro"
 msgstr ""
 
@@ -101,7 +93,7 @@ msgstr ""
 msgid "Several locations exist and none is marked as the main one. Choose which represents the business."
 msgstr ""
 
-#: includes/App/Audit/Rules/BusinessDescription.php:70 src/admin/lib/errors.js:609
+#: includes/App/Audit/Rules/BusinessDescription.php:70 src/admin/lib/errors.js:343
 msgid "No description."
 msgstr ""
 
@@ -113,7 +105,7 @@ msgstr ""
 msgid "Describe what you do in a sentence or two."
 msgstr ""
 
-#: includes/App/Audit/Rules/BusinessLogo.php:62 src/admin/lib/errors.js:607
+#: includes/App/Audit/Rules/BusinessLogo.php:62 src/admin/lib/errors.js:341
 msgid "No logo."
 msgstr ""
 
@@ -129,7 +121,7 @@ msgstr ""
 msgid "Add the name customers know you by on the Business screen."
 msgstr ""
 
-#: includes/App/Audit/Rules/BusinessPhone.php:71 src/admin/lib/errors.js:604
+#: includes/App/Audit/Rules/BusinessPhone.php:71 src/admin/lib/errors.js:338
 msgid "No phone number."
 msgstr ""
 
@@ -203,7 +195,7 @@ msgid_plural "%d days have no answer."
 msgstr[0] ""
 msgstr[1] ""
 
-#: includes/App/Audit/Rules/HoursSet.php:79 src/admin/lib/errors.js:612
+#: includes/App/Audit/Rules/HoursSet.php:79 src/admin/lib/errors.js:346
 msgid "No opening hours set."
 msgstr ""
 
@@ -227,7 +219,7 @@ msgstr ""
 msgid "A street, a city and a country are the minimum a search engine needs."
 msgstr ""
 
-#: includes/App/Audit/Rules/LocationCoordinates.php:66 src/admin/lib/errors.js:610
+#: includes/App/Audit/Rules/LocationCoordinates.php:66 src/admin/lib/errors.js:344
 msgid "No map coordinates."
 msgstr ""
 
@@ -287,7 +279,7 @@ msgstr ""
 msgid "Add at least one. They are published as corroborating links for the same business."
 msgstr ""
 
-#: includes/App/Audit/Rules/WebsiteAddress.php:70 src/admin/lib/errors.js:606
+#: includes/App/Audit/Rules/WebsiteAddress.php:70 src/admin/lib/errors.js:340
 msgid "No website address."
 msgstr ""
 
@@ -331,7 +323,7 @@ msgstr ""
 msgid "The attributes Google offers could not be stored."
 msgstr ""
 
-#: includes/App/Google/Client.php:250 includes/App/Google/OAuth.php:281
+#: includes/App/Google/Client.php:250 includes/App/Google/OAuth.php:312
 msgid "Google could not be reached. Please try again."
 msgstr ""
 
@@ -367,51 +359,51 @@ msgstr ""
 msgid "The connect service did not start a sign-in. Please try again."
 msgstr ""
 
-#: includes/App/Google/ConnectService.php:198
+#: includes/App/Google/ConnectService.php:225
 msgid "That sign-in has expired. Start again from this screen."
 msgstr ""
 
-#: includes/App/Google/ConnectService.php:206
+#: includes/App/Google/ConnectService.php:233
 msgid "That sign-in does not match the one this site started."
 msgstr ""
 
-#: includes/App/Google/ConnectService.php:217
+#: includes/App/Google/ConnectService.php:244
 msgid "This sign-in was started by a different user."
 msgstr ""
 
-#: includes/App/Google/ConnectService.php:238
+#: includes/App/Google/ConnectService.php:270
 msgid "The connect service returned no access token."
 msgstr ""
 
-#: includes/App/Google/ConnectService.php:260
+#: includes/App/Google/ConnectService.php:292
 msgid "There is no refresh token to renew."
 msgstr ""
 
-#: includes/App/Google/ConnectService.php:291
+#: includes/App/Google/ConnectService.php:323
 msgid "FoundHint\\'s connect service could not be reached. Please try again in a moment."
 msgstr ""
 
-#: includes/App/Google/ConnectService.php:340
+#: includes/App/Google/ConnectService.php:372
 msgid "Google has withdrawn this connection. Connect again."
 msgstr ""
 
-#: includes/App/Google/ConnectService.php:342
+#: includes/App/Google/ConnectService.php:374
 msgid "FoundHint\\'s connect service is busy. Try again in a minute."
 msgstr ""
 
-#: includes/App/Google/ConnectService.php:344
+#: includes/App/Google/ConnectService.php:376
 msgid "That sign-in has already been completed or has expired. Start again."
 msgstr ""
 
-#: includes/App/Google/ConnectService.php:349
+#: includes/App/Google/ConnectService.php:381
 msgid "The connect service refused this site\\'s return address. Check the site address in Settings → General."
 msgstr ""
 
-#: includes/App/Google/ConnectService.php:351
+#: includes/App/Google/ConnectService.php:383
 msgid "The connect service needs this site to be served over https before it can connect."
 msgstr ""
 
-#: includes/App/Google/ConnectService.php:358
+#: includes/App/Google/ConnectService.php:390
 msgid "FoundHint\\'s connect service refused the request."
 msgstr ""
 
@@ -419,35 +411,39 @@ msgstr ""
 msgid "Google\\'s return reached this site carrying: %s"
 msgstr ""
 
-#: includes/App/Google/Connection.php:220 includes/App/Google/Connection.php:234
+#: includes/App/Google/Connection.php:226 includes/App/Google/Connection.php:250 includes/App/Google/OAuth.php:165 includes/App/Google/OAuth.php:174
+msgid "That sign-in could not be verified. Please try connecting again."
+msgstr ""
+
+#: includes/App/Google/Connection.php:234 includes/App/Google/Connection.php:266
 msgid "Access was declined on the Google consent screen. Nothing has changed."
 msgstr ""
 
-#: includes/App/Google/Connection.php:221
+#: includes/App/Google/Connection.php:235
 msgid "The sign-in did not complete. Please try again."
 msgstr ""
 
-#: includes/App/Google/Connection.php:248
+#: includes/App/Google/Connection.php:273
 msgid "Google did not return an authorization code."
 msgstr ""
 
-#: includes/App/Google/Connection.php:271 includes/App/Google/Connection.php:410
+#: includes/App/Google/Connection.php:296 includes/App/Google/Connection.php:435
 msgid "Connected to Google Business Profile."
 msgstr ""
 
-#: includes/App/Google/Connection.php:310
+#: includes/App/Google/Connection.php:335
 msgid "Disconnected from Google Business Profile."
 msgstr ""
 
-#: includes/App/Google/Connection.php:311
+#: includes/App/Google/Connection.php:336
 msgid "Disconnected locally; Google did not confirm the revocation."
 msgstr ""
 
-#: includes/App/Google/Connection.php:332
+#: includes/App/Google/Connection.php:357
 msgid "Connect your Google account first."
 msgstr ""
 
-#: includes/App/Google/Connection.php:362
+#: includes/App/Google/Connection.php:387
 msgid "Google rejected the stored grant; the connection was cleared."
 msgstr ""
 
@@ -525,55 +521,51 @@ msgstr ""
 msgid "Unmapped %s."
 msgstr ""
 
-#: includes/App/Google/OAuth.php:91
+#: includes/App/Google/OAuth.php:100
 msgid "Add your Google client id and secret first."
 msgstr ""
 
-#: includes/App/Google/OAuth.php:147
+#: includes/App/Google/OAuth.php:158
 msgid "That sign-in could not be verified."
 msgstr ""
 
-#: includes/App/Google/OAuth.php:156
-msgid "That sign-in could not be verified. Please try connecting again."
-msgstr ""
-
-#: includes/App/Google/OAuth.php:160
+#: includes/App/Google/OAuth.php:178
 msgid "That sign-in was started by a different user."
 msgstr ""
 
-#: includes/App/Google/OAuth.php:228
+#: includes/App/Google/OAuth.php:259
 msgid "Google would not confirm the disconnection."
 msgstr ""
 
-#: includes/App/Google/OAuth.php:308
+#: includes/App/Google/OAuth.php:339
 msgid "Google did not return an access token."
 msgstr ""
 
-#: includes/App/Google/OAuth.php:325
+#: includes/App/Google/OAuth.php:356
 msgid "Google did not recognise the client id or secret. Check both, then try again."
 msgstr ""
 
-#: includes/App/Google/OAuth.php:327
+#: includes/App/Google/OAuth.php:358
 msgid "Google has expired or withdrawn this connection. Connect again to restore it."
 msgstr ""
 
-#: includes/App/Google/OAuth.php:329
+#: includes/App/Google/OAuth.php:360
 msgid "The redirect URI does not match the one registered in Google Cloud. Copy it from this screen exactly."
 msgstr ""
 
-#: includes/App/Google/OAuth.php:331
+#: includes/App/Google/OAuth.php:362
 msgid "Access was declined on the Google consent screen."
 msgstr ""
 
-#: includes/App/Google/OAuth.php:333
+#: includes/App/Google/OAuth.php:364
 msgid "Google refused the request. Please try connecting again."
 msgstr ""
 
-#: includes/App/Google/Profiles.php:97 includes/App/Review/ReviewSync.php:91 src/admin/pages/google/components/BusinessProfiles.jsx:49
+#: includes/App/Google/Profiles.php:97 includes/App/Review/ReviewSync.php:96 src/admin/pages/google/components/BusinessProfiles.jsx:49
 msgid "Read %1$s across %2$s."
 msgstr ""
 
-#: includes/App/Google/Profiles.php:100 includes/App/Review/ReviewSync.php:99 src/admin/layouts/root/index.jsx:37 src/admin/pages/google/components/BusinessProfiles.jsx:52
+#: includes/App/Google/Profiles.php:100 includes/App/Review/ReviewSync.php:104 src/admin/layouts/root/index.jsx:37 src/admin/pages/google/components/BusinessProfiles.jsx:52
 msgid "%d location"
 msgid_plural "%d locations"
 msgstr[0] ""
@@ -669,7 +661,7 @@ msgstr ""
 msgid "Google did not confirm the photo."
 msgstr ""
 
-#: includes/App/Post/PostMedia.php:55 includes/App/Post/PostMedia.php:136 includes/App/Post/PostSync.php:46 includes/App/Post/Posts.php:464
+#: includes/App/Post/PostMedia.php:55 includes/App/Post/PostMedia.php:136 includes/App/Post/PostSync.php:46 includes/App/Post/Posts.php:370
 msgid "That location has no Google listing. Read your Google profile first."
 msgstr ""
 
@@ -707,27 +699,19 @@ msgid_plural "Read %d posts from Google."
 msgstr[0] ""
 msgstr[1] ""
 
-#: includes/App/Post/Posts.php:117 src/admin/lib/errors.js:710
+#: includes/App/Post/Posts.php:113 src/admin/lib/errors.js:427
 msgid "This post is on Google. Changes to it are published straight away."
 msgstr ""
 
-#: includes/App/Post/Posts.php:168 src/admin/lib/errors.js:715
+#: includes/App/Post/Posts.php:158 src/admin/lib/errors.js:432
 msgid "This post is already on Google."
 msgstr ""
 
-#: includes/App/Post/Posts.php:205
-msgid "This post is not scheduled."
-msgstr ""
-
-#: includes/App/Post/Posts.php:442 src/admin/lib/errors.js:719
-msgid "This post is being sent to Google right now. Try again in a minute."
-msgstr ""
-
-#: includes/App/Post/Posts.php:453
+#: includes/App/Post/Posts.php:359
 msgid "That post no longer exists."
 msgstr ""
 
-#: includes/App/Post/Posts.php:475
+#: includes/App/Post/Posts.php:381
 msgid "The post could not be saved."
 msgstr ""
 
@@ -735,7 +719,7 @@ msgstr ""
 msgid "Attributes and photos were read from Google."
 msgstr ""
 
-#: includes/App/Profile/Profile.php:91 src/admin/lib/errors.js:691
+#: includes/App/Profile/Profile.php:91 src/admin/lib/errors.js:420
 msgid "That location no longer exists."
 msgstr ""
 
@@ -743,7 +727,7 @@ msgstr ""
 msgid "That is not a section of the profile."
 msgstr ""
 
-#: includes/App/Profile/Sections/Address.php:88 src/admin/lib/errors.js:747
+#: includes/App/Profile/Sections/Address.php:88 src/admin/lib/errors.js:447
 msgid "This address comes from your Google Business Profile. Change it on Google and it will be picked up here."
 msgstr ""
 
@@ -771,26 +755,22 @@ msgstr ""
 msgid "Google has the change, but it could not be saved here. Read your reviews from Google to catch up."
 msgstr ""
 
-#: includes/App/Review/ReviewSync.php:65
+#: includes/App/Review/ReviewSync.php:70
 msgid "There are no Google locations to read reviews for yet. Read your Google profile first."
 msgstr ""
 
-#: includes/App/Review/ReviewSync.php:94 src/admin/components/location-bar/BusinessBar.jsx:130
+#: includes/App/Review/ReviewSync.php:99 src/admin/components/location-bar/BusinessBar.jsx:130
 msgid "%d review"
 msgid_plural "%d reviews"
 msgstr[0] ""
 msgstr[1] ""
-
-#: src/admin/components/ComingSoonBanner.jsx:36 src/admin/pages/reviews/components/SoonTag.jsx:39
-msgid "Coming soon"
-msgstr ""
 
 #: src/admin/components/GoogleRequired.jsx:18
 msgid "Connect Google to see your details"
 msgstr ""
 
 #: src/admin/components/GoogleRequired.jsx:22
-msgid "Your business details come from your Google Business Profile. Connect it to show them here and edit them — until then every field stays empty and locked."
+msgid "Your business details come from your Google Business Profile. Connect it to show them here and edit them. Until then the fields stay empty."
 msgstr ""
 
 #: src/admin/components/GoogleRequired.jsx:29 src/admin/pages/dashboard/components/GetStarted.jsx:288
@@ -801,7 +781,7 @@ msgstr ""
 msgid "Continue with Google"
 msgstr ""
 
-#: src/admin/components/Hint.jsx:30 src/admin/pages/business/index.jsx:176 src/admin/pages/google/components/ImportFromGoogle.jsx:47 src/admin/pages/profile/components/InfoSection.jsx:38 src/admin/pages/profile/components/publish/labels.js:10 src/admin/pages/schema/lib/schema.js:21
+#: src/admin/components/Hint.jsx:30 src/admin/pages/business/index.jsx:176 src/admin/pages/google/components/ImportFromGoogle.jsx:47 src/admin/pages/profile/components/InfoSection.jsx:38 src/admin/pages/profile/components/publish/labels.js:10 src/admin/pages/setup/components/BusinessStep.jsx:93
 msgid "Business name"
 msgstr ""
 
@@ -825,7 +805,7 @@ msgstr ""
 msgid "FoundHint / %s"
 msgstr ""
 
-#: src/admin/components/location-bar/BusinessBar.jsx:70 src/admin/pages/schema/components/locations/LocationList.jsx:303
+#: src/admin/components/location-bar/BusinessBar.jsx:70
 msgid "Your business"
 msgstr ""
 
@@ -837,7 +817,7 @@ msgstr ""
 msgid "out of 5"
 msgstr ""
 
-#: src/admin/components/location-bar/BusinessBar.jsx:162 src/admin/pages/posts/components/PostRow.jsx:105
+#: src/admin/components/location-bar/BusinessBar.jsx:162 src/admin/pages/posts/components/PostRow.jsx:99
 msgid "View on Google"
 msgstr ""
 
@@ -853,7 +833,7 @@ msgstr ""
 msgid "Show the profile of"
 msgstr ""
 
-#: src/admin/components/location-bar/LocationSwitcher.jsx:101 src/admin/pages/schema/lib/locations.js:5
+#: src/admin/components/location-bar/LocationSwitcher.jsx:101
 msgid "Main"
 msgstr ""
 
@@ -861,7 +841,7 @@ msgstr ""
 msgid "On Google, not set up here yet. Opening it brings its details across."
 msgstr ""
 
-#: src/admin/layouts/root/components/Sidebar.jsx:32 src/admin/pages/dashboard/index.jsx:127 src/admin/pages/dashboard/index.jsx:152
+#: src/admin/layouts/root/components/Sidebar.jsx:32 src/admin/pages/dashboard/index.jsx:126 src/admin/pages/dashboard/index.jsx:151
 msgid "Dashboard"
 msgstr ""
 
@@ -869,7 +849,7 @@ msgstr ""
 msgid "Setup"
 msgstr ""
 
-#: src/admin/layouts/root/components/Sidebar.jsx:42 src/admin/pages/audit/index.jsx:41 src/admin/pages/business/index.jsx:147 src/admin/pages/dashboard/index.jsx:265 src/admin/pages/setup/index.jsx:73
+#: src/admin/layouts/root/components/Sidebar.jsx:42 src/admin/pages/audit/index.jsx:40 src/admin/pages/business/index.jsx:147 src/admin/pages/dashboard/index.jsx:256 src/admin/pages/setup/index.jsx:73
 msgid "Business"
 msgstr ""
 
@@ -877,76 +857,76 @@ msgstr ""
 msgid "Reviews"
 msgstr ""
 
-#: src/admin/layouts/root/components/Sidebar.jsx:53 src/admin/pages/posts/components/PostsHeader.jsx:38
-msgid "Posts & Scheduling"
+#: src/admin/layouts/root/components/Sidebar.jsx:53 src/admin/pages/posts/components/PostsHeader.jsx:38 src/admin/pages/posts/components/PostsNotice.jsx:16
+msgid "Posts"
 msgstr ""
 
-#: src/admin/layouts/root/components/Sidebar.jsx:58 src/admin/pages/audit/index.jsx:44 src/admin/pages/schema/components/page/SchemaHeader.jsx:57 src/admin/pages/schema/components/page/SchemaHeader.jsx:60
+#: src/admin/layouts/root/components/Sidebar.jsx:57 src/admin/pages/audit/index.jsx:43 src/admin/pages/schema/index.jsx:40 src/admin/pages/schema/index.jsx:67
 msgid "Schema"
 msgstr ""
 
-#: src/admin/layouts/root/components/Sidebar.jsx:62 src/admin/pages/audit/index.jsx:168 src/admin/pages/audit/index.jsx:237 src/admin/pages/audit/index.jsx:264
+#: src/admin/layouts/root/components/Sidebar.jsx:61 src/admin/pages/audit/index.jsx:167 src/admin/pages/audit/index.jsx:236 src/admin/pages/audit/index.jsx:256
 msgid "SEO audit"
 msgstr ""
 
-#: src/admin/layouts/root/components/Sidebar.jsx:64 src/admin/pages/audit/index.jsx:294
+#: src/admin/layouts/root/components/Sidebar.jsx:63 src/admin/pages/audit/index.jsx:278
 msgid "Score"
 msgstr ""
 
-#: src/admin/layouts/root/components/Sidebar.jsx:67 src/admin/pages/audit/index.jsx:340
+#: src/admin/layouts/root/components/Sidebar.jsx:66 src/admin/pages/audit/index.jsx:324
 msgid "What to fix"
 msgstr ""
 
-#: src/admin/layouts/root/components/Sidebar.jsx:73
+#: src/admin/layouts/root/components/Sidebar.jsx:72
 msgid "Google"
 msgstr ""
 
-#: src/admin/layouts/root/components/Sidebar.jsx:77 src/admin/pages/google/index.jsx:429
+#: src/admin/layouts/root/components/Sidebar.jsx:76 src/admin/pages/google/index.jsx:429
 msgid "Google client"
 msgstr ""
 
-#: src/admin/layouts/root/components/Sidebar.jsx:81 src/admin/pages/google/index.jsx:546
+#: src/admin/layouts/root/components/Sidebar.jsx:80 src/admin/pages/google/index.jsx:546
 msgid "Connection"
 msgstr ""
 
-#: src/admin/layouts/root/components/Sidebar.jsx:85 src/admin/pages/google/components/BusinessProfiles.jsx:104
+#: src/admin/layouts/root/components/Sidebar.jsx:84 src/admin/pages/google/components/BusinessProfiles.jsx:104
 msgid "Business profiles"
 msgstr ""
 
-#: src/admin/layouts/root/components/Sidebar.jsx:89 src/admin/pages/google/components/LocationMapping.jsx:173
+#: src/admin/layouts/root/components/Sidebar.jsx:88 src/admin/pages/google/components/LocationMapping.jsx:173
 msgid "Location mapping"
 msgstr ""
 
-#: src/admin/layouts/root/components/Sidebar.jsx:93 src/admin/pages/google/components/ImportFromGoogle.jsx:181 src/admin/pages/setup/google.jsx:477
+#: src/admin/layouts/root/components/Sidebar.jsx:92 src/admin/pages/google/components/ImportFromGoogle.jsx:181 src/admin/pages/setup/google.jsx:477
 msgid "Import from Google"
 msgstr ""
 
-#: src/admin/layouts/root/components/Sidebar.jsx:103 src/admin/pages/settings/index.jsx:111
+#: src/admin/layouts/root/components/Sidebar.jsx:102 src/admin/pages/settings/index.jsx:111
 msgid "Your data"
 msgstr ""
 
-#: src/admin/layouts/root/components/Sidebar.jsx:107 src/admin/pages/settings/index.jsx:148
+#: src/admin/layouts/root/components/Sidebar.jsx:106 src/admin/pages/settings/index.jsx:148
 msgid "Activity log"
 msgstr ""
 
-#: src/admin/layouts/root/components/Sidebar.jsx:111 src/admin/pages/settings/index.jsx:231
+#: src/admin/layouts/root/components/Sidebar.jsx:110 src/admin/pages/settings/index.jsx:231
 msgid "System"
 msgstr ""
 
-#: src/admin/layouts/root/components/Sidebar.jsx:272
+#: src/admin/layouts/root/components/Sidebar.jsx:271
 msgid "Collapse section list"
 msgstr ""
 
-#: src/admin/layouts/root/components/Sidebar.jsx:273
+#: src/admin/layouts/root/components/Sidebar.jsx:272
 msgid "Expand section list"
 msgstr ""
 
-#: src/admin/layouts/root/components/Sidebar.jsx:333
+#: src/admin/layouts/root/components/Sidebar.jsx:332
 msgid "Local SEO"
 msgstr ""
 
-#: src/admin/layouts/root/components/Sidebar.jsx:363
-msgid "FoundHint Free"
+#: src/admin/layouts/root/components/Sidebar.jsx:358
+msgid "This site"
 msgstr ""
 
 #: src/admin/layouts/root/index.jsx:32
@@ -955,11 +935,11 @@ msgid_plural "%d businesses"
 msgstr[0] ""
 msgstr[1] ""
 
-#: src/admin/lib/errors.js:14 src/admin/lib/errors.js:87
+#: src/admin/lib/errors.js:14
 msgid "Enter the name customers know you by."
 msgstr ""
 
-#: src/admin/lib/errors.js:16 src/admin/lib/errors.js:507 src/admin/lib/errors.js:552
+#: src/admin/lib/errors.js:16 src/admin/lib/errors.js:241 src/admin/lib/errors.js:286
 msgid "That name is too long — 255 characters at most."
 msgstr ""
 
@@ -967,7 +947,7 @@ msgstr ""
 msgid "That legal name is too long — 255 characters at most."
 msgstr ""
 
-#: src/admin/lib/errors.js:26 src/admin/lib/errors.js:85 src/admin/lib/errors.js:205
+#: src/admin/lib/errors.js:26
 msgid "Choose a business type from the list."
 msgstr ""
 
@@ -1020,706 +1000,354 @@ msgid "Google accepts an opening date up to one year ahead."
 msgstr ""
 
 #: src/admin/lib/errors.js:83
-msgid "Choose Organization or LocalBusiness."
-msgstr ""
-
-#: src/admin/lib/errors.js:89 src/admin/lib/errors.js:197 src/admin/lib/errors.js:218
-msgid "A name can be 200 characters at most."
-msgstr ""
-
-#: src/admin/lib/errors.js:91 src/admin/lib/errors.js:362 src/admin/lib/errors.js:367 src/admin/lib/errors.js:484 src/admin/lib/errors.js:527 src/admin/lib/errors.js:571
-msgid "Enter a full web address, starting with https://"
-msgstr ""
-
-#: src/admin/lib/errors.js:96
-msgid "Enter the full web address of your logo image."
-msgstr ""
-
-#: src/admin/lib/errors.js:98
-msgid "Use a Google Maps link, such as https://maps.google.com/?cid=…"
-msgstr ""
-
-#: src/admin/lib/errors.js:103
-msgid "Enter a phone number with its country code, such as +880 1712-345670."
-msgstr ""
-
-#: src/admin/lib/errors.js:108
-msgid "A price range can be 100 characters at most."
-msgstr ""
-
-#: src/admin/lib/errors.js:110
-msgid "Google allows 750 characters in a description."
-msgstr ""
-
-#: src/admin/lib/errors.js:112
-msgid "That address line is too long."
-msgstr ""
-
-#: src/admin/lib/errors.js:114
-msgid "That city name is too long."
-msgstr ""
-
-#: src/admin/lib/errors.js:116
-msgid "That region name is too long."
-msgstr ""
-
-#: src/admin/lib/errors.js:118
-msgid "That postal code is too long."
-msgstr ""
-
-#: src/admin/lib/errors.js:120
-msgid "Use the two-letter country code, such as BD or US."
-msgstr ""
-
-#: src/admin/lib/errors.js:125
-msgid "Latitude is a number between -90 and 90."
-msgstr ""
-
-#: src/admin/lib/errors.js:127
-msgid "Longitude is a number between -180 and 180."
-msgstr ""
-
-#: src/admin/lib/errors.js:129
-msgid "List up to 50 places."
-msgstr ""
-
-#: src/admin/lib/errors.js:131
-msgid "Put one link per line, each starting with https://"
-msgstr ""
-
-#: src/admin/lib/errors.js:136
-msgid "A legal name can be 200 characters at most."
-msgstr ""
-
-#: src/admin/lib/errors.js:138
-msgid "An alternate name can be 200 characters at most."
-msgstr ""
-
-#: src/admin/lib/errors.js:143
-msgid "A founder's name can be 200 characters at most."
-msgstr ""
-
-#: src/admin/lib/errors.js:148
-msgid "Enter an email address, such as hello@example.com."
-msgstr ""
-
-#: src/admin/lib/errors.js:153
-msgid "Enter an email address, such as support@example.com."
-msgstr ""
-
-#: src/admin/lib/errors.js:158
-msgid "Enter the date as YYYY-MM-DD, such as 2019-03-01. A year, or a year and month, also works."
-msgstr ""
-
-#: src/admin/lib/errors.js:163
-msgid "A founding date can't be in the future."
-msgstr ""
-
-#: src/admin/lib/errors.js:165
-msgid "Keep each topic to 100 characters or fewer."
-msgstr ""
-
-#: src/admin/lib/errors.js:167
-msgid "List 10 topics at most — the ones you are really known for."
-msgstr ""
-
-#: src/admin/lib/errors.js:172
-msgid "Choose a contact type from the list."
-msgstr ""
-
-#: src/admin/lib/errors.js:174
-msgid "Enter a phone number with 7 to 15 digits, such as +880 1518-984873."
-msgstr ""
-
-#: src/admin/lib/errors.js:179 src/admin/lib/errors.js:227
-msgid "Add the country code, such as +880 1518-984873, or set the country, so the number can be written in international form."
-msgstr ""
-
-#: src/admin/lib/errors.js:184
-msgid "Keep each language to 40 characters or fewer."
-msgstr ""
-
-#: src/admin/lib/errors.js:186
-msgid "List 10 languages at most."
-msgstr ""
-
-#: src/admin/lib/errors.js:188
-msgid "List 20 profile links at most."
-msgstr ""
-
-#: src/admin/lib/errors.js:190
-msgid "Choose the page for this row, or switch it off."
-msgstr ""
-
-#: src/admin/lib/errors.js:195
-msgid "Choose a published page."
-msgstr ""
-
-#: src/admin/lib/errors.js:199
-msgid "Choose the head or the end of the page."
-msgstr ""
-
-#: src/admin/lib/errors.js:201
-msgid "Choose Branch or Separate."
-msgstr ""
-
-#: src/admin/lib/errors.js:203
-msgid "That isn't one of your other Google profiles."
-msgstr ""
-
-#: src/admin/lib/errors.js:207 src/admin/lib/errors.js:315
-msgid "That page no longer exists. Choose another."
-msgstr ""
-
-#: src/admin/lib/errors.js:209
-msgid "Give this branch a name first; the page is named after it."
-msgstr ""
-
-#: src/admin/lib/errors.js:214
-msgid "Choose one of your locations."
-msgstr ""
-
-#: src/admin/lib/errors.js:216
-msgid "Enter your head office's name."
-msgstr ""
-
-#: src/admin/lib/errors.js:220
-msgid "An address can be 255 characters at most."
-msgstr ""
-
-#: src/admin/lib/errors.js:222
-msgid "Enter the website's full address, starting with https://."
-msgstr ""
-
-#: src/admin/lib/errors.js:232
-msgid "Choose the logo from your Media Library, so your site serves it."
-msgstr ""
-
-#: src/admin/lib/errors.js:237
-msgid "Choose photos from your Media Library, so your site serves them."
-msgstr ""
-
-#: src/admin/lib/errors.js:242
-msgid "That photo is not on your Google profile."
-msgstr ""
-
-#: src/admin/lib/errors.js:244
-msgid "The photo could not be downloaded from Google. Try again."
-msgstr ""
-
-#: src/admin/lib/errors.js:249
-msgid "Google sent something that is not a photo."
-msgstr ""
-
-#: src/admin/lib/errors.js:251
-msgid "The photo could not be added to your Media Library."
-msgstr ""
-
-#: src/admin/lib/errors.js:256
-msgid "Every image must be a web address."
-msgstr ""
-
-#: src/admin/lib/errors.js:258
-msgid "Choose up to 10 images."
-msgstr ""
-
-#: src/admin/lib/errors.js:260
-msgid "Choose where customers visit you."
-msgstr ""
-
-#: src/admin/lib/errors.js:262
-msgid "That value is not one this field accepts."
-msgstr ""
-
-#: src/admin/lib/errors.js:264
-msgid "Enter an email address, such as branch@example.com."
-msgstr ""
-
-#: src/admin/lib/errors.js:269
-msgid "A branch code can be 60 characters at most."
-msgstr ""
-
-#: src/admin/lib/errors.js:271
-msgid "Choose your business, or not part of a group."
-msgstr ""
-
-#: src/admin/lib/errors.js:273
-msgid "Switch the branch on or off."
-msgstr ""
-
-#: src/admin/lib/errors.js:275
-msgid "Give the service a name."
-msgstr ""
-
-#: src/admin/lib/errors.js:277
-msgid "A service name can be 255 characters at most."
-msgstr ""
-
-#: src/admin/lib/errors.js:279
-msgid "Keep the short description to 300 characters or fewer."
-msgstr ""
-
-#: src/admin/lib/errors.js:284
-msgid "A category can be 100 characters at most."
-msgstr ""
-
-#: src/admin/lib/errors.js:286
-msgid "Switch the service on or off."
-msgstr ""
-
-#: src/admin/lib/errors.js:288
-msgid "Enter the image's full web address, starting with https://."
-msgstr ""
-
-#: src/admin/lib/errors.js:293
-msgid "Choose who provides this service."
-msgstr ""
-
-#: src/admin/lib/errors.js:295
-msgid "Choose at least one branch."
-msgstr ""
-
-#: src/admin/lib/errors.js:297
-msgid "A provider's name can be 200 characters at most."
-msgstr ""
-
-#: src/admin/lib/errors.js:302
-msgid "Choose a person or a partner company."
-msgstr ""
-
-#: src/admin/lib/errors.js:304
-msgid "A service can list 20 places at most."
-msgstr ""
-
-#: src/admin/lib/errors.js:306
-msgid "A place name can be 191 characters at most."
-msgstr ""
-
-#: src/admin/lib/errors.js:308
-msgid "Choose what kind of place it is."
-msgstr ""
-
-#: src/admin/lib/errors.js:310
-msgid "Enter the page's full web address, starting with https://."
-msgstr ""
-
-#: src/admin/lib/errors.js:317
-msgid "Choose how the price is shown."
-msgstr ""
-
-#: src/admin/lib/errors.js:319
-msgid "Enter a price, or choose No price."
-msgstr ""
-
-#: src/admin/lib/errors.js:321
-msgid "Enter a price as a number, such as 1500."
-msgstr ""
-
-#: src/admin/lib/errors.js:323
-msgid "Enter the top of the range."
-msgstr ""
-
-#: src/admin/lib/errors.js:325
-msgid "The top of the range must be above its start."
-msgstr ""
-
-#: src/admin/lib/errors.js:327
-msgid "Choose a currency."
-msgstr ""
-
-#: src/admin/lib/errors.js:329
-msgid "Choose where the schema is added."
-msgstr ""
-
-#: src/admin/lib/errors.js:332
 msgid "Choose update, event or offer."
 msgstr ""
 
-#: src/admin/lib/errors.js:334
+#: src/admin/lib/errors.js:85
 msgid "Google does not let a published post change type. Delete it and write a new one."
 msgstr ""
 
-#: src/admin/lib/errors.js:339
+#: src/admin/lib/errors.js:90
 msgid "That way of writing a post is not available."
 msgstr ""
 
-#: src/admin/lib/errors.js:341
+#: src/admin/lib/errors.js:92
 msgid "Write what the post says."
 msgstr ""
 
-#: src/admin/lib/errors.js:343
+#: src/admin/lib/errors.js:94
 msgid "Google allows 1,500 characters in a post."
 msgstr ""
 
-#: src/admin/lib/errors.js:344
+#: src/admin/lib/errors.js:95
 msgid "Give it a title."
 msgstr ""
 
-#: src/admin/lib/errors.js:346
+#: src/admin/lib/errors.js:97
 msgid "Google allows 58 characters in a title."
 msgstr ""
 
-#: src/admin/lib/errors.js:348
+#: src/admin/lib/errors.js:99
 msgid "Choose when it starts."
 msgstr ""
 
-#: src/admin/lib/errors.js:350
+#: src/admin/lib/errors.js:101
 msgid "That start date is not a real date."
 msgstr ""
 
-#: src/admin/lib/errors.js:352
+#: src/admin/lib/errors.js:103
 msgid "Choose when it ends."
 msgstr ""
 
-#: src/admin/lib/errors.js:354
+#: src/admin/lib/errors.js:105
 msgid "That end date is not a real date."
 msgstr ""
 
-#: src/admin/lib/errors.js:356
+#: src/admin/lib/errors.js:107
 msgid "It has to end after it starts."
 msgstr ""
 
-#: src/admin/lib/errors.js:358
+#: src/admin/lib/errors.js:109
 msgid "Choose a button from the list."
 msgstr ""
 
-#: src/admin/lib/errors.js:360
+#: src/admin/lib/errors.js:111
 msgid "Add the link the button opens."
 msgstr ""
 
-#: src/admin/lib/errors.js:372
+#: src/admin/lib/errors.js:113 src/admin/lib/errors.js:118 src/admin/lib/errors.js:218 src/admin/lib/errors.js:261 src/admin/lib/errors.js:305
+msgid "Enter a full web address, starting with https://"
+msgstr ""
+
+#: src/admin/lib/errors.js:123
 msgid "A coupon code can be 58 characters at most."
 msgstr ""
 
-#: src/admin/lib/errors.js:374
+#: src/admin/lib/errors.js:125
 msgid "Terms can be 5,000 characters at most."
 msgstr ""
 
-#: src/admin/lib/errors.js:376
+#: src/admin/lib/errors.js:127
 msgid "Google is still processing this photo. Wait a minute, then choose it again from Your gallery."
 msgstr ""
 
-#: src/admin/lib/errors.js:381
+#: src/admin/lib/errors.js:132
 msgid "That photo is not a web address Google can open."
 msgstr ""
 
-#: src/admin/lib/errors.js:387
-msgid "Choose when to send it."
-msgstr ""
-
-#: src/admin/lib/errors.js:389
-msgid "Enter a date and a time."
-msgstr ""
-
-#: src/admin/lib/errors.js:391
-msgid "Pick a time at least 5 minutes from now, or choose Now instead."
-msgstr ""
-
-#: src/admin/lib/errors.js:396
-msgid "Pick a time within the next year."
-msgstr ""
-
-#: src/admin/lib/errors.js:398
-msgid "Send it before the event ends, or nobody will see it in time."
-msgstr ""
-
-#: src/admin/lib/errors.js:403
+#: src/admin/lib/errors.js:137
 msgid "Write a reply before posting it."
 msgstr ""
 
-#: src/admin/lib/errors.js:405 src/admin/pages/reviews/components/ReplyDialog.jsx:49
+#: src/admin/lib/errors.js:139 src/admin/pages/reviews/components/ReplyDialog.jsx:36
 msgid "That reply is too long for Google. Shorten it and try again."
 msgstr ""
 
-#: src/admin/lib/errors.js:410
+#: src/admin/lib/errors.js:144
 msgid "Choose a real date for this day."
 msgstr ""
 
-#: src/admin/lib/errors.js:412
+#: src/admin/lib/errors.js:146
 msgid "That date is already in the list. Edit the existing entry instead."
 msgstr ""
 
-#: src/admin/lib/errors.js:417
+#: src/admin/lib/errors.js:151
 msgid "Google accepts JPG and PNG photos only."
 msgstr ""
 
-#: src/admin/lib/errors.js:419
+#: src/admin/lib/errors.js:153
 msgid "That photo is over 5 MB. Choose a smaller one."
 msgstr ""
 
-#: src/admin/lib/errors.js:421
+#: src/admin/lib/errors.js:155
 msgid "That file is too small to be a photo Google will accept."
 msgstr ""
 
-#: src/admin/lib/errors.js:426
+#: src/admin/lib/errors.js:160
 msgid "That photo is too small. Google needs at least 250 pixels on each side."
 msgstr ""
 
-#: src/admin/lib/errors.js:431
+#: src/admin/lib/errors.js:165
 msgid "That is not a value Google accepts here."
 msgstr ""
 
-#: src/admin/lib/errors.js:433
+#: src/admin/lib/errors.js:167
 msgid "That service no longer exists. Reload the page and try again."
 msgstr ""
 
-#: src/admin/lib/errors.js:438
+#: src/admin/lib/errors.js:172
 msgid "That service is in the list twice."
 msgstr ""
 
-#: src/admin/lib/errors.js:440
+#: src/admin/lib/errors.js:174
 msgid "That service could not be read."
 msgstr ""
 
-#: src/admin/lib/errors.js:442
+#: src/admin/lib/errors.js:176
 msgid "The list of services could not be read."
 msgstr ""
 
-#: src/admin/lib/errors.js:444
+#: src/admin/lib/errors.js:178
 msgid "Google does not allow a web link in the description."
 msgstr ""
 
-#: src/admin/lib/errors.js:449
+#: src/admin/lib/errors.js:183
 msgid "Google says this is too long."
 msgstr ""
 
-#: src/admin/lib/errors.js:451
+#: src/admin/lib/errors.js:185
 msgid "Google does not recognise that category."
 msgstr ""
 
-#: src/admin/lib/errors.js:453
+#: src/admin/lib/errors.js:187
 msgid "Google could not accept that web address. Check it opens in a browser."
 msgstr ""
 
-#: src/admin/lib/errors.js:458
+#: src/admin/lib/errors.js:192
 msgid "Google did not accept this value."
 msgstr ""
 
-#: src/admin/lib/errors.js:460
+#: src/admin/lib/errors.js:194
 msgid "Google does not have that category. Choose one from the list."
 msgstr ""
 
-#: src/admin/lib/errors.js:465
+#: src/admin/lib/errors.js:199
 msgid "One of those categories is not on Google's list. Choose each one from the suggestions."
 msgstr ""
 
-#: src/admin/lib/errors.js:470
+#: src/admin/lib/errors.js:204
 msgid "Google allows 9 extra categories at most. Remove one to add another."
 msgstr ""
 
-#: src/admin/lib/errors.js:475
+#: src/admin/lib/errors.js:209
 msgid "Your main category is already counted. Remove it from the extra categories."
 msgstr ""
 
-#: src/admin/lib/errors.js:480 src/admin/lib/errors.js:523
+#: src/admin/lib/errors.js:214 src/admin/lib/errors.js:257
 msgid "That does not look like an email address."
 msgstr ""
 
-#: src/admin/lib/errors.js:482 src/admin/lib/errors.js:525
+#: src/admin/lib/errors.js:216 src/admin/lib/errors.js:259
 msgid "That does not look like a phone number."
 msgstr ""
 
-#: src/admin/lib/errors.js:489 src/admin/lib/errors.js:576
+#: src/admin/lib/errors.js:223 src/admin/lib/errors.js:310
 msgid "Enter a full image address, starting with https://"
 msgstr ""
 
-#: src/admin/lib/errors.js:494
+#: src/admin/lib/errors.js:228
 msgid "Keep the price range short, like $$."
 msgstr ""
 
-#: src/admin/lib/errors.js:496
+#: src/admin/lib/errors.js:230
 msgid "Enter a real date in YYYY-MM-DD form."
 msgstr ""
 
-#: src/admin/lib/errors.js:498
+#: src/admin/lib/errors.js:232
 msgid "Enter the full profile address, starting with https://"
 msgstr ""
 
-#: src/admin/lib/errors.js:505
+#: src/admin/lib/errors.js:239
 msgid "Give this location a name, such as Downtown."
 msgstr ""
 
-#: src/admin/lib/errors.js:512
+#: src/admin/lib/errors.js:246
 msgid "That is too long — 255 characters at most."
 msgstr ""
 
-#: src/admin/lib/errors.js:514
+#: src/admin/lib/errors.js:248
 msgid "Use a two-letter country code, such as US or BD."
 msgstr ""
 
-#: src/admin/lib/errors.js:519
+#: src/admin/lib/errors.js:253
 msgid "Latitude must be between -90 and 90."
 msgstr ""
 
-#: src/admin/lib/errors.js:521
+#: src/admin/lib/errors.js:255
 msgid "Longitude must be between -180 and 180."
 msgstr ""
 
-#: src/admin/lib/errors.js:532
+#: src/admin/lib/errors.js:266
 msgid "Choose a time zone from the list."
 msgstr ""
 
-#: src/admin/lib/errors.js:534 src/admin/lib/errors.js:581
+#: src/admin/lib/errors.js:268 src/admin/lib/errors.js:315
 msgid "Choose a status from the list."
 msgstr ""
 
-#: src/admin/lib/errors.js:538
+#: src/admin/lib/errors.js:272
 msgid "That is not a valid day."
 msgstr ""
 
-#: src/admin/lib/errors.js:540
+#: src/admin/lib/errors.js:274
 msgid "Add an opening time, or mark the day closed."
 msgstr ""
 
-#: src/admin/lib/errors.js:542
+#: src/admin/lib/errors.js:276
 msgid "Add a closing time, or mark the day closed."
 msgstr ""
 
-#: src/admin/lib/errors.js:544
+#: src/admin/lib/errors.js:278
 msgid "Opening and closing time cannot be the same."
 msgstr ""
 
-#: src/admin/lib/errors.js:546
+#: src/admin/lib/errors.js:280
 msgid "These times overlap each other."
 msgstr ""
 
-#: src/admin/lib/errors.js:550
+#: src/admin/lib/errors.js:284
 msgid "Give this service a name."
 msgstr ""
 
-#: src/admin/lib/errors.js:557
+#: src/admin/lib/errors.js:291
 msgid "A service needs a URL slug."
 msgstr ""
 
-#: src/admin/lib/errors.js:559
+#: src/admin/lib/errors.js:293
 msgid "That slug is too long — 200 characters at most."
 msgstr ""
 
-#: src/admin/lib/errors.js:563
+#: src/admin/lib/errors.js:297
 msgid "Enter a number."
 msgstr ""
 
-#: src/admin/lib/errors.js:565
+#: src/admin/lib/errors.js:299
 msgid "A price cannot be negative."
 msgstr ""
 
-#: src/admin/lib/errors.js:567
+#: src/admin/lib/errors.js:301
 msgid "Choose a currency for this price."
 msgstr ""
 
-#: src/admin/lib/errors.js:569
+#: src/admin/lib/errors.js:303
 msgid "Use a three-letter currency code, such as USD."
 msgstr ""
 
-#: src/admin/lib/errors.js:586
+#: src/admin/lib/errors.js:320
 msgid "Add your business details before publishing markup."
 msgstr ""
 
-#: src/admin/lib/errors.js:591
+#: src/admin/lib/errors.js:325
 msgid "Add a location before publishing markup."
 msgstr ""
 
-#: src/admin/lib/errors.js:593
+#: src/admin/lib/errors.js:327
 msgid "A business name is required."
 msgstr ""
 
-#: src/admin/lib/errors.js:595
+#: src/admin/lib/errors.js:329
 msgid "The address needs a street, a city and a country at least."
 msgstr ""
 
-#: src/admin/lib/errors.js:600
+#: src/admin/lib/errors.js:334
 msgid "This location is marked permanently closed, so nothing is published for it."
 msgstr ""
 
-#: src/admin/lib/errors.js:682
+#: src/admin/lib/errors.js:411
 msgid "Your session has expired. Reload the page and sign in."
 msgstr ""
 
-#: src/admin/lib/errors.js:687
+#: src/admin/lib/errors.js:416
 msgid "You do not have permission to change this."
 msgstr ""
 
-#: src/admin/lib/errors.js:689
+#: src/admin/lib/errors.js:418
 msgid "Add your business details first."
 msgstr ""
 
-#: src/admin/lib/errors.js:693
-msgid "Your account can't publish pages, so FoundHint can't create one. Use an existing page instead."
-msgstr ""
-
-#: src/admin/lib/errors.js:698
-msgid "The page couldn't be created. Try again, or use an existing page."
-msgstr ""
-
-#: src/admin/lib/errors.js:703
-msgid "Connect your Google Business Profile first."
-msgstr ""
-
-#: src/admin/lib/errors.js:705
+#: src/admin/lib/errors.js:422
 msgid "That post no longer exists. Sync posts to see the latest."
 msgstr ""
 
-#: src/admin/lib/errors.js:717
-msgid "This post is not scheduled any more."
-msgstr ""
-
-#: src/admin/lib/errors.js:724
-msgid "That blog post is not published, or no longer exists."
-msgstr ""
-
-#: src/admin/lib/errors.js:729
-msgid "Only a draft or a post that is not on Google yet can be scheduled."
-msgstr ""
-
-#: src/admin/lib/errors.js:734
+#: src/admin/lib/errors.js:434
 msgid "That review is no longer stored here. Read your reviews from Google again."
 msgstr ""
 
-#: src/admin/lib/errors.js:739
+#: src/admin/lib/errors.js:439
 msgid "That service no longer exists."
 msgstr ""
 
-#: src/admin/lib/errors.js:741
+#: src/admin/lib/errors.js:441
 msgid "The changes could not be saved. Try again."
 msgstr ""
 
-#: src/admin/lib/errors.js:743
+#: src/admin/lib/errors.js:443
 msgid "Nothing to reorder."
 msgstr ""
 
-#: src/admin/lib/errors.js:745
+#: src/admin/lib/errors.js:445
 msgid "Check the highlighted fields and try again."
 msgstr ""
 
-#: src/admin/lib/errors.js:752
+#: src/admin/lib/errors.js:452
 msgid "Connect Google before sending your profile."
 msgstr ""
 
-#: src/admin/lib/errors.js:754
+#: src/admin/lib/errors.js:454
 msgid "Choose which Google listing belongs to this business first."
 msgstr ""
 
-#: src/admin/lib/errors.js:759
+#: src/admin/lib/errors.js:459
 msgid "Something changed since this was checked. Check again before sending."
 msgstr ""
 
-#: src/admin/lib/errors.js:764
+#: src/admin/lib/errors.js:464
 msgid "Google already has everything in this step."
 msgstr ""
 
-#: src/admin/lib/errors.js:766
+#: src/admin/lib/errors.js:466
 msgid "Google did not accept this. Nothing was changed."
 msgstr ""
 
-#: src/admin/lib/errors.js:779
-msgid "Your plan includes %d location."
+#: src/admin/lib/errors.js:479
+msgid "This site allows up to %d locations."
 msgstr ""
 
-#: src/admin/lib/errors.js:787
-msgid "Your plan includes %d services."
+#: src/admin/lib/errors.js:487
+msgid "This site allows up to %d services."
 msgstr ""
 
-#: src/admin/lib/errors.js:794
+#: src/admin/lib/errors.js:494
 msgid "Something went wrong. Try again."
 msgstr ""
 
@@ -1727,147 +1355,139 @@ msgstr ""
 msgid "Use this image"
 msgstr ""
 
-#: src/admin/pages/audit/index.jsx:34 src/admin/pages/dashboard/components/ScoreCard.jsx:29
+#: src/admin/pages/audit/index.jsx:33 src/admin/pages/dashboard/components/ScoreCard.jsx:29
 msgid "Needs work"
 msgstr ""
 
-#: src/admin/pages/audit/index.jsx:35 src/admin/pages/dashboard/components/ScoreCard.jsx:34
+#: src/admin/pages/audit/index.jsx:34 src/admin/pages/dashboard/components/ScoreCard.jsx:34
 msgid "Fair"
 msgstr ""
 
-#: src/admin/pages/audit/index.jsx:36 src/admin/pages/dashboard/components/ScoreCard.jsx:39
+#: src/admin/pages/audit/index.jsx:35 src/admin/pages/dashboard/components/ScoreCard.jsx:39
 msgid "Good"
 msgstr ""
 
-#: src/admin/pages/audit/index.jsx:37 src/admin/pages/dashboard/components/ScoreCard.jsx:44
+#: src/admin/pages/audit/index.jsx:36 src/admin/pages/dashboard/components/ScoreCard.jsx:44
 msgid "Excellent"
 msgstr ""
 
-#: src/admin/pages/audit/index.jsx:42 src/admin/pages/schema/components/locations/LocationList.jsx:386 src/editor/components/ChooseListing.jsx:34
+#: src/admin/pages/audit/index.jsx:41
 msgid "Location"
 msgstr ""
 
-#: src/admin/pages/audit/index.jsx:43 src/admin/pages/schema/components/locations/BranchSections.jsx:675 src/admin/pages/setup/index.jsx:75
+#: src/admin/pages/audit/index.jsx:42 src/admin/pages/setup/index.jsx:75
 msgid "Hours"
 msgstr ""
 
-#: src/admin/pages/audit/index.jsx:45 src/admin/pages/business/index.jsx:350 src/admin/pages/google/components/ImportFromGoogle.jsx:55 src/admin/pages/profile/components/InfoSection.jsx:88 src/admin/pages/profile/components/publish/labels.js:12 src/admin/pages/schema/components/business/MainBusinessPicker.jsx:230
+#: src/admin/pages/audit/index.jsx:44 src/admin/pages/business/index.jsx:350 src/admin/pages/google/components/ImportFromGoogle.jsx:55 src/admin/pages/profile/components/InfoSection.jsx:88 src/admin/pages/profile/components/publish/labels.js:12 src/admin/pages/setup/components/BusinessStep.jsx:177
 msgid "Website"
 msgstr ""
 
-#: src/admin/pages/audit/index.jsx:46
+#: src/admin/pages/audit/index.jsx:45
 msgid "Technical"
 msgstr ""
 
-#: src/admin/pages/audit/index.jsx:50
+#: src/admin/pages/audit/index.jsx:49
 msgid "Critical"
 msgstr ""
 
-#: src/admin/pages/audit/index.jsx:51
+#: src/admin/pages/audit/index.jsx:50
 msgid "High"
 msgstr ""
 
-#: src/admin/pages/audit/index.jsx:52
+#: src/admin/pages/audit/index.jsx:51
 msgid "Medium"
 msgstr ""
 
-#: src/admin/pages/audit/index.jsx:53
+#: src/admin/pages/audit/index.jsx:52
 msgid "Low"
 msgstr ""
 
-#: src/admin/pages/audit/index.jsx:70
+#: src/admin/pages/audit/index.jsx:69
 msgid "Nothing to fix"
 msgstr ""
 
-#: src/admin/pages/audit/index.jsx:72
+#: src/admin/pages/audit/index.jsx:71
 msgid "Every check passed on the last run."
 msgstr ""
 
-#: src/admin/pages/audit/index.jsx:107
+#: src/admin/pages/audit/index.jsx:106
 msgid "Here: %1$s · Google: %2$s"
 msgstr ""
 
-#: src/admin/pages/audit/index.jsx:127
+#: src/admin/pages/audit/index.jsx:126
 msgid "Fix this"
 msgstr ""
 
-#: src/admin/pages/audit/index.jsx:136
+#: src/admin/pages/audit/index.jsx:135
 msgid "Ignore"
 msgstr ""
 
-#: src/admin/pages/audit/index.jsx:180
+#: src/admin/pages/audit/index.jsx:179
 msgid "Audit finished."
 msgstr ""
 
-#: src/admin/pages/audit/index.jsx:194
+#: src/admin/pages/audit/index.jsx:193
 msgid "Fixed, and the score has been recalculated."
 msgstr ""
 
-#: src/admin/pages/audit/index.jsx:198
+#: src/admin/pages/audit/index.jsx:197
 msgid "There was nothing left to change."
 msgstr ""
 
-#: src/admin/pages/audit/index.jsx:202
+#: src/admin/pages/audit/index.jsx:201
 msgid "That could not be fixed automatically."
 msgstr ""
 
-#: src/admin/pages/audit/index.jsx:214
+#: src/admin/pages/audit/index.jsx:213
 msgid "Ignored."
 msgstr ""
 
-#: src/admin/pages/audit/index.jsx:216
+#: src/admin/pages/audit/index.jsx:215
 msgid "Could not update that."
 msgstr ""
 
-#: src/admin/pages/audit/index.jsx:229
+#: src/admin/pages/audit/index.jsx:228
 msgid "Run audit"
 msgstr ""
 
-#: src/admin/pages/audit/index.jsx:241 src/admin/pages/audit/index.jsx:274
-msgid "Advanced SEO audit coming soon!"
-msgstr ""
-
-#: src/admin/pages/audit/index.jsx:242 src/admin/pages/audit/index.jsx:275
-msgid "More checks and step-by-step fixes are on the way."
-msgstr ""
-
-#: src/admin/pages/audit/index.jsx:249
+#: src/admin/pages/audit/index.jsx:241
 msgid "No audit yet"
 msgstr ""
 
-#: src/admin/pages/audit/index.jsx:251
+#: src/admin/pages/audit/index.jsx:243
 msgid "Run one to see how complete and consistent your local SEO is."
 msgstr ""
 
-#: src/admin/pages/audit/index.jsx:267
+#: src/admin/pages/audit/index.jsx:259
 msgid "Last run %s."
 msgstr ""
 
-#: src/admin/pages/audit/index.jsx:285
+#: src/admin/pages/audit/index.jsx:269
 msgid "Your details have changed since this audit ran, so the score below is out of date."
 msgstr ""
 
-#: src/admin/pages/audit/index.jsx:297
+#: src/admin/pages/audit/index.jsx:281
 msgid "%1$d checks ran, %2$d passed."
 msgstr ""
 
-#: src/admin/pages/audit/index.jsx:323
+#: src/admin/pages/audit/index.jsx:307
 msgid "%1$s of %2$s"
 msgstr ""
 
-#: src/admin/pages/audit/index.jsx:353
+#: src/admin/pages/audit/index.jsx:337
 msgid "Nothing outstanding."
 msgstr ""
 
-#: src/admin/pages/audit/index.jsx:367
+#: src/admin/pages/audit/index.jsx:351
 msgid "What is already right"
 msgstr ""
 
-#: src/admin/pages/audit/index.jsx:368
+#: src/admin/pages/audit/index.jsx:352
 msgid "Recorded so the score has a denominator you can see."
 msgstr ""
 
-#: src/admin/pages/audit/index.jsx:345
+#: src/admin/pages/audit/index.jsx:329
 msgid "%d thing to look at, most urgent first."
 msgid_plural "%d things to look at, most urgent first."
 msgstr[0] ""
@@ -1893,7 +1513,7 @@ msgstr ""
 msgid "The name customers know you by."
 msgstr ""
 
-#: src/admin/pages/business/index.jsx:199 src/admin/pages/schema/lib/schema.js:39
+#: src/admin/pages/business/index.jsx:199
 msgid "Legal name"
 msgstr ""
 
@@ -1921,7 +1541,7 @@ msgstr ""
 msgid "In your own words, e.g. Grocery Store."
 msgstr ""
 
-#: src/admin/pages/business/index.jsx:293 src/admin/pages/google/components/ImportFromGoogle.jsx:57 src/admin/pages/posts/components/composer/WritingFields.jsx:64 src/admin/pages/profile/components/publish/labels.js:11 src/admin/pages/profile/components/services/ServiceDescriptionField.jsx:17 src/admin/pages/schema/lib/schema.js:27
+#: src/admin/pages/business/index.jsx:293 src/admin/pages/google/components/ImportFromGoogle.jsx:57 src/admin/pages/posts/components/composer/WritingFields.jsx:64 src/admin/pages/profile/components/publish/labels.js:11 src/admin/pages/profile/components/services/ServiceDescriptionField.jsx:17
 msgid "Description"
 msgstr ""
 
@@ -1937,11 +1557,11 @@ msgstr ""
 msgid "Locations can override these; leave a location's field empty to use the business value."
 msgstr ""
 
-#: src/admin/pages/business/index.jsx:322 src/admin/pages/google/components/BusinessProfiles.jsx:153 src/admin/pages/google/components/ImportFromGoogle.jsx:51 src/admin/pages/schema/components/locations/BranchSections.jsx:672 src/admin/pages/setup/components/BusinessStep.jsx:149
+#: src/admin/pages/business/index.jsx:322 src/admin/pages/google/components/BusinessProfiles.jsx:153 src/admin/pages/google/components/ImportFromGoogle.jsx:51 src/admin/pages/setup/components/BusinessStep.jsx:149
 msgid "Phone"
 msgstr ""
 
-#: src/admin/pages/business/index.jsx:336 src/admin/pages/schema/lib/schema.js:41 src/admin/pages/setup/components/BusinessStep.jsx:163
+#: src/admin/pages/business/index.jsx:336 src/admin/pages/setup/components/BusinessStep.jsx:163
 msgid "Email"
 msgstr ""
 
@@ -1953,7 +1573,7 @@ msgstr ""
 msgid "Logo URL"
 msgstr ""
 
-#: src/admin/pages/business/index.jsx:391 src/admin/pages/schema/components/locations/BranchSections.jsx:619 src/admin/pages/schema/components/services/editor/OptionalDetails.jsx:86 src/admin/pages/schema/lib/schema.js:26
+#: src/admin/pages/business/index.jsx:391
 msgid "Price range"
 msgstr ""
 
@@ -1961,7 +1581,7 @@ msgstr ""
 msgid "Founded"
 msgstr ""
 
-#: src/admin/pages/business/index.jsx:425 src/admin/pages/google/components/ImportFromGoogle.jsx:67 src/admin/pages/schema/components/locations/BranchSections.jsx:614 src/admin/pages/schema/lib/schema.js:38
+#: src/admin/pages/business/index.jsx:425 src/admin/pages/google/components/ImportFromGoogle.jsx:67
 msgid "Social profiles"
 msgstr ""
 
@@ -1973,7 +1593,7 @@ msgstr ""
 msgid "Save changes"
 msgstr ""
 
-#: src/admin/pages/business/index.jsx:475 src/admin/pages/schema/components/shared/SaveBar.jsx:13 src/admin/pages/settings/index.jsx:223
+#: src/admin/pages/business/index.jsx:475 src/admin/pages/settings/index.jsx:223
 msgid "You have unsaved changes."
 msgstr ""
 
@@ -2157,7 +1777,7 @@ msgstr ""
 msgid "Read from Google"
 msgstr ""
 
-#: src/admin/pages/dashboard/components/GoogleCard.jsx:146 src/admin/pages/dashboard/index.jsx:321
+#: src/admin/pages/dashboard/components/GoogleCard.jsx:146 src/admin/pages/dashboard/index.jsx:312
 msgid "Manage"
 msgstr ""
 
@@ -2237,87 +1857,79 @@ msgstr ""
 msgid "Run your first check"
 msgstr ""
 
-#: src/admin/pages/dashboard/index.jsx:85
+#: src/admin/pages/dashboard/index.jsx:84
 msgid "Add your business name"
 msgstr ""
 
-#: src/admin/pages/dashboard/index.jsx:91
+#: src/admin/pages/dashboard/index.jsx:90
 msgid "Add a phone number or email"
 msgstr ""
 
-#: src/admin/pages/dashboard/index.jsx:97
+#: src/admin/pages/dashboard/index.jsx:96
 msgid "Add your website"
 msgstr ""
 
-#: src/admin/pages/dashboard/index.jsx:103
+#: src/admin/pages/dashboard/index.jsx:102
 msgid "Add your address"
 msgstr ""
 
-#: src/admin/pages/dashboard/index.jsx:109
+#: src/admin/pages/dashboard/index.jsx:108
 msgid "Set your opening hours"
 msgstr ""
 
-#: src/admin/pages/dashboard/index.jsx:115
+#: src/admin/pages/dashboard/index.jsx:114
 msgid "List what you offer"
 msgstr ""
 
-#: src/admin/pages/dashboard/index.jsx:153
+#: src/admin/pages/dashboard/index.jsx:152
 msgid "What you have told FoundHint about your business so far."
 msgstr ""
 
-#: src/admin/pages/dashboard/index.jsx:160
-msgid "Advanced dashboard coming soon!"
-msgstr ""
-
-#: src/admin/pages/dashboard/index.jsx:161
-msgid "Deeper insights into how customers find you are on the way. Everything here keeps working in the meantime."
-msgstr ""
-
-#: src/admin/pages/dashboard/index.jsx:180 src/admin/pages/dashboard/index.jsx:205
+#: src/admin/pages/dashboard/index.jsx:171 src/admin/pages/dashboard/index.jsx:196
 msgid "Setup progress"
 msgstr ""
 
-#: src/admin/pages/dashboard/index.jsx:185 src/admin/pages/setup/google.jsx:402
+#: src/admin/pages/dashboard/index.jsx:176 src/admin/pages/setup/google.jsx:402
 msgid "%1$d of %2$d steps done"
 msgstr ""
 
-#: src/admin/pages/dashboard/index.jsx:197
+#: src/admin/pages/dashboard/index.jsx:188
 msgid "%d%%"
 msgstr ""
 
-#: src/admin/pages/dashboard/index.jsx:235
+#: src/admin/pages/dashboard/index.jsx:226
 msgid " — done"
 msgstr ""
 
-#: src/admin/pages/dashboard/index.jsx:236
+#: src/admin/pages/dashboard/index.jsx:227
 msgid " — still to do"
 msgstr ""
 
-#: src/admin/pages/dashboard/index.jsx:245
+#: src/admin/pages/dashboard/index.jsx:236
 msgid "Do this"
 msgstr ""
 
-#: src/admin/pages/dashboard/index.jsx:270
+#: src/admin/pages/dashboard/index.jsx:261
 msgid "%d%% complete"
 msgstr ""
 
-#: src/admin/pages/dashboard/index.jsx:273
+#: src/admin/pages/dashboard/index.jsx:264
 msgid "Not started"
 msgstr ""
 
-#: src/admin/pages/dashboard/index.jsx:279 src/admin/pages/schema/components/locations/LocationList.jsx:375 src/admin/pages/schema/components/page/TabBar.jsx:18
+#: src/admin/pages/dashboard/index.jsx:270
 msgid "Locations"
 msgstr ""
 
-#: src/admin/pages/dashboard/index.jsx:282 src/admin/pages/dashboard/index.jsx:292
+#: src/admin/pages/dashboard/index.jsx:273 src/admin/pages/dashboard/index.jsx:283
 msgid "%d added"
 msgstr ""
 
-#: src/admin/pages/dashboard/index.jsx:289 src/admin/pages/google/components/ImportFromGoogle.jsx:71 src/admin/pages/profile/components/publish/labels.js:21 src/admin/pages/profile/tabs.jsx:192 src/admin/pages/schema/components/page/TabBar.jsx:19 src/admin/pages/schema/components/services/list/ServiceList.jsx:121
+#: src/admin/pages/dashboard/index.jsx:280 src/admin/pages/google/components/ImportFromGoogle.jsx:71 src/admin/pages/profile/components/publish/labels.js:21 src/admin/pages/profile/tabs.jsx:192 src/admin/pages/setup/components/DoneStep.jsx:9 src/admin/pages/setup/google.jsx:38
 msgid "Services"
 msgstr ""
 
-#: src/admin/pages/google/components/BusinessProfiles.jsx:30 src/admin/pages/schema/components/settings/OutputSettings.jsx:32
+#: src/admin/pages/google/components/BusinessProfiles.jsx:30
 msgid "Ready"
 msgstr ""
 
@@ -2353,7 +1965,7 @@ msgstr ""
 msgid "Profile"
 msgstr ""
 
-#: src/admin/pages/google/components/BusinessProfiles.jsx:152 src/admin/pages/google/components/ImportFromGoogle.jsx:49 src/admin/pages/schema/components/business/MainBusinessPicker.jsx:225 src/admin/pages/schema/components/locations/BranchSections.jsx:673 src/admin/pages/schema/components/locations/LocationSetup.jsx:305 src/admin/pages/schema/lib/business.js:11
+#: src/admin/pages/google/components/BusinessProfiles.jsx:152 src/admin/pages/google/components/ImportFromGoogle.jsx:49 src/admin/pages/setup/components/DoneStep.jsx:7 src/admin/pages/setup/index.jsx:74
 msgid "Address"
 msgstr ""
 
@@ -2377,7 +1989,7 @@ msgstr ""
 msgid "Opening date"
 msgstr ""
 
-#: src/admin/pages/google/components/ImportFromGoogle.jsx:61 src/admin/pages/schema/lib/schema.js:36 src/admin/pages/setup/components/DoneStep.jsx:8 src/admin/pages/setup/google.jsx:37
+#: src/admin/pages/google/components/ImportFromGoogle.jsx:61 src/admin/pages/setup/components/DoneStep.jsx:8 src/admin/pages/setup/google.jsx:37
 msgid "Opening hours"
 msgstr ""
 
@@ -2557,7 +2169,7 @@ msgstr ""
 msgid "Copied"
 msgstr ""
 
-#: src/admin/pages/google/index.jsx:132 src/admin/pages/profile/components/info/GoogleCid.jsx:57
+#: src/admin/pages/google/index.jsx:132 src/admin/pages/profile/components/info/GoogleCid.jsx:57 src/admin/pages/schema/components/PreviewCard.jsx:39
 msgid "Copy"
 msgstr ""
 
@@ -2689,44 +2301,6 @@ msgstr ""
 msgid "Page not found"
 msgstr ""
 
-#: src/admin/pages/posts/components/BlogCard.jsx:38
-msgid "Blog sharing is on. Find “GBP Posting” under each published post in Posts → All Posts."
-msgstr ""
-
-#: src/admin/pages/posts/components/BlogCard.jsx:42
-msgid "Blog sharing is off."
-msgstr ""
-
-#: src/admin/pages/posts/components/BlogCard.jsx:54
-msgid "Share your blog on Google"
-msgstr ""
-
-#: src/admin/pages/posts/components/BlogCard.jsx:58
-msgid "On: open Posts → All Posts and choose “GBP Posting” under a published post to share it here."
-msgstr ""
-
-#: src/admin/pages/posts/components/BlogCard.jsx:62
-msgid "Turn your WordPress blog posts into Google Business Profile updates."
-msgstr ""
-
-#: src/admin/pages/posts/components/BlogCard.jsx:90 src/admin/pages/posts/hooks/useBlogShare.js:50
-msgid "Sharing your blog is part of FoundHint Premium."
-msgstr ""
-
-#: src/admin/pages/posts/components/BlogCard.jsx:102
-msgid "Sharing on"
-msgstr ""
-
-#: src/admin/pages/posts/components/BlogCard.jsx:103
-msgid "Sharing off"
-msgstr ""
-
-#: src/admin/pages/posts/components/BlogCard.jsx:72
-msgid "%d published post on your site"
-msgid_plural "%d published posts on your site"
-msgstr[0] ""
-msgstr[1] ""
-
 #: src/admin/pages/posts/components/LinkInput.jsx:17
 msgid "Use my website address"
 msgstr ""
@@ -2751,7 +2325,7 @@ msgstr ""
 msgid "Remove photo"
 msgstr ""
 
-#: src/admin/pages/posts/components/PostFailedNote.jsx:24 src/admin/pages/posts/components/ScheduledActions.jsx:44 src/admin/pages/posts/lib/composer.js:112
+#: src/admin/pages/posts/components/PostFailedNote.jsx:24 src/admin/pages/posts/lib/composer.js:76
 msgid "Your post was published on Google."
 msgstr ""
 
@@ -2771,7 +2345,7 @@ msgstr ""
 msgid "Retry"
 msgstr ""
 
-#: src/admin/pages/posts/components/PostFilters.jsx:7 src/admin/pages/reviews/components/TemplatesCard.jsx:83
+#: src/admin/pages/posts/components/PostFilters.jsx:7
 msgid "All"
 msgstr ""
 
@@ -2787,7 +2361,7 @@ msgstr ""
 msgid "Offers"
 msgstr ""
 
-#: src/admin/pages/posts/components/PostFilters.jsx:17 src/admin/pages/schema/components/services/editor/BasicsSection.jsx:157
+#: src/admin/pages/posts/components/PostFilters.jsx:17
 msgid "Status"
 msgstr ""
 
@@ -2795,71 +2369,67 @@ msgstr ""
 msgid "All statuses"
 msgstr ""
 
-#: src/admin/pages/posts/components/PostFilters.jsx:20 src/admin/pages/posts/lib/posts.js:44 src/admin/pages/reviews/components/ReviewFilters.jsx:92 src/admin/pages/schema/lib/locations.js:12 src/admin/pages/schema/lib/locations.js:13
+#: src/admin/pages/posts/components/PostFilters.jsx:20 src/admin/pages/posts/lib/posts.js:44 src/admin/pages/reviews/components/ReviewFilters.jsx:92
 msgid "Live"
 msgstr ""
 
-#: src/admin/pages/posts/components/PostFilters.jsx:21 src/admin/pages/posts/lib/posts.js:49
-msgid "Scheduled"
-msgstr ""
-
-#: src/admin/pages/posts/components/PostFilters.jsx:22 src/admin/pages/posts/components/composer/WhenToPublish.jsx:53 src/admin/pages/posts/lib/posts.js:48
+#: src/admin/pages/posts/components/PostFilters.jsx:21 src/admin/pages/posts/components/composer/WhenToPublish.jsx:30 src/admin/pages/posts/lib/posts.js:48
 msgid "Draft"
 msgstr ""
 
-#: src/admin/pages/posts/components/PostFilters.jsx:23 src/admin/pages/posts/lib/posts.js:47
+#: src/admin/pages/posts/components/PostFilters.jsx:22 src/admin/pages/posts/lib/posts.js:47
 msgid "Failed"
 msgstr ""
 
-#: src/admin/pages/posts/components/PostFilters.jsx:28
+#: src/admin/pages/posts/components/PostFilters.jsx:27
 msgid "Time"
 msgstr ""
 
-#: src/admin/pages/posts/components/PostFilters.jsx:30
+#: src/admin/pages/posts/components/PostFilters.jsx:29
 msgid "Any time"
 msgstr ""
 
-#: src/admin/pages/posts/components/PostFilters.jsx:31
+#: src/admin/pages/posts/components/PostFilters.jsx:30
 msgid "Last 7 days"
 msgstr ""
 
-#: src/admin/pages/posts/components/PostFilters.jsx:32
+#: src/admin/pages/posts/components/PostFilters.jsx:31
 msgid "Last 30 days"
 msgstr ""
 
-#: src/admin/pages/posts/components/PostFilters.jsx:33
+#: src/admin/pages/posts/components/PostFilters.jsx:32
 msgid "Last 90 days"
 msgstr ""
 
-#: src/admin/pages/posts/components/PostFilters.jsx:38
+#: src/admin/pages/posts/components/PostFilters.jsx:37
 msgid "Source"
 msgstr ""
 
-#: src/admin/pages/posts/components/PostFilters.jsx:40
+#: src/admin/pages/posts/components/PostFilters.jsx:39
 msgid "All sources"
 msgstr ""
 
-#: src/admin/pages/posts/components/PostFilters.jsx:41
+#: src/admin/pages/posts/components/PostFilters.jsx:40
 msgid "Written by you"
 msgstr ""
 
-#: src/admin/pages/posts/components/PostFilters.jsx:42 src/admin/pages/posts/lib/posts.js:71
+#: src/admin/pages/posts/components/PostFilters.jsx:41 src/admin/pages/posts/lib/posts.js:67
 msgid "From a review"
 msgstr ""
 
-#: src/admin/pages/posts/components/PostFilters.jsx:47
+#: src/admin/pages/posts/components/PostFilters.jsx:46
 msgid "Order"
 msgstr ""
 
-#: src/admin/pages/posts/components/PostFilters.jsx:49
+#: src/admin/pages/posts/components/PostFilters.jsx:48
 msgid "Newest first"
 msgstr ""
 
-#: src/admin/pages/posts/components/PostFilters.jsx:50
+#: src/admin/pages/posts/components/PostFilters.jsx:49
 msgid "Oldest first"
 msgstr ""
 
-#: src/admin/pages/posts/components/PostFilters.jsx:73 src/admin/pages/posts/components/composer/TypePicker.jsx:15
+#: src/admin/pages/posts/components/PostFilters.jsx:71 src/admin/pages/posts/components/composer/TypePicker.jsx:15
 msgid "Post type"
 msgstr ""
 
@@ -2915,87 +2485,75 @@ msgstr ""
 msgid "Start typing and your post will appear here."
 msgstr ""
 
-#: src/admin/pages/posts/components/PostRow.jsx:32
+#: src/admin/pages/posts/components/PostRow.jsx:31
 msgid "Untitled post"
 msgstr ""
 
-#: src/admin/pages/posts/components/PostRow.jsx:38
+#: src/admin/pages/posts/components/PostRow.jsx:37
 msgid "%1$s: %2$s"
 msgstr ""
 
-#: src/admin/pages/posts/components/PostRow.jsx:83
+#: src/admin/pages/posts/components/PostRow.jsx:82
 msgid "A photo or video post with no text."
 msgstr ""
 
-#: src/admin/pages/posts/components/PostRow.jsx:84
+#: src/admin/pages/posts/components/PostRow.jsx:83
 msgid "No text yet."
 msgstr ""
 
-#: src/admin/pages/posts/components/PostRow.jsx:92
-msgid "Needs FoundHint Premium to send"
-msgstr ""
-
-#: src/admin/pages/posts/components/PostRow.jsx:108 src/admin/pages/schema/components/locations/BranchSections.jsx:419 src/admin/pages/schema/components/locations/LocationList.jsx:355 src/admin/pages/schema/components/page/PremiumTab.jsx:62 src/admin/pages/schema/components/page/SchemaHeader.jsx:145 src/admin/pages/schema/components/shared/JsonPreview.jsx:216
+#: src/admin/pages/posts/components/PostRow.jsx:102
 msgid "(opens in a new tab)"
 msgstr ""
 
-#: src/admin/pages/posts/components/PostRowActions.jsx:39 src/admin/pages/schema/components/locations/BranchSections.jsx:523
-msgid "Change"
-msgstr ""
-
-#: src/admin/pages/posts/components/PostRowActions.jsx:41 src/admin/pages/setup/index.jsx:77
+#: src/admin/pages/posts/components/PostRowActions.jsx:35 src/admin/pages/setup/index.jsx:77
 msgid "Finish"
 msgstr ""
 
-#: src/admin/pages/posts/components/PostRowActions.jsx:42 src/admin/pages/profile/components/ServicesSection.jsx:180 src/admin/pages/schema/components/field/FieldHeader.jsx:63 src/admin/pages/schema/components/locations/LocationList.jsx:515
+#: src/admin/pages/posts/components/PostRowActions.jsx:36 src/admin/pages/profile/components/ServicesSection.jsx:180
 msgid "Edit"
 msgstr ""
 
-#: src/admin/pages/posts/components/PostRowActions.jsx:49
+#: src/admin/pages/posts/components/PostRowActions.jsx:43
 msgid "The post was deleted from Google."
 msgstr ""
 
-#: src/admin/pages/posts/components/PostRowActions.jsx:50
+#: src/admin/pages/posts/components/PostRowActions.jsx:44
 msgid "The post was deleted."
 msgstr ""
 
-#: src/admin/pages/posts/components/PostRowActions.jsx:72
-msgid "Change %s"
-msgstr ""
-
-#: src/admin/pages/posts/components/PostRowActions.jsx:75
+#: src/admin/pages/posts/components/PostRowActions.jsx:65
 msgid "Finish %s"
 msgstr ""
 
-#: src/admin/pages/posts/components/PostRowActions.jsx:77 src/admin/pages/profile/components/ServicesSection.jsx:175 src/admin/pages/reviews/components/TemplatesCard.jsx:153
+#: src/admin/pages/posts/components/PostRowActions.jsx:67 src/admin/pages/profile/components/ServicesSection.jsx:175
 msgid "Edit %s"
 msgstr ""
 
-#: src/admin/pages/posts/components/PostRowActions.jsx:88
+#: src/admin/pages/posts/components/PostRowActions.jsx:78
 msgid "Delete"
 msgstr ""
 
-#: src/admin/pages/posts/components/PostRowActions.jsx:100
+#: src/admin/pages/posts/components/PostRowActions.jsx:90
 msgid "Delete %s"
 msgstr ""
 
-#: src/admin/pages/posts/components/PostRowActions.jsx:108
+#: src/admin/pages/posts/components/PostRowActions.jsx:98
 msgid "Delete this post?"
 msgstr ""
 
-#: src/admin/pages/posts/components/PostRowActions.jsx:112
+#: src/admin/pages/posts/components/PostRowActions.jsx:102
 msgid "It is removed from your Google profile, and nobody will see it there any more."
 msgstr ""
 
-#: src/admin/pages/posts/components/PostRowActions.jsx:116
+#: src/admin/pages/posts/components/PostRowActions.jsx:106
 msgid "It was never on Google, so this only deletes it here."
 msgstr ""
 
-#: src/admin/pages/posts/components/PostRowActions.jsx:124
+#: src/admin/pages/posts/components/PostRowActions.jsx:114
 msgid "Keep post"
 msgstr ""
 
-#: src/admin/pages/posts/components/PostRowActions.jsx:127
+#: src/admin/pages/posts/components/PostRowActions.jsx:117
 msgid "Delete post"
 msgstr ""
 
@@ -3023,15 +2581,11 @@ msgstr ""
 msgid "New post"
 msgstr ""
 
-#: src/admin/pages/posts/components/PostsNotice.jsx:16
-msgid "Posts"
-msgstr ""
-
-#: src/admin/pages/posts/components/PostsNotice.jsx:20 src/admin/pages/reviews/index.jsx:57
+#: src/admin/pages/posts/components/PostsNotice.jsx:20 src/admin/pages/reviews/index.jsx:48
 msgid "No Google locations yet"
 msgstr ""
 
-#: src/admin/pages/posts/components/PostsNotice.jsx:21 src/admin/pages/reviews/index.jsx:67
+#: src/admin/pages/posts/components/PostsNotice.jsx:21 src/admin/pages/reviews/index.jsx:58
 msgid "This location has no Google listing"
 msgstr ""
 
@@ -3055,26 +2609,6 @@ msgstr ""
 msgid "Post pages"
 msgstr ""
 
-#: src/admin/pages/posts/components/ScheduledActions.jsx:38
-msgid "Publish now"
-msgstr ""
-
-#: src/admin/pages/posts/components/ScheduledActions.jsx:40
-msgid "Publish %s now"
-msgstr ""
-
-#: src/admin/pages/posts/components/ScheduledActions.jsx:50
-msgid "Cancel schedule"
-msgstr ""
-
-#: src/admin/pages/posts/components/ScheduledActions.jsx:52
-msgid "Cancel the schedule for %s"
-msgstr ""
-
-#: src/admin/pages/posts/components/ScheduledActions.jsx:56
-msgid "Taken off the schedule. It is a draft now."
-msgstr ""
-
 #: src/admin/pages/posts/components/composer/ButtonFields.jsx:18
 msgid "Button"
 msgstr ""
@@ -3087,7 +2621,7 @@ msgstr ""
 msgid "The button calls the phone number on your Google profile."
 msgstr ""
 
-#: src/admin/pages/posts/components/composer/ComposerFooter.jsx:22 src/admin/pages/posts/components/photo/GooglePhotoPicker.jsx:30 src/admin/pages/profile/components/PublishDialog.jsx:124 src/admin/pages/profile/components/ServiceDialog.jsx:200 src/admin/pages/reviews/components/ReplyDialog.jsx:105 src/admin/pages/reviews/components/TemplateDialog.jsx:76
+#: src/admin/pages/posts/components/composer/ComposerFooter.jsx:20 src/admin/pages/posts/components/photo/GooglePhotoPicker.jsx:30 src/admin/pages/profile/components/PublishDialog.jsx:124 src/admin/pages/profile/components/ServiceDialog.jsx:200 src/admin/pages/reviews/components/ReplyDialog.jsx:91
 msgid "Cancel"
 msgstr ""
 
@@ -3095,23 +2629,19 @@ msgstr ""
 msgid "Edit post"
 msgstr ""
 
-#: src/admin/pages/posts/components/composer/ComposerHeader.jsx:22
-msgid "Change scheduled post"
-msgstr ""
-
-#: src/admin/pages/posts/components/composer/ComposerHeader.jsx:23
+#: src/admin/pages/posts/components/composer/ComposerHeader.jsx:21
 msgid "Finish post"
 msgstr ""
 
-#: src/admin/pages/posts/components/composer/ComposerHeader.jsx:29
+#: src/admin/pages/posts/components/composer/ComposerHeader.jsx:27
 msgid "For %s"
 msgstr ""
 
-#: src/admin/pages/posts/components/composer/ComposerHeader.jsx:36
+#: src/admin/pages/posts/components/composer/ComposerHeader.jsx:34
 msgid "Write a post for your Google Business Profile. A preview of how Google shows it is beside the form."
 msgstr ""
 
-#: src/admin/pages/posts/components/composer/ComposerHeader.jsx:49 src/admin/pages/profile/components/PublishDialog.jsx:123 src/admin/pages/profile/components/ServiceDialog.jsx:133 src/admin/pages/reviews/components/ReviewsDialog.jsx:59 src/editor/components/EditorNotice.jsx:63
+#: src/admin/pages/posts/components/composer/ComposerHeader.jsx:47 src/admin/pages/profile/components/PublishDialog.jsx:123 src/admin/pages/profile/components/ServiceDialog.jsx:133 src/admin/pages/reviews/components/ReviewsDialog.jsx:59
 msgid "Close"
 msgstr ""
 
@@ -3159,44 +2689,20 @@ msgstr ""
 msgid "posts with a photo usually get more clicks than posts without one."
 msgstr ""
 
-#: src/admin/pages/posts/components/composer/ScheduleField.jsx:23
-msgid "Publish on"
-msgstr ""
-
-#: src/admin/pages/posts/components/composer/ScheduleField.jsx:40
-msgid "Time zone: %s (from Settings → General)."
-msgstr ""
-
-#: src/admin/pages/posts/components/composer/WhenToPublish.jsx:10
+#: src/admin/pages/posts/components/composer/WhenToPublish.jsx:8
 msgid "Saved here only. Nothing goes to Google until you finish it."
 msgstr ""
 
-#: src/admin/pages/posts/components/composer/WhenToPublish.jsx:18
-msgid "Sent at this time. You can change or cancel it until then."
-msgstr ""
-
-#: src/admin/pages/posts/components/composer/WhenToPublish.jsx:22
-msgid "This post waits for FoundHint Premium to send it. Choose Now to publish it yourself, or Draft to take it off the schedule."
-msgstr ""
-
-#: src/admin/pages/posts/components/composer/WhenToPublish.jsx:28
+#: src/admin/pages/posts/components/composer/WhenToPublish.jsx:14
 msgid "Goes live when you press Publish. Google can take a few minutes to show it."
 msgstr ""
 
-#: src/admin/pages/posts/components/composer/WhenToPublish.jsx:51
+#: src/admin/pages/posts/components/composer/WhenToPublish.jsx:29
 msgid "Now"
 msgstr ""
 
-#: src/admin/pages/posts/components/composer/WhenToPublish.jsx:52
-msgid "Schedule"
-msgstr ""
-
-#: src/admin/pages/posts/components/composer/WhenToPublish.jsx:59 src/admin/pages/posts/components/composer/WhenToPublish.jsx:63
+#: src/admin/pages/posts/components/composer/WhenToPublish.jsx:36 src/admin/pages/posts/components/composer/WhenToPublish.jsx:40
 msgid "When to publish"
-msgstr ""
-
-#: src/admin/pages/posts/components/composer/WhenToPublish.jsx:79
-msgid "Scheduling posts is part of FoundHint Premium."
 msgstr ""
 
 #: src/admin/pages/posts/components/composer/WritingFields.jsx:11
@@ -3251,7 +2757,7 @@ msgstr ""
 msgid "Loading photos…"
 msgstr ""
 
-#: src/admin/pages/posts/components/photo/GooglePhotoPicker.jsx:52 src/admin/pages/schema/components/field/ImagePicker.jsx:83
+#: src/admin/pages/posts/components/photo/GooglePhotoPicker.jsx:52
 msgid "Photo %d"
 msgstr ""
 
@@ -3279,7 +2785,7 @@ msgstr ""
 msgid "Drop a JPG or PNG here, or choose one from your computer."
 msgstr ""
 
-#: src/admin/pages/posts/components/photo/PhotoChooser.jsx:68 src/admin/pages/schema/components/field/ImagePicker.jsx:188
+#: src/admin/pages/posts/components/photo/PhotoChooser.jsx:68
 msgid "Adding…"
 msgstr ""
 
@@ -3305,75 +2811,43 @@ msgid_plural "This post has %d photos and videos on Google. Changing or removing
 msgstr[0] ""
 msgstr[1] ""
 
-#: src/admin/pages/posts/hooks/useBlogShare.js:62 src/editor/EditorShare.jsx:25
-msgid "Google cannot fetch the blog post's featured image from this site, so it was left off. Add a photo in the post if you want one."
-msgstr ""
-
-#: src/admin/pages/posts/hooks/useComposer.js:59
-msgid "Your changes are saved, and it still goes out at its earlier time."
-msgstr ""
-
-#: src/admin/pages/posts/hooks/useComposer.js:63
-msgid "It is saved as a draft and is not scheduled yet."
-msgstr ""
-
-#: src/admin/pages/posts/hooks/useComposer.js:68
+#: src/admin/pages/posts/hooks/useComposer.js:41
 msgid "Google did not take the post. It is saved here, so you can fix it and try again."
 msgstr ""
 
-#: src/admin/pages/posts/hooks/useComposer.js:135
+#: src/admin/pages/posts/hooks/useComposer.js:100
 msgid "The photo was added to your Google profile's Photos, and this post uses it from there."
 msgstr ""
 
-#: src/admin/pages/posts/lib/composer.js:60
-msgid "Scheduling…"
-msgstr ""
-
-#: src/admin/pages/posts/lib/composer.js:61 src/admin/pages/profile/components/PublishDialog.jsx:143 src/admin/pages/profile/components/publish/PublishStep.jsx:51
+#: src/admin/pages/posts/lib/composer.js:45 src/admin/pages/profile/components/PublishDialog.jsx:143 src/admin/pages/profile/components/publish/PublishStep.jsx:51
 msgid "Sending…"
 msgstr ""
 
-#: src/admin/pages/posts/lib/composer.js:65
+#: src/admin/pages/posts/lib/composer.js:49
 msgid "Update on Google"
 msgstr ""
 
-#: src/admin/pages/posts/lib/composer.js:70
+#: src/admin/pages/posts/lib/composer.js:53
 msgid "Save draft"
 msgstr ""
 
-#: src/admin/pages/posts/lib/composer.js:71
-msgid "Schedule post"
-msgstr ""
-
-#: src/admin/pages/posts/lib/composer.js:72
+#: src/admin/pages/posts/lib/composer.js:54
 msgid "Publish to Google"
 msgstr ""
 
-#: src/admin/pages/posts/lib/composer.js:79
+#: src/admin/pages/posts/lib/composer.js:60
 msgid "Publishing posts this on your Google profile."
 msgstr ""
 
-#: src/admin/pages/posts/lib/composer.js:86
-msgid "Nothing is sent before the time you chose."
-msgstr ""
-
-#: src/admin/pages/posts/lib/composer.js:87
+#: src/admin/pages/posts/lib/composer.js:66
 msgid "Drafts are kept on this site only."
 msgstr ""
 
-#: src/admin/pages/posts/lib/composer.js:93
+#: src/admin/pages/posts/lib/composer.js:72
 msgid "Your post was updated on Google."
 msgstr ""
 
-#: src/admin/pages/posts/lib/composer.js:97
-msgid "Changes saved. The post waits for FoundHint Premium to send it."
-msgstr ""
-
-#: src/admin/pages/posts/lib/composer.js:106
-msgid "Scheduled. It will go out on %s."
-msgstr ""
-
-#: src/admin/pages/posts/lib/composer.js:113
+#: src/admin/pages/posts/lib/composer.js:77
 msgid "Draft saved."
 msgstr ""
 
@@ -3393,7 +2867,7 @@ msgstr ""
 msgid "Discount or deal"
 msgstr ""
 
-#: src/admin/pages/posts/lib/posts.js:28 src/admin/pages/schema/components/field/FieldControl.jsx:105 src/admin/pages/schema/components/locations/LocationList.jsx:500
+#: src/admin/pages/posts/lib/posts.js:28
 msgid "None"
 msgstr ""
 
@@ -3429,75 +2903,35 @@ msgstr ""
 msgid "Rejected"
 msgstr ""
 
-#: src/admin/pages/posts/lib/posts.js:50
-msgid "Sending"
-msgstr ""
-
-#: src/admin/pages/posts/lib/posts.js:72
-msgid "Written with AI"
-msgstr ""
-
-#: src/admin/pages/posts/lib/posts.js:73
-msgid "From CSV"
-msgstr ""
-
-#: src/admin/pages/posts/lib/posts.js:74
-msgid "Source: Website blog"
-msgstr ""
-
-#: src/admin/pages/posts/lib/posts.js:98 src/admin/pages/profile/lib/sync.js:20
+#: src/admin/pages/posts/lib/posts.js:91 src/admin/pages/profile/lib/sync.js:20
 msgid "just now"
 msgstr ""
 
-#: src/admin/pages/posts/lib/posts.js:103
+#: src/admin/pages/posts/lib/posts.js:96
 msgid "%dm ago"
 msgstr ""
 
-#: src/admin/pages/posts/lib/posts.js:110
+#: src/admin/pages/posts/lib/posts.js:103
 msgid "%dh ago"
 msgstr ""
 
-#: src/admin/pages/posts/lib/posts.js:114
+#: src/admin/pages/posts/lib/posts.js:107
 msgid "%dd ago"
 msgstr ""
 
-#: src/admin/pages/posts/lib/posts.js:134
-msgid "any minute"
-msgstr ""
-
-#: src/admin/pages/posts/lib/posts.js:139
-msgid "in %dm"
-msgstr ""
-
-#: src/admin/pages/posts/lib/posts.js:146
-msgid "in %dh"
-msgstr ""
-
-#: src/admin/pages/posts/lib/posts.js:150
-msgid "in %dd"
-msgstr ""
-
-#: src/admin/pages/posts/lib/posts.js:156
-msgid "Being sent to Google now"
-msgstr ""
-
-#: src/admin/pages/posts/lib/posts.js:162
-msgid "Goes live %1$s · %2$s"
-msgstr ""
-
-#: src/admin/pages/posts/lib/posts.js:171
+#: src/admin/pages/posts/lib/posts.js:115
 msgid "Draft, last edited %s"
 msgstr ""
 
-#: src/admin/pages/posts/lib/posts.js:179
+#: src/admin/pages/posts/lib/posts.js:123
 msgid "Not sent, last tried %s"
 msgstr ""
 
-#: src/admin/pages/posts/lib/posts.js:186
+#: src/admin/pages/posts/lib/posts.js:130
 msgid "Posted %s"
 msgstr ""
 
-#: src/admin/pages/posts/lib/posts.js:266
+#: src/admin/pages/posts/lib/posts.js:192
 msgid "Showing %1$d to %2$d of %3$d post"
 msgid_plural "Showing %1$d to %2$d of %3$d posts"
 msgstr[0] ""
@@ -3507,7 +2941,7 @@ msgstr[1] ""
 msgid "For your safety, Google does not let apps change a verified address. To move your address, update it in your Google Business Profile and FoundHint will pick up the change on the next sync."
 msgstr ""
 
-#: src/admin/pages/profile/components/AddressSection.jsx:81 src/admin/pages/schema/lib/schema.js:28 src/admin/pages/setup/components/LocationStep.jsx:117
+#: src/admin/pages/profile/components/AddressSection.jsx:81 src/admin/pages/setup/components/LocationStep.jsx:117
 msgid "Street address"
 msgstr ""
 
@@ -3515,19 +2949,19 @@ msgstr ""
 msgid "Suite, floor or unit"
 msgstr ""
 
-#: src/admin/pages/profile/components/AddressSection.jsx:86 src/admin/pages/schema/lib/schema.js:29 src/admin/pages/setup/components/LocationStep.jsx:132
+#: src/admin/pages/profile/components/AddressSection.jsx:86 src/admin/pages/setup/components/LocationStep.jsx:132
 msgid "City"
 msgstr ""
 
-#: src/admin/pages/profile/components/AddressSection.jsx:87 src/admin/pages/schema/lib/schema.js:30 src/admin/pages/setup/components/LocationStep.jsx:145
+#: src/admin/pages/profile/components/AddressSection.jsx:87 src/admin/pages/setup/components/LocationStep.jsx:145
 msgid "State or region"
 msgstr ""
 
-#: src/admin/pages/profile/components/AddressSection.jsx:88 src/admin/pages/schema/lib/schema.js:31 src/admin/pages/setup/components/LocationStep.jsx:158
+#: src/admin/pages/profile/components/AddressSection.jsx:88 src/admin/pages/setup/components/LocationStep.jsx:158
 msgid "Postal code"
 msgstr ""
 
-#: src/admin/pages/profile/components/AddressSection.jsx:89 src/admin/pages/schema/lib/schema.js:32 src/admin/pages/schema/lib/service.js:8 src/admin/pages/setup/components/LocationStep.jsx:169
+#: src/admin/pages/profile/components/AddressSection.jsx:89 src/admin/pages/setup/components/LocationStep.jsx:169
 msgid "Country"
 msgstr ""
 
@@ -3579,7 +3013,7 @@ msgstr ""
 msgid "Reading Google…"
 msgstr ""
 
-#: src/admin/pages/profile/components/AttributesSection.jsx:208 src/admin/pages/profile/components/header/TitleBar.jsx:134 src/admin/pages/profile/components/info/GoogleCid.jsx:73 src/admin/pages/profile/components/photos/PendingPhotos.jsx:86 src/admin/pages/schema/components/page/ConnectGoogleNotice.jsx:33
+#: src/admin/pages/profile/components/AttributesSection.jsx:208 src/admin/pages/profile/components/header/TitleBar.jsx:134 src/admin/pages/profile/components/info/GoogleCid.jsx:73 src/admin/pages/profile/components/photos/PendingPhotos.jsx:86
 msgid "Connect Google"
 msgstr ""
 
@@ -3619,7 +3053,7 @@ msgstr ""
 msgid "JPG or PNG, up to 5 MB each. Your logo should be square. Your cover photo should be wide (16 by 9)."
 msgstr ""
 
-#: src/admin/pages/profile/components/PhotosSection.jsx:45 src/admin/pages/profile/components/photos/PendingPhotos.jsx:129 src/admin/pages/schema/components/locations/BranchSections.jsx:603
+#: src/admin/pages/profile/components/PhotosSection.jsx:45 src/admin/pages/profile/components/photos/PendingPhotos.jsx:129
 msgid "Logo"
 msgstr ""
 
@@ -3679,11 +3113,11 @@ msgstr ""
 msgid "Connect your Google Business Profile and FoundHint will load every photo on your listing, from you and from your customers."
 msgstr ""
 
-#: src/admin/pages/profile/components/ProfileTabs.jsx:12 src/admin/pages/schema/components/page/TabBar.jsx:101
+#: src/admin/pages/profile/components/ProfileTabs.jsx:12
 msgid "Unsaved changes"
 msgstr ""
 
-#: src/admin/pages/profile/components/ProfileTabs.jsx:16 src/admin/pages/profile/components/Section.jsx:23 src/admin/pages/schema/components/business/MainBusinessPicker.jsx:256 src/admin/pages/schema/components/locations/LocationSetup.jsx:531 src/admin/pages/schema/components/shared/SaveBar.jsx:11
+#: src/admin/pages/profile/components/ProfileTabs.jsx:16 src/admin/pages/profile/components/Section.jsx:23
 msgid "Saving…"
 msgstr ""
 
@@ -3727,7 +3161,7 @@ msgstr ""
 msgid "Unsaved changes."
 msgstr ""
 
-#: src/admin/pages/profile/components/Section.jsx:27 src/admin/pages/schema/components/settings/OutputSettings.jsx:210 src/admin/pages/schema/components/settings/SettingsTab.jsx:66
+#: src/admin/pages/profile/components/Section.jsx:27 src/admin/pages/schema/index.jsx:56
 msgid "Saved."
 msgstr ""
 
@@ -3735,7 +3169,7 @@ msgstr ""
 msgid "Not saved. Check the highlighted fields."
 msgstr ""
 
-#: src/admin/pages/profile/components/Section.jsx:98 src/admin/pages/schema/components/page/UnsavedDialog.jsx:36
+#: src/admin/pages/profile/components/Section.jsx:98
 msgid "Discard"
 msgstr ""
 
@@ -3783,11 +3217,11 @@ msgstr ""
 msgid "No description yet."
 msgstr ""
 
-#: src/admin/pages/profile/components/ServicesSection.jsx:189 src/admin/pages/profile/components/address/ServiceAreaField.jsx:115 src/admin/pages/profile/components/info/ExtraCategoriesField.jsx:69 src/admin/pages/schema/components/services/editor/AreasSection.jsx:74 src/admin/pages/setup/components/ServicesStep.jsx:92
+#: src/admin/pages/profile/components/ServicesSection.jsx:189 src/admin/pages/profile/components/address/ServiceAreaField.jsx:115 src/admin/pages/profile/components/info/ExtraCategoriesField.jsx:69 src/admin/pages/setup/components/ServicesStep.jsx:92
 msgid "Remove %s"
 msgstr ""
 
-#: src/admin/pages/profile/components/ServicesSection.jsx:194 src/admin/pages/profile/components/hours/SpecialDayRow.jsx:41 src/admin/pages/schema/components/field/LogoPicker.jsx:69
+#: src/admin/pages/profile/components/ServicesSection.jsx:194 src/admin/pages/profile/components/hours/SpecialDayRow.jsx:41
 msgid "Remove"
 msgstr ""
 
@@ -3800,7 +3234,7 @@ msgid "Press Add service to list what you offer. Use the words customers would s
 msgstr ""
 
 #: src/admin/pages/profile/components/ServicesSection.jsx:219
-msgid "You have used all %d services on Free. Pro removes the limit."
+msgid "This site allows up to %d services, and all of them are in use."
 msgstr ""
 
 #: src/admin/pages/profile/components/SocialSection.jsx:59
@@ -3893,7 +3327,7 @@ msgstr ""
 msgid "Reads your attributes and photos from Google. Nothing on Google is changed."
 msgstr ""
 
-#: src/admin/pages/profile/components/header/TitleBar.jsx:94 src/admin/pages/schema/components/locations/LocationList.jsx:190 src/admin/pages/schema/components/locations/LocationList.jsx:366 src/admin/pages/schema/components/page/SchemaHeader.jsx:197
+#: src/admin/pages/profile/components/header/TitleBar.jsx:94
 msgid "Refresh from Google"
 msgstr ""
 
@@ -3913,7 +3347,7 @@ msgstr ""
 msgid "Choose a listing"
 msgstr ""
 
-#: src/admin/pages/profile/components/hours/DayTimes.jsx:36 src/admin/pages/schema/components/field/HoursGrid.jsx:34 src/admin/pages/setup/components/OpeningHoursEditor.jsx:147 src/admin/pages/setup/components/OpeningHoursEditor.jsx:212
+#: src/admin/pages/profile/components/hours/DayTimes.jsx:36 src/admin/pages/setup/components/OpeningHoursEditor.jsx:147 src/admin/pages/setup/components/OpeningHoursEditor.jsx:212
 msgid "Open 24 hours"
 msgstr ""
 
@@ -3945,7 +3379,7 @@ msgstr ""
 msgid "This day"
 msgstr ""
 
-#: src/admin/pages/profile/components/hours/SpecialDayRow.jsx:24 src/admin/pages/reviews/lib/csv.js:27
+#: src/admin/pages/profile/components/hours/SpecialDayRow.jsx:24 src/admin/pages/reviews/lib/csv.js:29
 msgid "Date"
 msgstr ""
 
@@ -3957,11 +3391,11 @@ msgstr ""
 msgid "%s is open"
 msgstr ""
 
-#: src/admin/pages/profile/components/hours/SpecialDayRow.jsx:59 src/admin/pages/profile/components/hours/WeekDayRow.jsx:86 src/admin/pages/schema/components/locations/LocationList.jsx:543 src/admin/pages/setup/components/OpeningHoursEditor.jsx:143 src/admin/pages/setup/components/OpeningHoursEditor.jsx:206
+#: src/admin/pages/profile/components/hours/SpecialDayRow.jsx:59 src/admin/pages/profile/components/hours/WeekDayRow.jsx:86 src/admin/pages/setup/components/OpeningHoursEditor.jsx:143 src/admin/pages/setup/components/OpeningHoursEditor.jsx:206
 msgid "Open"
 msgstr ""
 
-#: src/admin/pages/profile/components/hours/SpecialDayRow.jsx:60 src/admin/pages/profile/components/hours/WeekDayRow.jsx:87 src/admin/pages/schema/components/field/HoursGrid.jsx:32 src/admin/pages/setup/components/OpeningHoursEditor.jsx:144 src/admin/pages/setup/components/OpeningHoursEditor.jsx:209
+#: src/admin/pages/profile/components/hours/SpecialDayRow.jsx:60 src/admin/pages/profile/components/hours/WeekDayRow.jsx:87 src/admin/pages/setup/components/OpeningHoursEditor.jsx:144 src/admin/pages/setup/components/OpeningHoursEditor.jsx:209
 msgid "Closed"
 msgstr ""
 
@@ -3981,7 +3415,7 @@ msgstr ""
 msgid "Copy to all"
 msgstr ""
 
-#: src/admin/pages/profile/components/hours/WeekDayRow.jsx:84 src/admin/pages/schema/components/business/ExtraField.jsx:35 src/admin/pages/schema/components/business/ExtraField.jsx:47 src/admin/pages/schema/components/field/FieldControl.jsx:81 src/admin/pages/schema/components/field/HoursGrid.jsx:30 src/admin/pages/setup/components/OpeningHoursEditor.jsx:142
+#: src/admin/pages/profile/components/hours/WeekDayRow.jsx:84 src/admin/pages/setup/components/OpeningHoursEditor.jsx:142 src/admin/pages/setup/components/OpeningHoursEditor.jsx:203
 msgid "Not set"
 msgstr ""
 
@@ -4071,7 +3505,7 @@ msgstr ""
 msgid "Choose one from the list. A category typed by hand is kept here but cannot be sent to Google."
 msgstr ""
 
-#: src/admin/pages/profile/components/info/PhoneField.jsx:18 src/admin/pages/profile/components/info/PhoneField.jsx:21 src/admin/pages/profile/components/publish/labels.js:13 src/admin/pages/schema/lib/schema.js:9 src/admin/pages/schema/lib/schema.js:23
+#: src/admin/pages/profile/components/info/PhoneField.jsx:18 src/admin/pages/profile/components/info/PhoneField.jsx:21 src/admin/pages/profile/components/publish/labels.js:13
 msgid "Phone number"
 msgstr ""
 
@@ -4263,7 +3697,7 @@ msgstr ""
 msgid "Custom name"
 msgstr ""
 
-#: src/admin/pages/profile/components/services/NameField.jsx:16 src/admin/pages/schema/components/services/editor/BasicsSection.jsx:71 src/admin/pages/setup/components/ServicesStep.jsx:59
+#: src/admin/pages/profile/components/services/NameField.jsx:16 src/admin/pages/setup/components/ServicesStep.jsx:59
 msgid "Service name"
 msgstr ""
 
@@ -4275,11 +3709,11 @@ msgstr ""
 msgid "Please add a name for this service."
 msgstr ""
 
-#: src/admin/pages/profile/components/services/PriceField.jsx:33 src/admin/pages/schema/components/services/editor/OptionalDetails.jsx:98
+#: src/admin/pages/profile/components/services/PriceField.jsx:33
 msgid "Price"
 msgstr ""
 
-#: src/admin/pages/profile/components/services/PriceField.jsx:36 src/admin/pages/profile/components/services/ServiceDescriptionField.jsx:20 src/admin/pages/schema/components/business/ExtraField.jsx:20 src/admin/pages/schema/components/services/editor/BasicsSection.jsx:181 src/admin/pages/schema/components/services/editor/ProviderSection.jsx:149 src/admin/pages/schema/lib/schema.js:56
+#: src/admin/pages/profile/components/services/PriceField.jsx:36 src/admin/pages/profile/components/services/ServiceDescriptionField.jsx:20
 msgid "Optional"
 msgstr ""
 
@@ -4287,7 +3721,7 @@ msgstr ""
 msgid "Shown next to the service on Google. Leave it empty if the price depends on the visit."
 msgstr ""
 
-#: src/admin/pages/profile/components/services/PriceField.jsx:49 src/admin/pages/schema/components/services/editor/OptionalDetails.jsx:134
+#: src/admin/pages/profile/components/services/PriceField.jsx:49
 msgid "Currency"
 msgstr ""
 
@@ -4335,7 +3769,7 @@ msgstr ""
 msgid "Check link"
 msgstr ""
 
-#: src/admin/pages/profile/components/social/LinkCard.jsx:18 src/admin/pages/schema/components/website/WebsiteTab.jsx:270
+#: src/admin/pages/profile/components/social/LinkCard.jsx:18
 msgid "Not added"
 msgstr ""
 
@@ -4487,87 +3921,45 @@ msgstr ""
 msgid "Next"
 msgstr ""
 
-#: src/admin/pages/reviews/components/ProTemplatesCard.jsx:20 src/admin/pages/reviews/components/TemplatesCard.jsx:43
-msgid "Reply templates"
-msgstr ""
-
-#: src/admin/pages/reviews/components/ProTemplatesCard.jsx:31
-msgid "FoundHint Premium %s is active."
-msgstr ""
-
-#: src/admin/pages/reviews/components/ProTemplatesCard.jsx:34
-msgid "Loading FoundHint Premium…"
-msgstr ""
-
-#: src/admin/pages/reviews/components/ReplyDialog.jsx:67
+#: src/admin/pages/reviews/components/ReplyDialog.jsx:53
 msgid "Your reply was updated on Google."
 msgstr ""
 
-#: src/admin/pages/reviews/components/ReplyDialog.jsx:68
+#: src/admin/pages/reviews/components/ReplyDialog.jsx:54
 msgid "Your reply was posted on Google."
 msgstr ""
 
-#: src/admin/pages/reviews/components/ReplyDialog.jsx:82
+#: src/admin/pages/reviews/components/ReplyDialog.jsx:68
 msgid "Reply to %s"
 msgstr ""
 
-#: src/admin/pages/reviews/components/ReplyDialog.jsx:85
+#: src/admin/pages/reviews/components/ReplyDialog.jsx:71
 msgid "Reply to this review"
 msgstr ""
 
-#: src/admin/pages/reviews/components/ReplyDialog.jsx:87
+#: src/admin/pages/reviews/components/ReplyDialog.jsx:73
 msgid "Write a reply. It is posted on your Google profile when you press Publish reply."
 msgstr ""
 
-#: src/admin/pages/reviews/components/ReplyDialog.jsx:93
+#: src/admin/pages/reviews/components/ReplyDialog.jsx:79
 msgid "Publishing posts this reply on your Google profile."
 msgstr ""
 
-#: src/admin/pages/reviews/components/ReplyDialog.jsx:114
+#: src/admin/pages/reviews/components/ReplyDialog.jsx:100
 msgid "Publishing…"
 msgstr ""
 
-#: src/admin/pages/reviews/components/ReplyDialog.jsx:116
+#: src/admin/pages/reviews/components/ReplyDialog.jsx:102
 msgid "Update reply"
 msgstr ""
 
-#: src/admin/pages/reviews/components/ReplyDialog.jsx:117
+#: src/admin/pages/reviews/components/ReplyDialog.jsx:103
 msgid "Publish reply"
 msgstr ""
 
-#: src/admin/pages/reviews/components/ReplyDialog.jsx:126 src/admin/pages/reviews/components/ReviewCard.jsx:70 src/admin/pages/reviews/lib/csv.js:35
+#: src/admin/pages/reviews/components/ReviewCard.jsx:70 src/admin/pages/reviews/components/reply/ReviewQuote.jsx:19 src/admin/pages/reviews/lib/csv.js:37
 msgid "Anonymous"
 msgstr ""
-
-#: src/admin/pages/reviews/components/ReplyDialog.jsx:138 src/admin/pages/reviews/components/ReviewCard.jsx:143
-msgid "Left a star rating without a comment."
-msgstr ""
-
-#: src/admin/pages/reviews/components/ReplyDialog.jsx:155
-msgid "Quick templates"
-msgstr ""
-
-#: src/admin/pages/reviews/components/ReplyDialog.jsx:179
-msgid "Built-in reply"
-msgstr ""
-
-#: src/admin/pages/reviews/components/ReplyDialog.jsx:191 src/admin/pages/reviews/components/ReviewCard.jsx:153 src/admin/pages/reviews/lib/csv.js:30
-msgid "Your reply"
-msgstr ""
-
-#: src/admin/pages/reviews/components/ReplyDialog.jsx:201
-msgid "%1$s / %2$s"
-msgstr ""
-
-#: src/admin/pages/reviews/components/ReplyDialog.jsx:218
-msgid "Write a short, personal reply. Use their first name and mention something they said."
-msgstr ""
-
-#: src/admin/pages/reviews/components/ReplyDialog.jsx:147
-msgid "Quick templates for %d-star reviews"
-msgid_plural "Quick templates for %d-star reviews"
-msgstr[0] ""
-msgstr[1] ""
 
 #: src/admin/pages/reviews/components/ReviewCard.jsx:79
 msgid "Your reply was removed from Google."
@@ -4591,6 +3983,14 @@ msgstr ""
 
 #: src/admin/pages/reviews/components/ReviewCard.jsx:130 src/admin/pages/reviews/components/ReviewFilters.jsx:77
 msgid "Not replied"
+msgstr ""
+
+#: src/admin/pages/reviews/components/ReviewCard.jsx:143 src/admin/pages/reviews/components/reply/ReviewQuote.jsx:31
+msgid "Left a star rating without a comment."
+msgstr ""
+
+#: src/admin/pages/reviews/components/ReviewCard.jsx:153 src/admin/pages/reviews/components/reply/ReplyField.jsx:33 src/admin/pages/reviews/lib/csv.js:32
+msgid "Your reply"
 msgstr ""
 
 #: src/admin/pages/reviews/components/ReviewCard.jsx:172
@@ -4621,7 +4021,7 @@ msgstr ""
 msgid "The reviewer removed this review from Google, so it can no longer be replied to. It is not counted in your rating."
 msgstr ""
 
-#: src/admin/pages/reviews/components/ReviewCard.jsx:247 src/admin/pages/reviews/components/TemplateDialog.jsx:160
+#: src/admin/pages/reviews/components/ReviewCard.jsx:247
 msgid "Reply"
 msgstr ""
 
@@ -4629,11 +4029,11 @@ msgstr ""
 msgid "Filter reviews"
 msgstr ""
 
-#: src/admin/pages/reviews/components/ReviewFilters.jsx:46 src/admin/pages/reviews/lib/csv.js:26
+#: src/admin/pages/reviews/components/ReviewFilters.jsx:46 src/admin/pages/reviews/lib/csv.js:28
 msgid "Rating"
 msgstr ""
 
-#: src/admin/pages/reviews/components/ReviewFilters.jsx:54 src/admin/pages/reviews/components/TemplatesCard.jsx:66
+#: src/admin/pages/reviews/components/ReviewFilters.jsx:54
 msgid "All ratings"
 msgstr ""
 
@@ -4665,7 +4065,7 @@ msgstr ""
 msgid "All reviews"
 msgstr ""
 
-#: src/admin/pages/reviews/components/ReviewFilters.jsx:83 src/admin/pages/reviews/lib/csv.js:29
+#: src/admin/pages/reviews/components/ReviewFilters.jsx:83 src/admin/pages/reviews/lib/csv.js:31
 msgid "Review status"
 msgstr ""
 
@@ -4745,129 +4145,31 @@ msgstr ""
 msgid "Reads the latest reviews from Google. Nothing on Google is changed."
 msgstr ""
 
-#: src/admin/pages/reviews/components/SoonTag.jsx:26 src/admin/pages/schema/components/page/PremiumTab.jsx:31 src/admin/pages/schema/lib/tabSummaries.js:18
-msgid "Premium"
-msgstr ""
-
-#: src/admin/pages/reviews/components/Stars.jsx:17
+#: src/admin/pages/reviews/components/Stars.jsx:16
 msgid "No rating"
 msgstr ""
 
-#: src/admin/pages/reviews/components/Stars.jsx:39
+#: src/admin/pages/reviews/components/Stars.jsx:38
 msgid "%d star"
 msgid_plural "%d stars"
 msgstr[0] ""
 msgstr[1] ""
 
-#: src/admin/pages/reviews/components/TemplateDialog.jsx:57
-msgid "Edit template"
+#: src/admin/pages/reviews/components/reply/QuickReply.jsx:24
+msgid "Quick reply"
 msgstr ""
 
-#: src/admin/pages/reviews/components/TemplateDialog.jsx:58
-msgid "New reply template"
+#: src/admin/pages/reviews/components/reply/QuickReply.jsx:31
+msgid "Built-in reply"
 msgstr ""
 
-#: src/admin/pages/reviews/components/TemplateDialog.jsx:60
-msgid "Reply templates are part of FoundHint Premium."
+#: src/admin/pages/reviews/components/reply/ReplyField.jsx:43
+msgid "%1$s / %2$s"
 msgstr ""
 
-#: src/admin/pages/reviews/components/TemplateDialog.jsx:68
-msgid "%1$d of %2$d used for %3$d-star reviews"
+#: src/admin/pages/reviews/components/reply/ReplyField.jsx:57
+msgid "Write a short, personal reply. Use their first name and mention something they said."
 msgstr ""
-
-#: src/admin/pages/reviews/components/TemplateDialog.jsx:81
-msgid "Saving templates is part of FoundHint Premium."
-msgstr ""
-
-#: src/admin/pages/reviews/components/TemplateDialog.jsx:87
-msgid "Save template"
-msgstr ""
-
-#: src/admin/pages/reviews/components/TemplateDialog.jsx:94
-msgid "Saving your own templates comes with FoundHint Premium."
-msgstr ""
-
-#: src/admin/pages/reviews/components/TemplateDialog.jsx:103 src/admin/pages/reviews/components/TemplatesCard.jsx:53
-msgid "Star rating"
-msgstr ""
-
-#: src/admin/pages/reviews/components/TemplateDialog.jsx:117 src/admin/pages/reviews/components/TemplatesCard.jsx:69
-msgid "%d stars"
-msgstr ""
-
-#: src/admin/pages/reviews/components/TemplateDialog.jsx:126
-msgid "Used for"
-msgstr ""
-
-#: src/admin/pages/reviews/components/TemplateDialog.jsx:135
-msgid "Reviews with a comment"
-msgstr ""
-
-#: src/admin/pages/reviews/components/TemplateDialog.jsx:138 src/admin/pages/reviews/components/TemplatesCard.jsx:142
-msgid "Stars only"
-msgstr ""
-
-#: src/admin/pages/reviews/components/TemplateDialog.jsx:146 src/admin/pages/schema/components/locations/BranchSections.jsx:671
-msgid "Name"
-msgstr ""
-
-#: src/admin/pages/reviews/components/TemplateDialog.jsx:153
-msgid "e.g. Warm thank-you"
-msgstr ""
-
-#: src/admin/pages/reviews/components/TemplateDialog.jsx:181
-msgid "Insert a detail"
-msgstr ""
-
-#: src/admin/pages/reviews/components/TemplateDialog.jsx:184
-msgid "Added where the cursor is, and swapped for the real details when you reply."
-msgstr ""
-
-#: src/admin/pages/reviews/components/TemplatesCard.jsx:45
-msgid "Ready-made replies for each star rating."
-msgstr ""
-
-#: src/admin/pages/reviews/components/TemplatesCard.jsx:141
-msgid "With comment"
-msgstr ""
-
-#: src/admin/pages/reviews/components/TemplatesCard.jsx:193
-msgid "No templates for %d-star reviews yet."
-msgstr ""
-
-#: src/admin/pages/reviews/components/TemplatesCard.jsx:212
-msgid "Add a template"
-msgstr ""
-
-#: src/admin/pages/reviews/components/TemplatesCard.jsx:217
-msgid "Importing templates is part of FoundHint Premium."
-msgstr ""
-
-#: src/admin/pages/reviews/components/TemplatesCard.jsx:224
-msgid "Import from CSV"
-msgstr ""
-
-#: src/admin/pages/reviews/components/TemplatesCard.jsx:228
-msgid "Templates belong to this location. Words in curly brackets are swapped for real details when you reply."
-msgstr ""
-
-#: src/admin/pages/reviews/components/TemplatesCard.jsx:101
-msgid "All ratings have %d template."
-msgid_plural "All ratings have %d templates."
-msgstr[0] ""
-msgstr[1] ""
-
-#: src/admin/pages/reviews/components/TemplatesCard.jsx:111
-msgid "%1$d-star reviews have %2$d template."
-msgid_plural "%1$d-star reviews have %2$d templates."
-msgstr[0] ""
-msgstr[1] ""
-
-#: src/admin/pages/reviews/components/TemplatesCard.jsx:173
-msgid "For %d-star reviews"
-msgid_plural "For %d-star reviews"
-msgstr[0] ""
-msgstr[1] ""
 
 #: src/admin/pages/reviews/hooks/useReviewActions.js:36
 msgid "Read %d review from Google."
@@ -4875,2571 +4177,169 @@ msgid_plural "Read %d reviews from Google."
 msgstr[0] ""
 msgstr[1] ""
 
-#: src/admin/pages/reviews/index.jsx:58
+#: src/admin/pages/reviews/index.jsx:49
 msgid "Connect your Google account and read your profile first — reviews are read for the locations Google reports."
 msgstr ""
 
-#: src/admin/pages/reviews/index.jsx:71
+#: src/admin/pages/reviews/index.jsx:62
 msgid "Reviews are read from a location's own Google listing. Link this location to one on the Google screen, or choose another location at the top of the page."
 msgstr ""
 
-#: src/admin/pages/reviews/index.jsx:118
-msgid "Review tools"
-msgstr ""
-
-#: src/admin/pages/reviews/lib/csv.js:25
+#: src/admin/pages/reviews/lib/csv.js:27
 msgid "Reviewer"
 msgstr ""
 
-#: src/admin/pages/reviews/lib/csv.js:28
+#: src/admin/pages/reviews/lib/csv.js:30
 msgid "Review"
 msgstr ""
 
-#: src/admin/pages/reviews/lib/csv.js:31
+#: src/admin/pages/reviews/lib/csv.js:33
 msgid "Replied on"
 msgstr ""
 
-#: src/admin/pages/reviews/lib/replies.js:35
+#: src/admin/pages/reviews/lib/replies.js:22
 msgid "Thank you so much, {{reviewer_name}}! We're really glad you had a great experience with us. We look forward to seeing you again. — {{location_name}}"
 msgstr ""
 
-#: src/admin/pages/reviews/lib/replies.js:39
+#: src/admin/pages/reviews/lib/replies.js:26
 msgid "Thank you for the 5 stars, {{reviewer_name}}! It means a lot to our team at {{location_name}}."
 msgstr ""
 
-#: src/admin/pages/reviews/lib/replies.js:45
+#: src/admin/pages/reviews/lib/replies.js:32
 msgid "Thank you, {{reviewer_name}}! We're glad you enjoyed your visit, and we'll keep working to make the next one even better. — {{location_name}}"
 msgstr ""
 
-#: src/admin/pages/reviews/lib/replies.js:49
+#: src/admin/pages/reviews/lib/replies.js:36
 msgid "Thanks for the 4 stars, {{reviewer_name}}! We hope to see you again soon at {{location_name}}."
 msgstr ""
 
-#: src/admin/pages/reviews/lib/replies.js:55
+#: src/admin/pages/reviews/lib/replies.js:42
 msgid "Thank you for your feedback, {{reviewer_name}}. We'd love to hear how we could have made your visit better — please get in touch with us at {{location_name}}."
 msgstr ""
 
-#: src/admin/pages/reviews/lib/replies.js:59
+#: src/admin/pages/reviews/lib/replies.js:46
 msgid "Thank you for your rating, {{reviewer_name}}. If there's anything we could do better, we'd love to hear it."
 msgstr ""
 
-#: src/admin/pages/reviews/lib/replies.js:65
+#: src/admin/pages/reviews/lib/replies.js:52
 msgid "{{reviewer_name}}, we're sorry your visit fell short. We'd like to put it right — please contact us at {{location_name}} so we can talk it through."
 msgstr ""
 
-#: src/admin/pages/reviews/lib/replies.js:69
+#: src/admin/pages/reviews/lib/replies.js:56
 msgid "We're sorry your experience wasn't better, {{reviewer_name}}. Please get in touch so we can make it right."
 msgstr ""
 
-#: src/admin/pages/reviews/lib/replies.js:75
+#: src/admin/pages/reviews/lib/replies.js:62
 msgid "{{reviewer_name}}, we're truly sorry to read this. This isn't the experience we want for anyone. Please contact us at {{location_name}} so we can make it right."
 msgstr ""
 
-#: src/admin/pages/reviews/lib/replies.js:79
+#: src/admin/pages/reviews/lib/replies.js:66
 msgid "We're sorry, {{reviewer_name}}. We'd like to understand what went wrong — please get in touch with us at {{location_name}}."
 msgstr ""
 
-#: src/admin/pages/reviews/lib/templates.js:19
-msgid "Warm thank-you"
+#: src/admin/pages/schema/components/PreviewCard.jsx:16
+msgid "What gets published"
 msgstr ""
 
-#: src/admin/pages/reviews/lib/templates.js:20
-msgid "Hi {{reviewer_name}}, thank you for such a lovely review! Our whole team at {{location_name}} was happy to read it. See you at your next visit."
+#: src/admin/pages/schema/components/PreviewCard.jsx:17
+msgid "Exactly what appears in your pages' head, read from the same cache the front end uses."
 msgstr ""
 
-#: src/admin/pages/reviews/lib/templates.js:29
-msgid "Short and sweet"
+#: src/admin/pages/schema/components/PreviewCard.jsx:28
+msgid "Copied."
 msgstr ""
 
-#: src/admin/pages/reviews/lib/templates.js:30
-msgid "Thanks so much for the 5 stars, {{reviewer_name}}! It means a lot to our team in {{location_city}}."
-msgstr ""
-
-#: src/admin/pages/reviews/lib/templates.js:39
-msgid "Glad you came"
-msgstr ""
-
-#: src/admin/pages/reviews/lib/templates.js:40
-msgid "Thank you, {{reviewer_name}}! We're glad you enjoyed your visit, and we'll keep working to make the next one even better."
-msgstr ""
-
-#: src/admin/pages/reviews/lib/templates.js:49
-msgid "We're listening"
-msgstr ""
-
-#: src/admin/pages/reviews/lib/templates.js:50
-msgid "Thanks for your honest feedback, {{reviewer_name}}. We'd love to hear how we could have made your visit better."
-msgstr ""
-
-#: src/admin/pages/reviews/lib/templates.js:59
-msgid "Let's put it right"
-msgstr ""
-
-#: src/admin/pages/reviews/lib/templates.js:60
-msgid "{{reviewer_name}}, we're sorry your visit fell short. Please contact us at {{location_name}} so we can put it right."
-msgstr ""
-
-#: src/admin/pages/reviews/lib/templates.js:69
-msgid "Sincere apology"
-msgstr ""
-
-#: src/admin/pages/reviews/lib/templates.js:70
-msgid "{{reviewer_name}}, we're truly sorry to read this. Please get in touch with us at {{location_name}} so we can make it right."
-msgstr ""
-
-#: src/admin/pages/schema/components/business/BusinessFields.jsx:96
-msgid "Optional. Fill in only what you want published — a city and country is enough."
-msgstr ""
-
-#: src/admin/pages/schema/components/business/BusinessFields.jsx:132
-msgid "Details for %s"
-msgstr ""
-
-#: src/admin/pages/schema/components/business/BusinessTab.jsx:31
-msgid "organization schema"
-msgstr ""
-
-#: src/admin/pages/schema/components/business/BusinessTab.jsx:32
-msgid "local business schema"
-msgstr ""
-
-#: src/admin/pages/schema/components/business/BusinessTab.jsx:119 src/admin/pages/schema/components/locations/LocationTab.jsx:171
-msgid "Saved as a draft."
-msgstr ""
-
-#: src/admin/pages/schema/components/business/BusinessTab.jsx:121
-msgid "Organization schema saved."
-msgstr ""
-
-#: src/admin/pages/schema/components/business/BusinessTab.jsx:122
-msgid "LocalBusiness schema saved."
-msgstr ""
-
-#: src/admin/pages/schema/components/business/BusinessTab.jsx:125 src/admin/pages/schema/components/business/MainBusinessPicker.jsx:75 src/admin/pages/schema/components/locations/LocationTab.jsx:175 src/admin/pages/schema/components/services/editor/ServiceEditor.jsx:121
-msgid "Some fields need attention."
-msgstr ""
-
-#: src/admin/pages/schema/components/business/BusinessTab.jsx:145
-msgid "Organization schema"
-msgstr ""
-
-#: src/admin/pages/schema/components/business/BusinessTab.jsx:146
-msgid "LocalBusiness schema"
-msgstr ""
-
-#: src/admin/pages/schema/components/business/BusinessTab.jsx:150
-msgid "Who owns or runs the business, however many locations it has."
-msgstr ""
-
-#: src/admin/pages/schema/components/business/BusinessTab.jsx:154
-msgid "A business at a physical location, with its address, hours and category."
-msgstr ""
-
-#: src/admin/pages/schema/components/business/BusinessTab.jsx:211
-msgid "Add %s to"
-msgstr ""
-
-#: src/admin/pages/schema/components/business/ExtraField.jsx:36
-msgid "Yes"
-msgstr ""
-
-#: src/admin/pages/schema/components/business/ExtraField.jsx:37
-msgid "No"
-msgstr ""
-
-#: src/admin/pages/schema/components/business/MainBusinessPicker.jsx:67
-msgid "%s is your main business. Its fields are below."
-msgstr ""
-
-#: src/admin/pages/schema/components/business/MainBusinessPicker.jsx:85 src/admin/pages/schema/components/business/SubtypePicker.jsx:42 src/admin/pages/schema/components/locations/BranchSections.jsx:51 src/admin/pages/schema/components/locations/LocationSetup.jsx:169 src/admin/pages/schema/components/services/editor/BasicsSection.jsx:74
-msgid "Required"
-msgstr ""
-
-#: src/admin/pages/schema/components/business/MainBusinessPicker.jsx:114
-msgid "Main business schema"
-msgstr ""
-
-#: src/admin/pages/schema/components/business/MainBusinessPicker.jsx:130
-msgid "Choose your main business"
-msgstr ""
-
-#: src/admin/pages/schema/components/business/MainBusinessPicker.jsx:133
-msgid "This represents your whole brand on this website. Other locations become branches."
-msgstr ""
-
-#: src/admin/pages/schema/components/business/MainBusinessPicker.jsx:142 src/admin/pages/schema/components/locations/LocationSetup.jsx:227 src/admin/pages/schema/components/services/editor/ProviderSection.jsx:26
-msgid "Main business"
-msgstr ""
-
-#: src/admin/pages/schema/components/business/MainBusinessPicker.jsx:188
-msgid "Suggested: website and address match your site"
-msgstr ""
-
-#: src/admin/pages/schema/components/business/MainBusinessPicker.jsx:208
-msgid "My head office isn't on Google — enter details manually"
-msgstr ""
-
-#: src/admin/pages/schema/components/business/MainBusinessPicker.jsx:219 src/admin/pages/schema/components/locations/LocationSetup.jsx:299
-msgid "Head office name"
-msgstr ""
-
-#: src/admin/pages/schema/components/business/MainBusinessPicker.jsx:220 src/admin/pages/schema/components/locations/LocationSetup.jsx:300
-msgid "e.g. Smile Dental Ltd."
-msgstr ""
-
-#: src/admin/pages/schema/components/business/MainBusinessPicker.jsx:226 src/admin/pages/schema/components/locations/LocationSetup.jsx:306
-msgid "Street, city"
-msgstr ""
-
-#: src/admin/pages/schema/components/business/MainBusinessPicker.jsx:240
-msgid "Your head office is described from these details. Every Google profile becomes a branch."
-msgstr ""
-
-#: src/admin/pages/schema/components/business/MainBusinessPicker.jsx:244
-msgid "It becomes your main location across FoundHint. You can change this later in 03 Location schema."
-msgstr ""
-
-#: src/admin/pages/schema/components/business/MainBusinessPicker.jsx:257 src/admin/pages/schema/components/locations/LocationSetup.jsx:529 src/admin/pages/setup/components/HoursStep.jsx:71 src/admin/pages/setup/components/ServicesStep.jsx:134 src/editor/components/ChooseListing.jsx:58
-msgid "Continue"
-msgstr ""
-
-#: src/admin/pages/schema/components/business/MainBusinessPicker.jsx:117
-msgid "%d Google profile found"
-msgid_plural "%d Google profiles found"
-msgstr[0] ""
-msgstr[1] ""
-
-#: src/admin/pages/schema/components/business/MainBusinessPicker.jsx:173
-msgid "★ %1$s (%2$d review)"
-msgid_plural "★ %1$s (%2$d reviews)"
-msgstr[0] ""
-msgstr[1] ""
-
-#: src/admin/pages/schema/components/business/RequirementStatus.jsx:19
-msgid "Ready to publish."
-msgstr ""
-
-#: src/admin/pages/schema/components/business/RequirementStatus.jsx:20 src/admin/pages/schema/components/business/RequirementStatus.jsx:47
-msgid "Can't publish yet."
-msgstr ""
-
-#: src/admin/pages/schema/components/business/RequirementStatus.jsx:22
-msgid "Organization schema doesn't need an address or opening hours."
-msgstr ""
-
-#: src/admin/pages/schema/components/business/RequirementStatus.jsx:28
-msgid "FoundHint needs: %s."
-msgstr ""
-
-#: src/admin/pages/schema/components/business/RequirementStatus.jsx:32
-msgid "Has the details Google needs for a local business result."
-msgstr ""
-
-#: src/admin/pages/schema/components/business/RequirementStatus.jsx:38
-msgid "Service-area businesses publish their areas instead of a street address. Green badges improve how you show."
-msgstr ""
-
-#: src/admin/pages/schema/components/business/RequirementStatus.jsx:42
-msgid "Business name and physical address are in place. Green badges improve how you show."
-msgstr ""
-
-#: src/admin/pages/schema/components/business/RequirementStatus.jsx:50
-msgid "Google needs: %s. Everything else is optional. Until then this is saved as a draft and nothing is printed."
-msgstr ""
-
-#: src/admin/pages/schema/components/business/SchemaKindPicker.jsx:8 src/admin/pages/schema/components/page/TabBar.jsx:16
-msgid "Organization"
-msgstr ""
-
-#: src/admin/pages/schema/components/business/SchemaKindPicker.jsx:9
-msgid "Business-wide"
-msgstr ""
-
-#: src/admin/pages/schema/components/business/SchemaKindPicker.jsx:10
-msgid "For the overall company or brand. No address or opening hours needed."
-msgstr ""
-
-#: src/admin/pages/schema/components/business/SchemaKindPicker.jsx:14
-msgid "e.g. a parent brand that owns five plumbing locations."
-msgstr ""
-
-#: src/admin/pages/schema/components/business/SchemaKindPicker.jsx:21
-msgid "LocalBusiness / subtype"
-msgstr ""
-
-#: src/admin/pages/schema/components/business/SchemaKindPicker.jsx:22
-msgid "Location-specific"
-msgstr ""
-
-#: src/admin/pages/schema/components/business/SchemaKindPicker.jsx:23
-msgid "For a business customers visit or that serves a local area, with address, hours and category."
-msgstr ""
-
-#: src/admin/pages/schema/components/business/SchemaKindPicker.jsx:27
-msgid "e.g. a dental clinic with its own address and opening hours."
-msgstr ""
-
-#: src/admin/pages/schema/components/business/SchemaKindPicker.jsx:46 src/admin/pages/schema/components/locations/BranchSections.jsx:436
-msgid "Schema type"
-msgstr ""
-
-#: src/admin/pages/schema/components/business/SubtypePicker.jsx:39
-msgid "Business subtype"
-msgstr ""
-
-#: src/admin/pages/schema/components/business/SubtypePicker.jsx:63
-msgid "Search business types"
-msgstr ""
-
-#: src/admin/pages/schema/components/business/SubtypePicker.jsx:68
-msgid "No match. Try a broader word, or pick Local business."
-msgstr ""
-
-#: src/admin/pages/schema/components/business/SubtypePicker.jsx:93
-msgid "Matched from your Google category: %s. Not on the list? Pick the closest broader type."
-msgstr ""
-
-#: src/admin/pages/schema/components/business/SubtypePicker.jsx:99
-msgid "Not on the list? Pick the closest broader type."
-msgstr ""
-
-#: src/admin/pages/schema/components/business/VisitModePicker.jsx:8
-msgid "This address (storefront or office)"
-msgstr ""
-
-#: src/admin/pages/schema/components/business/VisitModePicker.jsx:12
-msgid "Their location (service area only)"
-msgstr ""
-
-#: src/admin/pages/schema/components/business/VisitModePicker.jsx:29
-msgid "Customers visit you at"
-msgstr ""
-
-#: src/admin/pages/schema/components/field/FieldControl.jsx:15
-msgid "e.g. English, Bengali"
-msgstr ""
-
-#: src/admin/pages/schema/components/field/FieldControl.jsx:16
-msgid "Another name people use"
-msgstr ""
-
-#: src/admin/pages/schema/components/field/FieldControl.jsx:55
-msgid "One topic per line, e.g. Local SEO. Up to 10."
-msgstr ""
-
-#: src/admin/pages/schema/components/field/FieldControl.jsx:60
-msgid "One link per line, starting with https://"
-msgstr ""
-
-#: src/admin/pages/schema/components/field/FieldHeader.jsx:45 src/admin/pages/schema/components/services/editor/BasicsSection.jsx:78 src/admin/pages/schema/components/services/list/ServiceRow.jsx:117
-msgid "From Google"
-msgstr ""
-
-#: src/admin/pages/schema/components/field/FieldHeader.jsx:50
-msgid "Edited here"
-msgstr ""
-
-#: src/admin/pages/schema/components/field/FieldHeader.jsx:60
-msgid "Use Google's value"
-msgstr ""
-
-#: src/admin/pages/schema/components/field/FieldNotes.jsx:28
-msgid "%1$d characters — aim for %2$d to %3$d."
-msgstr ""
-
-#: src/admin/pages/schema/components/field/FieldNotes.jsx:34
-msgid "Say what you do and for whom."
-msgstr ""
-
-#: src/admin/pages/schema/components/field/FieldNotes.jsx:36
-msgid "Search results cut it off; keep the first sentences strongest."
-msgstr ""
-
-#: src/admin/pages/schema/components/field/FieldNotes.jsx:46
-msgid "“%1$s” appears %2$d times. Say it once and describe what you offer instead — repetition reads as keyword stuffing."
-msgstr ""
-
-#: src/admin/pages/schema/components/field/FieldNotes.jsx:68
-msgid "Listed: %s."
-msgstr ""
-
-#: src/admin/pages/schema/components/field/FieldNotes.jsx:71
-msgid "No profiles listed yet."
-msgstr ""
-
-#: src/admin/pages/schema/components/field/FieldNotes.jsx:75
-msgid "Add any official profile you have — %s, and GitHub or WordPress.org for software. Each one helps Google match your business to its profiles."
-msgstr ""
-
-#: src/admin/pages/schema/components/field/FieldNotes.jsx:117
-msgid "Your website and Google disagree. Google now says: %s"
-msgstr ""
-
-#: src/admin/pages/schema/components/field/FieldNotes.jsx:133
-msgid "Printed as %s"
-msgstr ""
-
-#: src/admin/pages/schema/components/field/FieldNotes.jsx:139
-msgid "Not printed: add the country code (such as +880), or set the business country, so it can be written in international form."
-msgstr ""
-
-#: src/admin/pages/schema/components/field/FieldNotes.jsx:152
-msgid "Google needs this for a local business result."
-msgstr ""
-
-#: src/admin/pages/schema/components/field/HoursGrid.jsx:14
-msgid "No opening hours yet."
-msgstr ""
-
-#: src/admin/pages/schema/components/field/ImagePicker.jsx:36
-msgid "Choose photos of your business"
-msgstr ""
-
-#: src/admin/pages/schema/components/field/ImagePicker.jsx:37
-msgid "Add photos"
-msgstr ""
-
-#: src/admin/pages/schema/components/field/ImagePicker.jsx:57
-msgid "Photo added to your Media Library."
-msgstr ""
-
-#: src/admin/pages/schema/components/field/ImagePicker.jsx:94
-msgid "Remove photo %d"
-msgstr ""
-
-#: src/admin/pages/schema/components/field/ImagePicker.jsx:111
-msgid "No photos chosen."
-msgstr ""
-
-#: src/admin/pages/schema/components/field/ImagePicker.jsx:112
-msgid "No photos chosen. Without photos, your logo is used as the image."
-msgstr ""
-
-#: src/admin/pages/schema/components/field/ImagePicker.jsx:128 src/admin/pages/schema/components/field/LogoPicker.jsx:61
-msgid "Choose from Media Library"
-msgstr ""
-
-#: src/admin/pages/schema/components/field/ImagePicker.jsx:133
-msgid "%1$d of %2$d"
-msgstr ""
-
-#: src/admin/pages/schema/components/field/ImagePicker.jsx:143
-msgid "From your Google profile — added to your Media Library first, so your site serves them:"
-msgstr ""
-
-#: src/admin/pages/schema/components/field/ImagePicker.jsx:162
-msgid "Use Google photo %d"
-msgstr ""
-
-#: src/admin/pages/schema/components/field/ImagePicker.jsx:167
-msgid "Add Google photo %d to your Media Library and use it"
-msgstr ""
-
-#: src/admin/pages/schema/components/field/ImagePicker.jsx:190
-msgid "Use"
-msgstr ""
-
-#: src/admin/pages/schema/components/field/ImagePicker.jsx:191
-msgid "+ Add"
-msgstr ""
-
-#: src/admin/pages/schema/components/field/LogoPicker.jsx:14
-msgid "Choose your logo"
-msgstr ""
-
-#: src/admin/pages/schema/components/field/LogoPicker.jsx:15
-msgid "Use as logo"
-msgstr ""
-
-#: src/admin/pages/schema/components/field/LogoPicker.jsx:34
-msgid "Current logo"
-msgstr ""
-
-#: src/admin/pages/schema/components/field/LogoPicker.jsx:48
-msgid "No logo yet."
-msgstr ""
-
-#: src/admin/pages/schema/components/field/LogoPicker.jsx:60
-msgid "Replace logo"
-msgstr ""
-
-#: src/admin/pages/schema/components/locations/BranchButtons.jsx:20
-msgid "Branches"
-msgstr ""
-
-#: src/admin/pages/schema/components/locations/BranchGroupFields.jsx:14
-msgid "Sister branches"
-msgstr ""
-
-#: src/admin/pages/schema/components/locations/BranchGroupFields.jsx:29
-msgid "No other branch in the group."
-msgstr ""
-
-#: src/admin/pages/schema/components/locations/BranchGroupFields.jsx:30
-msgid "Not part of a group."
-msgstr ""
-
-#: src/admin/pages/schema/components/locations/BranchPrintSwitch.jsx:26
-msgid "Print this branch's schema"
-msgstr ""
-
-#: src/admin/pages/schema/components/locations/BranchPrintSwitch.jsx:30
-msgid "This location is marked permanently closed on your profile, so nothing is printed for it."
-msgstr ""
-
-#: src/admin/pages/schema/components/locations/BranchPrintSwitch.jsx:35
-msgid "Off: its details are kept, and nothing is printed."
-msgstr ""
-
-#: src/admin/pages/schema/components/locations/BranchPrintSwitch.jsx:42
-msgid "Can't publish yet. Google needs: %s."
-msgstr ""
-
-#: src/admin/pages/schema/components/locations/BranchPrintSwitch.jsx:48
-msgid "Has the details Google needs for this branch."
-msgstr ""
-
-#: src/admin/pages/schema/components/locations/BranchSections.jsx:139
-msgid "Page created and published. The branch's schema prints there."
-msgstr ""
-
-#: src/admin/pages/schema/components/locations/BranchSections.jsx:154
-msgid "Page saved. The branch publishes there."
-msgstr ""
-
-#: src/admin/pages/schema/components/locations/BranchSections.jsx:155
-msgid "Page removed from this branch."
-msgstr ""
-
-#: src/admin/pages/schema/components/locations/BranchSections.jsx:174 src/admin/pages/schema/components/locations/SeparatePanel.jsx:81
-msgid "All locations"
-msgstr ""
-
-#: src/admin/pages/schema/components/locations/BranchSections.jsx:198
-msgid "Branch schema for this Google profile. It links to your brand with parentOrganization, so Google sees one business with several locations."
-msgstr ""
-
-#: src/admin/pages/schema/components/locations/BranchSections.jsx:208 src/admin/pages/schema/components/shared/PanelHeading.jsx:28
-msgid "%1$d of %2$d fields from Google"
-msgstr ""
-
-#: src/admin/pages/schema/components/locations/BranchSections.jsx:252 src/admin/pages/schema/components/locations/BranchSections.jsx:281
-msgid "Location page"
-msgstr ""
-
-#: src/admin/pages/schema/components/locations/BranchSections.jsx:258
-msgid "No page yet. Pick the page that describes this branch."
-msgstr ""
-
-#: src/admin/pages/schema/components/locations/BranchSections.jsx:265
-msgid "%s is shared, so nothing publishes."
-msgstr ""
-
-#: src/admin/pages/schema/components/locations/BranchSections.jsx:273
-msgid "Schema outputs on %s"
-msgstr ""
-
-#: src/admin/pages/schema/components/locations/BranchSections.jsx:287
-msgid "Create location page"
-msgstr ""
-
-#: src/admin/pages/schema/components/locations/BranchSections.jsx:288
-msgid "FoundHint creates the page with this branch's address, hours and map, and adds the schema to it."
-msgstr ""
-
-#: src/admin/pages/schema/components/locations/BranchSections.jsx:295
-msgid "Use an existing page"
-msgstr ""
-
-#: src/admin/pages/schema/components/locations/BranchSections.jsx:296
-msgid "Pick a page you already have for this branch."
-msgstr ""
-
-#: src/admin/pages/schema/components/locations/BranchSections.jsx:323 src/admin/pages/schema/lib/schema.js:62
-msgid "Recommended"
-msgstr ""
-
-#: src/admin/pages/schema/components/locations/BranchSections.jsx:346
-msgid "Publishes a new page at %1$s and moves this branch's schema there from %2$s."
-msgstr ""
-
-#: src/admin/pages/schema/components/locations/BranchSections.jsx:355
-msgid "Publishes a new page at %s. You can edit it in WordPress afterwards."
-msgstr ""
-
-#: src/admin/pages/schema/components/locations/BranchSections.jsx:372
-msgid "Creating…"
-msgstr ""
-
-#: src/admin/pages/schema/components/locations/BranchSections.jsx:373
-msgid "Create and publish page"
-msgstr ""
-
-#: src/admin/pages/schema/components/locations/BranchSections.jsx:380
-msgid "Existing page"
-msgstr ""
-
-#: src/admin/pages/schema/components/locations/BranchSections.jsx:389 src/admin/pages/schema/components/services/editor/PageSection.jsx:136 src/admin/pages/schema/components/website/WebsiteTab.jsx:254
-msgid "Choose a page"
-msgstr ""
-
-#: src/admin/pages/schema/components/locations/BranchSections.jsx:396
-msgid "%1$s · %2$s (used by %3$s)"
-msgstr ""
-
-#: src/admin/pages/schema/components/locations/BranchSections.jsx:417
-msgid "View the page"
-msgstr ""
-
-#: src/admin/pages/schema/components/locations/BranchSections.jsx:425
-msgid "This page isn't published, so the branch can't publish yet."
-msgstr ""
-
-#: src/admin/pages/schema/components/locations/BranchSections.jsx:444
-msgid "LocalBusiness subtype"
-msgstr ""
-
-#: src/admin/pages/schema/components/locations/BranchSections.jsx:453
-msgid "Automatic (%s)"
-msgstr ""
-
-#: src/admin/pages/schema/components/locations/BranchSections.jsx:473
-msgid "Matched from this profile's Google category: %s. Organization isn't offered here, because a branch is a place customers visit."
-msgstr ""
-
-#: src/admin/pages/schema/components/locations/BranchSections.jsx:479
-msgid "Organization isn't offered here, because a branch is a place customers visit."
-msgstr ""
-
-#: src/admin/pages/schema/components/locations/BranchSections.jsx:489 src/admin/pages/schema/components/locations/BranchSections.jsx:538
-msgid "Parent business"
-msgstr ""
-
-#: src/admin/pages/schema/components/locations/BranchSections.jsx:501
-msgid "Linked to"
-msgstr ""
-
-#: src/admin/pages/schema/components/locations/BranchSections.jsx:508 src/admin/pages/schema/components/locations/BranchSections.jsx:557
-msgid "Not part of a group"
-msgstr ""
-
-#: src/admin/pages/schema/components/locations/BranchSections.jsx:512
-msgid "Read-only"
-msgstr ""
-
-#: src/admin/pages/schema/components/locations/BranchSections.jsx:522 src/admin/pages/setup/components/DoneStep.jsx:50
-msgid "Done"
-msgstr ""
-
-#: src/admin/pages/schema/components/locations/BranchSections.jsx:529
-msgid "That schema is switched off, so the branch isn't linked to it until you turn it on."
-msgstr ""
-
-#: src/admin/pages/schema/components/locations/BranchSections.jsx:545
-msgid "Organization from 01 · #organization"
-msgstr ""
-
-#: src/admin/pages/schema/components/locations/BranchSections.jsx:553
-msgid "Main business from 02 · #business"
-msgstr ""
-
-#: src/admin/pages/schema/components/locations/BranchSections.jsx:558
-msgid "A business of its own, with no parent."
-msgstr ""
-
-#: src/admin/pages/schema/components/locations/BranchSections.jsx:597
-msgid "Inherit from brand"
-msgstr ""
-
-#: src/admin/pages/schema/components/locations/BranchSections.jsx:607 src/admin/pages/schema/components/locations/BranchSections.jsx:623
-msgid "%s, from 02 Main business"
-msgstr ""
-
-#: src/admin/pages/schema/components/locations/BranchSections.jsx:610
-msgid "No logo set yet"
-msgstr ""
-
-#: src/admin/pages/schema/components/locations/BranchSections.jsx:615
-msgid "No profiles yet"
-msgstr ""
-
-#: src/admin/pages/schema/components/locations/BranchSections.jsx:626
-msgid "No price range set yet"
-msgstr ""
-
-#: src/admin/pages/schema/components/locations/BranchSections.jsx:649
-msgid "Inherited"
-msgstr ""
-
-#: src/admin/pages/schema/components/locations/BranchSections.jsx:650
-msgid "Not used"
-msgstr ""
-
-#: src/admin/pages/schema/components/locations/BranchSections.jsx:660
-msgid "Inherit %s from brand"
-msgstr ""
-
-#: src/admin/pages/schema/components/locations/BranchSections.jsx:674
-msgid "Geo"
-msgstr ""
-
-#: src/admin/pages/schema/components/locations/BranchSections.jsx:676
-msgid "Images"
-msgstr ""
-
-#: src/admin/pages/schema/components/locations/BranchSections.jsx:688
-msgid "Always from this location's Google profile, never from the brand."
-msgstr ""
-
-#: src/admin/pages/schema/components/locations/LocationList.jsx:105 src/admin/pages/schema/components/page/SchemaHeader.jsx:180
-msgid "Synced from Google %s"
-msgstr ""
-
-#: src/admin/pages/schema/components/locations/LocationList.jsx:108
-msgid "Not synced from Google yet"
-msgstr ""
-
-#: src/admin/pages/schema/components/locations/LocationList.jsx:124
-msgid "Refreshed from Google."
-msgstr ""
-
-#: src/admin/pages/schema/components/locations/LocationList.jsx:144
-msgid "%s is a branch now. Give it a page to publish."
-msgstr ""
-
-#: src/admin/pages/schema/components/locations/LocationList.jsx:179
-msgid "Run location setup"
-msgstr ""
-
-#: src/admin/pages/schema/components/locations/LocationList.jsx:189 src/admin/pages/schema/components/locations/LocationList.jsx:365 src/admin/pages/schema/components/page/SchemaHeader.jsx:196
-msgid "Refreshing…"
-msgstr ""
-
-#: src/admin/pages/schema/components/locations/LocationList.jsx:216
-msgid "%s. One has a website on another domain, so it may be a separate business — run location setup to choose, or generate branch schema for all of them."
-msgstr ""
-
-#: src/admin/pages/schema/components/locations/LocationList.jsx:224
-msgid "%s. Same website as yours, so FoundHint suggests making them branches."
-msgstr ""
-
-#: src/admin/pages/schema/components/locations/LocationList.jsx:238
-msgid "Hidden. They'll show again when another profile is found."
-msgstr ""
-
-#: src/admin/pages/schema/components/locations/LocationList.jsx:249
-msgid "Not now"
-msgstr ""
-
-#: src/admin/pages/schema/components/locations/LocationList.jsx:277
-msgid "Generate branch schema"
-msgstr ""
-
-#: src/admin/pages/schema/components/locations/LocationList.jsx:291
-msgid "You have one location. Your main business schema covers it."
-msgstr ""
-
-#: src/admin/pages/schema/components/locations/LocationList.jsx:299
-msgid "%s is described in 02 LocalBusiness schema. When you add another location to your Google Business Profile, FoundHint finds it here and creates branch schema linked to your business."
-msgstr ""
-
-#: src/admin/pages/schema/components/locations/LocationList.jsx:318
-msgid "Hide steps"
-msgstr ""
-
-#: src/admin/pages/schema/components/locations/LocationList.jsx:319
-msgid "Add another location"
-msgstr ""
-
-#: src/admin/pages/schema/components/locations/LocationList.jsx:322
-msgid "Open 02 LocalBusiness schema"
-msgstr ""
-
-#: src/admin/pages/schema/components/locations/LocationList.jsx:329
-msgid "Add the location on Google first."
-msgstr ""
-
-#: src/admin/pages/schema/components/locations/LocationList.jsx:334
-msgid "Create it in Google Business Profile with its own address and phone. FoundHint picks it up on the next refresh and suggests it as a branch."
-msgstr ""
-
-#: src/admin/pages/schema/components/locations/LocationList.jsx:349
-msgid "Open Business Profile"
-msgstr ""
-
-#: src/admin/pages/schema/components/locations/LocationList.jsx:388
-msgid "Role"
-msgstr ""
-
-#: src/admin/pages/schema/components/locations/LocationList.jsx:390
-msgid "Assigned page"
-msgstr ""
-
-#: src/admin/pages/schema/components/locations/LocationList.jsx:393
-msgid "Output"
-msgstr ""
-
-#: src/admin/pages/schema/components/locations/LocationList.jsx:396
-msgid "Warnings"
-msgstr ""
-
-#: src/admin/pages/schema/components/locations/LocationList.jsx:399
-msgid "Actions"
-msgstr ""
-
-#: src/admin/pages/schema/components/locations/LocationList.jsx:438
-msgid "Main business — edit in tab 02"
-msgstr ""
-
-#: src/admin/pages/schema/components/locations/LocationList.jsx:455
-msgid "Its own website"
-msgstr ""
-
-#: src/admin/pages/schema/components/locations/LocationList.jsx:464
-msgid "/ · home page"
-msgstr ""
-
-#: src/admin/pages/schema/components/locations/LocationList.jsx:468 src/admin/pages/schema/lib/service.js:192
-msgid "No page"
-msgstr ""
-
-#: src/admin/pages/schema/components/locations/LocationList.jsx:523
-msgid "Change page"
-msgstr ""
-
-#: src/admin/pages/schema/components/locations/LocationList.jsx:524
-msgid "Assign page"
-msgstr ""
-
-#: src/admin/pages/schema/components/locations/LocationList.jsx:534
-msgid "Open tab 02"
-msgstr ""
-
-#: src/admin/pages/schema/components/locations/LocationList.jsx:551
-msgid "More actions for %s"
-msgstr ""
-
-#: src/admin/pages/schema/components/locations/LocationList.jsx:576
-msgid "%s is publishing again."
-msgstr ""
-
-#: src/admin/pages/schema/components/locations/LocationList.jsx:584
-msgid "%s is paused. Its schema is off your site until you resume it."
-msgstr ""
-
-#: src/admin/pages/schema/components/locations/LocationList.jsx:594
-msgid "Resume output"
-msgstr ""
-
-#: src/admin/pages/schema/components/locations/LocationList.jsx:595
-msgid "Pause output"
-msgstr ""
-
-#: src/admin/pages/schema/components/locations/LocationList.jsx:604
-msgid "Re-synced %s from Google."
-msgstr ""
-
-#: src/admin/pages/schema/components/locations/LocationList.jsx:613
-msgid "Re-sync from Google"
-msgstr ""
-
-#: src/admin/pages/schema/components/locations/LocationList.jsx:622
-msgid "%s removed from schema. Its Google profile isn't changed."
-msgstr ""
-
-#: src/admin/pages/schema/components/locations/LocationList.jsx:631
-msgid "Remove from schema"
-msgstr ""
-
-#: src/admin/pages/schema/components/locations/LocationList.jsx:645
-msgid "Blocking: nothing publishes until fixed"
-msgstr ""
-
-#: src/admin/pages/schema/components/locations/LocationList.jsx:652
-msgid "Warning: publishes, but check it"
-msgstr ""
-
-#: src/admin/pages/schema/components/locations/LocationList.jsx:656
-msgid "Recommended: optional improvements"
-msgstr ""
-
-#: src/admin/pages/schema/components/locations/LocationList.jsx:203
-msgid "%d more Google profile found"
-msgid_plural "%d more Google profiles found"
-msgstr[0] ""
-msgstr[1] ""
-
-#: src/admin/pages/schema/components/locations/LocationList.jsx:261
-msgid "Branch schema generated for %d location. Give it a page to publish."
-msgid_plural "Branch schema generated for %d locations. Give each one a page to publish."
-msgstr[0] ""
-msgstr[1] ""
-
-#: src/admin/pages/schema/components/locations/LocationList.jsx:483
-msgid "%d issue"
-msgid_plural "%d issues"
-msgstr[0] ""
-msgstr[1] ""
-
-#: src/admin/pages/schema/components/locations/LocationSetup.jsx:72
-msgid "Your head office"
-msgstr ""
-
-#: src/admin/pages/schema/components/locations/LocationSetup.jsx:115
-msgid "Which one is your main business?"
-msgstr ""
-
-#: src/admin/pages/schema/components/locations/LocationSetup.jsx:116
-msgid "Do customers visit this location?"
-msgstr ""
-
-#: src/admin/pages/schema/components/locations/LocationSetup.jsx:117
-msgid "Confirm the other profiles"
-msgstr ""
-
-#: src/admin/pages/schema/components/locations/LocationSetup.jsx:132
-msgid "This decides how FoundHint describes %s."
-msgstr ""
-
-#: src/admin/pages/schema/components/locations/LocationSetup.jsx:135
-msgid "FoundHint suggested a role for each one from its website. Branches publish here, on their own page. Separate businesses publish on their own website."
-msgstr ""
-
-#: src/admin/pages/schema/components/locations/LocationSetup.jsx:141
-msgid "You can change roles later from the Locations tab."
-msgstr ""
-
-#: src/admin/pages/schema/components/locations/LocationSetup.jsx:147
-msgid "Main business uses LocalBusiness schema (02)."
-msgstr ""
-
-#: src/admin/pages/schema/components/locations/LocationSetup.jsx:151
-msgid "Main business is described in 01 Organization schema."
-msgstr ""
-
-#: src/admin/pages/schema/components/locations/LocationSetup.jsx:157
-msgid "%1$d branches · %2$d separate"
-msgstr ""
-
-#: src/admin/pages/schema/components/locations/LocationSetup.jsx:198
-msgid "Location setup · Step %d of 3"
-msgstr ""
-
-#: src/admin/pages/schema/components/locations/LocationSetup.jsx:251
-msgid "Current main"
-msgstr ""
-
-#: src/admin/pages/schema/components/locations/LocationSetup.jsx:286
-msgid "My head office isn't on Google — enter manually"
-msgstr ""
-
-#: src/admin/pages/schema/components/locations/LocationSetup.jsx:315
-msgid "Every Google profile becomes a branch or a separate business, linked to this head office."
-msgstr ""
-
-#: src/admin/pages/schema/components/locations/LocationSetup.jsx:328
-msgid "Choose a Google profile instead"
-msgstr ""
-
-#: src/admin/pages/schema/components/locations/LocationSetup.jsx:353
-msgid "Not on Google"
-msgstr ""
-
-#: src/admin/pages/schema/components/locations/LocationSetup.jsx:360
-msgid "Do customers visit it?"
-msgstr ""
-
-#: src/admin/pages/schema/components/locations/LocationSetup.jsx:366
-msgid "Yes, customers visit"
-msgstr ""
-
-#: src/admin/pages/schema/components/locations/LocationSetup.jsx:368
-msgid "Described as a local business with its address, opening hours and map pin."
-msgstr ""
-
-#: src/admin/pages/schema/components/locations/LocationSetup.jsx:375
-msgid "No, head office only"
-msgstr ""
-
-#: src/admin/pages/schema/components/locations/LocationSetup.jsx:377
-msgid "Company details only, with no address or hours. Your branches carry the customer visits."
-msgstr ""
-
-#: src/admin/pages/schema/components/locations/LocationSetup.jsx:432
-msgid "Website is %s"
-msgstr ""
-
-#: src/admin/pages/schema/components/locations/LocationSetup.jsx:435
-msgid "Same website as yours"
-msgstr ""
-
-#: src/admin/pages/schema/components/locations/LocationSetup.jsx:446
-msgid "Role for %s"
-msgstr ""
-
-#: src/admin/pages/schema/components/locations/LocationSetup.jsx:452 src/admin/pages/schema/components/locations/LocationTab.jsx:264 src/admin/pages/schema/lib/locations.js:6
-msgid "Branch"
-msgstr ""
-
-#: src/admin/pages/schema/components/locations/LocationSetup.jsx:453 src/admin/pages/schema/components/locations/SeparatePanel.jsx:91 src/admin/pages/schema/lib/locations.js:7
-msgid "Separate"
-msgstr ""
-
-#: src/admin/pages/schema/components/locations/LocationSetup.jsx:487
-msgid "Suggested"
-msgstr ""
-
-#: src/admin/pages/schema/components/locations/LocationSetup.jsx:499
-msgid "There are no other profiles. Your main business is your only location."
-msgstr ""
-
-#: src/admin/pages/schema/components/locations/LocationSetup.jsx:515 src/admin/pages/setup/components/DoneStep.jsx:78 src/admin/pages/setup/components/StepActions.jsx:22
-msgid "Back"
-msgstr ""
-
-#: src/admin/pages/schema/components/locations/LocationSetup.jsx:532
-msgid "Generate schema"
-msgstr ""
-
-#: src/admin/pages/schema/components/locations/LocationSetup.jsx:93
-msgid "Roles saved. %1$d branch now links to %2$s."
-msgid_plural "Roles saved. %1$d branches now link to %2$s."
-msgstr[0] ""
-msgstr[1] ""
-
-#: src/admin/pages/schema/components/locations/LocationSetup.jsx:122
-msgid "FoundHint found %d Google profile. Your main business carries the brand schema on your home page, and the others link to it."
-msgid_plural "FoundHint found %d Google profiles. Your main business carries the brand schema on your home page, and the others link to it."
-msgstr[0] ""
-msgstr[1] ""
-
-#: src/admin/pages/schema/components/locations/LocationSetup.jsx:263
-msgid "★ %1$s · %2$d review"
-msgid_plural "★ %1$s · %2$d reviews"
-msgstr[0] ""
-msgstr[1] ""
-
-#: src/admin/pages/schema/components/locations/LocationTab.jsx:43
-msgid "no page yet. Assign one to publish."
-msgstr ""
-
-#: src/admin/pages/schema/components/locations/LocationTab.jsx:52
-msgid "%s (not published yet)"
-msgstr ""
-
-#: src/admin/pages/schema/components/locations/LocationTab.jsx:63
-msgid "%s is shared, so nothing publishes"
-msgstr ""
-
-#: src/admin/pages/schema/components/locations/LocationTab.jsx:172
-msgid "Location schema saved."
-msgstr ""
-
-#: src/admin/pages/schema/components/locations/LocationTab.jsx:190
-msgid "this branch"
-msgstr ""
-
-#: src/admin/pages/schema/components/locations/LocationTab.jsx:207 src/admin/pages/schema/components/locations/NoBranchChosen.jsx:42
-msgid "Location schema"
-msgstr ""
-
-#: src/admin/pages/schema/components/locations/LocationTab.jsx:208
-msgid "Each branch: its own address, phone, hours and page, linked to your business."
-msgstr ""
-
-#: src/admin/pages/schema/components/locations/LocationTab.jsx:246
-msgid "More options"
-msgstr ""
-
-#: src/admin/pages/schema/components/locations/LocationTab.jsx:248
-msgid "Output switch, other branches, extra pages"
-msgstr ""
-
-#: src/admin/pages/schema/components/locations/LocationTab.jsx:279
-msgid "Add %s location schema to"
-msgstr ""
-
-#: src/admin/pages/schema/components/locations/NoBranchChosen.jsx:20
-msgid "Your business has one location"
-msgstr ""
-
-#: src/admin/pages/schema/components/locations/NoBranchChosen.jsx:28
-msgid "Business schema already describes it, with its address and hours. Branches appear here when your Google account has more than one location."
-msgstr ""
-
-#: src/admin/pages/schema/components/locations/NoBranchChosen.jsx:50
-msgid "Your main location is selected at the top of the page. It is described in Business schema. Choose a branch to edit its schema — the top bar switches with it."
-msgstr ""
-
-#: src/admin/pages/schema/components/locations/PlacementWarnings.jsx:13
-msgid "With more than one branch, every page would claim every branch. Choose each branch's own pages instead."
-msgstr ""
-
-#: src/admin/pages/schema/components/locations/PlacementWarnings.jsx:21
-msgid "No pages chosen yet, so this branch prints nowhere. Pick its page, and your Contact page."
-msgstr ""
-
-#: src/admin/pages/schema/components/locations/SeparatePanel.jsx:41 src/admin/pages/schema/components/shared/JsonPreview.jsx:97
-msgid "Schema copied."
-msgstr ""
-
-#: src/admin/pages/schema/components/locations/SeparatePanel.jsx:44 src/admin/pages/schema/components/shared/JsonPreview.jsx:100
+#: src/admin/pages/schema/components/PreviewCard.jsx:31
 msgid "Could not copy. Select the text instead."
 msgstr ""
 
-#: src/admin/pages/schema/components/locations/SeparatePanel.jsx:50
-msgid "Copy its schema with the button below."
-msgstr ""
-
-#: src/admin/pages/schema/components/locations/SeparatePanel.jsx:53
-msgid "Paste it into the <head> of %s, or install FoundHint on that site."
-msgstr ""
-
-#: src/admin/pages/schema/components/locations/SeparatePanel.jsx:59
-msgid "Test that page with Google's Rich Results Test."
-msgstr ""
-
-#: src/admin/pages/schema/components/locations/SeparatePanel.jsx:94 src/admin/pages/schema/lib/locations.js:17
-msgid "Not on this site"
-msgstr ""
-
-#: src/admin/pages/schema/components/locations/SeparatePanel.jsx:128
-msgid "This profile's website is %s. Its schema should be published on that site."
-msgstr ""
-
-#: src/admin/pages/schema/components/locations/SeparatePanel.jsx:138
-msgid "FoundHint only adds schema to %1$s, so nothing for %2$s is published here. Copy its schema to %3$s, or install FoundHint on that site."
-msgstr ""
-
-#: src/admin/pages/schema/components/locations/SeparatePanel.jsx:152
-msgid "Publish it on its own website"
-msgstr ""
-
-#: src/admin/pages/schema/components/locations/SeparatePanel.jsx:183 src/admin/pages/schema/components/shared/JsonPreview.jsx:205
-msgid "Copy schema"
-msgstr ""
-
-#: src/admin/pages/schema/components/locations/SeparatePanel.jsx:197
-msgid "Treat as a branch anyway"
-msgstr ""
-
-#: src/admin/pages/schema/components/locations/SeparatePanel.jsx:212
-msgid "not this site. Copy it to %s."
-msgstr ""
-
-#: src/admin/pages/schema/components/page/ConnectGoogleNotice.jsx:14
-msgid "Connect your Google Business Profile to set up schema"
-msgstr ""
-
-#: src/admin/pages/schema/components/page/ConnectGoogleNotice.jsx:20
-msgid "Your schema is built from your Business Profile: name, address, phone and hours come from Google, and you can edit any of them for your website. Nothing changes on your site until you connect."
-msgstr ""
-
-#: src/admin/pages/schema/components/page/OffPanel.jsx:17
-msgid "Organization schema is off"
-msgstr ""
-
-#: src/admin/pages/schema/components/page/OffPanel.jsx:19
-msgid "Turn it on to describe your brand: its name, logo, contact details and profiles."
-msgstr ""
-
-#: src/admin/pages/schema/components/page/OffPanel.jsx:23
-msgid "Turn on organization schema"
-msgstr ""
-
-#: src/admin/pages/schema/components/page/OffPanel.jsx:26
-msgid "Main business schema is off"
-msgstr ""
-
-#: src/admin/pages/schema/components/page/OffPanel.jsx:28
-msgid "Turn it on to choose your main business and publish its address, opening hours and category."
-msgstr ""
-
-#: src/admin/pages/schema/components/page/OffPanel.jsx:32 src/admin/pages/schema/components/page/OffPanel.jsx:76
-msgid "Turn on localbusiness schema"
-msgstr ""
-
-#: src/admin/pages/schema/components/page/OffPanel.jsx:35
-msgid "Location schema is off"
-msgstr ""
-
-#: src/admin/pages/schema/components/page/OffPanel.jsx:37
-msgid "Turn it on to publish each branch: its own address, phone, hours and page."
-msgstr ""
-
-#: src/admin/pages/schema/components/page/OffPanel.jsx:41
-msgid "Turn on location schema"
-msgstr ""
-
-#: src/admin/pages/schema/components/page/OffPanel.jsx:44
-msgid "Service schema is off"
-msgstr ""
-
-#: src/admin/pages/schema/components/page/OffPanel.jsx:46
-msgid "Turn it on to publish what you offer, who provides it, where, and at what price."
-msgstr ""
-
-#: src/admin/pages/schema/components/page/OffPanel.jsx:50
-msgid "Turn on service schema"
-msgstr ""
-
-#: src/admin/pages/schema/components/page/OffPanel.jsx:53
-msgid "Website structure is off"
-msgstr ""
-
-#: src/admin/pages/schema/components/page/OffPanel.jsx:55
-msgid "Turn it on to publish your website's name and how its pages fit together."
-msgstr ""
-
-#: src/admin/pages/schema/components/page/OffPanel.jsx:59
-msgid "Turn on website structure"
-msgstr ""
-
-#: src/admin/pages/schema/components/page/OffPanel.jsx:70
-msgid "Your main business is a head office."
-msgstr ""
-
-#: src/admin/pages/schema/components/page/OffPanel.jsx:72
-msgid "It's described in 01 Organization, and your branches link to it as their parent. Change this in location setup."
-msgstr ""
-
-#: src/admin/pages/schema/components/page/OffPanel.jsx:139 src/admin/pages/schema/components/settings/OutputSettings.jsx:173 src/admin/pages/schema/lib/location.js:52
-msgid "Off"
-msgstr ""
-
-#: src/admin/pages/schema/components/page/OffPanel.jsx:146
-msgid "Nothing from this section is added to your site while it's off."
-msgstr ""
-
-#: src/admin/pages/schema/components/page/OffPanel.jsx:158
-msgid "Open 01 Organization"
-msgstr ""
-
-#: src/admin/pages/schema/components/page/OffPanel.jsx:165
-msgid "Change in location setup"
-msgstr ""
-
-#: src/admin/pages/schema/components/page/OffPanel.jsx:185
-msgid "%s…"
-msgstr ""
-
-#: src/admin/pages/schema/components/page/PremiumTab.jsx:42
-msgid "Premium is installed; activate its licence to use it."
-msgstr ""
-
-#: src/admin/pages/schema/components/page/PremiumTab.jsx:46
-msgid "It's part of FoundHint Premium."
-msgstr ""
-
-#: src/admin/pages/schema/components/page/PremiumTab.jsx:51 src/admin/pages/schema/components/page/SchemaHeader.jsx:131 src/admin/pages/schema/components/shared/LockedPreview.jsx:92
-msgid "Activate licence"
-msgstr ""
-
-#: src/admin/pages/schema/components/page/PremiumTab.jsx:60 src/editor/components/EditorNotice.jsx:72
-msgid "Get Premium"
-msgstr ""
-
-#: src/admin/pages/schema/components/page/SchemaHeader.jsx:49
-msgid "FoundHint / Schema"
-msgstr ""
-
-#: src/admin/pages/schema/components/page/SchemaHeader.jsx:63
-msgid "The structured data your website prints so search engines can read your business, locations and services. It is built from your Business Profile."
-msgstr ""
-
-#: src/admin/pages/schema/components/page/SchemaHeader.jsx:104
-msgid "Activate your FoundHint Premium licence."
-msgstr ""
-
-#: src/admin/pages/schema/components/page/SchemaHeader.jsx:108
-msgid "The Schema Manager is part of FoundHint Premium."
-msgstr ""
-
-#: src/admin/pages/schema/components/page/SchemaHeader.jsx:114
-msgid "Premium is installed but its licence isn't active, so the Schema Manager is locked and your site prints the free markup. Activate it on the Plugins screen; everything you saved comes back as it was."
-msgstr ""
-
-#: src/admin/pages/schema/components/page/SchemaHeader.jsx:118
-msgid "Below is the markup your site prints today. Premium lets you edit it, add locations, services and your website's structure, and choose where each prints."
-msgstr ""
-
-#: src/admin/pages/schema/components/page/SchemaHeader.jsx:143
-msgid "Upgrade to Premium"
-msgstr ""
-
-#: src/admin/pages/schema/components/page/SchemaHeader.jsx:167
-msgid "Read your Business Profile from Google."
-msgstr ""
-
-#: src/admin/pages/schema/components/page/TabBar.jsx:17
-msgid "LocalBusiness"
-msgstr ""
-
-#: src/admin/pages/schema/components/page/TabBar.jsx:20 src/admin/pages/schema/components/website/WebsiteTab.jsx:175
-msgid "Website structure"
-msgstr ""
-
-#: src/admin/pages/schema/components/page/TabBar.jsx:54
-msgid "Schema sections"
-msgstr ""
-
-#: src/admin/pages/schema/components/page/TabBar.jsx:104
-msgid "Off · not printed"
-msgstr ""
-
-#: src/admin/pages/schema/components/page/TabBar.jsx:125 src/admin/pages/schema/components/services/list/ServiceRow.jsx:162
-msgid "Publish %s"
-msgstr ""
-
-#: src/admin/pages/schema/components/page/TabPanel.jsx:19
-msgid "Describe each branch: its own address, phone, hours and page, linked to your main business."
-msgstr ""
-
-#: src/admin/pages/schema/components/page/TabPanel.jsx:24
-msgid "Describe what you offer, who provides it, where, and at what price — each on its own page."
-msgstr ""
-
-#: src/admin/pages/schema/components/page/TabPanel.jsx:29
-msgid "Tie your pages together: your website's name, each page, About and Contact, and breadcrumbs."
-msgstr ""
-
-#: src/admin/pages/schema/components/page/UnsavedDialog.jsx:22
-msgid "You have unsaved changes"
-msgstr ""
-
-#: src/admin/pages/schema/components/page/UnsavedDialog.jsx:25
-msgid "Save them before you leave this tab, discard them, or stay here."
-msgstr ""
-
-#: src/admin/pages/schema/components/page/UnsavedDialog.jsx:33
-msgid "Stay"
-msgstr ""
-
-#: src/admin/pages/schema/components/page/UnsavedDialog.jsx:39
-msgid "Save"
-msgstr ""
-
-#: src/admin/pages/schema/components/services/editor/AreasSection.jsx:47
-msgid "Service areas"
-msgstr ""
-
-#: src/admin/pages/schema/components/services/editor/AreasSection.jsx:48
-msgid "Only add places you genuinely serve. A service area is not your business address, which lives in Location schema."
-msgstr ""
-
-#: src/admin/pages/schema/components/services/editor/AreasSection.jsx:55 src/admin/pages/schema/lib/schema.js:37
-msgid "Areas served"
-msgstr ""
-
-#: src/admin/pages/schema/components/services/editor/AreasSection.jsx:89
-msgid "No areas yet."
-msgstr ""
-
-#: src/admin/pages/schema/components/services/editor/AreasSection.jsx:105
-msgid "City, region or named area"
-msgstr ""
-
-#: src/admin/pages/schema/components/services/editor/AreasSection.jsx:109
-msgid "Area name"
-msgstr ""
-
-#: src/admin/pages/schema/components/services/editor/AreasSection.jsx:115
-msgid "Area type"
-msgstr ""
-
-#: src/admin/pages/schema/components/services/editor/AreasSection.jsx:133 src/admin/pages/setup/components/ServicesStep.jsx:71
-msgid "Add"
-msgstr ""
-
-#: src/admin/pages/schema/components/services/editor/AreasSection.jsx:141
-msgid "From your Google service area:"
-msgstr ""
-
-#: src/admin/pages/schema/components/services/editor/BasicsSection.jsx:35
-msgid "Google photo (saved)"
-msgstr ""
-
-#: src/admin/pages/schema/components/services/editor/BasicsSection.jsx:61
-msgid "Service"
-msgstr ""
-
-#: src/admin/pages/schema/components/services/editor/BasicsSection.jsx:62
-msgid "What you offer, in the words customers use. The description should match what the service page says."
-msgstr ""
-
-#: src/admin/pages/schema/components/services/editor/BasicsSection.jsx:88
-msgid "e.g. Teeth whitening"
-msgstr ""
-
-#: src/admin/pages/schema/components/services/editor/BasicsSection.jsx:98
-msgid "Service category"
-msgstr ""
-
-#: src/admin/pages/schema/components/services/editor/BasicsSection.jsx:108
-msgid "Pick or type a category"
-msgstr ""
-
-#: src/admin/pages/schema/components/services/editor/BasicsSection.jsx:109
-msgid "e.g. Orthodontics"
-msgstr ""
-
-#: src/admin/pages/schema/components/services/editor/BasicsSection.jsx:128
-msgid "Short description"
-msgstr ""
-
-#: src/admin/pages/schema/components/services/editor/BasicsSection.jsx:146
-msgid "One or two sentences on what's included."
-msgstr ""
-
-#: src/admin/pages/schema/components/services/editor/BasicsSection.jsx:167
-msgid "Active, publish it"
-msgstr ""
-
-#: src/admin/pages/schema/components/services/editor/BasicsSection.jsx:170
-msgid "Inactive, keep it off my site"
-msgstr ""
-
-#: src/admin/pages/schema/components/services/editor/BasicsSection.jsx:178
-msgid "Image"
-msgstr ""
-
-#: src/admin/pages/schema/components/services/editor/BasicsSection.jsx:192
-msgid "No image"
-msgstr ""
-
-#: src/admin/pages/schema/components/services/editor/BasicsSection.jsx:196
-msgid "Featured image of the service page"
-msgstr ""
-
-#: src/admin/pages/schema/components/services/editor/BasicsSection.jsx:208
-msgid "Enter an image URL"
-msgstr ""
-
-#: src/admin/pages/schema/components/services/editor/BasicsSection.jsx:213
-msgid "Copied to your Media Library when you save, so your site serves it."
-msgstr ""
-
-#: src/admin/pages/schema/components/services/editor/BasicsSection.jsx:221
-msgid "The service page has no featured image yet, so none is printed."
-msgstr ""
-
-#: src/admin/pages/schema/components/services/editor/BasicsSection.jsx:233
-msgid "Image URL"
-msgstr ""
-
-#: src/admin/pages/schema/components/services/editor/EditorBar.jsx:13
-msgid "Editing"
-msgstr ""
-
-#: src/admin/pages/schema/components/services/editor/EditorBar.jsx:27 src/admin/pages/schema/components/services/editor/RemoveDialog.jsx:50
-msgid "Remove service"
-msgstr ""
-
-#: src/admin/pages/schema/components/services/editor/OptionalDetails.jsx:37
-msgid "Optional details"
-msgstr ""
-
-#: src/admin/pages/schema/components/services/editor/OptionalDetails.jsx:59 src/admin/pages/schema/components/services/editor/OptionalDetails.jsx:62
-msgid "Pricing"
-msgstr ""
-
-#: src/admin/pages/schema/components/services/editor/OptionalDetails.jsx:63
-msgid "Only publish a price you would honour. The price is shared with your Business Profile's service list."
-msgstr ""
-
-#: src/admin/pages/schema/components/services/editor/OptionalDetails.jsx:77 src/admin/pages/schema/lib/service.js:51
-msgid "No price"
-msgstr ""
-
-#: src/admin/pages/schema/components/services/editor/OptionalDetails.jsx:80
-msgid "Fixed price"
-msgstr ""
-
-#: src/admin/pages/schema/components/services/editor/OptionalDetails.jsx:83
-msgid "Starting at"
-msgstr ""
-
-#: src/admin/pages/schema/components/services/editor/OptionalDetails.jsx:95
-msgid "From"
-msgstr ""
-
-#: src/admin/pages/schema/components/services/editor/OptionalDetails.jsx:97
-msgid "Starting price"
-msgstr ""
-
-#: src/admin/pages/schema/components/services/editor/OptionalDetails.jsx:116
-msgid "Up to"
-msgstr ""
-
-#: src/admin/pages/schema/components/services/editor/PageSection.jsx:11 src/admin/pages/schema/components/services/editor/PageSection.jsx:128
-msgid "WordPress page"
-msgstr ""
-
-#: src/admin/pages/schema/components/services/editor/PageSection.jsx:12
-msgid "Enter a URL"
-msgstr ""
-
-#: src/admin/pages/schema/components/services/editor/PageSection.jsx:52 src/admin/pages/schema/components/shared/PlacementCards.jsx:124
-msgid "Home"
-msgstr ""
-
-#: src/admin/pages/schema/components/services/editor/PageSection.jsx:57
-msgid "%1$s — Used by %2$s"
-msgstr ""
-
-#: src/admin/pages/schema/components/services/editor/PageSection.jsx:67
-msgid "Service page"
-msgstr ""
-
-#: src/admin/pages/schema/components/services/editor/PageSection.jsx:68
-msgid "The page about this service. The schema is printed there, and its address becomes the service's identity."
-msgstr ""
-
-#: src/admin/pages/schema/components/services/editor/PageSection.jsx:76
-msgid "Service page source"
-msgstr ""
-
-#: src/admin/pages/schema/components/services/editor/PageSection.jsx:101
-msgid "Service page URL"
-msgstr ""
-
-#: src/admin/pages/schema/components/services/editor/PageSection.jsx:113 src/admin/pages/schema/components/services/editor/PageSection.jsx:114 src/admin/pages/schema/components/shared/PlacementCards.jsx:98 src/admin/pages/schema/components/shared/PlacementCards.jsx:99
-msgid "Search your pages"
-msgstr ""
-
-#: src/admin/pages/schema/components/services/editor/PageSection.jsx:150
-msgid "Primary landing page:"
-msgstr ""
-
-#: src/admin/pages/schema/components/services/editor/PageSection.jsx:168
-msgid "Check:"
-msgstr ""
-
-#: src/admin/pages/schema/components/services/editor/ProviderSection.jsx:29
-msgid "%s, from Business schema."
-msgstr ""
-
-#: src/admin/pages/schema/components/services/editor/ProviderSection.jsx:35
-msgid "Specific branches"
-msgstr ""
-
-#: src/admin/pages/schema/components/services/editor/ProviderSection.jsx:37
-msgid "One or more branches from Location schema."
-msgstr ""
-
-#: src/admin/pages/schema/components/services/editor/ProviderSection.jsx:41
-msgid "Your business has no branches."
-msgstr ""
-
-#: src/admin/pages/schema/components/services/editor/ProviderSection.jsx:58
-msgid "Service provider"
-msgstr ""
-
-#: src/admin/pages/schema/components/services/editor/ProviderSection.jsx:59
-msgid "Who offers it. The service points at your business or branch, so it never creates a second business."
-msgstr ""
-
-#: src/admin/pages/schema/components/services/editor/ProviderSection.jsx:66
-msgid "Provided by"
-msgstr ""
-
-#: src/admin/pages/schema/components/services/editor/ProviderSection.jsx:114
-msgid "Branches that provide it"
-msgstr ""
-
-#: src/admin/pages/schema/components/services/editor/ProviderSection.jsx:146 src/admin/pages/schema/components/services/editor/ProviderSection.jsx:152
-msgid "Specific provider"
-msgstr ""
-
-#: src/admin/pages/schema/components/services/editor/ProviderSection.jsx:153
-msgid "A dentist, technician or partner company who does the work. They are added as their own entry linked to your business, which stays the provider."
-msgstr ""
-
-#: src/admin/pages/schema/components/services/editor/ProviderSection.jsx:166
-msgid "e.g. Dr. Farhana Rahman"
-msgstr ""
-
-#: src/admin/pages/schema/components/services/editor/ProviderSection.jsx:173
-msgid "Provider is a"
-msgstr ""
-
-#: src/admin/pages/schema/components/services/editor/ProviderSection.jsx:185
-msgid "Person (dentist, technician)"
-msgstr ""
-
-#: src/admin/pages/schema/components/services/editor/ProviderSection.jsx:188
-msgid "Partner company"
-msgstr ""
-
-#: src/admin/pages/schema/components/services/editor/RemoveDialog.jsx:22
-msgid "Remove %s?"
-msgstr ""
-
-#: src/admin/pages/schema/components/services/editor/RemoveDialog.jsx:27
-msgid "The service is removed from FoundHint, including your profile's service list, and its schema stops printing. To keep it but hide it from your site, switch it off instead."
-msgstr ""
-
-#: src/admin/pages/schema/components/services/editor/RemoveDialog.jsx:39
-msgid "Keep it"
-msgstr ""
-
-#: src/admin/pages/schema/components/services/editor/ServiceEditor.jsx:116
-msgid "Service added."
-msgstr ""
-
-#: src/admin/pages/schema/components/services/editor/ServiceEditor.jsx:117
-msgid "Service schema saved."
-msgstr ""
-
-#: src/admin/pages/schema/components/services/editor/ServiceEditor.jsx:134
-msgid "Service removed."
-msgstr ""
-
-#: src/admin/pages/schema/components/services/editor/ServiceEditor.jsx:153
-msgid "Service editor"
-msgstr ""
-
-#: src/admin/pages/schema/components/services/editor/ServiceEditor.jsx:165
-msgid "New service"
-msgstr ""
-
-#: src/admin/pages/schema/components/services/editor/ServiceEditor.jsx:191
-msgid "Add this schema to"
-msgstr ""
-
-#: src/admin/pages/schema/components/services/editor/ServiceEditor.jsx:200
-msgid "Its service page"
-msgstr ""
-
-#: src/admin/pages/schema/components/services/editor/ServiceEditor.jsx:204
-msgid "Printed only on %s."
-msgstr ""
-
-#: src/admin/pages/schema/components/services/editor/ServiceEditor.jsx:207
-msgid "Printed only on the service page."
-msgstr ""
-
-#: src/admin/pages/schema/components/services/editor/ServiceEditor.jsx:214 src/admin/pages/schema/components/shared/PlacementCards.jsx:53
-msgid "Pages I choose"
-msgstr ""
-
-#: src/admin/pages/schema/components/services/editor/ServiceEditor.jsx:215 src/admin/pages/schema/components/shared/PlacementCards.jsx:54
-msgid "Pick the pages below."
-msgstr ""
-
-#: src/admin/pages/schema/components/services/list/EmptyList.jsx:13
-msgid "No services yet. Add them on your Business Profile screen."
-msgstr ""
-
-#: src/admin/pages/schema/components/services/list/EmptyList.jsx:20
-msgid "%s has no services of its own yet. Add one here, or choose your main location at the top to see your business's services."
-msgstr ""
-
-#: src/admin/pages/schema/components/services/list/EmptyList.jsx:24
-msgid "This branch"
-msgstr ""
-
-#: src/admin/pages/schema/components/services/list/EmptyList.jsx:26
-msgid "No services yet. Add the first one."
-msgstr ""
-
-#: src/admin/pages/schema/components/services/list/ListHeader.jsx:20 src/admin/pages/schema/components/services/list/ListHeader.jsx:23
-msgid "Service schema"
-msgstr ""
-
-#: src/admin/pages/schema/components/services/list/ListHeader.jsx:24
-msgid "Each service you offer, linked to the business or branch that provides it. It never creates a second business."
-msgstr ""
-
-#: src/admin/pages/schema/components/services/list/ListHeader.jsx:36
-msgid "%1$d of %2$d on your plan"
-msgstr ""
-
-#: src/admin/pages/schema/components/services/list/ListHeader.jsx:49
-msgid "Add a service"
-msgstr ""
-
-#: src/admin/pages/schema/components/services/list/ListSummary.jsx:10
-msgid "Services offered"
-msgstr ""
-
-#: src/admin/pages/schema/components/services/list/ListSummary.jsx:18
-msgid "%1$d active · %2$d inactive"
-msgstr ""
-
-#: src/admin/pages/schema/components/services/list/ServiceList.jsx:67
-msgid "%s is published."
-msgstr ""
-
-#: src/admin/pages/schema/components/services/list/ServiceList.jsx:69 src/admin/pages/schema/components/website/WebsiteTab.jsx:159
-msgid "%s is off your site."
-msgstr ""
-
-#: src/admin/pages/schema/components/services/list/ServiceRow.jsx:81
-msgid "Move %s up"
-msgstr ""
-
-#: src/admin/pages/schema/components/services/list/ServiceRow.jsx:94
-msgid "Move %s down"
-msgstr ""
-
-#: src/admin/pages/schema/components/services/list/ServiceRow.jsx:153
-msgid "Active"
-msgstr ""
-
-#: src/admin/pages/schema/components/services/list/ServiceRow.jsx:154
-msgid "Inactive"
-msgstr ""
-
-#: src/admin/pages/schema/components/services/list/ServiceRow.jsx:140
-msgid "%d to check"
-msgid_plural "%d to check"
-msgstr[0] ""
-msgstr[1] ""
-
-#: src/admin/pages/schema/components/settings/OutputSettings.jsx:28
-msgid "Duplicate found"
-msgstr ""
-
-#: src/admin/pages/schema/components/settings/OutputSettings.jsx:29
-msgid "Check it"
-msgstr ""
-
-#: src/admin/pages/schema/components/settings/OutputSettings.jsx:30
-msgid "Overlaps"
-msgstr ""
-
-#: src/admin/pages/schema/components/settings/OutputSettings.jsx:31
-msgid "No overlap"
-msgstr ""
-
-#: src/admin/pages/schema/components/settings/OutputSettings.jsx:37
-msgid "Supported. Not installed."
-msgstr ""
-
-#: src/admin/pages/schema/components/settings/OutputSettings.jsx:42
-msgid "Active on this site. Also adds business schema."
-msgstr ""
-
-#: src/admin/pages/schema/components/settings/OutputSettings.jsx:47
-msgid "Active. It may add business schema, depending on its settings."
-msgstr ""
-
-#: src/admin/pages/schema/components/settings/OutputSettings.jsx:52
-msgid "Active. Adds its own website and page schema; choose who publishes those under Who publishes it."
-msgstr ""
-
-#: src/admin/pages/schema/components/settings/OutputSettings.jsx:58
-msgid "Active. Adds product schema only, which doesn't overlap."
-msgstr ""
-
-#: src/admin/pages/schema/components/settings/OutputSettings.jsx:62
-msgid "Active. No overlap."
-msgstr ""
-
-#: src/admin/pages/schema/components/settings/OutputSettings.jsx:124
-msgid "Couldn't reach your site to check it."
-msgstr ""
-
-#: src/admin/pages/schema/components/settings/OutputSettings.jsx:126
-msgid "Found on your site just now."
-msgstr ""
-
-#: src/admin/pages/schema/components/settings/OutputSettings.jsx:127
-msgid "Your site doesn't match yet. See below."
-msgstr ""
-
-#: src/admin/pages/schema/components/settings/OutputSettings.jsx:153 src/admin/pages/schema/components/settings/OutputSettings.jsx:156
-msgid "Add to my site header"
-msgstr ""
-
-#: src/admin/pages/schema/components/settings/OutputSettings.jsx:157
-msgid "One switch for all of it: FoundHint adds every schema you turned on to your pages as JSON-LD. Off, nothing is added."
-msgstr ""
-
-#: src/admin/pages/schema/components/settings/OutputSettings.jsx:164
-msgid "FoundHint prints every schema you set up into the pages you picked. Nothing to copy or paste."
-msgstr ""
-
-#: src/admin/pages/schema/components/settings/OutputSettings.jsx:172
-msgid "On"
-msgstr ""
-
-#: src/admin/pages/schema/components/settings/OutputSettings.jsx:182
-msgid "Schema is added to your site again."
-msgstr ""
-
-#: src/admin/pages/schema/components/settings/OutputSettings.jsx:186
-msgid "Automatic output is off. Nothing is added to your site."
-msgstr ""
-
-#: src/admin/pages/schema/components/settings/OutputSettings.jsx:201
-msgid "Where in the page"
-msgstr ""
-
-#: src/admin/pages/schema/components/settings/OutputSettings.jsx:220
-msgid "Inside <head> (recommended)"
-msgstr ""
-
-#: src/admin/pages/schema/components/settings/OutputSettings.jsx:223
-msgid "Just before </body>"
-msgstr ""
-
-#: src/admin/pages/schema/components/settings/OutputSettings.jsx:227
-msgid "Search engines read both. Use the second only if your theme strips extra code from the head."
-msgstr ""
-
-#: src/admin/pages/schema/components/settings/OutputSettings.jsx:251
-msgid "Not checked yet."
-msgstr ""
-
-#: src/admin/pages/schema/components/settings/OutputSettings.jsx:253
-msgid "Couldn't reach your site from the server to check it."
-msgstr ""
-
-#: src/admin/pages/schema/components/settings/OutputSettings.jsx:260
-msgid "Live on your site. Last checked %s."
-msgstr ""
-
-#: src/admin/pages/schema/components/settings/OutputSettings.jsx:268
-msgid "Checked %s."
-msgstr ""
-
-#: src/admin/pages/schema/components/settings/OutputSettings.jsx:279 src/admin/pages/schema/components/settings/OutputSettings.jsx:461
-msgid "Checking…"
-msgstr ""
-
-#: src/admin/pages/schema/components/settings/OutputSettings.jsx:280
-msgid "Check my site"
-msgstr ""
-
-#: src/admin/pages/schema/components/settings/OutputSettings.jsx:287
-msgid "Not on your home page yet: %s. A page cache may be serving an old copy — clear it and check again."
-msgstr ""
-
-#: src/admin/pages/schema/components/settings/OutputSettings.jsx:299
-msgid "Another plugin also prints %s on your home page."
-msgstr ""
-
-#: src/admin/pages/schema/components/settings/OutputSettings.jsx:311
-msgid "What gets added"
-msgstr ""
-
-#: src/admin/pages/schema/components/settings/OutputSettings.jsx:316
-msgid "…your theme's tags…"
-msgstr ""
-
-#: src/admin/pages/schema/components/settings/OutputSettings.jsx:318
-msgid "{ one @graph: business, locations, services, website }"
-msgstr ""
-
-#: src/admin/pages/schema/components/settings/OutputSettings.jsx:327
-msgid "Automatic output is off. Copy each schema from its section and paste it into your pages, or switch this on and FoundHint handles it."
-msgstr ""
-
-#: src/admin/pages/schema/components/settings/OutputSettings.jsx:337
-msgid "What goes where"
-msgstr ""
-
-#: src/admin/pages/schema/components/settings/OutputSettings.jsx:338
-msgid "Every schema on each page, from the pages you picked in each section."
-msgstr ""
-
-#: src/admin/pages/schema/components/settings/OutputSettings.jsx:371
-msgid "No schema"
-msgstr ""
-
-#: src/admin/pages/schema/components/settings/OutputSettings.jsx:391
-msgid "no schema"
-msgstr ""
-
-#: src/admin/pages/schema/components/settings/OutputSettings.jsx:403
-msgid "Works with your SEO plugin"
-msgstr ""
-
-#: src/admin/pages/schema/components/settings/OutputSettings.jsx:406
-msgid "FoundHint checks for these so your site never shows two copies of the same schema."
-msgstr ""
-
-#: src/admin/pages/schema/components/settings/OutputSettings.jsx:416
-msgid "%d to sort out"
-msgstr ""
-
-#: src/admin/pages/schema/components/settings/OutputSettings.jsx:419
-msgid "No duplicates"
-msgstr ""
-
-#: src/admin/pages/schema/components/settings/OutputSettings.jsx:444
-msgid "Yoast SEO also adds business schema."
-msgstr ""
-
-#: src/admin/pages/schema/components/settings/OutputSettings.jsx:449
-msgid "In WordPress, open Yoast SEO → Settings → Site representation and switch off Local business details. Your other Yoast settings stay as they are."
-msgstr ""
-
-#: src/admin/pages/schema/components/settings/OutputSettings.jsx:462
-msgid "I've switched it off, check again"
-msgstr ""
-
-#: src/admin/pages/schema/components/settings/OutputSettings.jsx:382
-msgid "Your other %1$d page gets: %2$s."
-msgid_plural "Your other %1$d pages get: %2$s."
-msgstr[0] ""
-msgstr[1] ""
-
-#: src/admin/pages/schema/components/settings/SettingsTab.jsx:25
-msgid "Automatic"
-msgstr ""
-
-#: src/admin/pages/schema/components/settings/SettingsTab.jsx:26
-msgid "FoundHint publishes it"
-msgstr ""
-
-#: src/admin/pages/schema/components/settings/SettingsTab.jsx:27
-msgid "My SEO plugin publishes it"
-msgstr ""
-
-#: src/admin/pages/schema/components/settings/SettingsTab.jsx:28
-msgid "Nobody publishes it"
-msgstr ""
-
-#: src/admin/pages/schema/components/settings/SettingsTab.jsx:33
-msgid "FoundHint publishes the markup unless it finds another plugin already doing it."
-msgstr ""
-
-#: src/admin/pages/schema/components/settings/SettingsTab.jsx:38
-msgid "Always publish, even if something else might be publishing too."
-msgstr ""
-
-#: src/admin/pages/schema/components/settings/SettingsTab.jsx:43
-msgid "Never publish. Use this when your SEO plugin already describes the business."
-msgstr ""
-
-#: src/admin/pages/schema/components/settings/SettingsTab.jsx:48
-msgid "No local business markup is published from this site."
-msgstr ""
-
-#: src/admin/pages/schema/components/settings/SettingsTab.jsx:75 src/admin/pages/schema/lib/tabSummaries.js:62
+#: src/admin/pages/schema/components/PublisherCard.jsx:28
 msgid "Who publishes it"
 msgstr ""
 
-#: src/admin/pages/schema/components/settings/SettingsTab.jsx:76
+#: src/admin/pages/schema/components/PublisherCard.jsx:29
 msgid "Two descriptions of the same business on one page is worse than one — search engines pick one and ignore the other."
 msgstr ""
 
-#: src/admin/pages/schema/components/settings/SettingsTab.jsx:83
+#: src/admin/pages/schema/components/PublisherCard.jsx:36
 msgid "Publishing"
 msgstr ""
 
-#: src/admin/pages/schema/components/settings/SettingsTab.jsx:110
+#: src/admin/pages/schema/components/PublisherCard.jsx:63
 msgid "Also installed"
 msgstr ""
 
-#: src/admin/pages/schema/components/settings/SettingsTab.jsx:132
+#: src/admin/pages/schema/components/PublisherCard.jsx:85
 msgid "— publishes local business markup of its own."
 msgstr ""
 
-#: src/admin/pages/schema/components/settings/SettingsTab.jsx:137
+#: src/admin/pages/schema/components/PublisherCard.jsx:90
 msgid "— does not publish local business markup."
 msgstr ""
 
-#: src/admin/pages/schema/components/settings/SettingsTab.jsx:141
+#: src/admin/pages/schema/components/PublisherCard.jsx:94
 msgid "— may publish local business markup, depending on how it is set up. Check your page source if you are not sure."
 msgstr ""
 
-#: src/admin/pages/schema/components/shared/JsonPreview.jsx:113 src/admin/pages/schema/components/shared/JsonPreview.jsx:128 src/admin/pages/schema/components/shared/LockedPreview.jsx:42 src/admin/pages/schema/components/shared/LockedPreview.jsx:50
-msgid "JSON-LD preview"
+#: src/admin/pages/schema/components/RecommendationsCard.jsx:15
+msgid "What would make this better"
 msgstr ""
 
-#: src/admin/pages/schema/components/shared/JsonPreview.jsx:137
-msgid "properties"
+#: src/admin/pages/schema/components/RecommendationsCard.jsx:16
+msgid "None of these stop the markup being published. They just leave less for a search engine to work with."
 msgstr ""
 
-#: src/admin/pages/schema/components/shared/JsonPreview.jsx:172
-msgid "Building the preview…"
+#: src/admin/pages/schema/components/StatusBanner.jsx:24
+msgid "FoundHint is not publishing this markup, because a plugin known to publish it is active."
 msgstr ""
 
-#: src/admin/pages/schema/components/shared/JsonPreview.jsx:173
-msgid "Nothing is printed for this yet."
+#: src/admin/pages/schema/components/StatusBanner.jsx:28
+msgid "FoundHint is not publishing this markup, because of the setting below."
 msgstr ""
 
-#: src/admin/pages/schema/components/shared/JsonPreview.jsx:181
-msgid "Outputs on:"
+#: src/admin/pages/schema/components/StatusBanner.jsx:40
+msgid "Nothing is being published"
 msgstr ""
 
-#: src/admin/pages/schema/components/shared/JsonPreview.jsx:214
-msgid "Test with Google"
+#: src/admin/pages/schema/components/StatusBanner.jsx:62
+msgid "This markup is published on your site."
 msgstr ""
 
-#: src/admin/pages/schema/components/shared/JsonPreview.jsx:229
-msgid "Check with Schema.org"
+#: src/admin/pages/schema/index.jsx:68
+msgid "The structured data that tells search engines what your business is, where it is, and when it is open. Every location is published; this is the one chosen at the top of the page."
 msgstr ""
 
-#: src/admin/pages/schema/components/shared/JsonPreview.jsx:237
-msgid "Save first to test the live page."
+#: src/admin/pages/schema/lib/modes.js:5
+msgid "Automatic"
 msgstr ""
 
-#: src/admin/pages/schema/components/shared/JsonPreview.jsx:240
-msgid "Google can't reach %s. Copy the schema and paste it into the test's Code tab instead."
+#: src/admin/pages/schema/lib/modes.js:6
+msgid "FoundHint publishes it"
 msgstr ""
 
-#: src/admin/pages/schema/components/shared/LockedPreview.jsx:71
-msgid "Schema preview is a Premium feature"
+#: src/admin/pages/schema/lib/modes.js:7
+msgid "My SEO plugin publishes it"
 msgstr ""
 
-#: src/admin/pages/schema/components/shared/LockedPreview.jsx:75
-msgid "FoundHint Premium is installed but its licence isn't active."
+#: src/admin/pages/schema/lib/modes.js:8
+msgid "Nobody publishes it"
 msgstr ""
 
-#: src/admin/pages/schema/components/shared/LockedPreview.jsx:79
-msgid "See and edit the exact markup each schema adds to your site."
+#: src/admin/pages/schema/lib/modes.js:13
+msgid "FoundHint publishes the markup unless it finds another plugin already doing it."
 msgstr ""
 
-#: src/admin/pages/schema/components/shared/LockedPreview.jsx:93
-msgid "Unlock with Premium"
+#: src/admin/pages/schema/lib/modes.js:18
+msgid "Always publish, even if something else might be publishing too."
 msgstr ""
 
-#: src/admin/pages/schema/components/shared/PlacementCards.jsx:37 src/admin/pages/schema/components/website/WebsiteTab.jsx:35
-msgid "Every page"
+#: src/admin/pages/schema/lib/modes.js:23
+msgid "Never publish. Use this when your SEO plugin already describes the business."
 msgstr ""
 
-#: src/admin/pages/schema/components/shared/PlacementCards.jsx:41
-msgid "Site-wide, all %d pages."
+#: src/admin/pages/schema/lib/modes.js:28
+msgid "No local business markup is published from this site."
 msgstr ""
-
-#: src/admin/pages/schema/components/shared/PlacementCards.jsx:44
-msgid "Site-wide, on every page."
-msgstr ""
-
-#: src/admin/pages/schema/components/shared/PlacementCards.jsx:48
-msgid "Home page only"
-msgstr ""
-
-#: src/admin/pages/schema/components/shared/PlacementCards.jsx:49
-msgid "Only your home page carries it."
-msgstr ""
-
-#: src/admin/pages/schema/components/shared/PlacementCards.jsx:105
-msgid "Pages"
-msgstr ""
-
-#: src/admin/pages/schema/components/shared/PlacementCards.jsx:130
-msgid "No published pages match."
-msgstr ""
-
-#: src/admin/pages/schema/components/shared/PlacementCards.jsx:136
-msgid "Your home page needs the business so the website can name its publisher. FoundHint will still add it there."
-msgstr ""
-
-#: src/admin/pages/schema/components/shared/SaveBar.jsx:15
-msgid "Saved as a draft. Nothing is printed until the details Google needs are filled in."
-msgstr ""
-
-#: src/admin/pages/schema/components/shared/SaveBar.jsx:20
-msgid "Saved and live on your site."
-msgstr ""
-
-#: src/admin/pages/schema/components/shared/SaveBar.jsx:21
-msgid "Saved. Your site keeps its current markup until FoundHint Premium's full schema output is switched on."
-msgstr ""
-
-#: src/admin/pages/schema/components/shared/SaveBar.jsx:53
-msgid "Save and publish"
-msgstr ""
-
-#: src/admin/pages/schema/components/website/WebsiteTab.jsx:19
-msgid "Your website"
-msgstr ""
-
-#: src/admin/pages/schema/components/website/WebsiteTab.jsx:21
-msgid "Your site name, so Google can show it above your link."
-msgstr ""
-
-#: src/admin/pages/schema/components/website/WebsiteTab.jsx:25
-msgid "Home page"
-msgstr ""
-
-#: src/admin/pages/schema/components/website/WebsiteTab.jsx:29
-msgid "Each page"
-msgstr ""
-
-#: src/admin/pages/schema/components/website/WebsiteTab.jsx:31
-msgid "Title and description of every page, read from your page settings."
-msgstr ""
-
-#: src/admin/pages/schema/components/website/WebsiteTab.jsx:39
-msgid "About page"
-msgstr ""
-
-#: src/admin/pages/schema/components/website/WebsiteTab.jsx:41
-msgid "Marks the page that tells your story."
-msgstr ""
-
-#: src/admin/pages/schema/components/website/WebsiteTab.jsx:46
-msgid "Contact page"
-msgstr ""
-
-#: src/admin/pages/schema/components/website/WebsiteTab.jsx:48
-msgid "Marks the page with your phone, address and booking details."
-msgstr ""
-
-#: src/admin/pages/schema/components/website/WebsiteTab.jsx:56
-msgid "Breadcrumbs"
-msgstr ""
-
-#: src/admin/pages/schema/components/website/WebsiteTab.jsx:58
-msgid "The path to each page, shown under your link in Google."
-msgstr ""
-
-#: src/admin/pages/schema/components/website/WebsiteTab.jsx:62
-msgid "Every page except Home"
-msgstr ""
-
-#: src/admin/pages/schema/components/website/WebsiteTab.jsx:115
-msgid "Website structure saved."
-msgstr ""
-
-#: src/admin/pages/schema/components/website/WebsiteTab.jsx:119
-msgid "Some rows need attention."
-msgstr ""
-
-#: src/admin/pages/schema/components/website/WebsiteTab.jsx:154
-msgid "%s is added to your site."
-msgstr ""
-
-#: src/admin/pages/schema/components/website/WebsiteTab.jsx:176
-msgid "Tells Google what your site is, what each page is for and how pages connect."
-msgstr ""
-
-#: src/admin/pages/schema/components/website/WebsiteTab.jsx:205
-msgid "Its name: %s."
-msgstr ""
-
-#: src/admin/pages/schema/components/website/WebsiteTab.jsx:212
-msgid "Your SEO plugin publishes this type (Settings → Who publishes it), so FoundHint leaves it out."
-msgstr ""
-
-#: src/admin/pages/schema/components/website/WebsiteTab.jsx:220
-msgid "Found by its address. Save to confirm it."
-msgstr ""
-
-#: src/admin/pages/schema/components/website/WebsiteTab.jsx:230
-msgid "Added to"
-msgstr ""
-
-#: src/admin/pages/schema/components/website/WebsiteTab.jsx:244
-msgid "Page for %s"
-msgstr ""
-
-#: src/admin/pages/schema/components/website/WebsiteTab.jsx:281
-msgid "%s schema"
-msgstr ""
-
-#: src/admin/pages/schema/index.jsx:88
-msgid "%s is on and added to your site."
-msgstr ""
-
-#: src/admin/pages/schema/index.jsx:93
-msgid "%s is off. Nothing from it is added to your site."
-msgstr ""
-
-#: src/admin/pages/schema/lib/business.js:8 src/admin/pages/schema/lib/location.js:8
-msgid "Business information"
-msgstr ""
-
-#: src/admin/pages/schema/lib/business.js:9
-msgid "About the business"
-msgstr ""
-
-#: src/admin/pages/schema/lib/business.js:10
-msgid "Contact point"
-msgstr ""
-
-#: src/admin/pages/schema/lib/business.js:12 src/admin/pages/schema/lib/location.js:10
-msgid "Hours and reach"
-msgstr ""
-
-#: src/admin/pages/schema/lib/business.js:30
-msgid "Customer support"
-msgstr ""
-
-#: src/admin/pages/schema/lib/business.js:31
-msgid "Technical support"
-msgstr ""
-
-#: src/admin/pages/schema/lib/business.js:32
-msgid "Sales"
-msgstr ""
-
-#: src/admin/pages/schema/lib/business.js:33
-msgid "Billing support"
-msgstr ""
-
-#: src/admin/pages/schema/lib/business.js:34
-msgid "Bill payment"
-msgstr ""
-
-#: src/admin/pages/schema/lib/business.js:35
-msgid "Reservations"
-msgstr ""
-
-#: src/admin/pages/schema/lib/business.js:36
-msgid "Emergency"
-msgstr ""
-
-#: src/admin/pages/schema/lib/location.js:11 src/admin/pages/schema/lib/schema.js:8
-msgid "Branch code"
-msgstr ""
-
-#: src/admin/pages/schema/lib/location.js:57
-msgid "On every page"
-msgstr ""
-
-#: src/admin/pages/schema/lib/location.js:62
-msgid "On %d page"
-msgid_plural "On %d pages"
-msgstr[0] ""
-msgstr[1] ""
-
-#: src/admin/pages/schema/lib/locations.js:14
-msgid "Paused"
-msgstr ""
-
-#: src/admin/pages/schema/lib/locations.js:15
-msgid "Needs a page"
-msgstr ""
-
-#: src/admin/pages/schema/lib/locations.js:16
-msgid "Blocked"
-msgstr ""
-
-#: src/admin/pages/schema/lib/locations.js:46
-msgid "name"
-msgstr ""
-
-#: src/admin/pages/schema/lib/locations.js:47
-msgid "street address"
-msgstr ""
-
-#: src/admin/pages/schema/lib/locations.js:48
-msgid "city"
-msgstr ""
-
-#: src/admin/pages/schema/lib/locations.js:49
-msgid "country"
-msgstr ""
-
-#: src/admin/pages/schema/lib/locations.js:64
-msgid "No page assigned"
-msgstr ""
-
-#: src/admin/pages/schema/lib/locations.js:65
-msgid "No page assigned."
-msgstr ""
-
-#: src/admin/pages/schema/lib/locations.js:66
-msgid "This branch can't publish until it has its own page."
-msgstr ""
-
-#: src/admin/pages/schema/lib/locations.js:73
-msgid "Page not published"
-msgstr ""
-
-#: src/admin/pages/schema/lib/locations.js:74
-msgid "Its page isn't published."
-msgstr ""
-
-#: src/admin/pages/schema/lib/locations.js:75
-msgid "Publish the page, or choose another, so this branch can publish."
-msgstr ""
-
-#: src/admin/pages/schema/lib/locations.js:82
-msgid "Shares a page"
-msgstr ""
-
-#: src/admin/pages/schema/lib/locations.js:83
-msgid "Two locations on one page."
-msgstr ""
-
-#: src/admin/pages/schema/lib/locations.js:86
-msgid "%s also uses this page. Give each location its own page."
-msgstr ""
-
-#: src/admin/pages/schema/lib/locations.js:95
-msgid "Missing details"
-msgstr ""
-
-#: src/admin/pages/schema/lib/locations.js:96
-msgid "Missing details."
-msgstr ""
-
-#: src/admin/pages/schema/lib/locations.js:99
-msgid "Google needs its %s."
-msgstr ""
-
-#: src/admin/pages/schema/lib/locations.js:107
-msgid "Other domain"
-msgstr ""
-
-#: src/admin/pages/schema/lib/locations.js:108
-msgid "Website on another domain."
-msgstr ""
-
-#: src/admin/pages/schema/lib/locations.js:111
-msgid "Its Google profile links to %s. Check this really is one of your branches."
-msgstr ""
-
-#: src/admin/pages/schema/lib/locations.js:120
-msgid "Duplicate phone"
-msgstr ""
-
-#: src/admin/pages/schema/lib/locations.js:121
-msgid "Duplicate phone number."
-msgstr ""
-
-#: src/admin/pages/schema/lib/locations.js:124
-msgid "%1$s uses %2$s too. Give each location its own number if you can."
-msgstr ""
-
-#: src/admin/pages/schema/lib/locations.js:134
-msgid "Duplicate address"
-msgstr ""
-
-#: src/admin/pages/schema/lib/locations.js:135
-msgid "Duplicate address."
-msgstr ""
-
-#: src/admin/pages/schema/lib/locations.js:138
-msgid "Same street address as %s."
-msgstr ""
-
-#: src/admin/pages/schema/lib/locations.js:144
-msgid "Missing geo"
-msgstr ""
-
-#: src/admin/pages/schema/lib/locations.js:145
-msgid "Missing map pin."
-msgstr ""
-
-#: src/admin/pages/schema/lib/locations.js:146
-msgid "Add the pin on Google so this location shows in the right place."
-msgstr ""
-
-#: src/admin/pages/schema/lib/locations.js:153
-msgid "Missing hours"
-msgstr ""
-
-#: src/admin/pages/schema/lib/locations.js:154
-msgid "Missing opening hours."
-msgstr ""
-
-#: src/admin/pages/schema/lib/locations.js:155
-msgid "Add hours on Google and they show up here."
-msgstr ""
-
-#: src/admin/pages/schema/lib/locations.js:189
-msgid "%d main"
-msgstr ""
-
-#: src/admin/pages/schema/lib/locations.js:200
-msgid "%d separate"
-msgstr ""
-
-#: src/admin/pages/schema/lib/locations.js:179
-msgid "%d Google profile"
-msgid_plural "%d Google profiles"
-msgstr[0] ""
-msgstr[1] ""
-
-#: src/admin/pages/schema/lib/locations.js:194 src/admin/pages/schema/lib/tabSummaries.js:84
-msgid "%d branch"
-msgid_plural "%d branches"
-msgstr[0] ""
-msgstr[1] ""
-
-#: src/admin/pages/schema/lib/schema.js:7
-msgid "Branch name"
-msgstr ""
-
-#: src/admin/pages/schema/lib/schema.js:10
-msgid "Branch email"
-msgstr ""
-
-#: src/admin/pages/schema/lib/schema.js:11
-msgid "Branch page URL"
-msgstr ""
-
-#: src/admin/pages/schema/lib/schema.js:22
-msgid "Business website"
-msgstr ""
-
-#: src/admin/pages/schema/lib/schema.js:24
-msgid "Business logo"
-msgstr ""
-
-#: src/admin/pages/schema/lib/schema.js:25
-msgid "Business images"
-msgstr ""
-
-#: src/admin/pages/schema/lib/schema.js:33
-msgid "Latitude"
-msgstr ""
-
-#: src/admin/pages/schema/lib/schema.js:34
-msgid "Longitude"
-msgstr ""
-
-#: src/admin/pages/schema/lib/schema.js:35
-msgid "Map URL"
-msgstr ""
-
-#: src/admin/pages/schema/lib/schema.js:40
-msgid "Alternate name"
-msgstr ""
-
-#: src/admin/pages/schema/lib/schema.js:42
-msgid "Founding date"
-msgstr ""
-
-#: src/admin/pages/schema/lib/schema.js:43
-msgid "Founder"
-msgstr ""
-
-#: src/admin/pages/schema/lib/schema.js:44
-msgid "Topics you are known for"
-msgstr ""
-
-#: src/admin/pages/schema/lib/schema.js:45
-msgid "Contact type"
-msgstr ""
-
-#: src/admin/pages/schema/lib/schema.js:46
-msgid "Contact phone"
-msgstr ""
-
-#: src/admin/pages/schema/lib/schema.js:47
-msgid "Contact email"
-msgstr ""
-
-#: src/admin/pages/schema/lib/schema.js:48
-msgid "Languages spoken"
-msgstr ""
-
-#: src/admin/pages/schema/lib/schema.js:57
-msgid "Required by Google for a storefront"
-msgstr ""
-
-#: src/admin/pages/schema/lib/schema.js:61
-msgid "Required by Google"
-msgstr ""
-
-#: src/admin/pages/schema/lib/schema.js:69
-msgid "every page"
-msgstr ""
-
-#: src/admin/pages/schema/lib/schema.js:70
-msgid "home page only"
-msgstr ""
-
-#: src/admin/pages/schema/lib/schema.js:71
-msgid "pages you choose"
-msgstr ""
-
-#: src/admin/pages/schema/lib/service.js:5
-msgid "City or town"
-msgstr ""
-
-#: src/admin/pages/schema/lib/service.js:6
-msgid "Region or state"
-msgstr ""
-
-#: src/admin/pages/schema/lib/service.js:7
-msgid "Named area"
-msgstr ""
-
-#: src/admin/pages/schema/lib/service.js:57
-msgid "From %1$s %2$s"
-msgstr ""
-
-#: src/admin/pages/schema/lib/service.js:115
-msgid "No service page yet. Choose the page about this service, or nothing is printed."
-msgstr ""
-
-#: src/admin/pages/schema/lib/service.js:122
-msgid "“%s” is a general page. A page about only this service works better."
-msgstr ""
-
-#: src/admin/pages/schema/lib/service.js:126
-msgid "This page"
-msgstr ""
-
-#: src/admin/pages/schema/lib/service.js:131
-msgid "%s already uses this page. Each service works best on its own page."
-msgstr ""
-
-#: src/admin/pages/schema/lib/service.js:138
-msgid "This page isn't published, so nothing will show."
-msgstr ""
-
-#: src/admin/pages/schema/lib/service.js:143
-msgid "This URL is on another site. Schema here can't describe it."
-msgstr ""
-
-#: src/admin/pages/schema/lib/service.js:150
-msgid "This page's own address is %s. Use that instead."
-msgstr ""
-
-#: src/admin/pages/schema/lib/service.js:157
-msgid "No service areas yet. Add the places you actually serve."
-msgstr ""
-
-#: src/admin/pages/schema/lib/service.js:162
-msgid "No pages chosen yet, so this service prints nowhere."
-msgstr ""
-
-#: src/admin/pages/schema/lib/service.js:169
-msgid "%s is switched off in Location schema, so the service points at a branch that isn't printed."
-msgstr ""
-
-#: src/admin/pages/schema/lib/service.js:188
-msgid "%d area"
-msgid_plural "%d areas"
-msgstr[0] ""
-msgstr[1] ""
-
-#: src/admin/pages/schema/lib/tabSummaries.js:19
-msgid "Coming in a later update"
-msgstr ""
-
-#: src/admin/pages/schema/lib/tabSummaries.js:39
-msgid "%1$d of %2$d added"
-msgstr ""
-
-#: src/admin/pages/schema/lib/tabSummaries.js:50
-msgid "Head office · described in 01"
-msgstr ""
-
-#: src/admin/pages/schema/lib/tabSummaries.js:59
-msgid "Added to site header"
-msgstr ""
-
-#: src/admin/pages/schema/lib/tabSummaries.js:60
-msgid "Header output off"
-msgstr ""
-
-#: src/admin/pages/schema/lib/tabSummaries.js:103
-msgid "%1$d active · %2$d to check"
-msgstr ""
-
-#: src/admin/pages/schema/lib/tabSummaries.js:109
-msgid "%d active"
-msgstr ""
-
-#: src/admin/pages/schema/lib/tabSummaries.js:88
-msgid "%d page"
-msgid_plural "%d pages"
-msgstr[0] ""
-msgstr[1] ""
 
 #: src/admin/pages/settings/index.jsx:63
 msgid "Settings saved."
@@ -7541,6 +4441,10 @@ msgstr ""
 msgid "What kind of business this is."
 msgstr ""
 
+#: src/admin/pages/setup/components/DoneStep.jsx:50
+msgid "Done"
+msgstr ""
+
 #: src/admin/pages/setup/components/DoneStep.jsx:51
 msgid "Still to do"
 msgstr ""
@@ -7557,12 +4461,20 @@ msgstr ""
 msgid "Go to the dashboard"
 msgstr ""
 
+#: src/admin/pages/setup/components/DoneStep.jsx:78 src/admin/pages/setup/components/StepActions.jsx:22
+msgid "Back"
+msgstr ""
+
 #: src/admin/pages/setup/components/HoursStep.jsx:58
 msgid "No location yet"
 msgstr ""
 
 #: src/admin/pages/setup/components/HoursStep.jsx:61
 msgid "Opening hours belong to a location. Go back a step and add your address first."
+msgstr ""
+
+#: src/admin/pages/setup/components/HoursStep.jsx:71 src/admin/pages/setup/components/ServicesStep.jsx:134
+msgid "Continue"
 msgstr ""
 
 #: src/admin/pages/setup/components/LocationStep.jsx:91
@@ -7601,12 +4513,16 @@ msgstr ""
 msgid "Routine check-up"
 msgstr ""
 
+#: src/admin/pages/setup/components/ServicesStep.jsx:71
+msgid "Add"
+msgstr ""
+
 #: src/admin/pages/setup/components/ServicesStep.jsx:104
 msgid "Nothing listed yet. Add the things people actually come to you for."
 msgstr ""
 
 #: src/admin/pages/setup/components/ServicesStep.jsx:115
-msgid "That is all %d services your plan includes."
+msgid "That is all %d services this site allows."
 msgstr ""
 
 #: src/admin/pages/setup/components/StepActions.jsx:17
@@ -7791,46 +4707,6 @@ msgstr ""
 
 #: src/admin/pages/setup/index.jsx:72
 msgid "Welcome"
-msgstr ""
-
-#: src/editor/components/ChooseListing.jsx:24
-msgid "Which location is this post for?"
-msgstr ""
-
-#: src/editor/components/ChooseListing.jsx:27
-msgid "The post goes on that location's Google Business Profile."
-msgstr ""
-
-#: src/editor/components/EditorNotice.jsx:15
-msgid "Getting your post ready…"
-msgstr ""
-
-#: src/editor/components/EditorNotice.jsx:17
-msgid "Sharing your blog is part of FoundHint Premium"
-msgstr ""
-
-#: src/editor/components/EditorNotice.jsx:21
-msgid "With Premium, any published blog post can become a post on your Google Business Profile in one click."
-msgstr ""
-
-#: src/editor/components/EditorNotice.jsx:27
-msgid "Publish this post first"
-msgstr ""
-
-#: src/editor/components/EditorNotice.jsx:28
-msgid "Google links to the article, so it has to be published on your site. Publish it (or save your changes), then try again."
-msgstr ""
-
-#: src/editor/components/EditorNotice.jsx:34
-msgid "No Google Business Profile yet"
-msgstr ""
-
-#: src/editor/components/EditorNotice.jsx:35
-msgid "Connect your Google Business Profile in FoundHint, then share your post from here."
-msgstr ""
-
-#: src/editor/toolbar.js:68
-msgid "Opening the GBP Posting window…"
 msgstr ""
 
 #: found-hint.php:175

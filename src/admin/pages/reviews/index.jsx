@@ -9,12 +9,8 @@ import ReviewList from "./components/ReviewList";
 import ReviewsHeader from "./components/ReviewsHeader";
 import ReviewsNotice from "./components/ReviewsNotice";
 import ReviewToolbar, { showingText } from "./components/ReviewToolbar";
-import TemplatesCard from "./components/TemplatesCard";
 import useReviewActions from "./hooks/useReviewActions";
 import useReviewList from "./hooks/useReviewList";
-import useTemplates from "./hooks/useTemplates";
-import useAutoReply from "./hooks/useAutoReply";
-import AutoReplySection from "./components/autoreply/AutoReplySection";
 
 /**
  * Google reviews for the location chosen in the bar at the top.
@@ -36,9 +32,6 @@ export default function Reviews() {
     query: list.query,
   });
   const [replying, setReplying] = useState(null);
-  // Premium's own templates, or the sample set as a preview.
-  const templates = useTemplates(list.locationName);
-  const autoReply = useAutoReply(list.locationName);
 
   return (
     <>
@@ -74,55 +67,41 @@ export default function Reviews() {
       ) : null}
 
       {list.listing ? (
-        <AutoReplySection autoReply={autoReply} templates={templates} />
-      ) : null}
-
-      {list.listing ? (
-        <div className="fhint:grid fhint:items-start fhint:gap-5 fhint:lg:grid-cols-[minmax(0,1fr)_320px] fhint:xl:grid-cols-[minmax(0,1fr)_350px]">
-          <div className="fhint:grid fhint:min-w-0 fhint:gap-5">
-            <ReviewToolbar
-              from={list.from}
-              to={list.to}
-              total={list.total}
-              filtered={list.filtered}
-              onExport={actions.onExport}
-              exporting={actions.exporting}
-            >
-              <div className="fhint:border-b fhint:border-b-border fhint:p-5">
-                <ReviewFilters
-                  filters={list.filters}
-                  onChange={list.setFilters}
-                />
-              </div>
-
-              <ReviewList
-                items={list.items}
-                loaded={list.loaded}
-                isFetching={list.isFetching}
-                filtered={list.filtered}
-                onReply={setReplying}
-                autoReplied={autoReply.replied}
-              />
-
-              {list.total ? (
-                <ListFooter
-                  summary={showingText(list)}
-                  page={list.page}
-                  pages={list.pages}
-                  perPage={list.perPage}
-                  onPage={list.setPage}
-                  onPerPage={list.setPerPage}
-                />
-              ) : null}
-            </ReviewToolbar>
-          </div>
-
-          <aside
-            aria-label={__("Review tools", "foundhint-local-seo")}
-            className="fhint:grid fhint:gap-5"
+        <div className="fhint:grid fhint:min-w-0 fhint:gap-5">
+          <ReviewToolbar
+            from={list.from}
+            to={list.to}
+            total={list.total}
+            filtered={list.filtered}
+            onExport={actions.onExport}
+            exporting={actions.exporting}
           >
-            <TemplatesCard {...templates} />
-          </aside>
+            <div className="fhint:border-b fhint:border-b-border fhint:p-5">
+              <ReviewFilters
+                filters={list.filters}
+                onChange={list.setFilters}
+              />
+            </div>
+
+            <ReviewList
+              items={list.items}
+              loaded={list.loaded}
+              isFetching={list.isFetching}
+              filtered={list.filtered}
+              onReply={setReplying}
+            />
+
+            {list.total ? (
+              <ListFooter
+                summary={showingText(list)}
+                page={list.page}
+                pages={list.pages}
+                perPage={list.perPage}
+                onPage={list.setPage}
+                onPerPage={list.setPerPage}
+              />
+            ) : null}
+          </ReviewToolbar>
         </div>
       ) : null}
 

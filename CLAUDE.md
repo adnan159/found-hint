@@ -15,18 +15,12 @@ is a Vite-built React SPA mounted on a single WordPress admin page.
 The data layer (business, locations, opening hours, services), its REST API
 and the admin screens for all of it are built.
 
-**Schema Manager (built; Premium):** the six-tab Schema screen — 01
-Organization, 02 LocalBusiness (main business), 03 Locations (list, setup,
-branch editor), 04 Services, 05 Website structure, 06 Settings — each schema
-tab with an on/off switch. Premium prints the site's schema itself
-(`schema.output`): one `@graph` per page. Decisions, data model, the
-Free/Premium split and every checklist are in
-[`docs/SCHEMA-PLAN.md`](docs/SCHEMA-PLAN.md); open items are unticked there.
-See `docs/PROGRESS.md` for exactly what is done and how it was verified.
-
-**Review auto-reply (built; Premium, no AI yet):** how a reply is chosen,
-sent and recorded, and where each part lives —
-[`docs/AUTO-REPLY.md`](docs/AUTO-REPLY.md).
+**Schema:** the free plugin prints LocalBusiness JSON-LD for every
+location, built from saved data (`App\Schema\Graph`). The Schema screen
+shows exactly what is printed, why anything is not, and who publishes it
+(`schema.mode`). The Schema Manager, review auto-reply, reply templates,
+post scheduling and blog sharing belong to **FoundHint Premium** and live
+entirely in that add-on — see *Free/Pro* below.
 
 The sibling `local-seo` plugin in this same directory is the reference for
 the *product*: its `docs/DATABASE.md`, `API.md` and `FEATURES.md` describe
@@ -37,10 +31,10 @@ from there; the structure is defined here.
 
 ```bash
 npm run dev              # Vite dev server for the admin React SPA (vite.admin.config.js)
-npm run build            # Production build of the admin SPA → assets/build/admin, then the editor bundle → assets/build/editor
+npm run build            # Production build of the admin SPA → assets/build/admin
 npm run lint              # eslint over src/
 npm run plugin:prepare    # build + copy everything (minus buildExclude globs in package.json) into ./build
-npm run plugin:publish    # plugin:prepare + zip ./build into found-hint.zip
+npm run plugin:publish    # plugin:prepare + zip ./build into found-hint.zip (folder inside: foundhint-local-seo/)
 composer install          # installs dev tooling (PHPCS + WPCS) — no runtime PHP deps
 composer lint              # vendor/bin/phpcs — WordPress Coding Standards check (see phpcs.xml.dist)
 composer lint:fix           # vendor/bin/phpcbf — auto-fix what's mechanically fixable
@@ -58,6 +52,7 @@ php tests/Smoke/audit.php              # the rule set, scoring and the registry
 php tests/Smoke/dashboard.php          # the score trend and what the card may claim
 php tests/Smoke/google-refresh.php     # categories, attributes and photos read from a listing
 php tests/Smoke/posts.php              # post mapping to/from Google, validation, photo reachability
+node tests/Vite/forward-refs.mjs      # ui/ components take refs on WordPress's React 18
 ```
 
 The smoke suites run on plain PHP against stubbed WordPress
@@ -156,7 +151,6 @@ includes/
 ├── functions.php           global non-class helpers only
 └── hooks.php               global hook wiring only
 src/admin/                  Vite-built React SPA (see below)
-src/editor/                 GBP Posting button + popup in the block editor (vite.editor.config.js)
 assets/build/               Vite output, gitignored — never hand-edit
 assets/static/              hand-written, directly-enqueued, no build step
 libs/assets.php             vite-for-wp integration (FHINT\Libs\Assets)
@@ -238,7 +232,7 @@ Filter the required capability with `fhint_manage_capability`.
   `includes/API/Business.php`.
 - Every PHP file starts with `defined( 'ABSPATH' ) || exit;`.
 - Prefixes: constants `FHINT_`, options `fhint_`, hooks `fhint_`, tables
-  `{$wpdb->prefix}fhint_`, text domain `found-hint`, REST namespace
+  `{$wpdb->prefix}fhint_`, text domain `foundhint-local-seo` (= the WordPress.org slug), REST namespace
   `fhint/v1`, admin page slug `fhint`.
 
 ### Security — non-negotiable
@@ -258,12 +252,12 @@ Filter the required capability with `fhint_manage_capability`.
 
 | Concern | Use |
 |---|---|
-| React | `react` / `react-dom` (bundled by Vite, not `@wordpress/element`) |
+| React | WordPress's own `react` / `react-dom` / `react-jsx-runtime` scripts (18.3 today) — **not bundled** |
 | Routing | `react-router` (`createHashRouter`) — client-side, under one WP page |
 | Components | shadcn/ui (`src/admin/components/ui/`) + base-ui primitives |
 | State | Redux Toolkit + RTK Query (`src/admin/store/`) |
 | HTTP | RTK Query `fetchBaseQuery`, nonce from `window.FHINT` |
-| i18n | `@wordpress/i18n` (`__()`) with the `found-hint` text domain |
+| i18n | `@wordpress/i18n` (`__()`) with the `foundhint-local-seo` text domain — WordPress's `wp-i18n`, not bundled |
 | Styling | Tailwind CSS v4, classes prefixed `fhint:` (see `components.json`) |
 | Build | Vite (`vite.admin.config.js`) via `@kucrut/vite-for-wp` |
 
@@ -284,16 +278,22 @@ route in `routes.jsx` and an entry in the sidebar; do not add
   source.
 - **Assets load on our screen only.** `Enqueue` gates on the exact hook
   suffix `toplevel_page_fhint`. Verify by loading an unrelated admin page
-  and grepping the HTML for `fhint-admin`. The one other bundle is
-  `src/editor` (`Admin\EditorAssets`): the block editor for a blog post,
-  while blog sharing is on. It must never import `src/admin/index.css` —
-  that resets every element on the page. Shared look lives in
-  `src/admin/styles/theme.css` (FoundHint-only selectors); the editor gets
-  Tailwind's reset inside `@scope` (`src/editor/preflight-scoped.css`,
-  regenerate it after a Tailwind upgrade).
+  and grepping the HTML for `fhint-admin`. Shared look lives in
+  `src/admin/styles/theme.css` (FoundHint-only selectors).
+- **CSS never reaches WordPress's own interface** — not even on our
+  screen (Plugin Directory review). Tailwind's reset runs inside `@scope`:
+  `src/admin/preflight-scoped.css` (the app's `#fhint-app` and the
+  `[data-base-ui-portal]` containers its popups render into). It is a copy
+  of Tailwind's preflight; regenerate it after a Tailwind upgrade. Class
+  names we own are `fhint-` prefixed (`.fhint-scroll`).
 - **Field errors come from the server.** REST returns machine codes; the
   client maps them to translated strings.
-- **Every string through `__()`** with the `found-hint` text domain.
+- **Every string through `__()`** with the `foundhint-local-seo` text domain.
+  It must equal the WordPress.org slug. Plugin Check derives the expected
+  domain from the folder name, so run it on the installed release
+  (`foundhint-local-seo/`), not on this repo folder (`found-hint/`), or it
+  reports a false `TextDomainMismatch` on every string. Never change the
+  domain to `found-hint`.
 - **Accessibility is a requirement.** Labels on every control, visible focus
   states, `aria-live` for save/error notices, focus moved to the heading on
   route change, never status by colour alone.
@@ -323,6 +323,35 @@ route in `routes.jsx` and an entry in the sidebar; do not add
   translate. Brackets stay only where there is no spacing scale — a font
   size like `fhint:text-[12.5px]`, letter-spacing, a colour.
 
+### React comes from WordPress
+
+Plugin Directory guideline 13: a plugin uses the libraries WordPress ships
+instead of bundling its own, and Plugin Check fails a bundle that inlines
+React. The Vite config therefore:
+
+- **`wp_scripts()`** (vite-for-wp) turns `react`, `react-dom`,
+  `react-dom/client`, `react/jsx-runtime` and `@wordpress/*` imports into
+  WordPress's globals. `Enqueue` lists `react`,
+  `react-dom`, `react-jsx-runtime` and `wp-i18n` as dependencies —
+  `react-jsx-runtime` is why the plugin requires WordPress 6.6.
+- **`vite/wp-require.js`** gives CommonJS packages (react-redux's
+  use-sync-external-store) a `require()` that returns those globals;
+  without it the bundle throws on load.
+- **`vite/forward-refs.js`** wraps every component in `components/ui/` in
+  `forwardRef` at build time. shadcn writes them for React 19, where `ref`
+  is a prop; on React 18 a ref given to a plain function component is
+  dropped, and Base UI passes one whenever our component is its `render`
+  (`render={<Button />}`). The files themselves stay untouched, so the CLI
+  can still regenerate them. Proved by `node tests/Vite/forward-refs.mjs`.
+
+Write code that runs on **React 18 and 19**: `npm` pins `react@18.3` to
+match WordPress, so no React 19-only API (`use()`, `<Context value>` as a
+provider, form `action` functions, `ref` as a prop on our own components —
+use `forwardRef`, ref cleanup functions, `inert` as a boolean — React 18
+drops it with a warning). When WordPress moves to React 19
+the bundle needs no change. Test with `SCRIPT_DEBUG` on: it loads React's
+development build, the only one that prints its warnings.
+
 ### Working with generated components
 
 - **Class merging comes from the `cn` package**, not a local helper —
@@ -344,10 +373,9 @@ route in `routes.jsx` and an entry in the sidebar; do not add
   errors without a browser — and load the real bundle in a browser against
   a mocked API before calling a screen done. The select bug below survived
   a clean build, a clean lint and a passing SSR render.
-- **Build Premium URLs with query strings through `proUrl()`** (`lib/pro.js`),
-  free ones through `withQuery()` (`store/api/baseApi.js`). On plain
-  permalinks the base already holds `?rest_route=`, and a second `?` is a
-  404 `rest_no_route`.
+- **Build URLs with query strings through `withQuery()`**
+  (`store/api/baseApi.js`). On plain permalinks the base already holds
+  `?rest_route=`, and a second `?` is a 404 `rest_no_route`.
 - **Never pass `undefined` as a controlled component's value.** Base UI
   treats `undefined` as "uncontrolled" on first render and then ignores the
   real value when it arrives, so a saved value shows as the placeholder
@@ -362,7 +390,8 @@ Product name in the UI: **FoundHint** (the `FHINT` token is the *code*
 prefix only — namespace, constants, hooks, slugs — never user-facing copy).
 Primary accent `#FF6B35`, dark sidebar — from the FoundHint prototype; see
 project memory (`project_ui_prototype_foundhint`) and `docs/NAVIGATION.md`
-for the dashboard card composition, Free/Pro gating pattern and copy tone.
+for the dashboard card composition and copy tone. (Ignore any Free/Pro
+gating pattern described there — see *Free/Pro*.)
 
 ## Performance rules
 
@@ -374,26 +403,33 @@ for the dashboard card composition, Free/Pro gating pattern and copy tone.
 
 ## Free/Pro
 
-There is deliberately **no generic registry or DI layer**. The one
-extension point that exists is `App\Core\Limits`, whose `fhint_limits`
-filter raises the plan ceilings — every limit check in the plugin goes
-through it, so a Pro tier raises a number instead of rewriting core. If
-Pro needs more, add narrow filters at the specific points it needs and
-document them; don't reintroduce a generic registry.
+**WordPress.org Guideline 5 (trialware) applies to everything here.** The
+free plugin must be fully functional on its own and must not contain any
+feature that is locked, disabled, limited, greyed out, blurred, or shown
+"read-only until you upgrade". It must not know about licences. A version
+was rejected for exactly this (2026-11): Premium UI lived in this bundle
+behind `hasPro()`. That code was removed; the pre-removal state is on the
+branch `backup/develop-pre-wporg-review`.
 
-**FoundHint Pro** is a separate add-on plugin (`../found-hint-premium`) that is
-**server-side only**: REST routes (`fhint-premium/v1`), data, jobs, limits.
-**All UI — Pro screens included — lives in this plugin.** A Pro screen is
-wrapped in `<ProFeature feature="…" fallback={upsell}>` and shows only
-when Pro reports serving that feature through `fhint_admin_bootstrap_data`
-(`src/admin/lib/pro.js`). See [`docs/EXTENDING.md`](docs/EXTENDING.md).
-UI-side gating (`PRO` badges, greyed "PRO ONLY" rows, sample-data cards)
-is described in `docs/NAVIGATION.md`.
+- **No Premium code in this plugin** — no Premium screens, hidden or not, no
+  feature flags read from Premium, no licence state, no Premium REST client
+  code, no settings keys or tables that only Premium uses.
+- **Allowed:** generic, documented extension hooks (`fhint_limits` — free
+  defaults are unlimited and must stay so —, `fhint_schema_document`,
+  `fhint_schema_placement`, `fhint_post_sources`,
+  `fhint_admin_bootstrap_data`). Docblocks describe them generically, never
+  as "for Pro".
+- **Allowed:** a plain link to the add-on (plugin-row action link, a neutral
+  readme FAQ). Never an upsell card where a feature would be.
 
-Premium has its own release build, the same shape as this plugin's minus
-Vite: `npm run plugin:publish` in `../found-hint-premium` makes
-`found-hint-premium.zip` (see its `CLAUDE.md`). Ship the free release a
-Premium release depends on first.
+**FoundHint Premium** (`../found-hint-pro`) is a separate add-on that ships
+its own code — PHP and, when it needs screens, its own admin bundle and
+storage. Ship the free release a Premium release depends on first.
+
+The one extension point for numbers is `App\Core\Limits`, whose
+`fhint_limits` filter can change ceilings; there is deliberately no generic
+registry or DI layer. If an add-on needs more, add narrow, generic filters
+at the specific points it needs and document them.
 
 ## Never do
 

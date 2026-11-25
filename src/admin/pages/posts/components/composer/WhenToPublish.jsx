@@ -1,28 +1,14 @@
 import { __ } from "@wordpress/i18n";
-import { CalendarClockIcon, FileIcon, ZapIcon } from "lucide-react";
+import { FileIcon, ZapIcon } from "lucide-react";
 import { help, label } from "@/pages/profile/styles";
-import SoonTag from "@/pages/reviews/components/SoonTag";
 import { choice } from "../../styles";
-import ScheduleField from "./ScheduleField";
 
-function note(when, canSchedule) {
+function note(when) {
   if (when === "draft") {
     return __(
       "Saved here only. Nothing goes to Google until you finish it.",
       "foundhint-local-seo",
     );
-  }
-
-  if (when === "schedule") {
-    return canSchedule
-      ? __(
-          "Sent at this time. You can change or cancel it until then.",
-          "foundhint-local-seo",
-        )
-      : __(
-          "This post waits for FoundHint Premium to send it. Choose Now to publish it yourself, or Draft to take it off the schedule.",
-          "foundhint-local-seo",
-        );
   }
 
   return __(
@@ -32,24 +18,15 @@ function note(when, canSchedule) {
 }
 
 /**
- * Now, Schedule or Draft. Schedule is FoundHint Premium: without it the
- * choice is drawn with its PRO tag and disabled — unless this post is
- * already scheduled, which it then shows (its time read-only) so it is
- * clear why the post is waiting.
+ * Now or Draft: publish to Google when saved, or keep it on this site.
+ *
+ * @param {Object}   props
+ * @param {string}   props.when     `now` or `draft`.
+ * @param {Function} props.onChange Picks one.
  */
-export function WhenToPublish({
-  id,
-  when,
-  onChange,
-  canSchedule,
-  scheduleAt,
-  onScheduleAt,
-  timezone,
-  error,
-}) {
+export function WhenToPublish({ when, onChange }) {
   const options = [
     ["now", ZapIcon, __("Now", "foundhint-local-seo")],
-    ["schedule", CalendarClockIcon, __("Schedule", "foundhint-local-seo")],
     ["draft", FileIcon, __("Draft", "foundhint-local-seo")],
   ];
 
@@ -65,7 +42,6 @@ export function WhenToPublish({
       >
         {options.map(([value, Icon, text]) => {
           const on = when === value;
-          const premium = value === "schedule" && !canSchedule;
 
           return (
             <button
@@ -73,37 +49,17 @@ export function WhenToPublish({
               type="button"
               role="radio"
               aria-checked={on}
-              disabled={premium && !on}
-              title={
-                premium
-                  ? __(
-                      "Scheduling posts is part of FoundHint Premium.",
-                      "foundhint-local-seo",
-                    )
-                  : undefined
-              }
               onClick={() => onChange(value)}
               className={choice(on)}
             >
               <Icon aria-hidden="true" className="fhint:size-3.5" />
               {text}
-              {premium ? <SoonTag kind="pro" /> : null}
             </button>
           );
         })}
       </div>
-      {when === "schedule" ? (
-        <ScheduleField
-          id={id}
-          value={scheduleAt}
-          onChange={onScheduleAt}
-          timezone={timezone}
-          error={error}
-          locked={!canSchedule}
-        />
-      ) : null}
       <span className={help} aria-live="polite">
-        {note(when, canSchedule)}
+        {note(when)}
       </span>
     </div>
   );

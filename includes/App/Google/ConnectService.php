@@ -178,6 +178,37 @@ class ConnectService {
 	}
 
 	/**
+	 * Close a connection the service reports as failed, if this site began it.
+	 *
+	 * The service's error redirect is only believed when an attempt is
+	 * pending for the same user (and, when the service names one, the same
+	 * session). Consumed either way: a failed attempt cannot be resumed.
+	 *
+	 * @param string $session_id Session the service reported back, or ''.
+	 * @param int    $user_id    Who the browser belongs to.
+	 * @return bool Whether the report matches an attempt this site started.
+	 */
+	public static function abandon( $session_id, $user_id ) {
+		$pending = get_transient( self::HANDSHAKE_TRANSIENT );
+
+		if ( ! is_array( $pending ) || empty( $pending['session_id'] ) ) {
+			return false;
+		}
+
+		if ( (int) $pending['user_id'] !== (int) $user_id ) {
+			return false;
+		}
+
+		if ( '' !== (string) $session_id && ! hash_equals( (string) $pending['session_id'], (string) $session_id ) ) {
+			return false;
+		}
+
+		delete_transient( self::HANDSHAKE_TRANSIENT );
+
+		return true;
+	}
+
+	/**
 	 * Collect the tokens after Google returns the browser here.
 	 *
 	 * @param string $session_id Session the service reported back.
@@ -187,10 +218,6 @@ class ConnectService {
 	 */
 	public static function claim( $session_id, $handoff, $user_id ) {
 		$pending = get_transient( self::HANDSHAKE_TRANSIENT );
-
-		// Single use, like the OAuth handshake: a replayed redirect finds
-		// nothing waiting for it.
-		delete_transient( self::HANDSHAKE_TRANSIENT );
 
 		if ( ! is_array( $pending ) || empty( $pending['session_id'] ) ) {
 			return new WP_Error(
@@ -218,6 +245,11 @@ class ConnectService {
 				array( 'status' => 403 )
 			);
 		}
+
+		// Single use, like the OAuth handshake: a replayed redirect finds
+		// nothing waiting for it. Consumed only once it matched, so a forged
+		// or mistaken redirect cannot cancel the attempt this user started.
+		delete_transient( self::HANDSHAKE_TRANSIENT );
 
 		$tokens = self::post(
 			'/v1/exchange',
@@ -371,7 +403,12 @@ class ConnectService {
 	private static function rebase( $url ) {
 		$public = self::public_url();
 
-		if ( '' === $public || 0 === strpos( $url, $public ) ) {
+		// Already on the public base — on its exact origin and path, with a
+		// boundary after it, so `https://host.example.evil` cannot pass as
+		// `https://host.example`.
+		$base = untrailingslashit( $public );
+
+		if ( '' === $public || $url === $base || 0 === strpos( $url, $base . '/' ) || 0 === strpos( $url, $base . '?' ) ) {
 			return $url;
 		}
 

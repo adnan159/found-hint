@@ -1,14 +1,15 @@
 <?php
 /**
- * Google's business categories: searching them, and storing a choice.
+ * Google's business categories: searching Google's list, and storing a choice.
  *
  * Run with plain PHP: `php tests/Smoke/google-categories.php`.
  *
  * A category is what decides which searches a business appears in, and what
- * Google is sent is an id, not the name a person picked. So the two things
- * worth proving are that the search puts the thing meant at the top, and
- * that whatever is stored is a real Google id with the right name beside it
- * — because a wrong id is not a typo, it is a different kind of business.
+ * Google is sent is an id, not the name a person picked. The list itself is
+ * Google's and is read from Google, so what is proved here is what this
+ * plugin does with Google's answers: the thing meant comes first, the noise
+ * of Google's broad filter is dropped, answers are cached, nothing is asked
+ * without a connection, and a save never waits on Google.
  *
  * @package FoundHint
  */
@@ -17,18 +18,59 @@ require __DIR__ . '/bootstrap.php';
 
 use FHINT\App\Business\Business;
 use FHINT\App\Google\Categories;
+use FHINT\App\Google\OAuth;
+use FHINT\App\Google\Tokens;
 
 echo "Google categories\n";
 
 /**
- * The names a search returns, in order.
+ * Forget the connection, the cache and the HTTP log.
  *
- * @param string $search What was typed.
- * @param int    $limit  How many.
- * @return string[]
+ * @return void
  */
-function fhint_category_names( $search, $limit = 20 ) {
-	return array_column( Categories::search( $search, $limit )['items'], 'name' );
+function fhint_reset_categories() {
+	$GLOBALS['__options']       = array();
+	$GLOBALS['__transients']    = array();
+	$GLOBALS['__http_queue']    = array();
+	$GLOBALS['__http_requests'] = array();
+
+	$memo = new ReflectionProperty( Categories::class, 'memo' );
+	$memo->setAccessible( true );
+	$memo->setValue( null, array() );
+}
+
+/**
+ * Connect a Google account with a fresh token.
+ *
+ * @return void
+ */
+function fhint_connect() {
+	Tokens::save(
+		array(
+			'access_token'  => 'ya29.test',
+			'refresh_token' => '1//refresh',
+			'expires_in'    => 3600,
+			'scope'         => OAuth::SCOPE_BUSINESS,
+		),
+		array(
+			'account_email' => 'owner@example.test',
+			'connected_at'  => time(),
+		)
+	);
+}
+
+/**
+ * One of Google's category entries.
+ *
+ * @param string $id   e.g. 'gcid:dentist'.
+ * @param string $name Display name.
+ * @return array
+ */
+function fhint_gcat( $id, $name ) {
+	return array(
+		'name'        => 'categories/' . $id,
+		'displayName' => $name,
+	);
 }
 
 /**
@@ -43,223 +85,219 @@ function fhint_category_errors( array $changes ) {
 	return Business::validate( $record )->errors();
 }
 
-// ── the list itself ─────────────────────────────────────────────────────
+// ── without a Google connection ─────────────────────────────────────────
 
-$fhint_meta = Categories::meta();
+fhint_reset_categories();
 
-check( $fhint_meta['count'] > 3000, 'the bundled list holds Google\'s categories' );
-check( '' !== $fhint_meta['updated'], 'and records when it was last rebuilt' );
+check_same( array(), Categories::search( 'dentist' )['items'], 'with no connection a search finds nothing' );
+check_same( 0, count( $GLOBALS['__http_requests'] ), 'and asks nobody' );
+check_same( null, Categories::find( 'gcid:dentist' ), 'nor is a name looked up' );
+check_same( 'meta', 'google' === Categories::meta()['source'] ? 'meta' : 'other', 'the list is said to be Google\'s' );
 
-$fhint_dentist = Categories::find( 'gcid:dentist' );
+check( Categories::exists( 'gcid:dentist' ), 'an id shaped like Google\'s is accepted' );
+check( Categories::exists( 'categories/gcid:dentist' ), 'Google\'s full resource name too' );
+check( Categories::exists( ' GCID:Dentist ' ), 'whatever its case or padding' );
+check( ! Categories::exists( 'dentist' ), 'a bare word is not an id' );
+check( ! Categories::exists( 'gcid:Bad Id!' ), 'nor is anything with spaces or punctuation' );
+check( ! Categories::exists( '' ), 'nor is nothing' );
 
-check_same( 'Dentist', $fhint_dentist['name'], 'a category is found by its Google id' );
-check_same( 'Health & Medical', $fhint_dentist['bucket'], 'and carries its industry group' );
-check_same( 'Dentist', Categories::find( 'categories/gcid:dentist' )['name'], 'Google\'s full resource name is understood too' );
-check_same( 'Dentist', Categories::find( ' GCID:Dentist ' )['name'], 'an id is matched whatever its case or padding' );
-check_same( null, Categories::find( 'gcid:not_a_real_category' ), 'an id Google does not have is not found' );
-check_same( null, Categories::find( '' ), 'an empty id is not found' );
+check_same( 'categories/gcid:dentist', Categories::resource_name( 'GCID:dentist' ), 'the resource name is what Google\'s API is sent' );
+check_same( '', Categories::resource_name( 'not an id' ), 'and there is none for a malformed id' );
 
-check_same( 'gcid:dentist', Categories::find_by_name( 'dentist' )['id'], 'a category is found by its exact name, ignoring case' );
-check_same( null, Categories::find_by_name( 'dent' ), 'but not by part of its name — a near miss would attach the wrong business type' );
-check_same( 'gcid:doctor', Categories::find_by_name( 'Physician' )['id'], 'another wording Google uses for it finds it as well' );
+check_same( array( 'id' => 'gcid:dentist', 'name' => 'Dentist' ), Categories::resolve( array( 'id' => 'categories/gcid:dentist', 'name' => 'Dentist' ) ), 'an id sent with its name keeps both, normalised' );
+check_same( array( 'id' => 'gcid:dentist', 'name' => 'Dentist' ), Categories::resolve( 'gcid:dentist' ), 'an id alone, with Google out of reach, gets a readable name from the id' );
+check_same( 'Pet store', Categories::resolve( 'gcid:pet_store' )['name'], 'underscores read as spaces' );
+check_same( array( 'id' => '', 'name' => 'Made up' ), Categories::resolve( 'Made up' ), 'a name that cannot be matched keeps no id' );
 
-check_same( 'categories/gcid:dentist', Categories::resource_name( 'gcid:dentist' ), 'the resource name is what Google\'s API is sent' );
-check_same( '', Categories::resource_name( 'gcid:not_a_real_category' ), 'and there is none for an unknown id' );
+// ── searching Google ────────────────────────────────────────────────────
 
-// ── searching ───────────────────────────────────────────────────────────
+fhint_reset_categories();
+fhint_connect();
 
-$fhint_names = fhint_category_names( 'dentist' );
-
-check_same( 'Dentist', $fhint_names[0], 'an exact match comes first' );
-check( in_array( 'Cosmetic dentist', $fhint_names, true ), 'and names that merely contain the word follow' );
-
-$fhint_names = fhint_category_names( 'dent', 50 );
-
-check_same( 'Dentist', $fhint_names[0], 'among names starting with what was typed, the shortest leads' );
-check(
-	array_search( 'Dental clinic', $fhint_names, true ) < array_search( 'Cosmetic dentist', $fhint_names, true ),
-	'a name that starts with it outranks one where it starts a later word'
+// Google's filter is broad: it answers "dent" with a deli and a passport
+// office too. Those must not reach the person choosing.
+queue_http(
+	200,
+	array(
+		'categories' => array(
+			fhint_gcat( 'gcid:auto_dent_removal_service', 'Auto dent removal service' ),
+			fhint_gcat( 'gcid:cosmetic_dentist', 'Cosmetic dentist' ),
+			fhint_gcat( 'gcid:deli', 'Deli' ),
+			fhint_gcat( 'gcid:dental_clinic', 'Dental clinic' ),
+			fhint_gcat( 'gcid:dentist', 'Dentist' ),
+			fhint_gcat( 'gcid:passport_office', 'Passport office' ),
+			array( 'name' => 'categories/not-an-id', 'displayName' => 'Broken' ),
+			array( 'displayName' => 'No id at all' ),
+		),
+	)
 );
-check(
-	array_search( 'Cosmetic dentist', $fhint_names, true ) < array_search( 'Student dormitory', $fhint_names, true ),
-	'and a word that starts with it outranks one that only contains it'
-);
 
-check_same( fhint_category_names( 'pizza' ), fhint_category_names( '  PIZZA  ' ), 'case and stray spaces make no difference' );
-check_same( array( 'Dental clinic' ), fhint_category_names( 'clinic dental' ), 'words are matched in any order' );
-check_same( array(), fhint_category_names( 'zzzqqq' ), 'nonsense finds nothing' );
-check_same( 0, Categories::search( 'zzzqqq' )['total'], 'and says so in the total' );
+$fhint_result = Categories::search( 'dent' );
+$fhint_names  = array_column( $fhint_result['items'], 'name' );
 
-// Found only through another wording: listed, after every match on the name,
-// and saying which wording matched so the screen can explain itself.
-$fhint_physician = Categories::search( 'physician', 50 )['items'];
-$fhint_doctor    = null;
+check_same( array( 'Dentist', 'Dental clinic', 'Cosmetic dentist', 'Auto dent removal service' ), $fhint_names, 'names starting with the search lead, shortest first, then a word starting with it' );
+check( ! in_array( 'Deli', $fhint_names, true ) && ! in_array( 'Passport office', $fhint_names, true ), 'Google\'s loose matches are dropped' );
+check( ! in_array( 'Broken', $fhint_names, true ) && ! in_array( 'No id at all', $fhint_names, true ), 'and so is anything without a real id' );
+check_same( 4, $fhint_result['total'], 'the total counts what is shown' );
+check_same( array( 'id' => 'gcid:dentist', 'name' => 'Dentist' ), $fhint_result['items'][0], 'each result is the id and Google\'s name' );
 
-foreach ( $fhint_physician as $fhint_position => $fhint_item ) {
-	if ( 'gcid:doctor' === $fhint_item['id'] ) {
-		$fhint_doctor = $fhint_item + array( 'position' => $fhint_position );
-	}
+$fhint_request = $GLOBALS['__http_requests'][0];
+
+check( 0 === strpos( $fhint_request['url'], Categories::LIST_URL ), 'the search asks Google\'s categories endpoint' );
+check( false !== strpos( $fhint_request['url'], 'filter=displayName%3Ddent' ), 'with what was typed as its filter' );
+check( false !== strpos( $fhint_request['url'], 'regionCode=US' ) && false !== strpos( $fhint_request['url'], 'languageCode=en' ), 'in a region and a language' );
+
+check_same( $fhint_names, array_column( Categories::search( '  DENT ' )['items'], 'name' ), 'case and stray spaces ask the same question' );
+check_same( 1, count( $GLOBALS['__http_requests'] ), 'and the cached answer is used: Google is asked once' );
+
+check_same( array( 'Dental clinic' ), array_column( Categories::search( 'dent', 1, 1 )['items'], 'name' ), 'paging skips and caps' );
+$fhint_many = array();
+for ( $i = 1; $i <= 60; $i++ ) {
+	$fhint_many[] = fhint_gcat( 'gcid:shop_' . $i, 'Shop ' . $i );
 }
+queue_http( 200, array( 'categories' => $fhint_many ) );
+check_same( Categories::MAX_RESULTS, count( Categories::search( 'shop', 5000 )['items'] ), 'a search never returns more than the cap' );
 
-check( null !== $fhint_doctor, 'a category is found through another name Google uses for it' );
-check_same( 'Physician', $fhint_doctor['matched'], 'and the result says which wording matched' );
-check_same( count( $fhint_physician ) - 1, $fhint_doctor['position'], 'ranked after every match on a category\'s own name' );
-check( ! isset( $fhint_physician[0]['matched'] ), 'while a match on the name itself carries no such note' );
+queue_http( 200, array( 'categories' => array( fhint_gcat( 'gcid:dental_clinic', 'Dental clinic' ) ) ) );
+check_same( array( 'Dental clinic' ), array_column( Categories::search( 'clinic dental' )['items'], 'name' ), 'words are matched in any order' );
 
-// Pasting an id means that id.
-check_same( array( 'Dentist' ), fhint_category_names( 'gcid:dentist' ), 'searching for an id returns exactly that category' );
+queue_http( 500, array( 'error' => array( 'message' => 'Backend error' ) ) );
+check_same( array(), Categories::search( 'plumber' )['items'], 'when Google fails, a search finds nothing rather than breaking' );
+queue_http( 200, array( 'categories' => array( fhint_gcat( 'gcid:plumber', 'Plumber' ) ) ) );
+check_same( array( 'Plumber' ), array_column( Categories::search( 'plumber' )['items'], 'name' ), 'and a failure is not cached: the next search asks again' );
 
-// Two different Google categories can share a name; both must be offered,
-// told apart by id.
-$fhint_pools = array();
+check_same( array(), Categories::search( '' )['items'], 'an empty search asks nothing' );
 
-foreach ( Categories::search( 'swimming pool' )['items'] as $fhint_item ) {
-	if ( 'Swimming pool' === $fhint_item['name'] ) {
-		$fhint_pools[] = $fhint_item['id'];
-	}
-}
+// ── ids and exact names ─────────────────────────────────────────────────
 
-check_same( 2, count( array_unique( $fhint_pools ) ), 'two categories sharing a name are both returned, with different ids' );
+fhint_reset_categories();
+fhint_connect();
 
-// ── paging ──────────────────────────────────────────────────────────────
+queue_http( 200, array( 'categories' => array( fhint_gcat( 'gcid:dentist', 'Dentist' ) ) ) );
 
-$fhint_all = Categories::search( '', 3 );
+check_same( array( 'Dentist' ), array_column( Categories::search( 'gcid:dentist' )['items'], 'name' ), 'searching for an id returns exactly that category' );
+check( false !== strpos( end( $GLOBALS['__http_requests'] )['url'], Categories::BATCH_URL ), 'looked up by id' );
+check_same( 'Dentist', Categories::find( 'categories/gcid:dentist' )['name'], 'a looked-up name is remembered' );
+check_same( 1, count( $GLOBALS['__http_requests'] ), 'without asking again' );
+check_same( array( 'id' => 'gcid:dentist', 'name' => 'Dentist' ), Categories::resolve( 'gcid:dentist' ), 'an id alone resolves to Google\'s name' );
 
-check_same( $fhint_meta['count'], $fhint_all['total'], 'an empty search counts the whole list' );
-check_same( 3, count( $fhint_all['items'] ), 'and returns only what was asked for' );
+queue_http( 200, array( 'categories' => array() ) );
+check_same( null, Categories::find( 'gcid:not_a_real_category' ), 'an id Google does not know is not found' );
 
-$fhint_sorted = array_column( $fhint_all['items'], 'name' );
-$fhint_copy   = $fhint_sorted;
-natcasesort( $fhint_copy );
-
-check_same( array_values( $fhint_copy ), $fhint_sorted, 'in alphabetical order' );
-
-check_same( Categories::MAX_RESULTS, count( Categories::search( 'a', 5000 )['items'] ), 'a search never returns more than the cap' );
-check_same( 1, count( Categories::search( 'a', 0 )['items'] ), 'and never fewer than one when something matches' );
-
-$fhint_first  = array_column( Categories::search( 'service', 5, 0 )['items'], 'id' );
-$fhint_second = array_column( Categories::search( 'service', 5, 5 )['items'], 'id' );
-
-check_same( array(), array_values( array_intersect( $fhint_first, $fhint_second ) ), 'the next page repeats nothing from the first' );
-check_same( Categories::search( 'service', 5, 0 )['total'], Categories::search( 'service', 5, 5 )['total'], 'and the total ignores paging' );
-
-// ── turning a choice into what is stored ────────────────────────────────
-
-check_same( array( 'id' => 'gcid:dentist', 'name' => 'Dentist' ), Categories::resolve( 'gcid:dentist' ), 'an id resolves to the stored pair' );
-check_same( array( 'id' => 'gcid:dentist', 'name' => 'Dentist' ), Categories::resolve( 'dentist' ), 'so does an exact name' );
-check_same(
-	array( 'id' => 'gcid:dentist', 'name' => 'Dentist' ),
-	Categories::resolve( array( 'id' => 'gcid:dentist', 'name' => 'Best dentist in town' ) ),
-	'the name comes from Google\'s list, never from the request'
+queue_http(
+	200,
+	array(
+		'categories' => array(
+			fhint_gcat( 'gcid:dental_clinic', 'Dental clinic' ),
+			fhint_gcat( 'gcid:dentist', 'Dentist' ),
+		),
+	)
 );
-check_same( array( 'id' => '', 'name' => 'Made up' ), Categories::resolve( 'Made up' ), 'a name Google does not have keeps no id' );
-check_same( 'gcid:not_real', Categories::resolve( array( 'id' => 'gcid:not_real' ) )['id'], 'an unknown id is kept as sent, so the error can name it' );
+check_same( 'gcid:dentist', Categories::find_by_name( 'DENTIST' )['id'], 'a category is found by its exact name, ignoring case' );
+check_same( null, Categories::find_by_name( 'dent' ), 'but not by part of a name — a near miss would attach the wrong business type' );
+check_same( array( 'id' => 'gcid:dentist', 'name' => 'Dentist' ), Categories::resolve( 'dentist' ), 'so a typed name Google uses is tied to its id' );
 
-// ── the primary category on a business ──────────────────────────────────
+// ── what a save stores and accepts ──────────────────────────────────────
+//
+// Connected on purpose: Google could be asked, and must not be.
+
+fhint_reset_categories();
+fhint_connect();
+
+// A choice comes from a search: the search is what teaches the names.
+queue_http(
+	200,
+	array(
+		'categories' => array(
+			fhint_gcat( 'gcid:dental_clinic', 'Dental clinic' ),
+			fhint_gcat( 'gcid:dentist', 'Dentist' ),
+		),
+	)
+);
+Categories::search( 'dent' );
+$GLOBALS['__http_requests'] = array();
+
+$memo = new ReflectionProperty( Categories::class, 'memo' );
+$memo->setAccessible( true );
+$memo->setValue( null, array() );
 
 $fhint_clean = Business::sanitize(
 	array(
-		'primary_category_id' => 'gcid:dentist',
-		'primary_category'    => 'Best dentist in town',
+		'primary_category_id' => 'categories/gcid:dentist',
+		'primary_category'    => 'Dentist',
 	)
 );
 
 check_same( 'gcid:dentist', $fhint_clean['primary_category_id'], 'choosing a category stores Google\'s id' );
-check_same( 'Dentist', $fhint_clean['primary_category'], 'and Google\'s name for it, whatever the request claimed' );
+check_same( 'Dentist', $fhint_clean['primary_category'], 'with Google\'s name beside it' );
+check_same( 0, count( $GLOBALS['__http_requests'] ), 'and the save asks Google nothing: the search already said' );
 
-// The existing text field sends a name and nothing else.
-$fhint_clean = Business::sanitize( array( 'primary_category' => 'dentist' ) );
+// A name carried over from another category must not end up beside this id.
+$fhint_clean = Business::sanitize(
+	array(
+		'primary_category_id' => 'gcid:dentist',
+		'primary_category'    => 'Pet store',
+	)
+);
+check_same( 'Dentist', $fhint_clean['primary_category'], 'a stale name sent with an id is replaced by Google\'s' );
 
-check_same( 'gcid:dentist', $fhint_clean['primary_category_id'], 'a typed name Google uses is tied to its id' );
-check_same( 'Dentist', $fhint_clean['primary_category'], 'and stored the way Google writes it' );
+// An id sent with a name, not yet known: no request is spent on it.
+$GLOBALS['__http_requests'] = array();
+$fhint_clean = Business::sanitize(
+	array(
+		'primary_category_id' => 'gcid:pet_store',
+		'primary_category'    => 'Pet store',
+	)
+);
+check_same( 'Pet store', $fhint_clean['primary_category'], 'an unknown id keeps the name it came with' );
+check_same( 0, count( $GLOBALS['__http_requests'] ), 'without asking Google' );
 
 $fhint_clean = Business::sanitize( array( 'primary_category' => 'Tooth wizard' ) );
-
 check_same( 'Tooth wizard', $fhint_clean['primary_category'], 'a freehand category is still kept' );
-check_same( '', $fhint_clean['primary_category_id'], 'but carries no id — and so cannot keep the last one chosen' );
+check_same( '', $fhint_clean['primary_category_id'], 'but carries no id' );
 
 check( ! array_key_exists( 'primary_category_id', Business::sanitize( array( 'phone' => '+1 512 555 0134' ) ) ), 'a save that does not mention the category leaves it alone' );
 
-check_same( array(), fhint_category_errors( array( 'primary_category_id' => 'gcid:dentist' ) ), 'a real category id is accepted' );
-check_same(
-	array( 'business.category_id.unknown' ),
-	fhint_category_errors( array( 'primary_category_id' => 'gcid:not_real' ) )['primary_category_id'],
-	'an id Google does not have is refused'
-);
-check_same( array(), fhint_category_errors( array( 'primary_category' => 'Tooth wizard' ) ), 'a freehand category with no id is not an error' );
+$GLOBALS['__http_requests'] = array();
 
-// ── additional categories ───────────────────────────────────────────────
+check_same( array(), fhint_category_errors( array( 'primary_category_id' => 'gcid:dentist', 'primary_category' => 'Dentist' ) ), 'a category id is accepted' );
+check_same( array( 'business.category_id.unknown' ), fhint_category_errors( array( 'primary_category_id' => 'not an id' ) )['primary_category_id'] ?? array(), 'a malformed one is refused' );
 
-$fhint_extra = Business::sanitize(
-	array(
-		'secondary_categories' => array(
-			'gcid:dental_clinic',
-			'Cosmetic dentist',
-			array( 'id' => 'gcid:orthodontist', 'name' => 'anything' ),
-			'gcid:dental_clinic',
-		),
-	)
-)['secondary_categories'];
-
-check_same(
-	array(
-		array( 'id' => 'gcid:dental_clinic', 'name' => 'Dental clinic' ),
-		array( 'id' => 'gcid:cosmetic_dentist', 'name' => 'Cosmetic dentist' ),
-		array( 'id' => 'gcid:orthodontist', 'name' => 'Orthodontist' ),
-	),
-	$fhint_extra,
-	'ids, names and objects are all stored as the same { id, name } pair, without repeats'
-);
-
-check_same(
-	array( array( 'id' => 'gcid:dental_clinic', 'name' => 'Dental clinic' ) ),
-	Business::sanitize( array( 'secondary_categories' => 'gcid:dental_clinic' ) )['secondary_categories'],
-	'a single id as a string is a list of one'
-);
-check_same( array(), Business::sanitize( array( 'secondary_categories' => '' ) )['secondary_categories'], 'an empty value clears the list' );
-
-check_same( array(), fhint_category_errors( array( 'secondary_categories' => array( 'gcid:dental_clinic', 'gcid:orthodontist' ) ) ), 'real additional categories are accepted' );
-
-check_same(
-	array( 'business.categories.unknown' ),
-	fhint_category_errors( array( 'secondary_categories' => array( 'gcid:dental_clinic', 'Tooth wizard' ) ) )['secondary_categories'],
-	'an additional category Google does not have is refused, not silently dropped'
-);
-
-$fhint_ten = array_slice( array_column( Categories::search( 'service', 50 )['items'], 'id' ), 0, Categories::MAX_ADDITIONAL + 1 );
-
-check_same( Categories::MAX_ADDITIONAL + 1, count( $fhint_ten ), 'ten real categories are available for the test' );
-check_same(
-	array( 'business.categories.too_many' ),
-	fhint_category_errors( array( 'secondary_categories' => $fhint_ten ) )['secondary_categories'],
-	'one more than Google allows is refused'
-);
 check_same(
 	array(),
-	fhint_category_errors( array( 'secondary_categories' => array_slice( $fhint_ten, 0, Categories::MAX_ADDITIONAL ) ) ),
-	'exactly as many as Google allows is accepted'
+	fhint_category_errors(
+		array(
+			'primary_category_id'  => 'gcid:dentist',
+			'primary_category'     => 'Dentist',
+			'secondary_categories' => array( array( 'id' => 'gcid:dental_clinic', 'name' => 'Dental clinic' ) ),
+		)
+	),
+	'additional categories with ids are accepted'
 );
-
 check_same(
 	array( 'business.categories.includes_primary' ),
 	fhint_category_errors(
 		array(
 			'primary_category_id'  => 'gcid:dentist',
-			'secondary_categories' => array( 'gcid:dental_clinic', 'gcid:dentist' ),
+			'primary_category'     => 'Dentist',
+			'secondary_categories' => array( array( 'id' => 'gcid:dentist', 'name' => 'Dentist' ) ),
 		)
-	)['secondary_categories'],
-	'the primary category cannot also be an additional one'
+	)['secondary_categories'] ?? array(),
+	'but not one repeating the primary'
 );
+check_same( 0, count( $GLOBALS['__http_requests'] ), 'validating ids never asks Google' );
 
-// Names stored before ids existed must not lock a business out of saving.
-$fhint_legacy = array_merge(
-	Business::blank(),
-	array(
-		'name'                 => 'Northside Dental Care',
-		'secondary_categories' => array( 'Some old free text', 'Another' ),
-	)
+// An id that arrives without its name is looked up once, for the name.
+queue_http( 200, array( 'categories' => array( fhint_gcat( 'gcid:dentist', 'Dentist' ) ) ) );
+check_same( 'Dentist', Business::sanitize( array( 'primary_category_id' => 'gcid:dentist' ) )['primary_category'] ?? '', 'an id sent alone gets Google\'s name' );
+
+// A bare name has no id to check; it is looked up in Google's list (and
+// kept without an id when it is not there).
+check_same( array(), fhint_category_errors( array( 'primary_category' => 'Tooth wizard' ) ), 'a freehand category with no id is not an error' );
+check_same(
+	array( 'business.categories.unknown' ),
+	fhint_category_errors( array( 'secondary_categories' => array( 'Made up' ) ) )['secondary_categories'] ?? array(),
+	'and not one without an id'
 );
-
-check_same( array(), Business::validate( $fhint_legacy )->errors(), 'plain names stored by an older version do not block later saves' );
 
 finish( 'Google categories' );

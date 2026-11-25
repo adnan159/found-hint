@@ -5,7 +5,7 @@ import RequestError from "@/components/RequestError";
 import useGoogleConnect from "@/hooks/useGoogleConnect";
 
 /**
- * Shown above a screen whose fields are locked because no Google account is
+ * Shown above a screen whose fields need a Google account, because none is
  * linked. The business details belong to a Google Business Profile, so they
  * stay empty and read-only until one is — and the way out is right here.
  */
@@ -20,7 +20,7 @@ export function GoogleRequired() {
       <AlertDescription className="fhint:flex fhint:flex-col fhint:items-start fhint:gap-3">
         <span>
           {__(
-            "Your business details come from your Google Business Profile. Connect it to show them here and edit them — until then every field stays empty and locked.",
+            "Your business details come from your Google Business Profile. Connect it to show them here and edit them. Until then the fields stay empty.",
             "foundhint-local-seo",
           )}
         </span>

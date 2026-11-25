@@ -18,7 +18,7 @@ export const NO_FILTERS = {
 
 /**
  * The posts for the location chosen in the bar at the top: which Google
- * listing that is, its state (blog posts, recent 5-star reviews), the
+ * listing that is, its state (recent 5-star reviews), the
  * filters, the page of stored posts, and reading posts from Google.
  *
  * Only `onSync` contacts Google; everything else reads stored rows.

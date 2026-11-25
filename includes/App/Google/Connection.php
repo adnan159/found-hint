@@ -63,8 +63,8 @@ class Connection {
 	 * @return void
 	 */
 	public static function handle_logged_out_callback() {
-		self::breadcrumb( 'google.callback_logged_out' );
-
+		// Nothing is recorded here: anybody can reach this URL, and a log
+		// row per anonymous request would let a stranger fill the table.
 		auth_redirect();
 	}
 
@@ -189,17 +189,16 @@ class Connection {
 	 *
 	 * @return void
 	 */
-	// Google redirects the browser here; a redirect cannot carry a nonce.
-	// Cross-site forgery is covered instead by `state`, which is single use
-	// and bound to the user who began the handshake — a borrowed or replayed
-	// redirect claims nothing. Every value below is unslashed and sanitised.
+	// Google (or the connect service) redirects the browser here, to a
+	// fixed redirect URI, so no `_wpnonce` parameter can be added to it.
+	// - Direct Google sign-in: a WordPress nonce travels inside `state` and
+	//   is checked with wp_verify_nonce() before anything else is acted on;
+	//   `state` itself is then single use and bound to the user.
+	// - Connect service: the session and one-time handoff must match the
+	//   attempt this site started, for the same user (ConnectService).
+	// Every value below is unslashed and sanitised.
 	// phpcs:disable WordPress.Security.NonceVerification.Recommended
 	public static function handle_callback() {
-		// Recorded before anything can go wrong, so a connection that never
-		// completes can be told apart from one that never came back at all.
-		// Parameter *names* only: the values are a one-time code.
-		self::breadcrumb( 'google.callback_received' );
-
 		if ( ! Capabilities::current_user_can_manage() ) {
 			wp_die(
 				esc_html__( 'You do not have permission to manage this.', 'foundhint-local-seo' ),
@@ -208,22 +207,55 @@ class Connection {
 			);
 		}
 
+		// Recorded once the user is known to be allowed here, so a
+		// connection that never completes can be told apart from one that
+		// never came back at all. Parameter *names* only: the values are a
+		// one-time code. Never written for a request that fails the
+		// capability check, so nobody else can fill the log.
+		self::breadcrumb( 'google.callback_received' );
+
 		// The connect service reports a refusal in its own parameter, because
 		// Google's `error` never reaches this site on that route — Google
 		// answers the service, and the service brings the person home.
+		// Believed only when it matches an attempt this user started here;
+		// anything else is reported as unverified, never in its own words.
 		if ( isset( $_GET['fhint_connect_error'] ) ) {
-			$reason = sanitize_text_field( wp_unslash( $_GET['fhint_connect_error'] ) );
+			$session = isset( $_GET['fhint_session'] ) ? sanitize_text_field( wp_unslash( $_GET['fhint_session'] ) ) : '';
+
+			if ( ! ConnectService::abandon( $session, get_current_user_id() ) ) {
+				self::fail( 'fhint_connect_unverified', __( 'That sign-in could not be verified. Please try connecting again.', 'foundhint-local-seo' ) );
+			}
+
+			$declined = 'access_denied' === sanitize_key( wp_unslash( $_GET['fhint_connect_error'] ) );
 
 			self::fail(
-				'fhint_connect_' . $reason,
-				'access_denied' === $reason
+				$declined ? 'fhint_connect_access_denied' : 'fhint_connect_failed',
+				$declined
 					? __( 'Access was declined on the Google consent screen. Nothing has changed.', 'foundhint-local-seo' )
 					: __( 'The sign-in did not complete. Please try again.', 'foundhint-local-seo' )
 			);
 		}
 
+		// Validated inside: session, user and a single-use handoff code.
 		if ( isset( $_GET['fhint_handoff'] ) ) {
 			self::complete_through_service();
+		}
+
+		$state = isset( $_GET['state'] ) ? sanitize_text_field( wp_unslash( $_GET['state'] ) ) : '';
+
+		// The nonce first, before any other parameter is acted on. Google
+		// returns `state` unchanged, and this site put a WordPress nonce in
+		// it when the sign-in began (OAuth::start()).
+		if ( ! wp_verify_nonce( OAuth::state_nonce( $state ), OAuth::NONCE_ACTION ) ) {
+			self::fail( 'fhint_google_state_invalid', __( 'That sign-in could not be verified. Please try connecting again.', 'foundhint-local-seo' ) );
+		}
+
+		// Then `state` itself: single use, and bound to the user who began
+		// the sign-in on this site.
+		$handshake = OAuth::claim_handshake( $state );
+
+		if ( is_wp_error( $handshake ) ) {
+			self::fail( $handshake->get_error_code(), $handshake->get_error_message() );
 		}
 
 		// Google reports a declined consent here rather than by not
@@ -235,14 +267,7 @@ class Connection {
 			);
 		}
 
-		$state = isset( $_GET['state'] ) ? sanitize_text_field( wp_unslash( $_GET['state'] ) ) : '';
-		$code  = isset( $_GET['code'] ) ? sanitize_text_field( wp_unslash( $_GET['code'] ) ) : '';
-
-		$handshake = OAuth::claim_handshake( $state );
-
-		if ( is_wp_error( $handshake ) ) {
-			self::fail( $handshake->get_error_code(), $handshake->get_error_message() );
-		}
+		$code = isset( $_GET['code'] ) ? sanitize_text_field( wp_unslash( $_GET['code'] ) ) : '';
 
 		if ( '' === $code ) {
 			self::fail( 'fhint_google_code_missing', __( 'Google did not return an authorization code.', 'foundhint-local-seo' ) );

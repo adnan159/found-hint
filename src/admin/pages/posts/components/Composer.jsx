@@ -15,7 +15,7 @@ import WritingFields from "./composer/WritingFields";
 
 /**
  * Writing or editing one post: the type, the words, the button, the photo
- * and when it goes out, beside a live preview of how Google shows it.
+ * and whether it goes out now, beside a live preview of how Google shows it.
  * A post already on Google can only be changed by publishing the change,
  * and keeps its type — Google does not allow either otherwise. State and
  * saving live in `useComposer`; this lays the dialog out.
@@ -25,7 +25,6 @@ import WritingFields from "./composer/WritingFields";
  * @param {string}   props.businessName     The listing's name, for the preview.
  * @param {string}   props.website          The listing's website, for the link fields' globe button.
  * @param {boolean}  props.uploadsReachable Whether Google can fetch this site's uploads.
- * @param {string}   props.timezone         The site's time zone, for the schedule picker.
  * @param {Function} props.onClose          Close.
  */
 export function Composer({
@@ -34,7 +33,6 @@ export function Composer({
   businessName,
   website,
   uploadsReachable,
-  timezone,
   onClose,
 }) {
   const id = useId();
@@ -70,17 +68,16 @@ export function Composer({
         <ComposerHeader
           isNew={c.isNew}
           onGoogle={c.onGoogle}
-          scheduled={post?.status === "scheduled"}
           businessName={businessName}
         />
         <TypePicker type={type} locked={c.onGoogle} onChange={switchType} />
 
-        <div className="modern-scroll fhint:grid fhint:min-h-0 fhint:flex-1 fhint:overflow-y-auto fhint:md:grid-cols-[minmax(0,1fr)_minmax(0,0.7fr)] fhint:md:grid-rows-[minmax(0,1fr)] fhint:md:overflow-hidden">
+        <div className="fhint-scroll fhint:grid fhint:min-h-0 fhint:flex-1 fhint:overflow-y-auto fhint:md:grid-cols-[minmax(0,1fr)_minmax(0,0.7fr)] fhint:md:grid-rows-[minmax(0,1fr)] fhint:md:overflow-hidden">
           <form
             id={`${id}-form`}
             onSubmit={c.submit}
             noValidate
-            className="modern-scroll fhint:grid fhint:auto-rows-max fhint:content-start fhint:gap-4 fhint:px-5 fhint:py-4 fhint:md:min-h-0 fhint:md:overflow-y-auto"
+            className="fhint-scroll fhint:grid fhint:auto-rows-max fhint:content-start fhint:gap-4 fhint:px-5 fhint:py-4 fhint:md:min-h-0 fhint:md:overflow-y-auto"
           >
             <WritingFields {...fields} />
             {type !== "update" ? <DateFields {...fields} /> : null}
@@ -101,16 +98,7 @@ export function Composer({
             />
 
             {c.onGoogle ? null : (
-              <WhenToPublish
-                id={id}
-                when={c.when}
-                onChange={c.setWhen}
-                canSchedule={c.canSchedule}
-                scheduleAt={c.scheduleAt}
-                onScheduleAt={c.setScheduleAt}
-                timezone={timezone}
-                error={errors.scheduled_at}
-              />
+              <WhenToPublish when={c.when} onChange={c.setWhen} />
             )}
 
             {c.requestError || c.keptAs ? (

@@ -46,7 +46,7 @@ class ReviewRepository {
 			return array();
 		}
 
-		$table = Tables::name( Tables::REVIEWS );
+		$table = esc_sql( Tables::name( Tables::REVIEWS ) );
 
 		list( $where, $params ) = self::where( $args );
 
@@ -60,9 +60,9 @@ class ReviewRepository {
 			$params[]  = $offset;
 		}
 
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter -- table name from Tables::name(); $where/$limit_sql/$skip are fixed SQL holding only placeholders, values go through prepare().
 		$rows = $wpdb->get_results(
-			// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+			// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.PreparedSQLPlaceholders.UnfinishedPrepare
 			$wpdb->prepare( "SELECT * FROM {$table} {$where} ORDER BY reviewed_at DESC, id DESC{$limit_sql}", $params ),
 			ARRAY_A
 		);
@@ -83,13 +83,13 @@ class ReviewRepository {
 			return 0;
 		}
 
-		$table = Tables::name( Tables::REVIEWS );
+		$table = esc_sql( Tables::name( Tables::REVIEWS ) );
 
 		list( $where, $params ) = self::where( $args );
 
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter -- table name from Tables::name(); $where/$limit_sql/$skip are fixed SQL holding only placeholders, values go through prepare().
 		return (int) $wpdb->get_var(
-			// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+			// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.PreparedSQLPlaceholders.UnfinishedPrepare
 			$wpdb->prepare( "SELECT COUNT(*) FROM {$table} {$where}", $params )
 		);
 	}
@@ -182,7 +182,7 @@ class ReviewRepository {
 			return null;
 		}
 
-		$table = Tables::name( Tables::REVIEWS );
+		$table = esc_sql( Tables::name( Tables::REVIEWS ) );
 
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		$row = $wpdb->get_row(
@@ -211,7 +211,7 @@ class ReviewRepository {
 			return false;
 		}
 
-		$table    = Tables::name( Tables::REVIEWS );
+		$table    = esc_sql( Tables::name( Tables::REVIEWS ) );
 		$existing = self::find( $data['review_id'] );
 		$now      = current_time( 'mysql', true );
 
@@ -309,7 +309,7 @@ class ReviewRepository {
 			return $empty;
 		}
 
-		$table  = Tables::name( Tables::REVIEWS );
+		$table  = esc_sql( Tables::name( Tables::REVIEWS ) );
 		$where  = 'WHERE 1 = %d';
 		$params = array( 1 );
 
@@ -321,9 +321,9 @@ class ReviewRepository {
 		// A review its author removed is not part of the rating any more.
 		$where .= ' AND removed_at IS NULL';
 
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter -- table name from Tables::name(); $where/$limit_sql/$skip are fixed SQL holding only placeholders, values go through prepare().
 		$rows = $wpdb->get_results(
-			// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+			// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.PreparedSQLPlaceholders.UnfinishedPrepare
 			$wpdb->prepare( "SELECT star_rating, COUNT(*) AS total FROM {$table} {$where} GROUP BY star_rating", $params ),
 			ARRAY_A
 		);
@@ -372,7 +372,7 @@ class ReviewRepository {
 			return null;
 		}
 
-		$table = Tables::name( Tables::REVIEWS );
+		$table = esc_sql( Tables::name( Tables::REVIEWS ) );
 
 		if ( '' !== (string) $location_name ) {
 			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
@@ -406,7 +406,7 @@ class ReviewRepository {
 			return 0;
 		}
 
-		$table  = Tables::name( Tables::REVIEWS );
+		$table  = esc_sql( Tables::name( Tables::REVIEWS ) );
 		$now    = current_time( 'mysql', true );
 		$params = array( $now, $now, (string) $location_name );
 		$skip   = '';
@@ -416,9 +416,9 @@ class ReviewRepository {
 			$params = array_merge( $params, array_map( 'strval', $keep_ids ) );
 		}
 
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter -- table name from Tables::name(); $where/$limit_sql/$skip are fixed SQL holding only placeholders, values go through prepare().
 		return (int) $wpdb->query(
-			// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+			// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.PreparedSQLPlaceholders.ReplacementsWrongNumber
 			$wpdb->prepare( "UPDATE {$table} SET removed_at = %s, updated_at = %s WHERE location_name = %s AND removed_at IS NULL{$skip}", $params )
 		);
 	}
@@ -441,7 +441,7 @@ class ReviewRepository {
 			return 0;
 		}
 
-		$table = Tables::name( Tables::REVIEWS );
+		$table = esc_sql( Tables::name( Tables::REVIEWS ) );
 
 		if ( ! $keep_ids ) {
 			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
@@ -473,7 +473,7 @@ class ReviewRepository {
 			return false;
 		}
 
-		$table = Tables::name( Tables::REVIEWS );
+		$table = esc_sql( Tables::name( Tables::REVIEWS ) );
 
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 		return false !== $wpdb->query( "DELETE FROM {$table}" );

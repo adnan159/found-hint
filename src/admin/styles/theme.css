@@ -1,9 +1,8 @@
 /*
- * FoundHint's look, shared by the admin app (src/admin/index.css) and the
- * post editor's GBP Posting popup (src/editor/editor.css): theme tokens,
- * colours, and rules aimed only at FoundHint's own elements — `#fhint-app`,
- * `[data-slot]` components and `.fhint-*` classes. Nothing here may style a
- * bare element page-wide: the editor bundle loads it on WordPress's screen.
+ * FoundHint's look, used by the admin app (src/admin/index.css): theme
+ * tokens, colours, and rules aimed only at FoundHint's own elements —
+ * `#fhint-app`, `[data-slot]` components and `.fhint-*` classes. Nothing
+ * here may style a bare element page-wide.
  */
 
 @custom-variant dark (&:is(.dark *));
@@ -144,7 +143,7 @@
   /* Sidebar sub-items, and the quieter disclosure chevron. */
   --sidebar-sub-foreground: #444141;
   --sidebar-chevron: #9b9797;
-  /* Plan-limit, "heads up" and "coming soon" notices — an accent-tinted
+  /* Limit, "heads up" and "coming soon" notices — an accent-tinted
      band, not an error — measured from the prototype. Left undefined (they
      were lost once, in the tooltip commit), `bg-notice` is transparent and
      `border-notice-border` falls back to the text colour: every notice
@@ -349,41 +348,41 @@
 }
 
 @supports not selector(::-webkit-scrollbar) {
-  .modern-scroll {
+  .fhint-scroll {
     scrollbar-width: thin;
     scrollbar-color: #a8a09d transparent;
   }
 }
 
-.modern-scroll::-webkit-scrollbar {
+.fhint-scroll::-webkit-scrollbar {
   width: 7px;
   height: 7px;
 }
 
 /* Track */
-.modern-scroll::-webkit-scrollbar-track {
+.fhint-scroll::-webkit-scrollbar-track {
   background: transparent;
 }
 
 /* Handle */
-.modern-scroll::-webkit-scrollbar-thumb {
+.fhint-scroll::-webkit-scrollbar-thumb {
   background: #a8a09d;
   border-radius: 100px;
 }
 
 /* Handle on hover */
-.modern-scroll::-webkit-scrollbar-thumb:hover {
+.fhint-scroll::-webkit-scrollbar-thumb:hover {
   background: #867e7b;
 }
 
-.modern-scroll::-webkit-scrollbar-button {
+.fhint-scroll::-webkit-scrollbar-button {
   width: 0;
   height: 0;
   display: none;
 }
 
 /* Remove corner/background */
-.modern-scroll::-webkit-scrollbar-corner {
+.fhint-scroll::-webkit-scrollbar-corner {
   background: transparent;
 }
 

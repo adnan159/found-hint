@@ -18,7 +18,7 @@ defined( 'ABSPATH' ) || exit;
  * node and an audit rule must all read the same value or they will disagree
  * with each other on the same page.
  *
- * Free ships one business row. The table carries an id anyway so multi-brand
+ * The plugin keeps one business row. The table carries an id anyway so multi-brand
  * support never needs a migration on an existing site.
  *
  * Columns

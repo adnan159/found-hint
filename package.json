@@ -1,18 +1,16 @@
 {
   "name": "found-hint",
-  "version": "1.2.3",
+  "version": "1.2.5",
   "type": "module",
   "scripts": {
     "dev": "vite --config vite.admin.config.js",
     "start": "npm run dev",
     "lint": "npx eslint src",
-    "build": "vite build --config vite.admin.config.js && vite build --config vite.editor.config.js",
+    "build": "vite build --config vite.admin.config.js",
     "plugin:prepare": "npm run build && npm run i18n && node scripts/build.cjs && npm run plugin:vendor",
     "plugin:publish": "npm run plugin:prepare && node scripts/zip.cjs",
     "plugin:vendor": "composer install --no-dev --optimize-autoloader --classmap-authoritative --working-dir=build --quiet",
-    "i18n": "node scripts/make-pot.cjs",
-    "categories:update": "node scripts/update-google-categories.cjs",
-    "dev:editor": "vite --config vite.editor.config.js"
+    "i18n": "node scripts/make-pot.cjs"
   },
   "buildExclude": [
     "node_modules",
@@ -29,6 +27,7 @@
     "composer.lock",
     "package-lock.json",
     "docs",
+    "includes/**/README.md",
     "tests",
     "phpcs.xml.dist",
     "eslint.config.js",
@@ -59,8 +58,8 @@
     "cn": "^0.3.0",
     "lucide-react": "^1.14.0",
     "next-themes": "^0.4.6",
-    "react": "^19.2.5",
-    "react-dom": "^19.2.5",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
     "react-redux": "^9.2.0",
     "react-router-dom": "^7.14.2",
     "shadcn": "^4.6.0",
@@ -76,8 +75,8 @@
     "@eslint/json": "^1.2.0",
     "@kucrut/vite-for-wp": "^0.12.0",
     "@tailwindcss/vite": "^4.2.4",
-    "@types/react": "^19.2.14",
-    "@types/react-dom": "^19.2.3",
+    "@types/react": "^18.3.31",
+    "@types/react-dom": "^18.3.7",
     "@typescript-eslint/eslint-plugin": "^8.59.2",
     "@typescript-eslint/parser": "^8.59.2",
     "@vitejs/plugin-react": "^6.0.1",
@@ -90,8 +89,10 @@
     "globals": "^17.5.0",
     "micromatch": "^4.0.8",
     "prettier": "^3.8.3",
+    "rollup-plugin-external-globals": "^0.13.0",
     "tailwindcss": "^4.2.4",
     "typescript": "^6.0.3",
-    "vite": "^8.0.10"
+    "vite": "^8.0.10",
+    "vite-plugin-external": "^6.2.2"
   }
 }

@@ -98,6 +98,20 @@ Credentials::save( 'client-id-456.apps.googleusercontent.com', '' );
 check_same( 'secret-value', Credentials::client_secret(), 'an empty secret keeps the stored one' );
 check_same( 'client-id-456.apps.googleusercontent.com', Credentials::client_id(), 'and the new client id is stored' );
 
+// -- The client secret is encrypted at rest ---------------------------------
+
+$fhint_stored = $GLOBALS['__options'][ Credentials::OPTION ]['client_secret'] ?? '';
+check( '' === $fhint_stored || Secrets::is_encrypted( $fhint_stored ) || ! Secrets::available(), 'the stored client secret is encrypted' );
+check( false === strpos( (string) $fhint_stored, 'secret-value' ) || ! Secrets::available(), 'and the plain secret is not in the option' );
+check_same( 'secret-value', Credentials::client_secret(), 'while it reads back intact' );
+
+$GLOBALS['__options'][ Credentials::OPTION ]['client_secret'] = 'legacy-plain';
+check_same( 'legacy-plain', Credentials::client_secret(), 'a secret saved before encryption still reads' );
+Credentials::save( '', '' );
+check( Secrets::is_encrypted( $GLOBALS['__options'][ Credentials::OPTION ]['client_secret'] ) || ! Secrets::available(), 'and is encrypted on the next save' );
+check_same( 'legacy-plain', Credentials::client_secret(), 'without changing it' );
+Credentials::save( '', 'secret-value' );
+
 // -- The connection state never carries a secret ---------------------------
 
 $state      = Connection::state();
@@ -169,6 +183,30 @@ check( $unknown instanceof WP_Error, 'an unknown state is rejected' );
 
 $missing = OAuth::claim_handshake( '' );
 check( $missing instanceof WP_Error, 'a missing state is rejected' );
+
+// -- State carries a WordPress nonce ----------------------------------------
+
+reset_google();
+Credentials::save( 'id', 'secret' );
+
+$url = OAuth::start( 1 );
+parse_str( (string) wp_parse_url( $url, PHP_URL_QUERY ), $query );
+
+check_same( wp_create_nonce( OAuth::NONCE_ACTION ), OAuth::state_nonce( $query['state'] ), 'state carries a nonce for the callback action' );
+check( false !== wp_verify_nonce( OAuth::state_nonce( $query['state'] ), OAuth::NONCE_ACTION ), 'and it verifies with wp_verify_nonce()' );
+check_same( '', OAuth::state_nonce( 'no-dot-here' ), 'a state without a nonce yields none' );
+
+// A state whose stored handshake exists but whose nonce was altered.
+$tampered = substr( $query['state'], 0, strrpos( $query['state'], '.' ) + 1 ) . 'bad0nce000';
+$GLOBALS['__transients'][ OAuth::HANDSHAKE_PREFIX . $tampered ] = $GLOBALS['__transients'][ OAuth::HANDSHAKE_PREFIX . $query['state'] ];
+
+$bad = OAuth::claim_handshake( $tampered );
+check( $bad instanceof WP_Error, 'a state with a wrong nonce is refused' );
+check_same( 'fhint_google_state_invalid', $bad instanceof WP_Error ? $bad->get_error_code() : 'claimed', 'as invalid' );
+check( ! isset( $GLOBALS['__transients'][ OAuth::HANDSHAKE_PREFIX . $tampered ] ), 'and is consumed, so it cannot be retried' );
+
+$good = OAuth::claim_handshake( $query['state'] );
+check( is_array( $good ), 'while the untouched state still completes' );
 
 // -- State belongs to the user who started it ------------------------------
 
@@ -476,6 +514,15 @@ queue_http(
 	)
 );
 
+// A redirect for another session or another user is refused, and does not
+// cancel the attempt this user started: it is consumed only on a match.
+$fhint_before = $GLOBALS['__transients'][ ConnectService::HANDSHAKE_TRANSIENT ];
+$fhint_wrong  = ConnectService::claim( 'session-other', 'handoff-xyz', 7 );
+check_same( 'fhint_connect_session_mismatch', is_wp_error( $fhint_wrong ) ? $fhint_wrong->get_error_code() : 'claimed', 'claim: another session is refused' );
+$fhint_wrong = ConnectService::claim( 'session-abc', 'handoff-xyz', 8 );
+check_same( 'fhint_connect_wrong_user', is_wp_error( $fhint_wrong ) ? $fhint_wrong->get_error_code() : 'claimed', 'claim: another user is refused' );
+check_same( $fhint_before, $GLOBALS['__transients'][ ConnectService::HANDSHAKE_TRANSIENT ] ?? null, 'claim: a refused redirect leaves the attempt in place' );
+
 $claimed = ConnectService::claim( 'session-abc', 'handoff-xyz', 7 );
 
 check( ! is_wp_error( $claimed ), 'the tokens can be collected' );
@@ -486,6 +533,28 @@ $exchange = json_decode( last_request()['args']['body'], true );
 check_same( $plain, $exchange['secret'], 'the secret sent is the real one' );
 check( ! Secrets::is_encrypted( $exchange['secret'] ), 'never the stored ciphertext' );
 check_same( 'handoff-xyz', $exchange['handoff'], 'with the handoff from the redirect' );
+check( ! isset( $GLOBALS['__transients'][ ConnectService::HANDSHAKE_TRANSIENT ] ), 'claim: a matched attempt is consumed' );
+
+// -- An error redirect from the connect service ------------------------------
+//
+// `fhint_connect_error` is believed only for an attempt this site started,
+// for the same user (and session, when the service names one). Anything
+// else must not be able to write the screen's notice.
+
+$fhint_pending = array( 'session_id' => 'session-abc', 'secret' => 'x', 'user_id' => 7 );
+
+unset( $GLOBALS['__transients'][ ConnectService::HANDSHAKE_TRANSIENT ] );
+check( ! ConnectService::abandon( '', 7 ), 'abandon: no attempt pending, the report is not believed' );
+
+$GLOBALS['__transients'][ ConnectService::HANDSHAKE_TRANSIENT ] = $fhint_pending;
+check( ! ConnectService::abandon( 'session-abc', 8 ), 'abandon: not for another user' );
+check( ! ConnectService::abandon( 'session-other', 7 ), 'abandon: not for another session' );
+check( isset( $GLOBALS['__transients'][ ConnectService::HANDSHAKE_TRANSIENT ] ), 'abandon: a refused report leaves the attempt in place' );
+check( ConnectService::abandon( 'session-abc', 7 ), 'abandon: the matching attempt is believed' );
+check( ! isset( $GLOBALS['__transients'][ ConnectService::HANDSHAKE_TRANSIENT ] ), 'abandon: and is consumed' );
+
+$GLOBALS['__transients'][ ConnectService::HANDSHAKE_TRANSIENT ] = $fhint_pending;
+check( ConnectService::abandon( '', 7 ), 'abandon: a report naming no session matches on the user' );
 
 $GLOBALS['__filters']['fhint_connect_url'] = array();
 

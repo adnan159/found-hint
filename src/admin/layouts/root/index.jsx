@@ -13,7 +13,7 @@ import Sidebar from "./components/Sidebar";
 /**
  * The shell every screen renders inside.
  *
- * The plan line in the sidebar footer is read from the same endpoints the
+ * The counts line in the sidebar footer is read from the same endpoints the
  * screens use, so it cannot disagree with them — RTK Query dedupes the
  * requests, and a save anywhere invalidates the tags that feed it.
  */

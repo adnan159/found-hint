@@ -110,6 +110,32 @@ class Installer {
 		self::drop_old_service_slug_key();
 		self::remember_google_listings();
 		self::rename_veterinarian_type();
+		self::drop_unused_tables();
+	}
+
+	/**
+	 * Tables an earlier version created and nothing uses any more.
+	 *
+	 * `schema_page_index` was meant to map pages to schema for the
+	 * front end; the page map is built from the cached graph instead, so the
+	 * table was never written. Dropped where it exists; on a new or already
+	 * cleaned site this is one SHOW TABLES per name.
+	 *
+	 * @return void
+	 */
+	private static function drop_unused_tables() {
+		global $wpdb;
+
+		foreach ( array( 'schema_page_index' ) as $key ) {
+			if ( ! Tables::exists( $key ) ) {
+				continue;
+			}
+
+			$table = esc_sql( Tables::name( $key ) );
+
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.SchemaChange, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+			$wpdb->query( "DROP TABLE IF EXISTS {$table}" );
+		}
 	}
 
 	/**
@@ -127,7 +153,7 @@ class Installer {
 			return;
 		}
 
-		$table = Tables::name( Tables::BUSINESS );
+		$table = esc_sql( Tables::name( Tables::BUSINESS ) );
 
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 		$wpdb->query( $wpdb->prepare( "UPDATE {$table} SET business_type = %s WHERE business_type = %s", 'VeterinaryCare', 'Veterinarian' ) );
@@ -151,8 +177,8 @@ class Installer {
 			return;
 		}
 
-		$locations = Tables::name( Tables::LOCATIONS );
-		$google    = Tables::name( Tables::GOOGLE_LOCATIONS );
+		$locations = esc_sql( Tables::name( Tables::LOCATIONS ) );
+		$google    = esc_sql( Tables::name( Tables::GOOGLE_LOCATIONS ) );
 
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 		$wpdb->query(
@@ -178,7 +204,7 @@ class Installer {
 			return;
 		}
 
-		$table = Tables::name( Tables::SERVICES );
+		$table = esc_sql( Tables::name( Tables::SERVICES ) );
 
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 		$exists = $wpdb->get_var( $wpdb->prepare( "SHOW INDEX FROM {$table} WHERE Key_name = %s", 'business_slug' ) );

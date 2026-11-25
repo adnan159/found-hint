@@ -5,9 +5,11 @@ import { formatDate } from "./replies";
 function cell(value) {
   let text = String(value ?? "");
 
-  // A cell starting with = + - or @ is run as a formula by spreadsheets;
-  // a review is someone else's words and must never run as one.
-  if (/^[=+\-@]/.test(text)) {
+  // A cell starting with = + - @, or a tab or carriage return (which some
+  // spreadsheets strip before reading a formula), is run as a formula; so
+  // is one where leading spaces hide those. A review is someone else's
+  // words and must never run as one (OWASP CSV injection).
+  if (/^[\s]*[=+\-@]/.test(text) || /^[\t\r]/.test(text)) {
     text = `'${text}`;
   }
 

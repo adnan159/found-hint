@@ -48,12 +48,12 @@ class OpeningHoursRepository {
 			return array();
 		}
 
-		$table        = Tables::name( Tables::LOCATION_HOURS );
+		$table        = esc_sql( Tables::name( Tables::LOCATION_HOURS ) );
 		$placeholders = implode( ',', array_fill( 0, count( $ids ), '%d' ) );
 
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 		$rows = $wpdb->get_results(
-			// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+			// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.PreparedSQLPlaceholders.UnfinishedPrepare
 			$wpdb->prepare( "SELECT * FROM {$table} WHERE location_id IN ({$placeholders}) ORDER BY location_id ASC, day_of_week ASC, period_index ASC", $ids ),
 			ARRAY_A
 		);
@@ -87,7 +87,7 @@ class OpeningHoursRepository {
 			return false;
 		}
 
-		$table = Tables::name( Tables::LOCATION_HOURS );
+		$table = esc_sql( Tables::name( Tables::LOCATION_HOURS ) );
 		$now   = Validator::now();
 
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
@@ -147,7 +147,7 @@ class OpeningHoursRepository {
 			return 0;
 		}
 
-		$table = Tables::name( Tables::LOCATION_HOURS );
+		$table = esc_sql( Tables::name( Tables::LOCATION_HOURS ) );
 
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 		return (int) $wpdb->query( $wpdb->prepare( "DELETE FROM {$table} WHERE location_id = %d", (int) $location_id ) );

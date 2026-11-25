@@ -542,6 +542,8 @@ check( false !== strpos( $tag, '<script type="application/ld+json" id="fhint-sch
 check( false !== strpos( $tag, '</script>' ), 'and is closed' );
 check( 0 === strpos( trim( $tag ), '<!-- This site uses FoundHint Local SEO' ), 'the page source names the plugin before it' );
 check( '<!-- / FoundHint Local SEO -->' === substr( trim( $tag ), -strlen( '<!-- / FoundHint Local SEO -->' ) ), 'and closes the block after it' );
+check( false === strpos( substr( $tag, 0, strpos( $tag, '<script' ) ), 'http' ), 'the comment carries no link on the public site' );
+check( false === strpos( substr( $tag, 0, strpos( $tag, '<script' ) ), FHINT_VERSION ), 'and no plugin version' );
 check( false !== strpos( $tag, 'Northside Dental Care' ), 'and carries the business name' );
 
 $payload = preg_match( '#<script type="application/ld\+json" id="fhint-schema">(.*)</script>#s', $tag, $fhint_match ) ? $fhint_match[1] : '';
@@ -651,7 +653,7 @@ check( ! isset( $node['areaServed'] ), 'no service area, no areaServed' );
 $node = business_node( Graph::from_parts( nap() ) );
 check( ! isset( $node['areaServed'] ), 'nor for a NAP that has no service area at all' );
 
-// -- Hooks FoundHint Pro uses ---------------------------------------------
+// -- Extension hooks ------------------------------------------------------
 //
 // fhint_schema_document replaces the whole document on a request;
 // fhint_schema_placement moves it from <head> to before </body>.
@@ -663,11 +665,11 @@ $GLOBALS['__is_embed'] = false;
 
 $fhint_pro_doc = array(
 	'@context' => 'https://schema.org',
-	'@graph'   => array( array( '@type' => 'WebSite', '@id' => 'https://example.test/#website', 'name' => 'From Pro' ) ),
+	'@graph'   => array( array( '@type' => 'WebSite', '@id' => 'https://example.test/#website', 'name' => 'From a filter' ) ),
 );
 
 // No document: the free path, which here has nothing publishable.
-check_same( '', \FHINT\Frontend\Schema::markup(), 'with no document from Pro, the free markup path runs (empty here)' );
+check_same( '', \FHINT\Frontend\Schema::markup(), 'with no document from the filter, the built-in markup path runs (empty here)' );
 
 add_filter(
 	'fhint_schema_document',
@@ -679,12 +681,12 @@ add_filter(
 	2
 );
 $fhint_markup = \FHINT\Frontend\Schema::markup();
-check( false !== strpos( $fhint_markup, 'From Pro' ), "a document from the filter is printed instead of the free markup" );
+check( false !== strpos( $fhint_markup, 'From a filter' ), "a document from the filter is printed instead of the free markup" );
 check_same( 1, substr_count( $fhint_markup, '<script' ), 'as one script tag' );
 check( isset( $GLOBALS['__seen_context']['post_id'], $GLOBALS['__seen_context']['url'], $GLOBALS['__seen_context']['is_front_page'] ), 'and the filter is told which request it is' );
 
 $GLOBALS['__options']['fhint_settings'] = array( 'schema' => array( 'mode' => Ownership::MODE_DISABLED ) );
-check( false !== strpos( \FHINT\Frontend\Schema::markup(), 'From Pro' ), "the free ownership switch does not silence Pro's document — Pro owns its own rules" );
+check( false !== strpos( \FHINT\Frontend\Schema::markup(), 'From a filter' ), "the ownership switch does not silence a filtered document — it owns its own rules" );
 
 $GLOBALS['__is_feed'] = true;
 check_same( '', \FHINT\Frontend\Schema::markup(), 'but a feed never carries it' );
@@ -696,7 +698,7 @@ ob_start();
 check_same( '', ob_get_clean(), 'and nothing prints in the footer then' );
 ob_start();
 \FHINT\Frontend\Schema::render_head();
-check( false !== strpos( ob_get_clean(), 'From Pro' ), 'it prints in the head' );
+check( false !== strpos( ob_get_clean(), 'From a filter' ), 'it prints in the head' );
 
 add_filter(
 	'fhint_schema_placement',
@@ -709,7 +711,7 @@ ob_start();
 check_same( '', ob_get_clean(), 'placed in the footer, nothing prints in the head' );
 ob_start();
 \FHINT\Frontend\Schema::render_footer();
-check( false !== strpos( ob_get_clean(), 'From Pro' ), 'and it prints before </body>' );
+check( false !== strpos( ob_get_clean(), 'From a filter' ), 'and it prints before </body>' );
 
 $GLOBALS['__filters']['fhint_schema_placement'] = array(
 	function () {

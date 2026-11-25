@@ -43,7 +43,7 @@ class BusinessRepository {
 			return null;
 		}
 
-		$table = Tables::name( Tables::BUSINESS );
+		$table = esc_sql( Tables::name( Tables::BUSINESS ) );
 
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 		$row = $wpdb->get_row( "SELECT * FROM {$table} ORDER BY id ASC LIMIT 1", ARRAY_A );
@@ -83,7 +83,7 @@ class BusinessRepository {
 		$existing = self::get();
 		$record   = $existing ? $existing : Business::blank();
 		$merged   = array_merge( $record, $changes );
-		$table    = Tables::name( Tables::BUSINESS );
+		$table    = esc_sql( Tables::name( Tables::BUSINESS ) );
 		$now      = Validator::now();
 
 		$columns = self::columns( $merged );
@@ -143,14 +143,14 @@ class BusinessRepository {
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		$wpdb->query( 'START TRANSACTION' );
 
-		$locations  = Tables::name( Tables::LOCATIONS );
-		$hours      = Tables::name( Tables::LOCATION_HOURS );
-		$special    = Tables::name( Tables::SPECIAL_HOURS );
-		$attributes = Tables::name( Tables::LOCATION_ATTRIBUTES );
-		$media      = Tables::name( Tables::MEDIA );
-		$history    = Tables::name( Tables::DESCRIPTION_HISTORY );
-		$services   = Tables::name( Tables::SERVICES );
-		$table      = Tables::name( Tables::BUSINESS );
+		$locations  = esc_sql( Tables::name( Tables::LOCATIONS ) );
+		$hours      = esc_sql( Tables::name( Tables::LOCATION_HOURS ) );
+		$special    = esc_sql( Tables::name( Tables::SPECIAL_HOURS ) );
+		$attributes = esc_sql( Tables::name( Tables::LOCATION_ATTRIBUTES ) );
+		$media      = esc_sql( Tables::name( Tables::MEDIA ) );
+		$history    = esc_sql( Tables::name( Tables::DESCRIPTION_HISTORY ) );
+		$services   = esc_sql( Tables::name( Tables::SERVICES ) );
+		$table      = esc_sql( Tables::name( Tables::BUSINESS ) );
 
 		// phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 		$wpdb->query( $wpdb->prepare( "DELETE h FROM {$hours} h INNER JOIN {$locations} l ON l.id = h.location_id WHERE l.business_id = %d", $id ) );

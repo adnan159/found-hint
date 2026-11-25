@@ -43,7 +43,7 @@ class ServiceRepository {
 			return array();
 		}
 
-		$table  = Tables::name( Tables::SERVICES );
+		$table  = esc_sql( Tables::name( Tables::SERVICES ) );
 		$where  = 'WHERE business_id = %d AND location_id = %d';
 		$params = array( $business_id, isset( $args['location_id'] ) ? (int) $args['location_id'] : 0 );
 
@@ -62,9 +62,9 @@ class ServiceRepository {
 			$params[]  = $offset;
 		}
 
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter -- table name from Tables::name(); $where/$limit_sql/$skip are fixed SQL holding only placeholders, values go through prepare().
 		$rows = $wpdb->get_results(
-			// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+			// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.PreparedSQLPlaceholders.UnfinishedPrepare
 			$wpdb->prepare( "SELECT * FROM {$table} {$where} ORDER BY sort_order ASC, id ASC{$limit_sql}", $params ),
 			ARRAY_A
 		);
@@ -87,7 +87,7 @@ class ServiceRepository {
 			return null;
 		}
 
-		$table = Tables::name( Tables::SERVICES );
+		$table = esc_sql( Tables::name( Tables::SERVICES ) );
 
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 		$row = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$table} WHERE id = %d", $id ), ARRAY_A );
@@ -114,7 +114,7 @@ class ServiceRepository {
 			return 0;
 		}
 
-		$table = Tables::name( Tables::SERVICES );
+		$table = esc_sql( Tables::name( Tables::SERVICES ) );
 
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 		return (int) $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM {$table} WHERE business_id = %d AND location_id = %d", $business_id, (int) $location_id ) );
@@ -242,7 +242,7 @@ class ServiceRepository {
 			return false;
 		}
 
-		$table = Tables::name( Tables::SERVICES );
+		$table = esc_sql( Tables::name( Tables::SERVICES ) );
 
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 		$deleted = $wpdb->query( $wpdb->prepare( "DELETE FROM {$table} WHERE id = %d", $id ) );
@@ -251,7 +251,7 @@ class ServiceRepository {
 			return false;
 		}
 
-		self::forget_schema( array( $id ) );
+		self::deleted( array( $id ) );
 
 		Logger::info( 'service', 'service.deleted', 'Service deleted.', array( 'metadata' => array( 'service_id' => $id ) ) );
 		BusinessRepository::stamp_data_changed();
@@ -285,7 +285,7 @@ class ServiceRepository {
 			$owned[ (int) $service['id'] ] = true;
 		}
 
-		$table    = Tables::name( Tables::SERVICES );
+		$table    = esc_sql( Tables::name( Tables::SERVICES ) );
 		$now      = Validator::now();
 		$position = 0;
 		$updated  = 0;
@@ -338,13 +338,15 @@ class ServiceRepository {
 	private static function unique_slug( $slug, $business_id, $ignore_id = 0, $location_id = 0 ) {
 		global $wpdb;
 
-		$slug = sanitize_title( (string) $slug );
+		// The column is ASCII: percent-encode anything a sanitize_title
+		// filter left unencoded, as WordPress itself does.
+		$slug = utf8_uri_encode( sanitize_title( (string) $slug ) );
 
 		if ( '' === $slug ) {
 			return '';
 		}
 
-		$table    = Tables::name( Tables::SERVICES );
+		$table    = esc_sql( Tables::name( Tables::SERVICES ) );
 		$base     = $slug;
 		$suffix   = 1;
 
@@ -380,7 +382,7 @@ class ServiceRepository {
 	private static function next_sort_order( $business_id, $location_id = 0 ) {
 		global $wpdb;
 
-		$table = Tables::name( Tables::SERVICES );
+		$table = esc_sql( Tables::name( Tables::SERVICES ) );
 
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 		$max = $wpdb->get_var( $wpdb->prepare( "SELECT MAX(sort_order) FROM {$table} WHERE business_id = %d AND location_id = %d", (int) $business_id, (int) $location_id ) );
@@ -453,45 +455,30 @@ class ServiceRepository {
 		$deleted = false !== $wpdb->delete( Tables::name( Tables::SERVICES ), array( 'location_id' => $location_id ) );
 
 		if ( $deleted ) {
-			self::forget_schema( $ids );
+			self::deleted( $ids );
 		}
 
 		return $deleted;
 	}
 
 	/**
-	 * Remove what the Schema Manager kept about deleted services: their
-	 * settings, providers and areas. Those tables are this plugin's, so a
-	 * service deleted anywhere leaves nothing behind, Premium installed or not.
+	 * Announce deleted services, so anything keyed to them can follow.
 	 *
 	 * @param int[] $ids Service ids.
 	 * @return void
 	 */
-	private static function forget_schema( array $ids ) {
-		global $wpdb;
-
+	private static function deleted( array $ids ) {
 		$ids = array_values( array_filter( array_map( 'intval', $ids ) ) );
 
 		if ( ! $ids ) {
 			return;
 		}
 
-		$placeholders = implode( ', ', array_fill( 0, count( $ids ), '%d' ) );
-
-		foreach ( array( Tables::SCHEMA_SERVICE_PROVIDERS, Tables::SCHEMA_SERVICE_AREAS ) as $key ) {
-			if ( Tables::exists( $key ) ) {
-				$table = Tables::name( $key );
-
-				// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.PreparedSQLPlaceholders.UnfinishedPrepare
-				$wpdb->query( $wpdb->prepare( "DELETE FROM {$table} WHERE service_id IN ({$placeholders})", $ids ) );
-			}
-		}
-
-		if ( Tables::exists( Tables::SCHEMA_ENTITIES ) ) {
-			$table = Tables::name( Tables::SCHEMA_ENTITIES );
-
-			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.PreparedSQLPlaceholders.UnfinishedPrepare
-			$wpdb->query( $wpdb->prepare( "DELETE FROM {$table} WHERE entity_kind = 'service' AND entity_id IN ({$placeholders})", $ids ) );
-		}
+		/**
+		 * Fires after services are deleted.
+		 *
+		 * @param int[] $ids Ids of the deleted services.
+		 */
+		do_action( 'fhint_services_deleted', $ids );
 	}
 }

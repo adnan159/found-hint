@@ -1,180 +1,90 @@
-import RequestError from "@/components/RequestError";
+import { __ } from "@wordpress/i18n";
+import { toast } from "sonner";
 import { Skeleton } from "@/components/ui/skeleton";
+import PageHeader from "@/components/PageHeader";
+import RequestError from "@/components/RequestError";
 import useSelectedLocation from "@/hooks/useSelectedLocation";
-import { errorMessage } from "@/lib/errors";
-import { hasPro } from "@/lib/pro";
 import { useGetSchemaQuery } from "@/store/api/schemaApi";
 import {
-  useGetBusinessSchemaQuery,
-  useGetSchemaStateQuery,
-  useSetSchemaTabMutation,
-} from "@/store/api/schemaManagerApi";
-import { __, sprintf } from "@wordpress/i18n";
-import { toast } from "sonner";
-import ConnectGoogleNotice from "./components/page/ConnectGoogleNotice";
-import SchemaHeader from "./components/page/SchemaHeader";
-import TabBar, { TABS } from "./components/page/TabBar";
-import TabPanel from "./components/page/TabPanel";
-import UnsavedDialog from "./components/page/UnsavedDialog";
-import useLocationBranches from "./hooks/useLocationBranches";
-import useSchemaTab from "./hooks/useSchemaTab";
-import useUnsavedGuard from "./hooks/useUnsavedGuard";
-import { tabSummaries } from "./lib/tabSummaries";
+  useGetSettingsQuery,
+  useUpdateSettingsMutation,
+} from "@/store/api/settingsApi";
+import PreviewCard from "./components/PreviewCard";
+import PublisherCard from "./components/PublisherCard";
+import RecommendationsCard from "./components/RecommendationsCard";
+import StatusBanner from "./components/StatusBanner";
 
 /**
- * Schema — the Schema Manager (docs/SCHEMA-PLAN.md).
+ * Schema — what this site publishes about the business, and who publishes it.
  *
- * Six tabs: Organization, LocalBusiness, Location, Service, Website
- * structure, Settings — each schema tab with its own on/off switch. With
- * FoundHint Premium serving `schema.business`, the two business tabs are
- * live; the others arrive step by step. Without Pro, the same screen is shown locked,
- * filled with the markup the free plugin already prints.
- *
- * This file wires the page together; the parts live in `hooks/` (open tab,
- * branches, unsaved changes), `lib/summaries` and `components/`.
+ * The preview is the graph the front end prints, read from the same cache —
+ * not a second rendering that could quietly disagree with what search
+ * engines actually see.
  */
 export default function SchemaPage() {
-  const plan = {
-    business: hasPro("schema.business"),
-    locations: hasPro("schema.locations"),
-    services: hasPro("schema.services"),
-    website: hasPro("schema.website"),
-    settings: hasPro("schema.settings"),
-    live: hasPro("schema.output"),
-  };
+  // The preview is per location: the one chosen here or elsewhere, else
+  // the main location. Every location is published; this shows one.
+  const { locationId, ready } = useSelectedLocation();
+  const {
+    currentData: schema,
+    isFetching,
+    error,
+  } = useGetSchemaQuery(locationId, { skip: !ready });
+  const isLoading = !ready || (isFetching && !schema);
+  const { data: settingsData } = useGetSettingsQuery();
+  const [updateSettings, { isLoading: isSaving }] = useUpdateSettingsMutation();
 
-  // One location for the whole admin: the bar at the top of every page.
-  // The Business tab is the main location; the Location tab follows the
-  // branch chosen there, and choosing a branch here switches the bar too.
-  const { locationId, current, choose } = useSelectedLocation();
-  const { tab, go, stay } = useSchemaTab(locationId);
-  const unsaved = useUnsavedGuard({ go, choose });
-  const branches = useLocationBranches({
-    pro: plan.locations,
-    open: tab === "locations",
-    locationId,
-    choose,
-  });
+  if (isLoading || !schema) {
+    return (
+      <>
+        <PageHeader title={__("Schema", "foundhint-local-seo")} />
+        <Skeleton className="fhint:h-[60vh] fhint:w-full" />
+      </>
+    );
+  }
 
-  const { data: free, error: freeError } = useGetSchemaQuery(0);
-  const { data: state, error: stateError } = useGetSchemaStateQuery(undefined, {
-    skip: !plan.business,
-  });
-  const { data: business, error: businessError } = useGetBusinessSchemaQuery(
-    undefined,
-    { skip: !plan.business },
-  );
+  const ownership = schema.ownership ?? {};
+  const mode = settingsData?.settings?.schema_mode ?? ownership.mode ?? "auto";
 
-  const { data: organization, error: organizationError } =
-    useGetBusinessSchemaQuery("organization", {
-      skip: !plan.business || tab !== "organization",
-    });
-  const [setTab, setTabState] = useSetSchemaTabMutation();
+  const onModeChange = async (next) => {
+    if (!next || next === mode) {
+      return;
+    }
 
-  // A tab's switch saves at once, like a service's. Switching off the open
-  // tab hides its form, so unsaved changes there are saved or discarded
-  // first.
-  const toggle = (key, on) => {
-    const run = async () => {
-      try {
-        await setTab({ key, enabled: on }).unwrap();
-
-        const name = TABS.find(([tabKey]) => tabKey === key)?.[1]() ?? key;
-
-        toast.success(
-          on
-            ? sprintf(
-                /* translators: %s: a schema tab, e.g. "Organization". */
-                __("%s is on and added to your site.", "foundhint-local-seo"),
-                name,
-              )
-            : sprintf(
-                /* translators: %s: a schema tab, e.g. "Organization". */
-                __(
-                  "%s is off. Nothing from it is added to your site.",
-                  "foundhint-local-seo",
-                ),
-                name,
-              ),
-        );
-      } catch (error) {
-        toast.error(errorMessage(error));
-      }
-    };
-
-    if (!on && key === tab) {
-      unsaved.guard(run);
-    } else {
-      run();
+    try {
+      await updateSettings({ schema_mode: next }).unwrap();
+      toast.success(__("Saved.", "foundhint-local-seo"));
+    } catch {
+      // Shown inline.
     }
   };
 
-  const loading = !free || (plan.business && (!state || !business));
-  const connectFirst = plan.business && state && !state.connected;
+  const json = schema.graph ? JSON.stringify(schema.graph, null, 2) : "";
 
   return (
-    <div className="fhint:grid fhint:min-w-0 fhint:grid-cols-[minmax(0,1fr)] fhint:gap-4">
-      <SchemaHeader
-        locked={!plan.business}
-        syncedAt={state?.synced_at}
-        locationId={tab === "locations" ? branches.branchId : 0}
-        actions={!connectFirst}
+    <>
+      <PageHeader
+        title={__("Schema", "foundhint-local-seo")}
+        description={__(
+          "The structured data that tells search engines what your business is, where it is, and when it is open. Every location is published; this is the one chosen at the top of the page.",
+          "foundhint-local-seo",
+        )}
       />
 
-      <RequestError
-        error={freeError ?? stateError ?? businessError ?? organizationError}
+      <RequestError error={error} />
+
+      <StatusBanner schema={schema} />
+
+      <PublisherCard
+        ownership={ownership}
+        mode={mode}
+        onModeChange={onModeChange}
+        isSaving={isSaving}
       />
 
-      {connectFirst ? (
-        <ConnectGoogleNotice />
-      ) : (
-        <>
-          <TabBar
-            current={tab}
-            summaries={tabSummaries({ plan, state, business })}
-            dirty={unsaved.dirty}
-            enabled={state?.enabled}
-            locked={!plan.business}
-            onPick={(key) => (key === tab ? null : unsaved.pickTab(key))}
-            onToggle={toggle}
-          />
+      <RecommendationsCard schema={schema} />
 
-          {loading ? (
-            <Skeleton className="fhint:h-[60vh] fhint:w-full" />
-          ) : (
-            <TabPanel
-              tab={tab}
-              plan={plan}
-              free={free}
-              business={business}
-              organization={organization}
-              enabled={state?.enabled}
-              switching={setTabState.isLoading}
-              onToggle={toggle}
-              branches={branches}
-              onAllLocations={() => {
-                stay();
-                choose(0);
-              }}
-              onOpenMain={() => go("localbusiness")}
-              onOpenTab={go}
-              syncedAt={state?.synced_at}
-              locationId={locationId}
-              branchName={
-                locationId ? current?.business_name || current?.name : ""
-              }
-              unsaved={unsaved}
-            />
-          )}
-        </>
-      )}
-
-      <UnsavedDialog
-        open={unsaved.asking}
-        onStay={unsaved.stay}
-        onDiscard={unsaved.discard}
-        onSave={unsaved.save}
-      />
-    </div>
+      <PreviewCard json={json} />
+    </>
   );
 }

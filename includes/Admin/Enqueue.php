@@ -100,7 +100,9 @@ class Enqueue {
 	 */
 	private static function script_options() {
 		return array(
-			'dependencies' => array( 'react', 'react-dom' ),
+			// WordPress's own React (the bundle leaves it out); react-jsx-runtime
+			// is why the plugin needs WordPress 6.6.
+			'dependencies' => array( 'react', 'react-dom', 'react-jsx-runtime', 'wp-i18n' ),
 			'handle'       => self::SCRIPT_HANDLE,
 			'in-footer'    => true,
 		);
@@ -127,8 +129,6 @@ class Enqueue {
 			'rest_nonce' => wp_create_nonce( 'wp_rest' ),
 			'plugin_url' => FHINT_URL,
 			'version'    => FHINT_VERSION,
-			// Where "Upgrade to Pro" goes; filterable for a campaign link.
-			'upgrade_url' => (string) apply_filters( 'fhint_upgrade_url', 'https://foundhint.com/pricing/' ),
 			'reference'  => array(
 				'business_types'    => Business::types(),
 				'location_statuses' => Location::statuses(),
@@ -142,11 +142,8 @@ class Enqueue {
 		 * Filters the first-paint data handed to the admin app as
 		 * `window.FHINT`. It is page source: never add a secret.
 		 *
-		 * FoundHint Pro adds a `pro` key here — `{ version, rest_url,
-		 * features }` — which is how the app knows to show a Pro feature's
-		 * working screen instead of its upsell (src/admin/lib/pro.js). The
-		 * keys above are the app's own and are restored if a callback drops
-		 * or replaces them.
+		 * Other plugins may add keys of their own. The keys above are the
+		 * app's own and are restored if a callback drops or replaces them.
 		 *
 		 * @param array $data Bootstrap data.
 		 */

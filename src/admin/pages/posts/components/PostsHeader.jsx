@@ -11,7 +11,7 @@ const primaryPill = cn(
 );
 
 /**
- * The Posts & Scheduling title row: the shared screen title bar, with the
+ * The Posts title row: the shared screen title bar, with the
  * screen's actions on the right — History, Sync posts and New post.
  *
  * The actions need a Google listing for the location; until one is chosen
@@ -35,7 +35,7 @@ export function PostsHeader({
 }) {
   return (
     <ScreenTitleBar
-      title={__("Posts & Scheduling", "foundhint-local-seo")}
+      title={__("Posts", "foundhint-local-seo")}
       hint={__(
         "The posts on this location's Google listing, and new ones to publish. Only syncing, publishing, editing a live post and deleting one contact Google.",
         "foundhint-local-seo",

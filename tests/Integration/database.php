@@ -167,7 +167,7 @@ check( ! empty( $changes ), 'the first run creates tables' );
 $missing = Tables::missing();
 
 check_same( array(), $missing, 'every declared table exists after installation' );
-check_same( 19, count( Tables::all() ), 'all nineteen tables are declared' );
+check_same( 15, count( Tables::all() ), 'all fifteen tables are declared' );
 
 foreach ( array_keys( Tables::all() ) as $key ) {
 	check( Tables::exists( $key ), "table {$key} exists in MySQL" );
@@ -1691,40 +1691,7 @@ remove_filter( 'pre_http_request', $fhint_fake_reply, 10 );
 // Admin::init() runs only on admin pages, so a class it names wrongly
 // crashes every admin page yet nothing else in this suite. Run it here.
 FHINT\Admin::init();
-check( false !== has_filter( 'post_row_actions', array( 'FHINT\\Admin\\BlogSharing', 'row_actions' ) ), 'admin: the GBP Posting link is wired' );
-check( false !== has_action( 'enqueue_block_editor_assets', array( 'FHINT\\Admin\\EditorAssets', 'enqueue' ) ), 'admin: the editor button is wired' );
-
-// When the editor bundle loads: a blog post, in the block editor, for a
-// manager, with blog sharing on (Premium answers the filter; forced here).
-require_once ABSPATH . 'wp-admin/includes/class-wp-screen.php';
-require_once ABSPATH . 'wp-admin/includes/screen.php';
-$fhint_editor_user = get_users( array( 'role' => 'administrator', 'number' => 1, 'fields' => 'ID' ) );
-wp_set_current_user( (int) ( $fhint_editor_user[0] ?? 0 ) );
-$fhint_sharing = static function () {
-	return true;
-};
-add_filter( 'fhint_blog_sharing_enabled', $fhint_sharing, 99 );
-$fhint_screen = WP_Screen::get( 'post' );
-$fhint_screen->is_block_editor( true );
-set_current_screen( $fhint_screen );
-check( FHINT\Admin\EditorAssets::applies(), 'editor: the button loads for a blog post with sharing on' );
-$fhint_screen->is_block_editor( false );
-check( ! FHINT\Admin\EditorAssets::applies(), 'editor: not in the classic editor' );
-$fhint_screen->is_block_editor( true );
-$fhint_page = WP_Screen::get( 'page' );
-$fhint_page->is_block_editor( true );
-set_current_screen( $fhint_page );
-check( ! FHINT\Admin\EditorAssets::applies(), 'editor: not for a page' );
-set_current_screen( $fhint_screen );
-remove_filter( 'fhint_blog_sharing_enabled', $fhint_sharing, 99 );
-add_filter( 'fhint_blog_sharing_enabled', '__return_false', 99 );
-check( ! FHINT\Admin\EditorAssets::applies(), 'editor: not while sharing is off' );
-remove_filter( 'fhint_blog_sharing_enabled', '__return_false', 99 );
-wp_set_current_user( 0 );
-add_filter( 'fhint_blog_sharing_enabled', $fhint_sharing, 99 );
-check( ! FHINT\Admin\EditorAssets::applies(), 'editor: not for someone who cannot manage FoundHint' );
-remove_filter( 'fhint_blog_sharing_enabled', $fhint_sharing, 99 );
-$GLOBALS['current_screen'] = null;
+check( false !== has_filter( 'plugin_action_links_' . FHINT_BASENAME, array( 'FHINT\\Admin', 'plugin_action_links' ) ), 'admin: the plugin row links are wired' );
 
 // -- Posts, with Google answered in-process ----------------------------------
 //
@@ -1893,50 +1860,6 @@ check_same(
 $fhint_ordered = PostRepository::all( array( 'location_name' => 'locations/1', 'sort' => 'old' ) );
 check_same( $fhint_live['id'], $fhint_ordered[0]['id'], 'posts: oldest first starts with the earliest published' );
 check_same( 2, count( PostRepository::all( array( 'per_page' => 2 ) ) ), 'posts: paging limits the page' );
-
-// Scheduled posts (Premium sets the status; the free plugin lists, edits and
-// cancels them). They sit after everything posted, soonest first.
-$fhint_scheduled_row = static function ( $due ) {
-	return PostRepository::create(
-		array(
-			'location_name' => 'locations/1',
-			'account_name'  => 'accounts/1',
-			'topic_type'    => 'update',
-			'summary'       => 'Due ' . $due,
-			'source'        => 'manual',
-			'status'        => 'scheduled',
-			'scheduled_at'  => $due,
-		)
-	);
-};
-$fhint_due_late = $fhint_scheduled_row( '2099-02-01 09:00:00' );
-$fhint_due_soon = $fhint_scheduled_row( '2099-01-01 09:00:00' );
-// Added after everything above, so — newest first — they lead the list,
-// the last one added on top, whenever each is due.
-$fhint_ordered = array_column( PostRepository::all( array( 'location_name' => 'locations/1' ) ), 'id' );
-check_same( array( $fhint_due_soon['id'], $fhint_due_late['id'] ), array_slice( $fhint_ordered, 0, 2 ), 'posts: newest first puts the last post added on top, scheduled or not' );
-$fhint_ordered = array_column( PostRepository::all( array( 'location_name' => 'locations/1', 'sort' => 'old' ) ), 'id' );
-check_same( array( $fhint_due_late['id'], $fhint_due_soon['id'] ), array_slice( $fhint_ordered, -2 ), 'posts: oldest first is the exact reverse' );
-check_same( 2, PostRepository::count( array( 'location_name' => 'locations/1', 'status' => 'scheduled' ) ), 'posts: the scheduled filter finds them' );
-
-$fhint_post_calls = array();
-$fhint_result     = FHINT\App\Post\Posts::update( $fhint_due_soon['id'], array( 'summary' => '' ), false );
-check( $fhint_result instanceof FHINT\App\Core\ValidationResult, 'posts: a scheduled post is held to the publishing rules on every save' );
-$fhint_result = FHINT\App\Post\Posts::update( $fhint_due_soon['id'], array( 'summary' => 'Changed while queued' ), false );
-check( is_array( $fhint_result ) && 'scheduled' === $fhint_result['status'], 'posts: editing a scheduled post keeps it scheduled' );
-check_same( '2099-01-01 09:00:00', $fhint_result['scheduled_at'], 'posts: and keeps its time' );
-check_same( array(), $fhint_post_calls, 'posts: without asking Google' );
-check( 1 === preg_match( '/^2099-01-0[12]T\d\d:\d\d$/', $fhint_result['scheduled_local'] ), 'posts: its time is also given as site wall time, in the picker\'s shape' );
-
-$fhint_result = FHINT\App\Post\Posts::unschedule( $fhint_due_soon['id'] );
-check( is_array( $fhint_result ) && 'draft' === $fhint_result['status'], 'posts: cancelling a schedule makes the post a draft' );
-check_same( null, PostRepository::find( $fhint_due_soon['id'] )['scheduled_at'], 'posts: and forgets the time' );
-$fhint_result = FHINT\App\Post\Posts::unschedule( $fhint_due_soon['id'] );
-check( is_wp_error( $fhint_result ) && 409 === $fhint_result->get_error_data()['status'], 'posts: a post that is not scheduled cannot be cancelled' );
-$fhint_result = FHINT\App\Post\Posts::unschedule( 999999 );
-check( is_wp_error( $fhint_result ) && 404 === $fhint_result->get_error_data()['status'], 'posts: nor can one that does not exist' );
-PostRepository::delete( $fhint_due_soon['id'] );
-PostRepository::delete( $fhint_due_late['id'] );
 
 // A sync: Google's copy wins, but what only this site knows is kept, and a
 // post gone from Google is forgotten — drafts are never touched.
@@ -2252,6 +2175,18 @@ $fhint_rename->invoke( null );
 check_same( 'VeterinaryCare', BusinessRepository::get()['business_type'], 'and running it again changes nothing' );
 $wpdb->update( Tables::name( Tables::BUSINESS ), array( 'business_type' => $fhint_type_before ), array( 'id' => BusinessRepository::current_id() ) );
 
+// schema_page_index was created by earlier versions and never used: the
+// upgrade drops it, and only it.
+$wpdb->query( 'CREATE TABLE ' . Tables::name( 'schema_page_index' ) . ' (id bigint(20) unsigned NOT NULL auto_increment, PRIMARY KEY  (id))' ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+check( Tables::exists( 'schema_page_index' ), 'an old site has the unused schema_page_index table' );
+$fhint_drop = new ReflectionMethod( FHINT\Installer::class, 'drop_unused_tables' );
+$fhint_drop->setAccessible( true );
+$fhint_drop->invoke( null );
+check( ! Tables::exists( 'schema_page_index' ), 'the upgrade drops it' );
+check_same( array(), Tables::missing(), 'and leaves every table in use in place' );
+$fhint_drop->invoke( null );
+check( ! Tables::exists( 'schema_page_index' ), 'running it again on a cleaned site is harmless' );
+
 // Leave the table as the later sections expect it.
 LocationRepository::delete( (int) $fhint_shop['id'] );
 LocationRepository::delete( (int) $fhint_other['id'] );
@@ -2424,7 +2359,60 @@ if ( $admins ) {
 		'PATCH /business accepts the Google category id'
 	);
 
-	// -- Google categories: searched from the bundled list, saved as ids ----
+	// -- Google categories: searched in Google's list, saved as ids ---------
+	//
+	// Google is answered in-process: the point is what this plugin does with
+	// the answer. The category list stands in for Google's own.
+
+	$fhint_google_categories = array(
+		'gcid:cosmetic_dentist' => 'Cosmetic dentist',
+		'gcid:deli'             => 'Deli',
+		'gcid:dental_clinic'    => 'Dental clinic',
+		'gcid:dentist'          => 'Dentist',
+		'gcid:orthodontist'     => 'Orthodontist',
+		'gcid:pet_groomer'      => 'Pet groomer',
+		'gcid:pet_store'        => 'Pet store',
+	);
+	$fhint_category_calls    = 0;
+	$fhint_fake_categories   = static function ( $pre, $args, $url ) use ( $fhint_google_categories, &$fhint_category_calls ) {
+		if ( false === strpos( (string) $url, 'mybusinessbusinessinformation.googleapis.com/v1/categories' ) ) {
+			return $pre;
+		}
+
+		++$fhint_category_calls;
+		parse_str( (string) wp_parse_url( $url, PHP_URL_QUERY ), $query );
+
+		$entries = array();
+
+		foreach ( $fhint_google_categories as $id => $name ) {
+			if ( false !== strpos( (string) $url, ':batchGet' ) ) {
+				// names= may repeat; one is all this plugin sends.
+				if ( isset( $query['names'] ) && 'categories/' . $id === $query['names'] ) {
+					$entries[] = array( 'name' => 'categories/' . $id, 'displayName' => $name );
+				}
+				continue;
+			}
+
+			// Like Google's own filter: broad, so a "dent" search brings the
+			// deli along too, and it is this plugin that ranks and drops.
+			$needle = strtolower( (string) preg_replace( '/^displayName=/', '', isset( $query['filter'] ) ? (string) $query['filter'] : '' ) );
+			if ( '' !== $needle && ( false !== strpos( strtolower( $name ), substr( $needle, 0, 3 ) ) || 'Deli' === $name ) ) {
+				$entries[] = array( 'name' => 'categories/' . $id, 'displayName' => $name );
+			}
+		}
+
+		return array(
+			'headers'  => array(),
+			'body'     => wp_json_encode( array( 'categories' => $entries ) ),
+			'response' => array(
+				'code'    => 200,
+				'message' => 'OK',
+			),
+			'cookies'  => array(),
+		);
+	};
+
+	add_filter( 'pre_http_request', $fhint_fake_categories, 9, 3 );
 
 	$fhint_search = new WP_REST_Request( 'GET', '/fhint/v1/google/categories' );
 	$fhint_search->set_query_params(
@@ -2439,20 +2427,23 @@ if ( $admins ) {
 
 	check_same( 200, $fhint_found->get_status(), 'an administrator can search Google categories' );
 	check_same( 'gcid:dentist', isset( $fhint_body['data'][0]['id'] ) ? $fhint_body['data'][0]['id'] : '', 'the best match leads, under data' );
+	check( ! in_array( 'Deli', array_column( isset( $fhint_body['data'] ) ? $fhint_body['data'] : array(), 'name' ), true ), 'Google\'s loose matches are dropped' );
 	check( isset( $fhint_body['meta']['total'] ) && $fhint_body['meta']['total'] >= 1, 'with the total in meta' );
+	check( ! empty( $fhint_body['meta']['connected'] ), 'and says Google is connected' );
 
 	$fhint_greedy = new WP_REST_Request( 'GET', '/fhint/v1/google/categories' );
 	$fhint_greedy->set_query_params( array( 'per_page' => 500 ) );
 
 	check_same( 400, rest_do_request( $fhint_greedy )->get_status(), 'asking for more than the cap is refused before the search runs' );
 
-	// The chosen categories reach the database as Google's ids, with
-	// Google's names — whatever name the request claimed.
+	// The chosen categories reach the database as Google's ids. A name sent
+	// with an id is kept; an id or a name sent alone is completed from
+	// Google's list.
 	$fhint_choose = new WP_REST_Request( 'PATCH', '/fhint/v1/business' );
 	$fhint_choose->set_body_params(
 		array(
 			'primary_category_id'  => 'gcid:dentist',
-			'primary_category'     => 'Best dentist in town',
+			'primary_category'     => 'Dentist',
 			'secondary_categories' => array( 'gcid:dental_clinic', 'Cosmetic dentist' ),
 		)
 	);
@@ -2462,7 +2453,7 @@ if ( $admins ) {
 	$fhint_saved = BusinessRepository::get();
 
 	check_same( 'gcid:dentist', $fhint_saved['primary_category_id'], 'the primary category is stored as Google\'s id' );
-	check_same( 'Dentist', $fhint_saved['primary_category'], 'beside Google\'s name for it, not the request\'s' );
+	check_same( 'Dentist', $fhint_saved['primary_category'], 'beside its name' );
 	check_same(
 		array(
 			array(
@@ -2475,14 +2466,14 @@ if ( $admins ) {
 			),
 		),
 		$fhint_saved['secondary_categories'],
-		'and the additional ones round-trip through MySQL as { id, name } pairs'
+		'and the additional ones round-trip through MySQL as { id, name } pairs, completed from Google'
 	);
 
-	// A category Google does not have is refused, and nothing is written.
+	// A malformed id is refused, and nothing is written.
 	$fhint_bogus = new WP_REST_Request( 'PATCH', '/fhint/v1/business' );
-	$fhint_bogus->set_body_params( array( 'primary_category_id' => 'gcid:not_a_real_category' ) );
+	$fhint_bogus->set_body_params( array( 'primary_category_id' => 'not a category id' ) );
 
-	check_same( 400, rest_do_request( $fhint_bogus )->get_status(), 'an id Google does not have is refused with a 400' );
+	check_same( 400, rest_do_request( $fhint_bogus )->get_status(), 'a malformed category id is refused with a 400' );
 	check_same( 'gcid:dentist', BusinessRepository::get()['primary_category_id'], 'leaving the stored category untouched' );
 
 	// The legacy text field: a name alone, tied back to its id on the way in.
@@ -2498,6 +2489,11 @@ if ( $admins ) {
 	rest_do_request( $fhint_typed );
 
 	check_same( '', BusinessRepository::get()['primary_category_id'], 'and a freehand one clears it, rather than keeping a stale id' );
+
+	// Left in place: later sections save categories too, and a lookup that
+	// reached the real Google with this suite's fake token would be refused
+	// and disconnect the site, exactly as a revoked token does. It answers
+	// category URLs only.
 
 	wp_set_current_user( 0 );
 
@@ -4372,8 +4368,7 @@ if ( $admins ) {
 
 	check( ServiceRepository::count() >= 6, 'services are not capped either' );
 
-	// The limits remain enforceable: a filter is still the way to cap them,
-	// which is what a Pro plan would use.
+	// The limits remain enforceable: a filter is still the way to cap them.
 	add_filter(
 		'fhint_limits',
 		static function ( $limits ) {

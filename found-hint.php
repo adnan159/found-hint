@@ -3,8 +3,8 @@
  * Plugin Name:       FoundHint – Local SEO, Schema & Google Business Profile Manager
  * Plugin URI:        https://foundhint.com/local-seo/
  * Description:       Local SEO WordPress plugin to manage business info, locations, schema, audits, and Google Business Profile from one simple dashboard.
- * Version:           1.2.3
- * Requires at least: 6.4
+ * Version:           1.2.5
+ * Requires at least: 6.6
  * Requires PHP:      7.4
  * Author:            FoundHint
  * Author URI:        https://foundhint.com/about/
@@ -79,8 +79,8 @@ final class FHINT {
 	 * @return void
 	 */
 	public function define_constants() {
-		define( 'FHINT_VERSION', '1.2.3' );
-		define( 'FHINT_DB_VERSION', '0.19.0' );
+		define( 'FHINT_VERSION', '1.2.5' );
+		define( 'FHINT_DB_VERSION', '0.20.0' );
 		define( 'FHINT_MIN_PHP', '7.4' );
 		define( 'FHINT_SETTINGS_NAME', 'fhint_settings' );
 		define( 'FHINT_FILE', __FILE__ );
@@ -207,6 +207,8 @@ final class FHINT {
 		if ( $timestamp ) {
 			wp_unschedule_event( $timestamp, 'fhint_purge_logs' );
 		}
+
+		FHINT\Audit::unschedule();
 
 		do_action( 'fhint_deactivated' );
 	}

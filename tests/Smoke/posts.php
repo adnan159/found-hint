@@ -222,7 +222,7 @@ check_same( 'post.cta_type.invalid', $fhint_button( 'teleport', '', true ), 'an 
 check_same( 'post.redeem_url.invalid', $fhint_codes( PostValidator::validate( $fhint_post( array( 'topic_type' => 'offer', 'redeem_url' => 'nope' ) ), false ) )['redeem_url'], "an offer's redeem link must be a link" );
 check_same( 'post.media_url.invalid', $fhint_codes( PostValidator::validate( $fhint_post( array( 'media_url' => 'data:image/png;base64,AAA' ) ), false ) )['media_url'], 'a photo must be a link Google can fetch' );
 check_same( 'post.type.invalid', $fhint_codes( PostValidator::validate( $fhint_post( array( 'topic_type' => 'alert' ) ), false ) )['topic_type'], 'an unknown type is refused' );
-check_same( 'post.source.invalid', $fhint_codes( PostValidator::validate( $fhint_post( array( 'source' => 'ai' ) ), false ) )['source'], 'the free plugin does not accept AI as a source' );
+check_same( 'post.source.invalid', $fhint_codes( PostValidator::validate( $fhint_post( array( 'source' => 'ai' ) ), false ) )['source'], 'an unknown source is refused by default' );
 
 add_filter(
 	'fhint_post_sources',
@@ -231,7 +231,7 @@ add_filter(
 		return $sources;
 	}
 );
-check_same( array(), $fhint_codes( PostValidator::validate( $fhint_post( array( 'source' => 'ai' ) ), false ) ), 'Pro can add a source through fhint_post_sources' );
+check_same( array(), $fhint_codes( PostValidator::validate( $fhint_post( array( 'source' => 'ai' ) ), false ) ), 'a source can be added through fhint_post_sources' );
 
 // ── shape ─────────────────────────────────────────────────────────────
 
