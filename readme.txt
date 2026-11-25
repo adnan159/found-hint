@@ -4,7 +4,7 @@ Tags: local seo, google business profile, local business schema, multi location,
 Requires at least: 6.6
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 1.2.5
+Stable tag: 1.2.6
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -239,6 +239,11 @@ No. Google is never contacted on visitor-facing pages, and no scripts or stylesh
 
 == Changelog ==
 
+= 1.2.6 =
+* Security: A FoundHint Connect sign-in error is accepted only when it names the session of the sign-in this site started. Anything else shows a "could not be verified" message and leaves your sign-in in progress.
+* Security: The Google sign-in return no longer writes to the activity log before it is verified.
+* Changed: The link to the separate add-on on the Plugins screen is now a plain link.
+
 = 1.2.5 =
 * Security: The Google sign-in return now checks your permission first, then verifies the sign-in before reading anything else from the redirect. With your own Google client the sign-in carries a WordPress nonce; with FoundHint Connect the session and user must match the sign-in this site started.
 * Security: Your own Google client secret is now stored encrypted, like your Google tokens.
@@ -317,6 +322,9 @@ No. Google is never contacted on visitor-facing pages, and no scripts or stylesh
 * Google reviews for each location, with replies.
 
 == Upgrade Notice ==
+
+= 1.2.6 =
+Tighter checks on the Google sign-in return.
 
 = 1.2.5 =
 Security hardening for Google sign-in and stored credentials. Features of the separate Premium add-on are no longer part of this plugin.
