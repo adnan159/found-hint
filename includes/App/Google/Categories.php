@@ -1,11 +1,13 @@
 <?php
 /**
- * Google Business Profile categories: the list, and searching it.
+ * Google Business Profile categories: searching Google's list, and ids.
  *
  * @package FoundHint
  */
 
 namespace FHINT\App\Google;
+
+use FHINT\App\Location\LocationRepository;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -17,15 +19,24 @@ defined( 'ABSPATH' ) || exit;
  * country to the next. So everything that stores a category stores the id,
  * and the name beside it is only what a person reads.
  *
- * The list ships with the plugin (`data/google-categories.json`, rebuilt by
- * `npm run categories:update`) rather than being fetched. Choosing a category
- * is one of the first things a new site does, usually before Google is
- * connected, and a search box that needs an approved API connection to show
- * its first suggestion is a search box that does not work.
+ * **The list is Google's, read from Google.** Nothing is bundled: a search
+ * asks Google's own categories endpoint (`categories.list` with a
+ * `displayName` filter), in the site's language and the main location's
+ * country, and the answers are cached for a day. Business details can only
+ * be edited while Google is connected, so the search is only ever needed
+ * then; without a connection it answers with nothing.
  *
- * Searching happens in memory. The whole list is about four thousand short
- * strings, and ranking — an exact match before a prefix before a word in the
- * middle — is a few lines of PHP and awkward in SQL.
+ * **Validation never waits on Google.** It checks that an id is shaped like
+ * one (`gcid:…`); Google checks that it exists when the change is pushed,
+ * exactly as it checks everything else sent to it.
+ *
+ * **The name stored beside an id is Google's.** Every search remembers the
+ * names it found (per language, bounded), and a choice always comes from a
+ * search, so naming a saved id normally costs nothing. An id that arrives
+ * with no name is looked up once (`categories:batchGet`) and remembered; one
+ * that arrives with a name (from the picker, or from Google in an import)
+ * keeps it unless Google's is already known. When nothing can be asked, a
+ * readable name is built from the id (`gcid:pet_store` → "Pet store").
  */
 class Categories {
 
@@ -43,53 +54,128 @@ class Categories {
 	const MAX_RESULTS = 50;
 
 	/**
-	 * The decoded data file, read once per request.
-	 *
-	 * @var array|null
+	 * Google's categories endpoint.
 	 */
-	private static $data = null;
+	const LIST_URL = 'https://mybusinessbusinessinformation.googleapis.com/v1/categories';
 
 	/**
-	 * Row index by category id, built on first lookup.
-	 *
-	 * @var array<string, int>|null
+	 * Google's endpoint for looking categories up by id.
 	 */
-	private static $by_id = null;
+	const BATCH_URL = 'https://mybusinessbusinessinformation.googleapis.com/v1/categories:batchGet';
 
 	/**
-	 * Row index by lower-cased name and variant, built on first lookup.
-	 *
-	 * @var array<string, int>|null
+	 * How long a search answer is kept.
 	 */
-	private static $by_name = null;
+	const SEARCH_TTL = DAY_IN_SECONDS;
 
 	/**
-	 * One category by its Google id.
-	 *
-	 * @param string $id Google category id, e.g. 'gcid:dentist'.
-	 * @return array|null
+	 * How long a looked-up name is kept. Category names barely move.
 	 */
-	public static function find( $id ) {
+	const NAME_TTL = WEEK_IN_SECONDS;
+
+	/**
+	 * How many id → name pairs are kept per language.
+	 */
+	const NAMES_MAX = 1000;
+
+	/**
+	 * What a Google category id looks like.
+	 */
+	const ID_PATTERN = '/^gcid:[a-z0-9_]+$/';
+
+	/**
+	 * Names looked up during this request, by language and id.
+	 *
+	 * @var array<string, array|false>
+	 */
+	private static $memo = array();
+
+	/**
+	 * One category by its Google id, with its name in the site's language.
+	 *
+	 * Asks Google (cached) when connected. Null when the id is malformed,
+	 * when Google does not know it, or when Google cannot be asked.
+	 *
+	 * @param string $id  Google category id, e.g. 'gcid:dentist'.
+	 * @param bool   $ask Whether Google may be asked when the name is not
+	 *                    already known; false answers from memory only.
+	 * @return array{id:string, name:string}|null
+	 */
+	public static function find( $id, $ask = true ) {
 		$id = self::normalize_id( $id );
 
-		if ( '' === $id ) {
+		if ( ! self::is_id( $id ) ) {
 			return null;
 		}
 
-		self::index();
+		$language = self::language();
+		$key      = $language . '|' . $id;
 
-		return isset( self::$by_id[ $id ] ) ? self::shape( self::rows()[ self::$by_id[ $id ] ] ) : null;
+		if ( array_key_exists( $key, self::$memo ) ) {
+			return self::$memo[ $key ] ? self::$memo[ $key ] : null;
+		}
+
+		// Every search adds what it found to this map, and a choice always
+		// comes from a search, so a save is normally answered from here.
+		$names = self::names( $language );
+
+		if ( isset( $names[ $id ] ) ) {
+			self::$memo[ $key ] = array(
+				'id'   => $id,
+				'name' => (string) $names[ $id ],
+			);
+
+			return self::$memo[ $key ];
+		}
+
+		if ( ! $ask || ! Connection::is_linked() ) {
+			return null;
+		}
+
+		$response = Client::get(
+			self::BATCH_URL,
+			array(
+				'names'        => 'categories/' . $id,
+				'languageCode' => $language,
+				'view'         => 'BASIC',
+			)
+		);
+
+		if ( is_wp_error( $response ) ) {
+			// Not remembered: Google being unreachable now says nothing
+			// about the id.
+			return null;
+		}
+
+		$found = null;
+
+		foreach ( isset( $response['categories'] ) && is_array( $response['categories'] ) ? $response['categories'] : array() as $category ) {
+			$shaped = self::shape( $category );
+
+			if ( null !== $shaped && $shaped['id'] === $id ) {
+				$found = $shaped;
+				break;
+			}
+		}
+
+		self::$memo[ $key ] = $found ? $found : false;
+
+		if ( $found ) {
+			self::remember( array( $found ), $language );
+		}
+
+		return $found;
 	}
 
 	/**
 	 * One category by exactly what it is called.
 	 *
 	 * Case is ignored and so is surrounding space, but nothing fuzzier: this
-	 * is how a name typed or imported earlier is tied back to an id, and a
-	 * near miss there would attach the wrong category to a business.
+	 * is how a name typed or sent earlier is tied back to an id, and a near
+	 * miss there would attach the wrong category to a business.
 	 *
-	 * @param string $name A category name or one of its variants.
-	 * @return array|null
+	 * @param string $name A category name.
+	 * @return array{id:string, name:string}|null
 	 */
 	public static function find_by_name( $name ) {
 		$key = self::fold( $name );
@@ -98,32 +184,37 @@ class Categories {
 			return null;
 		}
 
-		self::index();
+		foreach ( self::ask_google( $key ) as $category ) {
+			if ( self::fold( $category['name'] ) === $key ) {
+				return $category;
+			}
+		}
 
-		return isset( self::$by_name[ $key ] ) ? self::shape( self::rows()[ self::$by_name[ $key ] ] ) : null;
+		return null;
 	}
 
 	/**
-	 * Whether Google has a category with this id.
+	 * Whether an id is one Google could hold.
+	 *
+	 * The shape only: Google confirms the category itself when the change is
+	 * pushed, so a save is never refused because Google was slow to answer.
 	 *
 	 * @param string $id Google category id.
 	 * @return bool
 	 */
 	public static function exists( $id ) {
-		return null !== self::find( $id );
+		return self::is_id( self::normalize_id( $id ) );
 	}
 
 	/**
-	 * Search the list.
+	 * Search Google's list.
 	 *
-	 * Every word typed must appear, in any order, in the name or in one of
-	 * its variants. Results are ranked so the thing most likely meant comes
-	 * first: the exact name, then names that start with what was typed, then
-	 * names with a word that starts with it, then anything containing it, and
-	 * last a match that was only found in a variant.
+	 * Google's own filter is broad, so its answers are ranked here and the
+	 * ones that do not contain what was typed are dropped: the exact name,
+	 * then names that start with it, then names with a word that starts
+	 * with it, then anything containing it, then every word in any order.
 	 *
-	 * An empty search lists alphabetically, so a chooser has something to
-	 * show before anyone types.
+	 * Answers with nothing while Google is not connected.
 	 *
 	 * @param string $search What was typed.
 	 * @param int    $limit  How many to return, capped at MAX_RESULTS.
@@ -134,56 +225,38 @@ class Categories {
 		$limit  = max( 1, min( self::MAX_RESULTS, (int) $limit ) );
 		$offset = max( 0, (int) $offset );
 		$query  = self::fold( $search );
-		$rows   = self::rows();
 
 		if ( '' === $query ) {
 			return array(
-				'items' => array_map( array( __CLASS__, 'shape' ), array_slice( $rows, $offset, $limit ) ),
-				'total' => count( $rows ),
+				'items' => array(),
+				'total' => 0,
 			);
 		}
 
 		// Somebody pasting an id means that id, not a name containing it.
-		$by_id = self::find( $query );
+		if ( self::is_id( self::normalize_id( $query ) ) ) {
+			$by_id = self::find( $query );
 
-		if ( null !== $by_id ) {
 			return array(
-				'items' => 0 === $offset ? array( $by_id ) : array(),
-				'total' => 1,
+				'items' => null !== $by_id && 0 === $offset ? array( $by_id ) : array(),
+				'total' => null !== $by_id ? 1 : 0,
 			);
 		}
 
 		$words   = array_values( array_filter( explode( ' ', $query ), 'strlen' ) );
 		$matches = array();
 
-		foreach ( $rows as $position => $row ) {
-			$name  = self::fold( $row[1] );
+		foreach ( self::ask_google( $query ) as $position => $category ) {
+			$name  = self::fold( $category['name'] );
 			$score = self::score( $name, $query, $words );
-			$via   = '';
 
-			if ( null === $score && ! empty( $row[4] ) ) {
-				foreach ( $row[4] as $variant ) {
-					$variant_score = self::score( self::fold( $variant ), $query, $words );
-
-					if ( null !== $variant_score ) {
-						// Found only through another wording: rank it after
-						// every match on the name itself.
-						$score = 10 + $variant_score;
-						$via   = $variant;
-						break;
-					}
-				}
+			if ( null !== $score ) {
+				$matches[] = array( $score, strlen( $name ), $position, $category );
 			}
-
-			if ( null === $score ) {
-				continue;
-			}
-
-			$matches[] = array( $score, strlen( $name ), $position, $via );
 		}
 
 		// Best score first; among equals, the shorter name (the closer fit),
-		// then the list's own alphabetical order.
+		// then Google's own order.
 		usort(
 			$matches,
 			static function ( $a, $b ) {
@@ -199,20 +272,13 @@ class Categories {
 			}
 		);
 
-		$items = array();
-
-		foreach ( array_slice( $matches, $offset, $limit ) as $match ) {
-			$item = self::shape( $rows[ $match[2] ] );
-
-			if ( '' !== $match[3] ) {
-				$item['matched'] = $match[3];
-			}
-
-			$items[] = $item;
-		}
-
 		return array(
-			'items' => $items,
+			'items' => array_map(
+				static function ( $match ) {
+					return $match[3];
+				},
+				array_slice( $matches, $offset, $limit )
+			),
 			'total' => count( $matches ),
 		);
 	}
@@ -221,10 +287,11 @@ class Categories {
 	 * Turn what a client sent into the pair this plugin stores.
 	 *
 	 * Accepts an id, a name, or an array carrying either, and answers with
-	 * `{ id, name }` taken **from the list** — never the client's wording —
-	 * so a stored name always matches its id. Something that cannot be found
-	 * comes back with an empty id and the text as given, which is how
-	 * validation recognises it and says so.
+	 * `{ id, name }`. An id is normalised; its name is Google's when Google
+	 * can be asked, otherwise the name sent with it. A bare name is matched
+	 * exactly against Google's list; one that cannot be found comes back
+	 * with an empty id and the text as given, which is how validation
+	 * recognises it and says so.
 	 *
 	 * @param mixed $value An id, a name, or `{ id, name }`.
 	 * @return array{id:string, name:string}
@@ -246,20 +313,36 @@ class Categories {
 			}
 		}
 
-		$found = '' !== trim( $id ) ? self::find( $id ) : self::find_by_name( $name );
+		$id   = self::normalize_id( $id );
+		$name = trim( $name );
 
-		if ( null !== $found ) {
+		if ( '' !== $id ) {
+			// Google's name when it is already known (every search teaches
+			// some). Google is asked only for an id that came with no name:
+			// one that came with a name — from the picker, or from Google
+			// in an import — keeps it, so a save or an import does not spend
+			// a request per category.
+			$found = self::find( $id, '' === $name );
+
+			if ( null !== $found ) {
+				return $found;
+			}
+
 			return array(
-				'id'   => $found['id'],
-				'name' => $found['name'],
+				'id'   => $id,
+				'name' => '' !== $name ? $name : self::readable( $id ),
 			);
 		}
 
+		$found = self::find_by_name( $name );
+
+		if ( null !== $found ) {
+			return $found;
+		}
+
 		return array(
-			// An id nobody has heard of is kept as sent so the error can name
-			// it; a bare name has no id to keep.
-			'id'   => '' !== trim( $id ) ? self::normalize_id( $id ) : '',
-			'name' => trim( '' !== trim( $name ) ? $name : $id ),
+			'id'   => '',
+			'name' => $name,
 		);
 	}
 
@@ -267,27 +350,195 @@ class Categories {
 	 * The resource name Google's API takes for a category.
 	 *
 	 * @param string $id Google category id, e.g. 'gcid:dentist'.
-	 * @return string e.g. 'categories/gcid:dentist', or '' for an unknown id.
+	 * @return string e.g. 'categories/gcid:dentist', or '' for a malformed id.
 	 */
 	public static function resource_name( $id ) {
-		$found = self::find( $id );
+		$id = self::normalize_id( $id );
 
-		return null === $found ? '' : 'categories/' . $found['id'];
+		return self::is_id( $id ) ? 'categories/' . $id : '';
 	}
 
 	/**
-	 * Where the list came from and when it was last rebuilt.
+	 * Where the list comes from.
 	 *
 	 * @return array{source:string, updated:string, count:int}
 	 */
 	public static function meta() {
-		$data = self::data();
+		return array(
+			'source'  => 'google',
+			'updated' => '',
+			'count'   => 0,
+		);
+	}
+
+	/**
+	 * The id → name map kept for a language.
+	 *
+	 * @param string $language Language code.
+	 * @return array<string, string>
+	 */
+	private static function names( $language ) {
+		$names = get_transient( 'fhint_gcat_names_' . $language );
+
+		return is_array( $names ) ? $names : array();
+	}
+
+	/**
+	 * Add categories to the id → name map, newest last, capped.
+	 *
+	 * @param array[] $categories Each `{ id, name }`.
+	 * @param string  $language   Language code.
+	 * @return void
+	 */
+	private static function remember( array $categories, $language ) {
+		if ( ! $categories ) {
+			return;
+		}
+
+		$names = self::names( $language );
+
+		foreach ( $categories as $category ) {
+			unset( $names[ $category['id'] ] );
+			$names[ $category['id'] ] = $category['name'];
+		}
+
+		// Bounded, so one option row never grows with every search ever
+		// made: the oldest go first.
+		if ( count( $names ) > self::NAMES_MAX ) {
+			$names = array_slice( $names, -self::NAMES_MAX, null, true );
+		}
+
+		set_transient( 'fhint_gcat_names_' . $language, $names, self::NAME_TTL );
+	}
+
+	/**
+	 * Google's answer for a search, shaped and cached.
+	 *
+	 * @param string $query Folded search.
+	 * @return array[] Each `{ id, name }`, in Google's order.
+	 */
+	private static function ask_google( $query ) {
+		if ( ! Connection::is_linked() ) {
+			return array();
+		}
+
+		$language = self::language();
+		$region   = self::region();
+		$cache    = 'fhint_gcat_q_' . md5( $language . '|' . $region . '|' . $query );
+		$cached   = get_transient( $cache );
+
+		if ( is_array( $cached ) ) {
+			return $cached;
+		}
+
+		$response = Client::get(
+			self::LIST_URL,
+			array(
+				'regionCode'   => $region,
+				'languageCode' => $language,
+				'view'         => 'BASIC',
+				'pageSize'     => 100,
+				'filter'       => 'displayName=' . $query,
+			)
+		);
+
+		if ( is_wp_error( $response ) ) {
+			return array();
+		}
+
+		$categories = array();
+
+		foreach ( isset( $response['categories'] ) && is_array( $response['categories'] ) ? $response['categories'] : array() as $category ) {
+			$shaped = self::shape( $category );
+
+			if ( null !== $shaped ) {
+				$categories[] = $shaped;
+			}
+		}
+
+		set_transient( $cache, $categories, self::SEARCH_TTL );
+		self::remember( $categories, $language );
+
+		return $categories;
+	}
+
+	/**
+	 * One entry of Google's answer as the rest of the plugin sees it.
+	 *
+	 * @param mixed $category `{ name: 'categories/gcid:…', displayName }`.
+	 * @return array{id:string, name:string}|null
+	 */
+	private static function shape( $category ) {
+		if ( ! is_array( $category ) || empty( $category['name'] ) || empty( $category['displayName'] ) ) {
+			return null;
+		}
+
+		$id = self::normalize_id( $category['name'] );
+
+		if ( ! self::is_id( $id ) ) {
+			return null;
+		}
 
 		return array(
-			'source'  => isset( $data['source'] ) ? (string) $data['source'] : '',
-			'updated' => isset( $data['updated'] ) ? (string) $data['updated'] : '',
-			'count'   => count( self::rows() ),
+			'id'   => $id,
+			'name' => sanitize_text_field( (string) $category['displayName'] ),
 		);
+	}
+
+	/**
+	 * The language names are asked for in: the site's, e.g. 'en'.
+	 *
+	 * @return string
+	 */
+	private static function language() {
+		$locale = function_exists( 'get_locale' ) ? (string) get_locale() : 'en_US';
+		$code   = strtolower( substr( $locale, 0, 2 ) );
+
+		return preg_match( '/^[a-z]{2}$/', $code ) ? $code : 'en';
+	}
+
+	/**
+	 * The country categories are asked for in: the main location's, else the
+	 * site locale's (en_GB → GB), else US.
+	 *
+	 * @return string
+	 */
+	private static function region() {
+		$country = '';
+
+		if ( isset( $GLOBALS['wpdb'] ) ) {
+			$primary = LocationRepository::primary();
+			$country = is_array( $primary ) && isset( $primary['country'] ) ? strtoupper( trim( (string) $primary['country'] ) ) : '';
+		}
+
+		if ( ! preg_match( '/^[A-Z]{2}$/', $country ) && function_exists( 'get_locale' ) ) {
+			$country = strtoupper( (string) substr( (string) get_locale(), 3, 2 ) );
+		}
+
+		return preg_match( '/^[A-Z]{2}$/', $country ) ? $country : 'US';
+	}
+
+	/**
+	 * A readable stand-in name built from the id itself, for when Google
+	 * cannot be asked: `gcid:pet_store` reads as "Pet store".
+	 *
+	 * @param string $id Normalised id.
+	 * @return string
+	 */
+	private static function readable( $id ) {
+		$words = str_replace( '_', ' ', (string) preg_replace( '/^gcid:/', '', (string) $id ) );
+
+		return '' !== $words ? ucfirst( $words ) : (string) $id;
+	}
+
+	/**
+	 * Whether a normalised id has Google's shape.
+	 *
+	 * @param string $id Normalised id.
+	 * @return bool
+	 */
+	private static function is_id( $id ) {
+		return 1 === preg_match( self::ID_PATTERN, (string) $id );
 	}
 
 	/**
@@ -342,7 +593,7 @@ class Categories {
 	}
 
 	/**
-	 * A category id in the form the list holds it.
+	 * A category id in its short form.
 	 *
 	 * Accepts Google's full resource name as well, because that is what its
 	 * API hands back and what an import will be holding.
@@ -358,96 +609,5 @@ class Categories {
 		}
 
 		return $id;
-	}
-
-	/**
-	 * One row of the data file as the rest of the plugin sees it.
-	 *
-	 * @param array $row Positional row: id, name, bucket index, in_us, variants.
-	 * @return array
-	 */
-	private static function shape( array $row ) {
-		$data    = self::data();
-		$buckets = isset( $data['buckets'] ) && is_array( $data['buckets'] ) ? $data['buckets'] : array();
-
-		return array(
-			'id'       => (string) $row[0],
-			'name'     => (string) $row[1],
-			'bucket'   => isset( $buckets[ $row[2] ] ) ? (string) $buckets[ $row[2] ] : '',
-			'in_us'    => ! empty( $row[3] ),
-			'variants' => isset( $row[4] ) && is_array( $row[4] ) ? array_values( $row[4] ) : array(),
-		);
-	}
-
-	/**
-	 * Build the id and name indexes once.
-	 *
-	 * @return void
-	 */
-	private static function index() {
-		if ( null !== self::$by_id ) {
-			return;
-		}
-
-		self::$by_id   = array();
-		self::$by_name = array();
-
-		foreach ( self::rows() as $position => $row ) {
-			self::$by_id[ (string) $row[0] ] = $position;
-
-			$names = array_merge( array( $row[1] ), isset( $row[4] ) && is_array( $row[4] ) ? $row[4] : array() );
-
-			foreach ( $names as $name ) {
-				$key = self::fold( $name );
-
-				// Two categories can share a wording. The first one listed
-				// keeps it: guessing between them would be worse than asking
-				// for the id, which is what the search hands back anyway.
-				if ( '' !== $key && ! isset( self::$by_name[ $key ] ) ) {
-					self::$by_name[ $key ] = $position;
-				}
-			}
-		}
-	}
-
-	/**
-	 * The category rows.
-	 *
-	 * @return array[]
-	 */
-	private static function rows() {
-		$data = self::data();
-
-		return isset( $data['categories'] ) && is_array( $data['categories'] ) ? $data['categories'] : array();
-	}
-
-	/**
-	 * Read and decode the bundled data file.
-	 *
-	 * A missing or unreadable file yields an empty list rather than a fatal:
-	 * a search that finds nothing is a problem somebody can report, while a
-	 * white screen on the Business page is not.
-	 *
-	 * @return array
-	 */
-	private static function data() {
-		if ( null !== self::$data ) {
-			return self::$data;
-		}
-
-		self::$data = array();
-
-		$file = __DIR__ . '/data/google-categories.json';
-
-		if ( is_readable( $file ) ) {
-			// phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents -- a local plugin file, not a remote request.
-			$decoded = json_decode( (string) file_get_contents( $file ), true );
-
-			if ( is_array( $decoded ) ) {
-				self::$data = $decoded;
-			}
-		}
-
-		return self::$data;
 	}
 }

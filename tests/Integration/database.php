@@ -2359,7 +2359,60 @@ if ( $admins ) {
 		'PATCH /business accepts the Google category id'
 	);
 
-	// -- Google categories: searched from the bundled list, saved as ids ----
+	// -- Google categories: searched in Google's list, saved as ids ---------
+	//
+	// Google is answered in-process: the point is what this plugin does with
+	// the answer. The category list stands in for Google's own.
+
+	$fhint_google_categories = array(
+		'gcid:cosmetic_dentist' => 'Cosmetic dentist',
+		'gcid:deli'             => 'Deli',
+		'gcid:dental_clinic'    => 'Dental clinic',
+		'gcid:dentist'          => 'Dentist',
+		'gcid:orthodontist'     => 'Orthodontist',
+		'gcid:pet_groomer'      => 'Pet groomer',
+		'gcid:pet_store'        => 'Pet store',
+	);
+	$fhint_category_calls    = 0;
+	$fhint_fake_categories   = static function ( $pre, $args, $url ) use ( $fhint_google_categories, &$fhint_category_calls ) {
+		if ( false === strpos( (string) $url, 'mybusinessbusinessinformation.googleapis.com/v1/categories' ) ) {
+			return $pre;
+		}
+
+		++$fhint_category_calls;
+		parse_str( (string) wp_parse_url( $url, PHP_URL_QUERY ), $query );
+
+		$entries = array();
+
+		foreach ( $fhint_google_categories as $id => $name ) {
+			if ( false !== strpos( (string) $url, ':batchGet' ) ) {
+				// names= may repeat; one is all this plugin sends.
+				if ( isset( $query['names'] ) && 'categories/' . $id === $query['names'] ) {
+					$entries[] = array( 'name' => 'categories/' . $id, 'displayName' => $name );
+				}
+				continue;
+			}
+
+			// Like Google's own filter: broad, so a "dent" search brings the
+			// deli along too, and it is this plugin that ranks and drops.
+			$needle = strtolower( (string) preg_replace( '/^displayName=/', '', isset( $query['filter'] ) ? (string) $query['filter'] : '' ) );
+			if ( '' !== $needle && ( false !== strpos( strtolower( $name ), substr( $needle, 0, 3 ) ) || 'Deli' === $name ) ) {
+				$entries[] = array( 'name' => 'categories/' . $id, 'displayName' => $name );
+			}
+		}
+
+		return array(
+			'headers'  => array(),
+			'body'     => wp_json_encode( array( 'categories' => $entries ) ),
+			'response' => array(
+				'code'    => 200,
+				'message' => 'OK',
+			),
+			'cookies'  => array(),
+		);
+	};
+
+	add_filter( 'pre_http_request', $fhint_fake_categories, 9, 3 );
 
 	$fhint_search = new WP_REST_Request( 'GET', '/fhint/v1/google/categories' );
 	$fhint_search->set_query_params(
@@ -2374,20 +2427,23 @@ if ( $admins ) {
 
 	check_same( 200, $fhint_found->get_status(), 'an administrator can search Google categories' );
 	check_same( 'gcid:dentist', isset( $fhint_body['data'][0]['id'] ) ? $fhint_body['data'][0]['id'] : '', 'the best match leads, under data' );
+	check( ! in_array( 'Deli', array_column( isset( $fhint_body['data'] ) ? $fhint_body['data'] : array(), 'name' ), true ), 'Google\'s loose matches are dropped' );
 	check( isset( $fhint_body['meta']['total'] ) && $fhint_body['meta']['total'] >= 1, 'with the total in meta' );
+	check( ! empty( $fhint_body['meta']['connected'] ), 'and says Google is connected' );
 
 	$fhint_greedy = new WP_REST_Request( 'GET', '/fhint/v1/google/categories' );
 	$fhint_greedy->set_query_params( array( 'per_page' => 500 ) );
 
 	check_same( 400, rest_do_request( $fhint_greedy )->get_status(), 'asking for more than the cap is refused before the search runs' );
 
-	// The chosen categories reach the database as Google's ids, with
-	// Google's names — whatever name the request claimed.
+	// The chosen categories reach the database as Google's ids. A name sent
+	// with an id is kept; an id or a name sent alone is completed from
+	// Google's list.
 	$fhint_choose = new WP_REST_Request( 'PATCH', '/fhint/v1/business' );
 	$fhint_choose->set_body_params(
 		array(
 			'primary_category_id'  => 'gcid:dentist',
-			'primary_category'     => 'Best dentist in town',
+			'primary_category'     => 'Dentist',
 			'secondary_categories' => array( 'gcid:dental_clinic', 'Cosmetic dentist' ),
 		)
 	);
@@ -2397,7 +2453,7 @@ if ( $admins ) {
 	$fhint_saved = BusinessRepository::get();
 
 	check_same( 'gcid:dentist', $fhint_saved['primary_category_id'], 'the primary category is stored as Google\'s id' );
-	check_same( 'Dentist', $fhint_saved['primary_category'], 'beside Google\'s name for it, not the request\'s' );
+	check_same( 'Dentist', $fhint_saved['primary_category'], 'beside its name' );
 	check_same(
 		array(
 			array(
@@ -2410,14 +2466,14 @@ if ( $admins ) {
 			),
 		),
 		$fhint_saved['secondary_categories'],
-		'and the additional ones round-trip through MySQL as { id, name } pairs'
+		'and the additional ones round-trip through MySQL as { id, name } pairs, completed from Google'
 	);
 
-	// A category Google does not have is refused, and nothing is written.
+	// A malformed id is refused, and nothing is written.
 	$fhint_bogus = new WP_REST_Request( 'PATCH', '/fhint/v1/business' );
-	$fhint_bogus->set_body_params( array( 'primary_category_id' => 'gcid:not_a_real_category' ) );
+	$fhint_bogus->set_body_params( array( 'primary_category_id' => 'not a category id' ) );
 
-	check_same( 400, rest_do_request( $fhint_bogus )->get_status(), 'an id Google does not have is refused with a 400' );
+	check_same( 400, rest_do_request( $fhint_bogus )->get_status(), 'a malformed category id is refused with a 400' );
 	check_same( 'gcid:dentist', BusinessRepository::get()['primary_category_id'], 'leaving the stored category untouched' );
 
 	// The legacy text field: a name alone, tied back to its id on the way in.
@@ -2433,6 +2489,11 @@ if ( $admins ) {
 	rest_do_request( $fhint_typed );
 
 	check_same( '', BusinessRepository::get()['primary_category_id'], 'and a freehand one clears it, rather than keeping a stale id' );
+
+	// Left in place: later sections save categories too, and a lookup that
+	// reached the real Google with this suite's fake token would be refused
+	// and disconnect the site, exactly as a revoked token does. It answers
+	// category URLs only.
 
 	wp_set_current_user( 0 );
 

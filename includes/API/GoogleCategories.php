@@ -8,6 +8,7 @@
 namespace FHINT\API;
 
 use FHINT\App\Google\Categories;
+use FHINT\App\Google\Connection;
 use WP_REST_Server;
 
 defined( 'ABSPATH' ) || exit;
@@ -88,17 +89,14 @@ class GoogleCategories extends AbstractController {
 			(int) $request->get_param( 'offset' )
 		);
 
-		$list = Categories::meta();
-
 		return $this->envelope(
 			$result['items'],
 			array(
 				'total'          => $result['total'],
 				'max_additional' => Categories::MAX_ADDITIONAL,
-				'list'           => array(
-					'count'   => $list['count'],
-					'updated' => $list['updated'],
-				),
+				// Searches go to Google, so with no connection there is
+				// nothing to search; the screen says so.
+				'connected'      => Connection::is_linked(),
 			)
 		);
 	}

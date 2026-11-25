@@ -1713,53 +1713,33 @@ action.
 
 ### `GET /google/categories`
 
-Searches Google's Business Profile categories. **It never contacts Google and
-needs no connection**: the list ships with the plugin
-(`includes/App/Google/data/google-categories.json`, rebuilt with
-`npm run categories:update`), so it works on a site that has not connected an
-account yet.
+Searches Google's Business Profile categories **in Google's own list**
+(`categories.list` with a `displayName` filter), in the site's language and
+the main location's country. Answers are cached for a day. With no Google
+connection it returns nothing, with `meta.connected: false`. Nothing is
+bundled with the plugin.
+
+Google's filter is broad, so results are re-ranked here and anything that
+does not contain what was typed is dropped: exact name, then names starting
+with it, then a word starting with it, then containing it, then every word in
+any order. A pasted id (`gcid:…`) is looked up directly (`categories:batchGet`).
 
 | Param | Default | |
 |---|---|---|
-| `search` | `''` | What was typed, up to 100 characters. Empty lists alphabetically. |
+| `search` | `''` | What was typed, up to 100 characters. Empty returns nothing. |
 | `per_page` | `20` | 1–50. |
 | `offset` | `0` | For paging. |
 
 ```json
 {
-  "data": [
-    {
-      "id": "gcid:dentist",
-      "name": "Dentist",
-      "bucket": "Health & Medical",
-      "in_us": true,
-      "variants": []
-    }
-  ],
-  "meta": {
-    "total": 3,
-    "max_additional": 9,
-    "list": { "count": 4053, "updated": "2026-10-10" }
-  }
+  "data": [ { "id": "gcid:dentist", "name": "Dentist" } ],
+  "meta": { "total": 1, "max_additional": 9, "connected": true }
 }
 ```
 
-**Ranking**, best first: the exact name; names starting with the search; names
-where a later word starts with it; names containing it; then categories found
-only through another wording Google uses. Those last ones carry
-`"matched": "Physician"` so a screen can say why "Doctor" appeared. Every
-word typed must be present, in any order. Searching for an id (`gcid:dentist`
-or `categories/gcid:dentist`) returns exactly that category.
-
-**Show `bucket`, and key on `id`, never on `name`.** Two different categories
-can share a name — there are two "Swimming pool" entries with different ids.
-
-`meta.total` ignores paging. `meta.max_additional` is how many extra
-categories Google allows beside the primary one.
-
-There is no write route here. A chosen category is saved through
-[`/business`](#categories-on-a-business), which validates it against this
-same list.
+Saving a category never contacts Google: validation checks the id's shape
+(`gcid:…`) and Google confirms the category when the change is pushed. An id
+sent without its name is looked up once (cached) for the name.
 
 ### `admin-post.php?action=fhint_google_callback`
 

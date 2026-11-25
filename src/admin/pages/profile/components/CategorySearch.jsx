@@ -44,7 +44,7 @@ export function CategorySearch({
       return undefined;
     }
 
-    timer.current = setTimeout(() => search(String(value).trim(), true), 180);
+    timer.current = setTimeout(() => search(String(value).trim(), true), 300);
 
     return () => clearTimeout(timer.current);
   }, [value, open, search]);

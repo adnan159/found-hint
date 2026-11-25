@@ -105,7 +105,7 @@ FoundHint contacts these services only from admin screens, never on visitor-faci
 Reads and updates the profiles your Google account manages.
 
 * Sent: your access token, the profile ID and, when you choose, business details, photos, posts and review replies.
-* When: when you connect, import, refresh, send updates, publish a post or reply to a review, and when you open the Business Profile screen (to read the current listing).
+* When: when you connect, import, refresh, send updates, publish a post or reply to a review, when you open the Business Profile screen (to read the current listing), and when you search for a business category (Google's category list, cached for a day).
 * Review and profile photos shown on the Business Profile, Reviews and Posts screens are loaded from Google's servers (googleusercontent.com).
 * [Terms](https://policies.google.com/terms) | [Privacy](https://policies.google.com/privacy)
 
@@ -142,7 +142,7 @@ Shows your location on a map, with no API key.
 * [DM Sans Variable](https://github.com/googlefonts/dm-fonts) webfont, SIL Open Font License 1.1
 * [Simple Icons](https://github.com/simple-icons/simple-icons) social logos, CC0 1.0
 
-The Google category list (`includes/App/Google/data/google-categories.json`) comes from [lobstrio/google-business-categories](https://github.com/lobstrio/google-business-categories) and ships with the plugin. No scripts, styles or fonts are loaded from remote hosts; the only remote content is listed under External services.
+No scripts, styles or fonts are loaded from remote hosts; the only remote content is listed under External services.
 
 == Installation ==
 
@@ -242,6 +242,7 @@ No. Google is never contacted on visitor-facing pages, and no scripts or stylesh
 = 1.2.5 =
 * Fix: The Google sign-in callback now verifies the sign-in before reading anything else from the redirect.
 * Fix: Pruning old audits now uses prepared database queries.
+* Changed: Business categories are now searched in Google's own category list instead of a bundled copy.
 * Changed: Removed add-on features and upsell screens from this plugin.
 * Changed: The Schema screen shows the full markup your site publishes, and who publishes it.
 
