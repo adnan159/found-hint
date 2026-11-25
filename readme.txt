@@ -4,7 +4,7 @@ Tags: local seo, google business profile, local business schema, multi location,
 Requires at least: 6.6
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 1.2.4
+Stable tag: 1.2.5
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -240,11 +240,19 @@ No. Google is never contacted on visitor-facing pages, and no scripts or stylesh
 == Changelog ==
 
 = 1.2.5 =
-* Fix: The Google sign-in callback now verifies the sign-in before reading anything else from the redirect.
-* Fix: Pruning old audits now uses prepared database queries.
-* Changed: Business categories are now searched in Google's own category list instead of a bundled copy.
-* Changed: Removed add-on features and upsell screens from this plugin.
-* Changed: The Schema screen shows the full markup your site publishes, and who publishes it.
+* Security: The Google sign-in return now checks your permission first, then verifies the sign-in before reading anything else from the redirect. With your own Google client the sign-in carries a WordPress nonce; with FoundHint Connect the session and user must match the sign-in this site started.
+* Security: Your own Google client secret is now stored encrypted, like your Google tokens.
+* Security: A sign-in return that does not match the attempt in progress no longer cancels it, and nothing is logged for visitors who are not logged in.
+* Security: All database queries with values use prepared statements, including pruning old audits.
+* Security: The reviews CSV export guards against more spreadsheet formula tricks.
+* Changed: Removed the features that belong to the separate FoundHint Premium add-on, and the screens that promoted them. Everything in this plugin works fully on its own.
+* Changed: The Schema screen shows the full markup your site publishes, why anything is not published, and who publishes it.
+* Changed: Business categories are searched in Google's own category list, in your site's language, instead of a bundled copy.
+* Changed: The comment around the schema in your page source no longer includes a link or the plugin version.
+* Changed: Removed the "coming soon" banners from the dashboard and the audit.
+* Fix: Deactivating the plugin now also stops the daily audit.
+* Fix: Uninstalling always removes scheduled tasks and temporary data. With "Delete data on uninstall" turned on, the remaining options and tables from earlier versions are removed too.
+* Improvement: The readme now lists every external service the plugin contacts, what is sent and when.
 
 = 1.2.4 =
 * Requirement: WordPress 6.6 or later.
@@ -311,7 +319,7 @@ No. Google is never contacted on visitor-facing pages, and no scripts or stylesh
 == Upgrade Notice ==
 
 = 1.2.5 =
-Security hardening for the Google sign-in callback, and a simpler Schema screen that shows exactly what your site publishes.
+Security hardening for Google sign-in and stored credentials. Features of the separate Premium add-on are no longer part of this plugin.
 
 = 1.2.4 =
 Fixes activation on older MySQL setups and uses WordPress's own React. Requires WordPress 6.6.
