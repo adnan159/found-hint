@@ -538,8 +538,8 @@ check( ! isset( $GLOBALS['__transients'][ ConnectService::HANDSHAKE_TRANSIENT ] 
 // -- An error redirect from the connect service ------------------------------
 //
 // `fhint_connect_error` is believed only for an attempt this site started,
-// for the same user (and session, when the service names one). Anything
-// else must not be able to write the screen's notice.
+// for the same user and the same session. Anything else must not be able to
+// close the attempt or choose the screen's notice.
 
 $fhint_pending = array( 'session_id' => 'session-abc', 'secret' => 'x', 'user_id' => 7 );
 
@@ -554,7 +554,8 @@ check( ConnectService::abandon( 'session-abc', 7 ), 'abandon: the matching attem
 check( ! isset( $GLOBALS['__transients'][ ConnectService::HANDSHAKE_TRANSIENT ] ), 'abandon: and is consumed' );
 
 $GLOBALS['__transients'][ ConnectService::HANDSHAKE_TRANSIENT ] = $fhint_pending;
-check( ConnectService::abandon( '', 7 ), 'abandon: a report naming no session matches on the user' );
+check( ! ConnectService::abandon( '', 7 ), 'abandon: a report naming no session is not believed' );
+check( isset( $GLOBALS['__transients'][ ConnectService::HANDSHAKE_TRANSIENT ] ), 'abandon: and leaves the attempt in place' );
 
 $GLOBALS['__filters']['fhint_connect_url'] = array();
 
