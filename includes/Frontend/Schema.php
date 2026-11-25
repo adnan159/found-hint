@@ -166,11 +166,16 @@ class Schema {
 		}
 
 		// Marked in the page source, as SEO plugins do, so whoever reads it
-		// sees which plugin printed the structured data.
-		$version = defined( 'FHINT_VERSION' ) ? ' v' . FHINT_VERSION : '';
-
-		return "\n" . '<!-- This site uses FoundHint Local SEO' . $version . ' - https://foundhint.com/ -->' . "\n"
-			. '<script type="application/ld+json" id="fhint-schema">' . $json . '</script>' . "\n"
+		// sees which plugin printed the structured data. A name only: no
+		// link and no version on the public site.
+		return "\n" . '<!-- This site uses FoundHint Local SEO -->' . "\n"
+			. wp_get_inline_script_tag(
+				$json,
+				array(
+					'type' => 'application/ld+json',
+					'id'   => 'fhint-schema',
+				)
+			)
 			. '<!-- / FoundHint Local SEO -->' . "\n";
 	}
 

@@ -22,9 +22,9 @@ When your details are right everywhere, local customers find you, trust you and 
 
 [youtube https://www.youtube.com/watch?v=CDN625JkPXo]
 
-## Why FoundHint Is the Best Local SEO Plugin for WordPress?
+## Why FoundHint?
 
-Most WordPress local SEO plugins either lock multiple locations behind a paid add-on or ask you to set up a Google Cloud project. FoundHint does neither.
+Multiple locations are included for free, and no Google Cloud project is needed. Your business details are managed through your Google Business Profile, so you connect a Google account to edit and sync them.
 
 * **Multi-location management**, run every branch from one WordPress dashboard, free.
 * **Accurate business info with Google sync**, keep your website and Google Business Profile in step, and review every change before it's sent.
@@ -56,7 +56,7 @@ Get accurate structured data with no coding. FoundHint builds LocalBusiness sche
 
 **No duplicate schema.** FoundHint detects **Yoast SEO**, **Rank Math**, **All in One SEO** and **SEOPress**. If one of them already outputs LocalBusiness schema, FoundHint can stand aside. It never changes or disables another plugin's settings.
 
-## A Yoast Local SEO and Rank Math Local SEO Alternative
+## Works Alongside Your SEO Plugin
 
 FoundHint focuses only on local search: multiple locations, Google Business Profile sync and review replies, all free. Keep your current SEO plugin for content and on-page SEO, and let FoundHint handle the local side.
 
@@ -105,7 +105,8 @@ FoundHint contacts these services only from admin screens, never on visitor-faci
 Reads and updates the profiles your Google account manages.
 
 * Sent: your access token, the profile ID and, when you choose, business details, photos, posts and review replies.
-* When: when you connect, import, refresh, send updates, publish a post or reply to a review.
+* When: when you connect, import, refresh, send updates, publish a post or reply to a review, and when you open the Business Profile screen (to read the current listing).
+* Review and profile photos shown on the Business Profile, Reviews and Posts screens are loaded from Google's servers (googleusercontent.com).
 * [Terms](https://policies.google.com/terms) | [Privacy](https://policies.google.com/privacy)
 
 = Google Sign-In (Google LLC) =
@@ -120,7 +121,8 @@ Signs you in to Google and keeps that sign-in working: accounts.google.com, oaut
 
 Handles Google sign-in, so you don't need your own Google Cloud project.
 
-* Sent: your site address, the return address and, on renewal, your refresh token. Tokens are not stored. Business data is never sent.
+* Sent at sign-in: your site address, the return address, a session ID, a one-time handoff code and a secret that proves this site started the sign-in (only its hash is sent first). The service exchanges Google's code and returns your Google access and refresh tokens to your site once.
+* Sent on renewal: your refresh token, to get a new access token. Tokens are not stored by the service. Business data is never sent.
 * When: at sign-in, and about hourly while you use the Google screens.
 * To skip it, add your own Google client under **Google → Advanced**.
 * [Terms](https://foundhint.com/terms-and-conditions/) | [Privacy](https://foundhint.com/privacy-policy/)
@@ -140,7 +142,7 @@ Shows your location on a map, with no API key.
 * [DM Sans Variable](https://github.com/googlefonts/dm-fonts) webfont, SIL Open Font License 1.1
 * [Simple Icons](https://github.com/simple-icons/simple-icons) social logos, CC0 1.0
 
-The Google category list (`includes/App/Google/data/google-categories.json`) comes from [lobstrio/google-business-categories](https://github.com/lobstrio/google-business-categories) and ships with the plugin. Nothing is loaded from a remote host.
+The Google category list (`includes/App/Google/data/google-categories.json`) comes from [lobstrio/google-business-categories](https://github.com/lobstrio/google-business-categories) and ships with the plugin. No scripts, styles or fonts are loaded from remote hosts; the only remote content is listed under External services.
 
 == Installation ==
 
@@ -152,9 +154,9 @@ The Google category list (`includes/App/Google/data/google-categories.json`) com
 
 == Frequently Asked Questions ==
 
-= What is the best local SEO plugin for WordPress? =
+= Do I need a Google account? =
 
-The best choice depends on your needs. If you want multiple locations, Google Business Profile sync, LocalBusiness schema, an audit and review replies in a free WordPress local SEO plugin, FoundHint covers all of them without a Google Cloud project.
+Yes. FoundHint manages your business details through your Google Business Profile: you connect the Google account that manages it, either with FoundHint Connect or with your own Google Cloud client. Until then the business screens stay empty. The audit and the Settings screen work without it.
 
 = Is FoundHint a free WordPress local SEO plugin? =
 

@@ -10,7 +10,7 @@
  * Author URI:        https://foundhint.com/about/
  * License:           GPL-2.0-or-later
  * License URI:       https://www.gnu.org/licenses/gpl-2.0.html
- * Text Domain:       found-hint
+ * Text Domain:       foundhint-local-seo
  * Domain Path:       /languages
  *
  * @package FoundHint

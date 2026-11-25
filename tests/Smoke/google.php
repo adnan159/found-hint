@@ -98,6 +98,20 @@ Credentials::save( 'client-id-456.apps.googleusercontent.com', '' );
 check_same( 'secret-value', Credentials::client_secret(), 'an empty secret keeps the stored one' );
 check_same( 'client-id-456.apps.googleusercontent.com', Credentials::client_id(), 'and the new client id is stored' );
 
+// -- The client secret is encrypted at rest ---------------------------------
+
+$fhint_stored = $GLOBALS['__options'][ Credentials::OPTION ]['client_secret'] ?? '';
+check( '' === $fhint_stored || Secrets::is_encrypted( $fhint_stored ) || ! Secrets::available(), 'the stored client secret is encrypted' );
+check( false === strpos( (string) $fhint_stored, 'secret-value' ) || ! Secrets::available(), 'and the plain secret is not in the option' );
+check_same( 'secret-value', Credentials::client_secret(), 'while it reads back intact' );
+
+$GLOBALS['__options'][ Credentials::OPTION ]['client_secret'] = 'legacy-plain';
+check_same( 'legacy-plain', Credentials::client_secret(), 'a secret saved before encryption still reads' );
+Credentials::save( '', '' );
+check( Secrets::is_encrypted( $GLOBALS['__options'][ Credentials::OPTION ]['client_secret'] ) || ! Secrets::available(), 'and is encrypted on the next save' );
+check_same( 'legacy-plain', Credentials::client_secret(), 'without changing it' );
+Credentials::save( '', 'secret-value' );
+
 // -- The connection state never carries a secret ---------------------------
 
 $state      = Connection::state();
@@ -500,6 +514,15 @@ queue_http(
 	)
 );
 
+// A redirect for another session or another user is refused, and does not
+// cancel the attempt this user started: it is consumed only on a match.
+$fhint_before = $GLOBALS['__transients'][ ConnectService::HANDSHAKE_TRANSIENT ];
+$fhint_wrong  = ConnectService::claim( 'session-other', 'handoff-xyz', 7 );
+check_same( 'fhint_connect_session_mismatch', is_wp_error( $fhint_wrong ) ? $fhint_wrong->get_error_code() : 'claimed', 'claim: another session is refused' );
+$fhint_wrong = ConnectService::claim( 'session-abc', 'handoff-xyz', 8 );
+check_same( 'fhint_connect_wrong_user', is_wp_error( $fhint_wrong ) ? $fhint_wrong->get_error_code() : 'claimed', 'claim: another user is refused' );
+check_same( $fhint_before, $GLOBALS['__transients'][ ConnectService::HANDSHAKE_TRANSIENT ] ?? null, 'claim: a refused redirect leaves the attempt in place' );
+
 $claimed = ConnectService::claim( 'session-abc', 'handoff-xyz', 7 );
 
 check( ! is_wp_error( $claimed ), 'the tokens can be collected' );
@@ -510,6 +533,7 @@ $exchange = json_decode( last_request()['args']['body'], true );
 check_same( $plain, $exchange['secret'], 'the secret sent is the real one' );
 check( ! Secrets::is_encrypted( $exchange['secret'] ), 'never the stored ciphertext' );
 check_same( 'handoff-xyz', $exchange['handoff'], 'with the handoff from the redirect' );
+check( ! isset( $GLOBALS['__transients'][ ConnectService::HANDSHAKE_TRANSIENT ] ), 'claim: a matched attempt is consumed' );
 
 // -- An error redirect from the connect service ------------------------------
 //

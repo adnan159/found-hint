@@ -359,51 +359,51 @@ msgstr ""
 msgid "The connect service did not start a sign-in. Please try again."
 msgstr ""
 
-#: includes/App/Google/ConnectService.php:229
+#: includes/App/Google/ConnectService.php:225
 msgid "That sign-in has expired. Start again from this screen."
 msgstr ""
 
-#: includes/App/Google/ConnectService.php:237
+#: includes/App/Google/ConnectService.php:233
 msgid "That sign-in does not match the one this site started."
 msgstr ""
 
-#: includes/App/Google/ConnectService.php:248
+#: includes/App/Google/ConnectService.php:244
 msgid "This sign-in was started by a different user."
 msgstr ""
 
-#: includes/App/Google/ConnectService.php:269
+#: includes/App/Google/ConnectService.php:270
 msgid "The connect service returned no access token."
 msgstr ""
 
-#: includes/App/Google/ConnectService.php:291
+#: includes/App/Google/ConnectService.php:292
 msgid "There is no refresh token to renew."
 msgstr ""
 
-#: includes/App/Google/ConnectService.php:322
+#: includes/App/Google/ConnectService.php:323
 msgid "FoundHint\\'s connect service could not be reached. Please try again in a moment."
 msgstr ""
 
-#: includes/App/Google/ConnectService.php:371
+#: includes/App/Google/ConnectService.php:372
 msgid "Google has withdrawn this connection. Connect again."
 msgstr ""
 
-#: includes/App/Google/ConnectService.php:373
+#: includes/App/Google/ConnectService.php:374
 msgid "FoundHint\\'s connect service is busy. Try again in a minute."
 msgstr ""
 
-#: includes/App/Google/ConnectService.php:375
+#: includes/App/Google/ConnectService.php:376
 msgid "That sign-in has already been completed or has expired. Start again."
 msgstr ""
 
-#: includes/App/Google/ConnectService.php:380
+#: includes/App/Google/ConnectService.php:381
 msgid "The connect service refused this site\\'s return address. Check the site address in Settings → General."
 msgstr ""
 
-#: includes/App/Google/ConnectService.php:382
+#: includes/App/Google/ConnectService.php:383
 msgid "The connect service needs this site to be served over https before it can connect."
 msgstr ""
 
-#: includes/App/Google/ConnectService.php:389
+#: includes/App/Google/ConnectService.php:390
 msgid "FoundHint\\'s connect service refused the request."
 msgstr ""
 
@@ -3379,7 +3379,7 @@ msgstr ""
 msgid "This day"
 msgstr ""
 
-#: src/admin/pages/profile/components/hours/SpecialDayRow.jsx:24 src/admin/pages/reviews/lib/csv.js:27
+#: src/admin/pages/profile/components/hours/SpecialDayRow.jsx:24 src/admin/pages/reviews/lib/csv.js:29
 msgid "Date"
 msgstr ""
 
@@ -3957,7 +3957,7 @@ msgstr ""
 msgid "Publish reply"
 msgstr ""
 
-#: src/admin/pages/reviews/components/ReviewCard.jsx:70 src/admin/pages/reviews/components/reply/ReviewQuote.jsx:19 src/admin/pages/reviews/lib/csv.js:35
+#: src/admin/pages/reviews/components/ReviewCard.jsx:70 src/admin/pages/reviews/components/reply/ReviewQuote.jsx:19 src/admin/pages/reviews/lib/csv.js:37
 msgid "Anonymous"
 msgstr ""
 
@@ -3989,7 +3989,7 @@ msgstr ""
 msgid "Left a star rating without a comment."
 msgstr ""
 
-#: src/admin/pages/reviews/components/ReviewCard.jsx:153 src/admin/pages/reviews/components/reply/ReplyField.jsx:33 src/admin/pages/reviews/lib/csv.js:30
+#: src/admin/pages/reviews/components/ReviewCard.jsx:153 src/admin/pages/reviews/components/reply/ReplyField.jsx:33 src/admin/pages/reviews/lib/csv.js:32
 msgid "Your reply"
 msgstr ""
 
@@ -4029,7 +4029,7 @@ msgstr ""
 msgid "Filter reviews"
 msgstr ""
 
-#: src/admin/pages/reviews/components/ReviewFilters.jsx:46 src/admin/pages/reviews/lib/csv.js:26
+#: src/admin/pages/reviews/components/ReviewFilters.jsx:46 src/admin/pages/reviews/lib/csv.js:28
 msgid "Rating"
 msgstr ""
 
@@ -4065,7 +4065,7 @@ msgstr ""
 msgid "All reviews"
 msgstr ""
 
-#: src/admin/pages/reviews/components/ReviewFilters.jsx:83 src/admin/pages/reviews/lib/csv.js:29
+#: src/admin/pages/reviews/components/ReviewFilters.jsx:83 src/admin/pages/reviews/lib/csv.js:31
 msgid "Review status"
 msgstr ""
 
@@ -4185,15 +4185,15 @@ msgstr ""
 msgid "Reviews are read from a location's own Google listing. Link this location to one on the Google screen, or choose another location at the top of the page."
 msgstr ""
 
-#: src/admin/pages/reviews/lib/csv.js:25
+#: src/admin/pages/reviews/lib/csv.js:27
 msgid "Reviewer"
 msgstr ""
 
-#: src/admin/pages/reviews/lib/csv.js:28
+#: src/admin/pages/reviews/lib/csv.js:30
 msgid "Review"
 msgstr ""
 
-#: src/admin/pages/reviews/lib/csv.js:31
+#: src/admin/pages/reviews/lib/csv.js:33
 msgid "Replied on"
 msgstr ""
 

@@ -542,6 +542,8 @@ check( false !== strpos( $tag, '<script type="application/ld+json" id="fhint-sch
 check( false !== strpos( $tag, '</script>' ), 'and is closed' );
 check( 0 === strpos( trim( $tag ), '<!-- This site uses FoundHint Local SEO' ), 'the page source names the plugin before it' );
 check( '<!-- / FoundHint Local SEO -->' === substr( trim( $tag ), -strlen( '<!-- / FoundHint Local SEO -->' ) ), 'and closes the block after it' );
+check( false === strpos( substr( $tag, 0, strpos( $tag, '<script' ) ), 'http' ), 'the comment carries no link on the public site' );
+check( false === strpos( substr( $tag, 0, strpos( $tag, '<script' ) ), FHINT_VERSION ), 'and no plugin version' );
 check( false !== strpos( $tag, 'Northside Dental Care' ), 'and carries the business name' );
 
 $payload = preg_match( '#<script type="application/ld\+json" id="fhint-schema">(.*)</script>#s', $tag, $fhint_match ) ? $fhint_match[1] : '';

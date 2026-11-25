@@ -48,13 +48,15 @@ foreach ( $fhint_google_options as $fhint_google_option ) {
 
 global $wpdb;
 
-// Any half-finished handshake, which holds a PKCE verifier.
+// Every transient this plugin set: caches, and any half-finished sign-in
+// (a PKCE verifier, or the connect service's encrypted secret). None of
+// them is the operator's data, so they always go.
 // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 $wpdb->query(
 	$wpdb->prepare(
 		"DELETE FROM {$wpdb->options} WHERE option_name LIKE %s OR option_name LIKE %s",
-		$wpdb->esc_like( '_transient_fhint_google_oauth_' ) . '%',
-		$wpdb->esc_like( '_transient_timeout_fhint_google_oauth_' ) . '%'
+		$wpdb->esc_like( '_transient_fhint_' ) . '%',
+		$wpdb->esc_like( '_transient_timeout_fhint_' ) . '%'
 	)
 );
 
@@ -122,9 +124,14 @@ $fhint_options = array(
 	'fhint_schema_cache',
 	'fhint_onboarding',
 	'fhint_required_rewrite_flush',
+	'fhint_encryption_unavailable',
 );
 
 foreach ( $fhint_options as $fhint_option ) {
 	delete_option( $fhint_option );
 }
+
+// The marker on photos uploaded through this plugin. The photos themselves
+// are the site's media and stay in the library.
+delete_post_meta_by_key( '_fhint_uploaded' );
 

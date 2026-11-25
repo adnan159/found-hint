@@ -165,6 +165,13 @@ function wp_rand( $min = 0, $max = 0 ) {
 function get_current_user_id() {
 	return 1;
 }
+function wp_get_inline_script_tag( $data, $attributes = array() ) {
+	$attrs = '';
+	foreach ( $attributes as $name => $value ) {
+		$attrs .= sprintf( ' %s="%s"', $name, $value );
+	}
+	return sprintf( "<script%s>\n%s\n</script>\n", $attrs, $data );
+}
 function esc_sql( $data ) {
 	return is_array( $data ) ? array_map( 'esc_sql', $data ) : addslashes( (string) $data );
 }
